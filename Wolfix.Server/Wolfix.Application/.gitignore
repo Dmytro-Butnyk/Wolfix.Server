@@ -1,0 +1,43 @@
+# .NET
+bin/
+obj/
+.vs/
+.vscode/
+.idea/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.sln.docstates
+
+# Rider
+.idea/
+
+# Windows Installer files
+Thumbs.db
+Desktop.ini
+
+# Mac system files
+.DS_Store
+
+# ASP.NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# NuGet
+# User-specific files
+.nuget/
+
+# Windows Installer files
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# JetBrains Rider
+.idea/
+
+# Log files
+*.log
