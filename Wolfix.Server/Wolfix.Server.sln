@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wolfix.API", "Wolfix.API\Wolfix.API.csproj", "{C4D48B68-3059-4AF9-955C-4AE5069ED89F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wolfix.Domain", "Wolfix.Domain\Wolfix.Domain.csproj", "{7D15489B-BD6D-4D45-8447-2D61914FB9EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wolfix.Infrastructure", "Wolfix.Infrastructure\Wolfix.Infrastructure.csproj", "{10C0211B-0341-4F78-8D15-D0907B99BED6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wolfix.Application", "Wolfix.Application\Wolfix.Application.csproj", "{DD9FCDEF-18C8-496F-8F7B-C412C35E507A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C4D48B68-3059-4AF9-955C-4AE5069ED89F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4D48B68-3059-4AF9-955C-4AE5069ED89F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4D48B68-3059-4AF9-955C-4AE5069ED89F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4D48B68-3059-4AF9-955C-4AE5069ED89F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D15489B-BD6D-4D45-8447-2D61914FB9EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D15489B-BD6D-4D45-8447-2D61914FB9EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D15489B-BD6D-4D45-8447-2D61914FB9EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D15489B-BD6D-4D45-8447-2D61914FB9EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10C0211B-0341-4F78-8D15-D0907B99BED6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10C0211B-0341-4F78-8D15-D0907B99BED6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10C0211B-0341-4F78-8D15-D0907B99BED6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10C0211B-0341-4F78-8D15-D0907B99BED6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD9FCDEF-18C8-496F-8F7B-C412C35E507A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD9FCDEF-18C8-496F-8F7B-C412C35E507A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD9FCDEF-18C8-496F-8F7B-C412C35E507A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD9FCDEF-18C8-496F-8F7B-C412C35E507A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
