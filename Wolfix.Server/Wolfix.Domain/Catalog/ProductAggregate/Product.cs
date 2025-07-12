@@ -17,8 +17,19 @@ public sealed class Product : BaseEntity
     
     public Discount? Discount { get; private set; }
     
-    //todo: public decimal? FinalPrice => Discount is { Status: DiscountStatus.Active } ? Price - Discount?.Percent / 100 * Price : Price;
-    
+    public decimal FinalPrice
+    {
+        get
+        {
+            if (Discount == null)
+            {
+                return Price;
+            }
+            
+            return Price * (100 - Discount.Percent) / 100;
+        }
+    }
+
     public Guid CategoryId { get; private set; }
     
     //todo: seller ID (именно ID, потому что другой контекст)
