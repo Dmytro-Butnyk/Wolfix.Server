@@ -40,4 +40,10 @@ public sealed class Discount : BaseEntity
         var discount = new Discount(percent, expirationDateTime);
         return Result<Discount>.Success(discount, HttpStatusCode.Created);
     }
+    
+    internal VoidResult SetStatus(DiscountStatus status)
+    {
+        Status = status;
+        return VoidResult.Success();
+    }
 }

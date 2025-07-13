@@ -5,8 +5,8 @@ namespace Wolfix.Domain.Catalog.AttributeAggregate;
 
 public sealed class Attribute : BaseEntity
 {
-    public Guid CategoryId { get; set; }
-    public string Key { get; set; }
+    public Guid CategoryId { get; private set; }
+    public string Key { get; private set; }
     
     private Attribute() { }
     

@@ -7,7 +7,7 @@ public sealed class ProductsAttributes : BaseEntity
 {
     public Product Product { get; private set; }
     public Guid AttributeId { get; private set; }
-    public string Value { get; set; }
+    public string Value { get; private set; }
     
     private ProductsAttributes() { }
 

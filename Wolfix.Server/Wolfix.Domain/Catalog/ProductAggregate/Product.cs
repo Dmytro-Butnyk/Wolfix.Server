@@ -7,30 +7,30 @@ namespace Wolfix.Domain.Catalog.ProductAggregate;
 
 public sealed class Product : BaseEntity
 {
-    public string Title { get; private set; }
+    public string Title { get; private set; } //✅
     
-    public string Description { get; private set; }
+    public string Description { get; private set; } //✅
     
-    public decimal Price { get; private set; }
+    public decimal Price { get; private set; } //✅
     
-    public ProductStatus Status { get; private set; }
+    public ProductStatus Status { get; private set; } //✅
     
-    public Discount? Discount { get; private set; }
+    public Discount? Discount { get; private set; } //✅
     
-    public decimal FinalPrice
+    public decimal FinalPrice //✅
     {
         get
         {
-            if (Discount == null)
+            if (Discount == null || Discount.Status == DiscountStatus.Expired)
             {
                 return Price;
             }
-            
+
             return Price * (100 - Discount.Percent) / 100;
         }
     }
 
-    public Guid CategoryId { get; private set; }
+    public Guid CategoryId { get; private set; } //✅
     
     //todo: seller ID (именно ID, потому что другой контекст)
     
@@ -88,6 +88,51 @@ public sealed class Product : BaseEntity
         return Result<Product>.Success(product, HttpStatusCode.Created);
     }
 
+    public VoidResult ChangeTitle(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            return VoidResult.Failure($"{nameof(title)} is required");
+        }
+        
+        Title = title;
+        return VoidResult.Success();
+    }
+    
+    public VoidResult ChangeDescription(string description)
+    {
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            return VoidResult.Failure($"{nameof(description)} is required");
+        }
+        
+        Description = description;
+        return VoidResult.Success();
+    }
+
+    public VoidResult ChangePrice(decimal price)
+    {
+        if (price < 0)
+        {
+            return VoidResult.Failure($"{nameof(price)} must be positive");
+        }
+        
+        Price = price;
+        return VoidResult.Success();
+    }
+
+    public VoidResult ChangeStatus(ProductStatus status)
+    {
+        if (!Enum.IsDefined(status))
+        {
+            return VoidResult.Failure($"{nameof(status)} is invalid");
+        }
+        
+        Status = status;
+        return VoidResult.Success();
+    }
+
+    #region categoryId
     public VoidResult ChangeCategory(Guid categoryId)
     {
         if (Guid.Empty == categoryId)
@@ -103,16 +148,47 @@ public sealed class Product : BaseEntity
         CategoryId = categoryId;
         return VoidResult.Success();
     }
-    
-    //todo: add blob resource, delete blob resource
-    
-    //todo: add product attribute, delete product attribute, change product attribute
-    
-    //todo: change attribute value, change attribute id
-    
-    //todo: add product variant, delete product variant
-    
-    //todo: add review, delete review
-    
-    //todo: change title, change description, change price
+    #endregion
+
+    #region discount
+    public VoidResult AddDiscount(uint percent, DateTime expirationDateTime)
+    {
+        var createDiscountResult = Discount.Create(percent, expirationDateTime);
+
+        return createDiscountResult.Map(
+            onSuccess: discount =>
+            {
+                Discount = discount;
+                return VoidResult.Success();
+            },
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, createDiscountResult.StatusCode)
+        );
+    }
+
+    public VoidResult RemoveDiscount()
+    {
+        if (Discount == null)
+        {
+            return VoidResult.Failure($"{nameof(Discount)} is null. Nothing to remove.");
+        }
+        
+        Discount = null;
+        return VoidResult.Success();
+    }
+
+    public VoidResult MakeDiscountExpired()
+    {
+        if (Discount == null)
+        {
+            return VoidResult.Failure($"{nameof(Discount)} is null. Nothing to change.");
+        }
+
+        var setStatusResult = Discount.SetStatus(DiscountStatus.Expired);
+        
+        return setStatusResult.Map(
+            onSuccess: () => VoidResult.Success(),
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, setStatusResult.StatusCode)
+        );
+    }
+    #endregion
 }
