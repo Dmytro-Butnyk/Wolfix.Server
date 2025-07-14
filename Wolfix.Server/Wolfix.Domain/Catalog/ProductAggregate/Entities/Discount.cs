@@ -46,4 +46,26 @@ public sealed class Discount : BaseEntity
         Status = status;
         return VoidResult.Success();
     }
+    
+    internal VoidResult SetPercent(uint percent)
+    {
+        if (percent <= 0 || percent > 100)
+        {
+            return VoidResult.Failure($"{nameof(percent)} must be positive and less than 100");
+        }
+        
+        Percent = percent;
+        return VoidResult.Success();
+    }
+    
+    internal VoidResult SetExpirationDateTime(DateTime expirationDateTime)
+    {
+        if (expirationDateTime <= DateTime.UtcNow)
+        {
+            return VoidResult.Failure($"{nameof(expirationDateTime)} must be greater than now");
+        }
+        
+        ExpirationDateTime = expirationDateTime;
+        return VoidResult.Success();
+    }
 }

@@ -39,12 +39,45 @@ public sealed class Review : BaseEntity
             return Result<Review>.Failure($"{nameof(text)} is required");
         }
 
-        if (rating > 5)
+        if (rating is > 5 or < 1)
         {
-            return Result<Review>.Failure($"{nameof(rating)} must be less than 6");
+            return Result<Review>.Failure($"{nameof(rating)} must be between 1 and 5");
         }
 
         var review = new Review(title, text, rating, product);
         return Result<Review>.Success(review, HttpStatusCode.Created);
+    }
+
+    internal VoidResult SetTitle(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            return VoidResult.Failure($"{nameof(title)} is required");
+        }
+        
+        Title = title;
+        return VoidResult.Success();
+    }
+    
+    internal VoidResult SetText(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return VoidResult.Failure($"{nameof(text)} is required");
+        }
+        
+        Text = text;
+        return VoidResult.Success();
+    }
+    
+    internal VoidResult SetRating(uint rating)
+    {
+        if (rating is > 5 or < 1)
+        {
+            return VoidResult.Failure($"{nameof(rating)} must be between 1 and 5");
+        }
+
+        Rating = rating;
+        return VoidResult.Success();
     }
 }
