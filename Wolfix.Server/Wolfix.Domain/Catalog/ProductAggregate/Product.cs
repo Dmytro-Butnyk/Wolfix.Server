@@ -40,11 +40,11 @@ public sealed class Product : BaseEntity
     private readonly List<Review> _reviews = [];
     public IReadOnlyCollection<Review> Reviews => _reviews.AsReadOnly();
 
-    private readonly List<ProductsAttributes> _productsAttributes = [];
-    public IReadOnlyCollection<ProductsAttributes> ProductsAttributes => _productsAttributes.AsReadOnly();
+    private readonly List<ProductAttributeValue> _productsAttributes = [];
+    public IReadOnlyCollection<ProductAttributeValue> ProductsAttributes => _productsAttributes.AsReadOnly();
     
-    private readonly List<ProductVariant> _productVariants = [];
-    public IReadOnlyCollection<ProductVariant> ProductVariants => _productVariants.AsReadOnly();
+    private readonly List<ProductVariantValue> _productVariants = [];
+    public IReadOnlyCollection<ProductVariantValue> ProductVariants => _productVariants.AsReadOnly();
     
     private Product() { }
     
