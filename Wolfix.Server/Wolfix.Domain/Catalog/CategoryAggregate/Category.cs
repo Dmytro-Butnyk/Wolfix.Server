@@ -75,7 +75,7 @@ public sealed class Category : BaseEntity
 
         if (_productIds.Contains(productId))
         {
-            return VoidResult.Failure($"{nameof(productId)} already exists");
+            return VoidResult.Failure($"{nameof(productId)} already exists", HttpStatusCode.Conflict);
         }
         
         _productIds.Add(productId);
@@ -91,7 +91,7 @@ public sealed class Category : BaseEntity
         
         if (!_productIds.Contains(productId))
         {
-            return VoidResult.Failure($"{nameof(productId)} does not exist");
+            return VoidResult.Failure($"{nameof(productId)} does not exist", HttpStatusCode.Conflict);
         }
         
         _productIds.Remove(productId);
@@ -112,7 +112,7 @@ public sealed class Category : BaseEntity
 
         if (existingProductVariant != null)
         {
-            return VoidResult.Failure($"{nameof(key)} already exists");
+            return VoidResult.Failure($"{nameof(key)} already exists", HttpStatusCode.Conflict);
         }
         
         var createProductVariantResult = ProductVariant.Create(this, key);
@@ -133,7 +133,7 @@ public sealed class Category : BaseEntity
         
         if (existingProductVariant == null)
         {
-            return VoidResult.Failure($"{nameof(key)} does not exist");
+            return VoidResult.Failure($"{nameof(key)} does not exist", HttpStatusCode.NotFound);
         }
         
         _productVariants.Remove(existingProductVariant);
@@ -152,7 +152,7 @@ public sealed class Category : BaseEntity
         
         if (existingProductVariant == null)
         {
-            return VoidResult.Failure($"{nameof(productVariantId)} does not exist");
+            return VoidResult.Failure($"{nameof(productVariantId)} does not exist", HttpStatusCode.NotFound);
         }
         
         var setProductVariantKeyResult = existingProductVariant.SetKey(key);

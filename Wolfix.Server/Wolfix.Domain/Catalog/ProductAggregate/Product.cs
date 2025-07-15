@@ -214,7 +214,7 @@ public sealed class Product : BaseEntity
 
         if (review == null)
         {
-            return VoidResult.Failure($"{nameof(review)} is null. Nothing to remove.");
+            return VoidResult.Failure($"{nameof(review)} is null. Nothing to remove.", HttpStatusCode.NotFound);
         }
         
         _reviews.Remove(review);
@@ -233,7 +233,7 @@ public sealed class Product : BaseEntity
 
         if (review == null)
         {
-            return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.");
+            return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
         var setReviewTitleResult = review.SetTitle(title);
@@ -250,7 +250,7 @@ public sealed class Product : BaseEntity
 
         if (review == null)
         {
-            return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.");
+            return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
         var setReviewTextResult = review.SetText(text);
@@ -267,7 +267,7 @@ public sealed class Product : BaseEntity
 
         if (review == null)
         {
-            return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.");
+            return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
         var setReviewRatingResult = review.SetRating(rating);
@@ -286,7 +286,7 @@ public sealed class Product : BaseEntity
 
         if (existingProductAttributeValue != null)
         {
-            return VoidResult.Failure($"{nameof(existingProductAttributeValue)} already exists");
+            return VoidResult.Failure($"{nameof(existingProductAttributeValue)} already exists", HttpStatusCode.Conflict);
         }
         
         var createProductAttributeValueResult = ProductAttributeValue.Create(this, key, value);
@@ -307,7 +307,7 @@ public sealed class Product : BaseEntity
         
         if (productAttributeValue == null)
         {
-            return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to remove.");
+            return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to remove.", HttpStatusCode.NotFound);
         }
         
         _productsAttributeValues.Remove(productAttributeValue);
@@ -326,7 +326,7 @@ public sealed class Product : BaseEntity
         
         if (productAttributeValue == null)
         {
-            return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to change.");
+            return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
         var setProductAttributeKeyResult = productAttributeValue.SetKey(key);
@@ -343,7 +343,7 @@ public sealed class Product : BaseEntity
         
         if (productAttributeValue == null)
         {
-            return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to change.");
+            return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
         var setProductAttributeValueResult = productAttributeValue.SetValue(value);
@@ -362,7 +362,7 @@ public sealed class Product : BaseEntity
 
         if (existingProductVariantValue != null)
         {
-            return VoidResult.Failure($"{nameof(existingProductVariantValue)} already exists");
+            return VoidResult.Failure($"{nameof(existingProductVariantValue)} already exists", HttpStatusCode.Conflict);
         }
         
         var createProductVariantValueResult = ProductVariantValue.Create(this, key, value);
@@ -383,7 +383,7 @@ public sealed class Product : BaseEntity
         
         if (productVariantValue == null)
         {
-            return VoidResult.Failure($"{nameof(productVariantValue)} is null. Nothing to remove.");
+            return VoidResult.Failure($"{nameof(productVariantValue)} is null. Nothing to remove.", HttpStatusCode.NotFound);
         }
         
         _productVariantValues.Remove(productVariantValue);
@@ -402,7 +402,7 @@ public sealed class Product : BaseEntity
         
         if (productVariantValue == null)
         {
-            return VoidResult.Failure($"{nameof(productVariantValue)} is null. Nothing to change.");
+            return VoidResult.Failure($"{nameof(productVariantValue)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
         var setProductVariantKeyResult = productVariantValue.SetKey(key);
@@ -419,7 +419,7 @@ public sealed class Product : BaseEntity
         
         if (productVariantValue == null)
         {
-            return VoidResult.Failure($"{nameof(productVariantValue)} is null. Nothing to change.");
+            return VoidResult.Failure($"{nameof(productVariantValue)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
         var setProductVariantValueResult = productVariantValue.SetValue(value);
