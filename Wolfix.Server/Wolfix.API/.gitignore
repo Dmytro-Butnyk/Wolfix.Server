@@ -12,9 +12,6 @@ obj/
 *.userprefs
 *.sln.docstates
 
-# Rider
-.idea/
-
 # Windows Installer files
 Thumbs.db
 Desktop.ini
@@ -37,9 +34,6 @@ artifacts/
 *.msi
 *.msm
 *.msp
-
-# JetBrains Rider
-.idea/
 
 # Log files
 *.log
