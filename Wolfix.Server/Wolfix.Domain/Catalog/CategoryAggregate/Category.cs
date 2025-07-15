@@ -1,4 +1,5 @@
 using System.Net;
+using Wolfix.Domain.Catalog.CategoryAggregate.Entities;
 using Wolfix.Domain.Shared;
 
 namespace Wolfix.Domain.Catalog.CategoryAggregate;
@@ -13,6 +14,9 @@ public sealed class Category : BaseEntity
     
     private readonly List<Guid> _productIds = [];
     public IReadOnlyCollection<Guid> ProductIds => _productIds.AsReadOnly();
+    
+    private readonly List<ProductVariant> _productVariants = [];
+    public IReadOnlyCollection<ProductVariant> ProductVariants => _productVariants.AsReadOnly();
     
     private Category() { }
 
