@@ -35,4 +35,26 @@ public sealed class ProductVariantValue : BaseEntity
         var productVariant = new ProductVariantValue(product, key, value);
         return Result<ProductVariantValue>.Success(productVariant, HttpStatusCode.Created);
     }
+
+    internal VoidResult SetKey(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            return VoidResult.Failure($"{nameof(key)} is required");
+        }
+        
+        Key = key;
+        return VoidResult.Success();
+    }
+    
+    internal VoidResult SetValue(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return VoidResult.Failure($"{nameof(value)} is required");
+        }
+        
+        Value = value;
+        return VoidResult.Success();
+    }
 }

@@ -37,14 +37,14 @@ public sealed class Product : BaseEntity
     private readonly List<BlobResource> _resources = [];
     public IReadOnlyCollection<BlobResource> Resources => _resources.AsReadOnly();
     
-    private readonly List<Review> _reviews = [];
-    public IReadOnlyCollection<Review> Reviews => _reviews.AsReadOnly();
+    private readonly List<Review> _reviews = []; //✅
+    public IReadOnlyCollection<Review> Reviews => _reviews.AsReadOnly(); //✅
 
-    private readonly List<ProductAttributeValue> _productsAttributes = [];
-    public IReadOnlyCollection<ProductAttributeValue> ProductsAttributes => _productsAttributes.AsReadOnly();
+    private readonly List<ProductAttributeValue> _productsAttributeValues = []; //✅
+    public IReadOnlyCollection<ProductAttributeValue> ProductsAttributeValues => _productsAttributeValues.AsReadOnly(); //✅
     
-    private readonly List<ProductVariantValue> _productVariants = [];
-    public IReadOnlyCollection<ProductVariantValue> ProductVariants => _productVariants.AsReadOnly();
+    private readonly List<ProductVariantValue> _productVariantValues = []; //✅
+    public IReadOnlyCollection<ProductVariantValue> ProductVariantValues => _productVariantValues.AsReadOnly(); //✅
     
     private Product() { }
     
@@ -188,6 +188,245 @@ public sealed class Product : BaseEntity
         return setStatusResult.Map(
             onSuccess: () => VoidResult.Success(),
             onFailure: errorMessage => VoidResult.Failure(errorMessage, setStatusResult.StatusCode)
+        );
+    }
+    #endregion
+    
+    //todo: userId
+    #region reviews
+    public VoidResult AddReview(string title, string text, uint rating)
+    {
+        var createReviewResult = Review.Create(title, text, rating, this);
+
+        return createReviewResult.Map(
+            onSuccess: review =>
+            {
+                _reviews.Add(review);
+                return VoidResult.Success();
+            },
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, createReviewResult.StatusCode)
+        );
+    }
+    
+    public VoidResult RemoveReview(Guid reviewId)
+    {
+        var review = _reviews.FirstOrDefault(r => r.Id == reviewId);
+
+        if (review == null)
+        {
+            return VoidResult.Failure($"{nameof(review)} is null. Nothing to remove.");
+        }
+        
+        _reviews.Remove(review);
+        return VoidResult.Success();
+    }
+
+    public VoidResult RemoveAllReviews()
+    {
+        _reviews.Clear();
+        return VoidResult.Success();
+    }
+
+    public VoidResult ChangeReviewTitle(Guid reviewId, string title)
+    {
+        var review = _reviews.FirstOrDefault(r => r.Id == reviewId);
+
+        if (review == null)
+        {
+            return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.");
+        }
+        
+        var setReviewTitleResult = review.SetTitle(title);
+        
+        return setReviewTitleResult.Map(
+            onSuccess: () => VoidResult.Success(),
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, setReviewTitleResult.StatusCode)
+        );
+    }
+
+    public VoidResult ChangeReviewText(Guid reviewId, string text)
+    {
+        var review = _reviews.FirstOrDefault(r => r.Id == reviewId);
+
+        if (review == null)
+        {
+            return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.");
+        }
+        
+        var setReviewTextResult = review.SetText(text);
+        
+        return setReviewTextResult.Map(
+            onSuccess: () => VoidResult.Success(),
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, setReviewTextResult.StatusCode)
+        );
+    }
+
+    public VoidResult ChangeReviewRating(Guid reviewId, uint rating)
+    {
+        var review = _reviews.FirstOrDefault(r => r.Id == reviewId);
+
+        if (review == null)
+        {
+            return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.");
+        }
+        
+        var setReviewRatingResult = review.SetRating(rating);
+        
+        return setReviewRatingResult.Map(
+            onSuccess: () => VoidResult.Success(),
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, setReviewRatingResult.StatusCode)
+        );
+    }
+    #endregion
+
+    #region productAttributeValues
+    public VoidResult AddProductAttributeValue(string key, string value)
+    {
+        var existingProductAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Value == value);
+
+        if (existingProductAttributeValue != null)
+        {
+            return VoidResult.Failure($"{nameof(existingProductAttributeValue)} already exists");
+        }
+        
+        var createProductAttributeValueResult = ProductAttributeValue.Create(this, key, value);
+
+        return createProductAttributeValueResult.Map(
+            onSuccess: productAttributeValue =>
+            {
+                _productsAttributeValues.Add(productAttributeValue);
+                return VoidResult.Success();
+            },
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, createProductAttributeValueResult.StatusCode)
+        );
+    }
+
+    public VoidResult RemoveProductAttributeValue(Guid productAttributeValueId)
+    {
+        var productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        
+        if (productAttributeValue == null)
+        {
+            return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to remove.");
+        }
+        
+        _productsAttributeValues.Remove(productAttributeValue);
+        return VoidResult.Success();
+    }
+    
+    public VoidResult RemoveAllProductAttributeValues()
+    {
+        _productsAttributeValues.Clear();
+        return VoidResult.Success();
+    }
+
+    public VoidResult ChangeProductAttributeKey(Guid productAttributeValueId, string key)
+    {
+        var productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        
+        if (productAttributeValue == null)
+        {
+            return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to change.");
+        }
+        
+        var setProductAttributeKeyResult = productAttributeValue.SetKey(key);
+
+        return setProductAttributeKeyResult.Map(
+            onSuccess: () => VoidResult.Success(),
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, setProductAttributeKeyResult.StatusCode)
+        );
+    }
+
+    public VoidResult ChangeProductAttributeValue(Guid productAttributeValueId, string value)
+    {
+        var productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        
+        if (productAttributeValue == null)
+        {
+            return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to change.");
+        }
+        
+        var setProductAttributeValueResult = productAttributeValue.SetValue(value);
+
+        return setProductAttributeValueResult.Map(
+            onSuccess: () => VoidResult.Success(),
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, setProductAttributeValueResult.StatusCode)
+        );
+    }
+    #endregion
+    
+    #region productVariantValues
+    public VoidResult AddProductVariantValue(string key, string value)
+    {
+        var existingProductVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Value == value);
+
+        if (existingProductVariantValue != null)
+        {
+            return VoidResult.Failure($"{nameof(existingProductVariantValue)} already exists");
+        }
+        
+        var createProductVariantValueResult = ProductVariantValue.Create(this, key, value);
+
+        return createProductVariantValueResult.Map(
+            onSuccess: productVariantValue =>
+            {
+                _productVariantValues.Add(productVariantValue);
+                return VoidResult.Success();
+            },
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, createProductVariantValueResult.StatusCode)
+        );
+    }
+
+    public VoidResult RemoveProductVariantValue(Guid productVariantValueId)
+    {
+        var productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
+        
+        if (productVariantValue == null)
+        {
+            return VoidResult.Failure($"{nameof(productVariantValue)} is null. Nothing to remove.");
+        }
+        
+        _productVariantValues.Remove(productVariantValue);
+        return VoidResult.Success();
+    }
+
+    public VoidResult RemoveAllProductVariantValues()
+    {
+        _productVariantValues.Clear();
+        return VoidResult.Success();
+    }
+    
+    public VoidResult ChangeProductVariantKey(Guid productVariantValueId, string key)
+    {
+        var productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
+        
+        if (productVariantValue == null)
+        {
+            return VoidResult.Failure($"{nameof(productVariantValue)} is null. Nothing to change.");
+        }
+        
+        var setProductVariantKeyResult = productVariantValue.SetKey(key);
+
+        return setProductVariantKeyResult.Map(
+            onSuccess: () => VoidResult.Success(),
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, setProductVariantKeyResult.StatusCode)
+        );
+    }
+
+    public VoidResult ChangeProductVariantValue(Guid productVariantValueId, string value)
+    {
+        var productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
+        
+        if (productVariantValue == null)
+        {
+            return VoidResult.Failure($"{nameof(productVariantValue)} is null. Nothing to change.");
+        }
+        
+        var setProductVariantValueResult = productVariantValue.SetValue(value);
+
+        return setProductVariantValueResult.Map(
+            onSuccess: () => VoidResult.Success(),
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, setProductVariantValueResult.StatusCode)
         );
     }
     #endregion
