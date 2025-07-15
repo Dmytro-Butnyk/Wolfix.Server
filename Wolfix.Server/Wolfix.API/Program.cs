@@ -1,3 +1,11 @@
+using DotNetEnv;
+
+if (File.Exists(".env"))
+{
+    var loadOptions = new LoadOptions(onlyExactPath: true);
+    Env.Load(options: loadOptions);
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
