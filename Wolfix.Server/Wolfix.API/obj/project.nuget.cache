@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "vW3GqBFjI1U=",
+  "dgSpecHash": "usP2fm3k8tc=",
   "success": true,
-  "projectFilePath": "D:\\ForProgramming\\Projects\\MyProjects\\CSharp\\ITStepDiploma\\Wolfix.Server\\Wolfix.Server\\Wolfix.API\\Wolfix.API.csproj",
+  "projectFilePath": "/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Wolfix.API/Wolfix.API.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\dimab\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.4\\microsoft.aspnetcore.openapi.9.0.4.nupkg.sha512",
-    "C:\\Users\\dimab\\.nuget\\packages\\microsoft.openapi\\1.6.17\\microsoft.openapi.1.6.17.nupkg.sha512"
+    "/Users/admin/.nuget/packages/microsoft.aspnetcore.openapi/9.0.4/microsoft.aspnetcore.openapi.9.0.4.nupkg.sha512",
+    "/Users/admin/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512"
   ],
   "logs": []
 }
