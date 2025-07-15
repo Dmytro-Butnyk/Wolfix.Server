@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Wolfix.Domain.Catalog.ProductAggregate.Entities;
 
 namespace Wolfix.API.Сontrollers.Catalog
 {

@@ -12,4 +12,10 @@
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Wolfix.Application\Wolfix.Application.csproj" />
+      <ProjectReference Include="..\Wolfix.Domain\Wolfix.Domain.csproj" />
+      <ProjectReference Include="..\Wolfix.Infrastructure\Wolfix.Infrastructure.csproj" />
+    </ItemGroup>
+
 </Project>
