@@ -30,6 +30,8 @@ public sealed class Product : BaseEntity
         }
     }
 
+    public uint Bonuses => (uint)Math.Round((double)FinalPrice * 0.01);
+    
     public Guid CategoryId { get; private set; } //✅
     
     //todo: seller ID (именно ID, потому что другой контекст)
