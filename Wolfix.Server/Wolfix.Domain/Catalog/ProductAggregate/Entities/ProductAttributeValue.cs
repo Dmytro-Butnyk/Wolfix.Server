@@ -3,7 +3,7 @@ using Wolfix.Domain.Shared;
 
 namespace Wolfix.Domain.Catalog.ProductAggregate.Entities;
 
-public sealed class ProductAttributeValue : BaseEntity
+internal sealed class ProductAttributeValue : BaseEntity
 {
     public Product Product { get; private set; }
     public string Key { get; private set; }
@@ -56,3 +56,5 @@ public sealed class ProductAttributeValue : BaseEntity
         return VoidResult.Success();
     }
 }
+
+public record ProductAttributeValueInfo(string Key, string Value);

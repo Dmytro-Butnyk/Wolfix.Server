@@ -3,7 +3,7 @@ using Wolfix.Domain.Shared;
 
 namespace Wolfix.Domain.Catalog.ProductAggregate.Entities;
 
-public sealed class Review : BaseEntity
+internal sealed class Review : BaseEntity
 {
     public string Title { get; private set; }
     
@@ -81,3 +81,5 @@ public sealed class Review : BaseEntity
         return VoidResult.Success();
     }
 }
+
+public record ReviewInfo(string Title, string Text, uint Rating, DateTime CreatedAt);

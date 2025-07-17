@@ -4,7 +4,7 @@ using Wolfix.Domain.Shared;
 
 namespace Wolfix.Domain.Catalog.ProductAggregate.Entities;
 
-public sealed class Discount : BaseEntity
+internal sealed class Discount : BaseEntity
 {
     public uint Percent { get; private set; }
     
@@ -69,3 +69,5 @@ public sealed class Discount : BaseEntity
         return VoidResult.Success();
     }
 }
+
+public record DiscountInfo(uint Percent, DateTime ExpirationDateTime, DiscountStatus Status);
