@@ -20,14 +20,14 @@ internal sealed class ProductAttributeValue : BaseEntity
 
     internal static Result<ProductAttributeValue> Create(Product product, string key, string value)
     {
-        if (string.IsNullOrWhiteSpace(key))
+        if (IsTextInvalid(key, out var keyErrorMessage))
         {
-            return Result<ProductAttributeValue>.Failure($"{nameof(key)} is required");
+            return Result<ProductAttributeValue>.Failure(keyErrorMessage);
         }
 
-        if (string.IsNullOrWhiteSpace(value))
+        if (IsTextInvalid(value, out var valueErrorMessage))
         {
-            return Result<ProductAttributeValue>.Failure($"{nameof(value)} is required");
+            return Result<ProductAttributeValue>.Failure(valueErrorMessage);
         }
 
         var productsAttributes = new ProductAttributeValue(product, key, value);
@@ -36,9 +36,9 @@ internal sealed class ProductAttributeValue : BaseEntity
 
     internal VoidResult SetValue(string newValue)
     {
-        if (string.IsNullOrWhiteSpace(newValue))
+        if (IsTextInvalid(newValue, out var errorMessage))
         {
-            return VoidResult.Failure($"{nameof(newValue)} is required");
+            return VoidResult.Failure(errorMessage);
         }
         
         Value = newValue;
@@ -47,14 +47,28 @@ internal sealed class ProductAttributeValue : BaseEntity
 
     internal VoidResult SetKey(string key)
     {
-        if (string.IsNullOrWhiteSpace(key))
+        if (IsTextInvalid(key, out var errorMessage))
         {
-            return VoidResult.Failure($"{nameof(key)} is required");
+            return VoidResult.Failure(errorMessage);
         }
         
         Key = key;
         return VoidResult.Success();
     }
+    
+    #region validation
+    private static bool IsTextInvalid(string text, out string errorMessage)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            errorMessage = $"{nameof(text)} is required";
+            return true;
+        }
+
+        errorMessage = string.Empty;
+        return false;
+    }
+    #endregion
 }
 
-public record ProductAttributeValueInfo(string Key, string Value);
+public record ProductAttributeValueInfo(Guid Id, string Key, string Value);

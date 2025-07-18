@@ -40,14 +40,14 @@ public sealed class Category : BaseEntity
 
     public static Result<Category> Create(string name, string? description = null, Category? parent = null)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if (IsTextInvalid(name, out var nameErrorMessage))
         {
-            return Result<Category>.Failure($"{nameof(name)} is required");
+            return Result<Category>.Failure(nameErrorMessage);
         }
         
-        if (description != null && string.IsNullOrWhiteSpace(description))
+        if (description != null && IsTextInvalid(description, out var descriptionErrorMessage))
         {
-            return Result<Category>.Failure($"{nameof(description)} is required");
+            return Result<Category>.Failure(descriptionErrorMessage);
         }
 
         var category = new Category(name, description, parent);
@@ -56,9 +56,9 @@ public sealed class Category : BaseEntity
 
     public VoidResult ChangeName(string name)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if (IsTextInvalid(name, out var errorMessage))
         {
-            return VoidResult.Failure($"{nameof(name)} is required");
+            return VoidResult.Failure(errorMessage);
         }
         
         Name = name;
@@ -67,9 +67,9 @@ public sealed class Category : BaseEntity
     
     public VoidResult ChangeDescription(string? description)
     {
-        if (string.IsNullOrWhiteSpace(description))
+        if (description == " ")
         {
-            return VoidResult.Failure($"{nameof(description)} is required");
+            return VoidResult.Failure($"{nameof(description)} cannot be white space");
         }
         
         Description = description;
@@ -79,9 +79,9 @@ public sealed class Category : BaseEntity
     #region productIds
     public VoidResult AddProductId(Guid productId)
     {
-        if (productId == Guid.Empty)
+        if (IsGuidInvalid(productId, out var errorMessage))
         {
-            return VoidResult.Failure($"{nameof(productId)} is required");
+            return VoidResult.Failure(errorMessage);
         }
 
         if (_productIds.Contains(productId))
@@ -95,9 +95,9 @@ public sealed class Category : BaseEntity
 
     public VoidResult RemoveProductId(Guid productId)
     {
-        if (productId == Guid.Empty)
+        if (IsGuidInvalid(productId, out var errorMessage))
         {
-            return VoidResult.Failure($"{nameof(productId)} is required");
+            return VoidResult.Failure(errorMessage);
         }
         
         if (!_productIds.Contains(productId))
@@ -281,6 +281,32 @@ public sealed class Category : BaseEntity
 
         _productAttributes.Remove(existingProductAttribute);
         return VoidResult.Success();
+    }
+    #endregion
+    
+    #region validation
+    private static bool IsTextInvalid(string text, out string errorMessage)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            errorMessage = $"{nameof(text)} is required";
+            return true;
+        }
+        
+        errorMessage = string.Empty;
+        return false;
+    }
+    
+    private bool IsGuidInvalid(Guid guid, out string errorMessage)
+    {
+        if (guid == Guid.Empty)
+        {
+            errorMessage = $"{nameof(guid)} is required";
+            return true;
+        }
+        
+        errorMessage = string.Empty;
+        return false;
     }
     #endregion
 }

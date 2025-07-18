@@ -21,16 +21,17 @@ public sealed class Product : BaseEntity
     {
         get
         {
-            if (Discount == null || Discount.Status == DiscountStatus.Expired)
+            if (IsDiscountExists(out _) || IsDiscountExpired(out _))
             {
                 return Price;
             }
 
-            return Price * (100 - Discount.Percent) / 100;
+            return Price * (100 - Discount!.Percent) / 100;
         }
     }
-
-    public uint Bonuses => (uint)Math.Round((double)FinalPrice * 0.01);
+    
+    private const decimal BonusPercent = 0.01m;
+    public uint Bonuses => (uint)Math.Round(Price * BonusPercent);
     
     public Guid CategoryId { get; private set; } //✅
     
@@ -41,19 +42,19 @@ public sealed class Product : BaseEntity
     
     private readonly List<Review> _reviews = []; //✅
     public IReadOnlyCollection<ReviewInfo> Reviews => _reviews
-        .Select(r => new ReviewInfo(r.Title, r.Text, r.Rating, r.CreatedAt))
+        .Select(r => new ReviewInfo(r.Id, r.Title, r.Text, r.Rating, r.CreatedAt))
         .ToList()
         .AsReadOnly(); //✅
 
     private readonly List<ProductAttributeValue> _productsAttributeValues = []; //✅
     public IReadOnlyCollection<ProductAttributeValueInfo> ProductsAttributeValues => _productsAttributeValues
-        .Select(pav => new ProductAttributeValueInfo(pav.Key, pav.Value))
+        .Select(pav => new ProductAttributeValueInfo(pav.Id, pav.Key, pav.Value))
         .ToList()
         .AsReadOnly(); //✅
     
     private readonly List<ProductVariantValue> _productVariantValues = []; //✅
     public IReadOnlyCollection<ProductVariantValueInfo> ProductVariantValues => _productVariantValues
-        .Select(pvv => new ProductVariantValueInfo(pvv.Key, pvv.Value))
+        .Select(pvv => new ProductVariantValueInfo(pvv.Id, pvv.Key, pvv.Value))
         .ToList()
         .AsReadOnly(); //✅
     
@@ -70,29 +71,29 @@ public sealed class Product : BaseEntity
 
     public static Result<Product> Create(string title, string description, decimal price, ProductStatus status, Guid categoryId)
     {
-        if (string.IsNullOrWhiteSpace(title))
+        if (IsTextInvalid(title, out var titleErrorMessage))
         {
-            return Result<Product>.Failure($"{nameof(title)} is required");
+            return Result<Product>.Failure(titleErrorMessage);
         }
 
-        if (string.IsNullOrWhiteSpace(description))
+        if (IsTextInvalid(description, out var descriptionErrorMessage))
         {
-            return Result<Product>.Failure($"{nameof(description)} is required");
+            return Result<Product>.Failure(descriptionErrorMessage);
         }
 
-        if (price < 0)
+        if (IsPriceInvalid(price, out var priceErrorMessage))
         {
-            return Result<Product>.Failure($"{nameof(price)} must be positive");
+            return Result<Product>.Failure(priceErrorMessage);
         }
 
-        if (!Enum.IsDefined(status))
+        if (IsStatusInvalid(status, out var statusErrorMessage))
         {
-            return Result<Product>.Failure($"{nameof(status)} is invalid");
+            return Result<Product>.Failure(statusErrorMessage);
         }
 
-        if (Guid.Empty == categoryId)
+        if (IsGuidInvalid(categoryId, out var categoryIdErrorMessage))
         {
-            return Result<Product>.Failure($"{nameof(categoryId)} is required");
+            return Result<Product>.Failure(categoryIdErrorMessage);
         }
 
         var product = new Product(title, description, price, status, categoryId);
@@ -101,9 +102,9 @@ public sealed class Product : BaseEntity
 
     public VoidResult ChangeTitle(string title)
     {
-        if (string.IsNullOrWhiteSpace(title))
+        if (IsTextInvalid(title, out var titleErrorMessage))
         {
-            return VoidResult.Failure($"{nameof(title)} is required");
+            return VoidResult.Failure(titleErrorMessage);
         }
         
         Title = title;
@@ -112,9 +113,9 @@ public sealed class Product : BaseEntity
     
     public VoidResult ChangeDescription(string description)
     {
-        if (string.IsNullOrWhiteSpace(description))
+        if (IsTextInvalid(description, out var descriptionErrorMessage))
         {
-            return VoidResult.Failure($"{nameof(description)} is required");
+            return VoidResult.Failure(descriptionErrorMessage);
         }
         
         Description = description;
@@ -123,9 +124,9 @@ public sealed class Product : BaseEntity
 
     public VoidResult ChangePrice(decimal price)
     {
-        if (price < 0)
+        if (IsPriceInvalid(price, out var priceErrorMessage))
         {
-            return VoidResult.Failure($"{nameof(price)} must be positive");
+            return VoidResult.Failure(priceErrorMessage);
         }
         
         Price = price;
@@ -134,9 +135,9 @@ public sealed class Product : BaseEntity
 
     public VoidResult ChangeStatus(ProductStatus status)
     {
-        if (!Enum.IsDefined(status))
+        if (IsStatusInvalid(status, out var errorMessage))
         {
-            return VoidResult.Failure($"{nameof(status)} is invalid");
+            return VoidResult.Failure(errorMessage);
         }
         
         Status = status;
@@ -146,9 +147,9 @@ public sealed class Product : BaseEntity
     #region categoryId
     public VoidResult ChangeCategory(Guid categoryId)
     {
-        if (Guid.Empty == categoryId)
+        if (IsGuidInvalid(categoryId, out var errorMessage))
         {
-            return VoidResult.Failure($"{nameof(categoryId)} is required");
+            return VoidResult.Failure(errorMessage);
         }
 
         if (CategoryId == categoryId)
@@ -164,65 +165,65 @@ public sealed class Product : BaseEntity
     #region discount
     public Result<DiscountInfo> GetDiscount()
     {
-        if (Discount == null)
+        if (IsDiscountExists(out var errorMessage))
         {
-            return Result<DiscountInfo>.Failure($"{nameof(Discount)} is null. Nothing to get.");
+            return Result<DiscountInfo>.Failure(errorMessage);
         }
         
-        var discountInfo = new DiscountInfo(Discount.Percent, Discount.ExpirationDateTime, Discount.Status);
+        var discountInfo = new DiscountInfo(Discount!.Id, Discount.Percent, Discount.ExpirationDateTime, Discount.Status);
         return Result<DiscountInfo>.Success(discountInfo);
     }
 
     public Result<Guid> GetDiscountId()
     {
-        if (Discount == null)
+        if (IsDiscountExists(out var errorMessage))
         {
-            return Result<Guid>.Failure($"{nameof(Discount)} is null. Nothing to get.");
+            return Result<Guid>.Failure(errorMessage);
         }
         
-        return Result<Guid>.Success(Discount.Id);
+        return Result<Guid>.Success(Discount!.Id);
     }
     
     public Result<uint> GetDiscountPercent()
     {
-        if (Discount == null)
+        if (IsDiscountExists(out var discountInvalidErrorMessage))
         {
-            return Result<uint>.Failure($"{nameof(Discount)} is null. Nothing to get.");
+            return Result<uint>.Failure(discountInvalidErrorMessage);
         }
         
         //todo:?
-        if (Discount.Status == DiscountStatus.Expired)
+        if (IsDiscountExpired(out var discountExpiredErrorMessage))
         {
-            return Result<uint>.Failure($"{nameof(Discount)} is expired. Nothing to get.");
+            return Result<uint>.Failure(discountExpiredErrorMessage);
         }
         
-        return Result<uint>.Success(Discount.Percent);
+        return Result<uint>.Success(Discount!.Percent);
     }
 
     public Result<DateTime> GetDiscountExpirationDateTime()
     {
-        if (Discount == null)
+        if (IsDiscountExists(out var discountInvalidErrorMessage))
         {
-            return Result<DateTime>.Failure($"{nameof(Discount)} is null. Nothing to get.");
+            return Result<DateTime>.Failure(discountInvalidErrorMessage);
         }
         
         //todo:?
-        if (Discount.Status == DiscountStatus.Expired)
+        if (IsDiscountExpired(out var discountExpiredErrorMessage))
         {
-            return Result<DateTime>.Failure($"{nameof(Discount)} is expired. Nothing to get.");
+            return Result<DateTime>.Failure(discountExpiredErrorMessage);
         }
         
-        return Result<DateTime>.Success(Discount.ExpirationDateTime);
+        return Result<DateTime>.Success(Discount!.ExpirationDateTime);
     }
 
     public Result<DiscountStatus> GetDiscountStatus()
     {
-        if (Discount == null)
+        if (IsDiscountExists(out var errorMessage))
         {
-            return Result<DiscountStatus>.Failure($"{nameof(Discount)} is null. Nothing to get.");
+            return Result<DiscountStatus>.Failure(errorMessage);
         }
         
-        return Result<DiscountStatus>.Success(Discount.Status);
+        return Result<DiscountStatus>.Success(Discount!.Status);
     }
     
     public VoidResult AddDiscount(uint percent, DateTime expirationDateTime)
@@ -241,9 +242,9 @@ public sealed class Product : BaseEntity
 
     public VoidResult RemoveDiscount()
     {
-        if (Discount == null)
+        if (IsDiscountExists(out var errorMessage))
         {
-            return VoidResult.Failure($"{nameof(Discount)} is null. Nothing to remove.");
+            return VoidResult.Failure(errorMessage);
         }
         
         Discount = null;
@@ -252,12 +253,12 @@ public sealed class Product : BaseEntity
 
     public VoidResult MakeDiscountExpired()
     {
-        if (Discount == null)
+        if (IsDiscountExists(out var discountInvalidErrorMessage))
         {
-            return VoidResult.Failure($"{nameof(Discount)} is null. Nothing to change.");
+            return VoidResult.Failure(discountInvalidErrorMessage);
         }
 
-        var setStatusResult = Discount.SetStatus(DiscountStatus.Expired);
+        var setStatusResult = Discount!.SetStatus(DiscountStatus.Expired);
         
         return setStatusResult.Map(
             onSuccess: () => VoidResult.Success(),
@@ -276,7 +277,7 @@ public sealed class Product : BaseEntity
             return Result<ReviewInfo>.Failure($"{nameof(review)} is null. Nothing to get.");
         }
         
-        var reviewInfo = new ReviewInfo(review.Title, review.Text, review.Rating, review.CreatedAt);
+        var reviewInfo = new ReviewInfo(review.Id, review.Title, review.Text, review.Rating, review.CreatedAt);
         return Result<ReviewInfo>.Success(reviewInfo);
     }
 
@@ -318,6 +319,7 @@ public sealed class Product : BaseEntity
     #endregion
     
     //todo: userId
+    //todo: private method for get by id with null check
     #region reviews
     public VoidResult AddReview(string title, string text, uint rating)
     {
@@ -414,7 +416,7 @@ public sealed class Product : BaseEntity
             return Result<ProductAttributeValueInfo>.Failure($"{nameof(productAttributeValue)} is null. Nothing to get.");
         }
         
-        var productAttributeValueInfo = new ProductAttributeValueInfo(productAttributeValue.Key, productAttributeValue.Value);
+        var productAttributeValueInfo = new ProductAttributeValueInfo(productAttributeValue.Id, productAttributeValue.Key, productAttributeValue.Value);
         return Result<ProductAttributeValueInfo>.Success(productAttributeValueInfo);
     }
 
@@ -529,7 +531,7 @@ public sealed class Product : BaseEntity
             return Result<ProductVariantValueInfo>.Failure($"{nameof(productVariantValue)} is null. Nothing to get.");
         }
         
-        var productVariantValueInfo = new ProductVariantValueInfo(productVariantValue.Key, productVariantValue.Value);
+        var productVariantValueInfo = new ProductVariantValueInfo(productVariantValue.Id, productVariantValue.Key, productVariantValue.Value);
         return Result<ProductVariantValueInfo>.Success(productVariantValueInfo);
     }
 
@@ -558,6 +560,7 @@ public sealed class Product : BaseEntity
     }
     #endregion
     
+    //todo
     #region productVariantValues
     public VoidResult AddProductVariantValue(string key, string value)
     {
@@ -631,6 +634,80 @@ public sealed class Product : BaseEntity
             onSuccess: () => VoidResult.Success(),
             onFailure: errorMessage => VoidResult.Failure(errorMessage, setProductVariantValueResult.StatusCode)
         );
+    }
+    #endregion
+    
+    #region validation
+    private static bool IsTextInvalid(string text, out string errorMessage)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            errorMessage = $"{nameof(text)} is required";
+            return true;
+        }
+
+        errorMessage = string.Empty;
+        return false;
+    }
+
+    private static bool IsPriceInvalid(decimal price, out string errorMessage)
+    {
+        if (price < 0)
+        {
+            errorMessage = $"{nameof(price)} must be positive";
+            return true;
+        }
+        
+        errorMessage = string.Empty;
+        return false;
+    }
+
+    private static bool IsStatusInvalid(ProductStatus status, out string errorMessage)
+    {
+        if (!Enum.IsDefined(status))
+        {
+            errorMessage = $"{nameof(status)} is invalid";
+            return true;
+        }
+        
+        errorMessage = string.Empty;
+        return false;
+    }
+    
+    private static bool IsGuidInvalid(Guid guid, out string errorMessage)
+    {
+        if (guid == Guid.Empty)
+        {
+            errorMessage = $"{nameof(guid)} is required";
+            return true;
+        }
+        
+        errorMessage = string.Empty;
+        return false;
+    }
+    
+    private bool IsDiscountExists(out string errorMessage)
+    {
+        if (Discount == null)
+        {
+            errorMessage = $"{nameof(Discount)} does not exist.";
+            return true;
+        }
+        
+        errorMessage = string.Empty;
+        return false;
+    }
+    
+    private bool IsDiscountExpired(out string errorMessage)
+    {
+        if (Discount!.Status == DiscountStatus.Expired)
+        {
+            errorMessage = $"{nameof(Discount)} is expired. Nothing to do.";
+            return true;
+        }
+
+        errorMessage = string.Empty;
+        return false;
     }
     #endregion
 }

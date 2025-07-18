@@ -22,19 +22,14 @@ internal sealed class Discount : BaseEntity
 
     internal static Result<Discount> Create(uint percent, DateTime expirationDateTime)
     {
-        if (percent <= 0)
+        if (IsPercentInvalid(percent, out var percentErrorMessage))
         {
-            return Result<Discount>.Failure($"{nameof(percent)} must be positive");
-        }
-        
-        if (percent > 100)
-        {
-            return Result<Discount>.Failure($"{nameof(percent)} must be less than 100");
+            return Result<Discount>.Failure(percentErrorMessage);
         }
 
-        if (expirationDateTime <= DateTime.UtcNow)
+        if (IsExpirationDateTimeInvalid(expirationDateTime, out var expirationDateTimeErrorMessage))
         {
-            return Result<Discount>.Failure($"{nameof(expirationDateTime)} must be greater than now");
+            return Result<Discount>.Failure(expirationDateTimeErrorMessage);
         }
 
         var discount = new Discount(percent, expirationDateTime);
@@ -49,9 +44,9 @@ internal sealed class Discount : BaseEntity
     
     internal VoidResult SetPercent(uint percent)
     {
-        if (percent <= 0 || percent > 100)
+        if (IsPercentInvalid(percent, out var errorMessage))
         {
-            return VoidResult.Failure($"{nameof(percent)} must be positive and less than 100");
+            return VoidResult.Failure(errorMessage);
         }
         
         Percent = percent;
@@ -60,14 +55,46 @@ internal sealed class Discount : BaseEntity
     
     internal VoidResult SetExpirationDateTime(DateTime expirationDateTime)
     {
-        if (expirationDateTime <= DateTime.UtcNow)
+        if (IsExpirationDateTimeInvalid(expirationDateTime, out var errorMessage))
         {
-            return VoidResult.Failure($"{nameof(expirationDateTime)} must be greater than now");
+            return VoidResult.Failure(errorMessage);
         }
         
         ExpirationDateTime = expirationDateTime;
         return VoidResult.Success();
     }
+
+    #region validation
+    private static bool IsPercentInvalid(uint percent, out string errorMessage)
+    {
+        if (percent <= 0)
+        {
+            errorMessage = $"{nameof(percent)} must be positive";
+            return true;
+        }
+        
+        if (percent > 100)
+        {
+            errorMessage = $"{nameof(percent)} must be less than 100";
+            return true;
+        }
+
+        errorMessage = string.Empty;
+        return false;
+    }
+
+    private static bool IsExpirationDateTimeInvalid(DateTime expirationDateTime, out string errorMessage)
+    {
+        if (expirationDateTime <= DateTime.UtcNow)
+        {
+            errorMessage = $"{nameof(expirationDateTime)} must be greater than now";
+            return true;
+        }
+        
+        errorMessage = string.Empty;
+        return false;
+    }
+    #endregion
 }
 
-public record DiscountInfo(uint Percent, DateTime ExpirationDateTime, DiscountStatus Status);
+public record DiscountInfo(Guid Id, uint Percent, DateTime ExpirationDateTime, DiscountStatus Status);

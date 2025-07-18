@@ -29,19 +29,19 @@ internal sealed class Review : BaseEntity
 
     internal static Result<Review> Create(string title, string text, uint rating, Product product)
     {
-        if (string.IsNullOrWhiteSpace(title))
+        if (IsTextInvalid(title, out var titleErrorMessage))
         {
-            return Result<Review>.Failure($"{nameof(title)} is required");
+            return Result<Review>.Failure(titleErrorMessage);
         }
         
-        if (string.IsNullOrWhiteSpace(text))
+        if (IsTextInvalid(text, out var textErrorMessage))
         {
-            return Result<Review>.Failure($"{nameof(text)} is required");
+            return Result<Review>.Failure(textErrorMessage);
         }
-
-        if (rating is > 5 or < 1)
+        
+        if (IsRatingInvalid(rating, out var ratingErrorMessage))
         {
-            return Result<Review>.Failure($"{nameof(rating)} must be between 1 and 5");
+            return Result<Review>.Failure(ratingErrorMessage);
         }
 
         var review = new Review(title, text, rating, product);
@@ -50,9 +50,9 @@ internal sealed class Review : BaseEntity
 
     internal VoidResult SetTitle(string title)
     {
-        if (string.IsNullOrWhiteSpace(title))
+        if (IsTextInvalid(title, out var titleErrorMessage))
         {
-            return VoidResult.Failure($"{nameof(title)} is required");
+            return VoidResult.Failure(titleErrorMessage);
         }
         
         Title = title;
@@ -61,9 +61,9 @@ internal sealed class Review : BaseEntity
     
     internal VoidResult SetText(string text)
     {
-        if (string.IsNullOrWhiteSpace(text))
+        if (IsTextInvalid(text, out var textErrorMessage))
         {
-            return VoidResult.Failure($"{nameof(text)} is required");
+            return VoidResult.Failure(textErrorMessage);
         }
         
         Text = text;
@@ -72,14 +72,40 @@ internal sealed class Review : BaseEntity
     
     internal VoidResult SetRating(uint rating)
     {
-        if (rating is > 5 or < 1)
+        if (IsRatingInvalid(rating, out var ratingErrorMessage))
         {
-            return VoidResult.Failure($"{nameof(rating)} must be between 1 and 5");
+            return VoidResult.Failure(ratingErrorMessage);
         }
 
         Rating = rating;
         return VoidResult.Success();
     }
+
+    #region validation
+    private static bool IsTextInvalid(string text, out string errorMessage)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            errorMessage = $"{nameof(text)} is required";
+            return true;
+        }
+
+        errorMessage = string.Empty;
+        return false;
+    }
+
+    private static bool IsRatingInvalid(uint rating, out string errorMessage)
+    {
+        if (rating is > 5 or < 1)
+        {
+            errorMessage = $"{nameof(rating)} must be between 1 and 5";
+            return true;
+        }
+        
+        errorMessage = string.Empty;
+        return false;
+    }
+    #endregion
 }
 
-public record ReviewInfo(string Title, string Text, uint Rating, DateTime CreatedAt);
+public record ReviewInfo(Guid Id, string Title, string Text, uint Rating, DateTime CreatedAt);
