@@ -6,26 +6,26 @@ namespace Wolfix.Domain.Catalog.CategoryAggregate;
 
 public sealed class Category : BaseEntity
 {
-    public Category? Parent { get; private set; } //✅
+    public Category? Parent { get; private set; }
     
-    public string Name { get; private set; } //✅
+    public string Name { get; private set; }
     
-    public string? Description { get; private set; } //✅
+    public string? Description { get; private set; }
     
-    private readonly List<Guid> _productIds = []; //✅
-    public IReadOnlyCollection<Guid> ProductIds => _productIds.AsReadOnly(); //✅
+    private readonly List<Guid> _productIds = [];
+    public IReadOnlyCollection<Guid> ProductIds => _productIds.AsReadOnly();
     
-    private readonly List<ProductVariant> _productVariants = []; //✅
+    private readonly List<ProductVariant> _productVariants = [];
     public IReadOnlyCollection<ProductVariantInfo> ProductVariants => _productVariants
         .Select(pv => new ProductVariantInfo(pv.Key))
         .ToList()
-        .AsReadOnly(); //✅
+        .AsReadOnly();
 
-    private readonly List<ProductAttribute> _productAttributes = []; //✅
+    private readonly List<ProductAttribute> _productAttributes = [];
     public IReadOnlyCollection<ProductAttributeInfo> ProductAttributes => _productAttributes
         .Select(pa => new ProductAttributeInfo(pa.Key))
         .ToList()
-        .AsReadOnly(); //✅
+        .AsReadOnly();
 
     public int ProductsCount => _productIds.Count;
     

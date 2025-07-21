@@ -7,17 +7,17 @@ namespace Wolfix.Domain.Catalog.ProductAggregate;
 
 public sealed class Product : BaseEntity
 {
-    public string Title { get; private set; } //✅
+    public string Title { get; private set; }
     
-    public string Description { get; private set; } //✅
+    public string Description { get; private set; }
     
-    public decimal Price { get; private set; } //✅
+    public decimal Price { get; private set; }
     
-    public ProductStatus Status { get; private set; } //✅
+    public ProductStatus Status { get; private set; }
     
-    private Discount? Discount { get; set; } //✅
+    private Discount? Discount { get; set; }
     
-    public decimal FinalPrice //✅
+    public decimal FinalPrice
     {
         get
         {
@@ -33,30 +33,30 @@ public sealed class Product : BaseEntity
     private const decimal BonusPercent = 0.01m;
     public uint Bonuses => (uint)Math.Round(Price * BonusPercent);
     
-    public Guid CategoryId { get; private set; } //✅
+    public Guid CategoryId { get; private set; }
     
     //todo: seller ID (именно ID, потому что другой контекст)
     
     private readonly List<BlobResource> _resources = [];
     public IReadOnlyCollection<BlobResource> Resources => _resources.AsReadOnly();
     
-    private readonly List<Review> _reviews = []; //✅
+    private readonly List<Review> _reviews = [];
     public IReadOnlyCollection<ReviewInfo> Reviews => _reviews
         .Select(r => new ReviewInfo(r.Id, r.Title, r.Text, r.Rating, r.CreatedAt))
         .ToList()
-        .AsReadOnly(); //✅
+        .AsReadOnly();
 
-    private readonly List<ProductAttributeValue> _productsAttributeValues = []; //✅
+    private readonly List<ProductAttributeValue> _productsAttributeValues = [];
     public IReadOnlyCollection<ProductAttributeValueInfo> ProductsAttributeValues => _productsAttributeValues
         .Select(pav => new ProductAttributeValueInfo(pav.Id, pav.Key, pav.Value))
         .ToList()
-        .AsReadOnly(); //✅
+        .AsReadOnly();
     
-    private readonly List<ProductVariantValue> _productVariantValues = []; //✅
+    private readonly List<ProductVariantValue> _productVariantValues = [];
     public IReadOnlyCollection<ProductVariantValueInfo> ProductVariantValues => _productVariantValues
         .Select(pvv => new ProductVariantValueInfo(pvv.Id, pvv.Key, pvv.Value))
         .ToList()
-        .AsReadOnly(); //✅
+        .AsReadOnly();
     
     private Product() { }
     
