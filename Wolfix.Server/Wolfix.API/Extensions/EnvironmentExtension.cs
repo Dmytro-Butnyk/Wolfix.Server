@@ -4,7 +4,7 @@ namespace Wolfix.API.Extensions;
 
 public static class EnvironmentExtension
 {
-    public static string GetEnvironmentVariableOrThrowException(string key)
+    public static string GetEnvironmentVariableOrThrow(string key)
     {
         var value = Environment.GetEnvironmentVariable(key);
 

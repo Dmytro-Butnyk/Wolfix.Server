@@ -12,6 +12,8 @@ internal sealed class Discount : BaseEntity
 
     public DiscountStatus Status { get; private set; } = DiscountStatus.Active;
     
+    public Guid ProductId { get; private set; }
+    
     private Discount() { }
     
     private Discount(uint percent, DateTime expirationDateTime)

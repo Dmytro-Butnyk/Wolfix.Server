@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Wolfix.API.Сontrollers.Catalog
+namespace Wolfix.API.Сontrollers.Catalog;
+
+[Route("api/[controller]")]
+[ApiController]
+public class CategoriesController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class CategoriesController : ControllerBase
-    {
         
-    }
 }
