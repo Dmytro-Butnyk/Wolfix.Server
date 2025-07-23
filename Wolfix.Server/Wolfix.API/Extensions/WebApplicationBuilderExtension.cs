@@ -1,4 +1,11 @@
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
+using Wolfix.Domain.Catalog.Interfaces;
+using Wolfix.Domain.Shared.Interfaces;
+using Wolfix.Infrastructure;
+using Wolfix.Infrastructure.Catalog.Repositories;
+using Wolfix.Infrastructure.Shared.Database;
 
 namespace Wolfix.API.Extensions;
 
@@ -14,20 +21,31 @@ public static class WebApplicationBuilderExtension
     //     
     // }
     //
-    // public static WebApplicationBuilder AddRepositories(this WebApplicationBuilder builder)
-    // {
-    //     
-    // }
+    public static WebApplicationBuilder AddRepositories(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+        builder.Services.AddScoped<IProductRepository, ProductRepository>();
+        builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+        return builder;
+    }
+
     //
     // public static WebApplicationBuilder AddOptions(this WebApplicationBuilder builder)
     // {
     //     
     // }
     //
-    // public static WebApplicationBuilder AddDbContext(this WebApplicationBuilder builder)
-    // {
-    //     
-    // }
+    public static WebApplicationBuilder AddDbContext(this WebApplicationBuilder builder)
+    {
+        string connectionString = EnvironmentExtension.GetEnvironmentVariableOrThrow("DB_CONNECTION_STRING");
+
+        builder.Services.AddDbContext<WolfixStoreContext>(options =>
+            options.UseNpgsql(connectionString));
+
+        return builder;
+    }
+
     //
     // public static WebApplicationBuilder AddFluentValidation(this WebApplicationBuilder builder)
     // {
@@ -49,10 +67,17 @@ public static class WebApplicationBuilderExtension
     //     
     // }
     //
-    // public static WebApplicationBuilder AddResponseCompression(this WebApplicationBuilder builder)
-    // {
-    //     
-    // }
+    public static WebApplicationBuilder AddResponseCompression(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddResponseCompression(options =>
+        {
+            options.EnableForHttps = true;
+            options.Providers.Add<BrotliCompressionProvider>();
+            options.Providers.Add<GzipCompressionProvider>();
+        });
+
+        return builder;
+    }
     //
     // public static WebApplicationBuilder AddRateLimiter(this WebApplicationBuilder builder)
     // {

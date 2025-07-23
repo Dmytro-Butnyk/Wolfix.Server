@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Wolfix.Domain.Catalog.ProductAggregate.Entities;
 
-namespace Wolfix.Infrastructure.Configurations.Catalog.Product;
+namespace Wolfix.Infrastructure.Catalog.Configurations.Product;
 
 internal sealed class DiscountEntityConfiguration : IEntityTypeConfiguration<Discount>
 {

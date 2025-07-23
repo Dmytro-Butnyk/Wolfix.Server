@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Wolfix.Domain.Catalog.CategoryAggregate.Entities;
 
-namespace Wolfix.Infrastructure.Configurations.Catalog.Category;
+namespace Wolfix.Infrastructure.Catalog.Configurations.Category;
 
 internal sealed class ProductVariantEntityConfiguration : IEntityTypeConfiguration<ProductVariant>
 {

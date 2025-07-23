@@ -1,4 +1,5 @@
 using DotNetEnv;
+using Wolfix.API.Extensions;
 
 if (File.Exists(".env"))
 {
@@ -8,9 +9,20 @@ if (File.Exists(".env"))
 
 var builder = WebApplication.CreateBuilder(args);
 
+#region DATABASE
+builder
+    .AddDbContext()
+    .AddRepositories();
+#endregion
+
+builder.AddResponseCompression();
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -18,8 +30,17 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
+app.UseRouting();
+app.UseAuthorization();
+app.MapControllers();
+
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseResponseCompression();
 
 app.Run();
