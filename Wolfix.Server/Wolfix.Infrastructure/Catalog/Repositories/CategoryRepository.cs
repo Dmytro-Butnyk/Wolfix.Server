@@ -1,6 +1,6 @@
 ﻿using Wolfix.Domain.Catalog.CategoryAggregate;
 using Wolfix.Domain.Catalog.Interfaces;
-using Wolfix.Infrastructure.Shared.Database;
+using Wolfix.Infrastructure.Shared.Repositories;
 
 namespace Wolfix.Infrastructure.Catalog.Repositories;
 

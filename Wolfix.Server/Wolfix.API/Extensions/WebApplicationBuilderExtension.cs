@@ -5,7 +5,7 @@ using Wolfix.Domain.Catalog.Interfaces;
 using Wolfix.Domain.Shared.Interfaces;
 using Wolfix.Infrastructure;
 using Wolfix.Infrastructure.Catalog.Repositories;
-using Wolfix.Infrastructure.Shared.Database;
+using Wolfix.Infrastructure.Shared.Repositories;
 
 namespace Wolfix.API.Extensions;
 

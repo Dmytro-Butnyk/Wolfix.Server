@@ -1,5 +1,6 @@
 using DotNetEnv;
 using Wolfix.API.Extensions;
+using Wolfix.API.Middlewares;
 
 if (File.Exists(".env"))
 {
@@ -40,6 +41,8 @@ app.MapControllers();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseResponseCompression();
 

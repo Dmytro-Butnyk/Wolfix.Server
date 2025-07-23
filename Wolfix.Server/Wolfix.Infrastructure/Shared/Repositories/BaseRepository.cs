@@ -2,7 +2,7 @@
 using Wolfix.Domain.Shared;
 using Wolfix.Domain.Shared.Interfaces;
 
-namespace Wolfix.Infrastructure.Shared.Database;
+namespace Wolfix.Infrastructure.Shared.Repositories;
 
 public abstract class BaseRepository<TEntity>(WolfixStoreContext context)
     : IBaseRepository<TEntity> where TEntity: BaseEntity
