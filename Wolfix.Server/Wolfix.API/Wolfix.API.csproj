@@ -7,11 +7,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="DotNetEnv" Version="3.1.1" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4"/>
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Сontrollers\" />
+      <ProjectReference Include="..\Wolfix.Application\Wolfix.Application.csproj" />
+      <ProjectReference Include="..\Wolfix.Domain\Wolfix.Domain.csproj" />
+      <ProjectReference Include="..\Wolfix.Infrastructure\Wolfix.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

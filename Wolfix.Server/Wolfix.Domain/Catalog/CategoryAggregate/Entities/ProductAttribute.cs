@@ -3,7 +3,7 @@ using Wolfix.Domain.Shared;
 
 namespace Wolfix.Domain.Catalog.CategoryAggregate.Entities;
 
-public sealed class ProductAttribute : BaseEntity
+internal sealed class ProductAttribute : BaseEntity
 {
     public Category Category { get; private set; }
     public string Key { get; private set; }
@@ -27,3 +27,5 @@ public sealed class ProductAttribute : BaseEntity
         return Result<ProductAttribute>.Success(attribute, HttpStatusCode.Created);
     }
 }
+
+public record ProductAttributeInfo(string Key);

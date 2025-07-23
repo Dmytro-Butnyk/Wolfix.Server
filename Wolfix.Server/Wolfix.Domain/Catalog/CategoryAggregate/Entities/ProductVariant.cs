@@ -3,7 +3,7 @@ using Wolfix.Domain.Shared;
 
 namespace Wolfix.Domain.Catalog.CategoryAggregate.Entities;
 
-public sealed class ProductVariant : BaseEntity
+internal sealed class ProductVariant : BaseEntity
 {
     public Category Category { get; private set; }
     
@@ -19,9 +19,9 @@ public sealed class ProductVariant : BaseEntity
 
     internal static Result<ProductVariant> Create(Category category, string key)
     {
-        if (string.IsNullOrWhiteSpace(key))
+        if (IsTextInvalid(key, out var errorMessage))
         {
-            return Result<ProductVariant>.Failure($"{nameof(key)} is required");
+            return Result<ProductVariant>.Failure(errorMessage);
         }
 
         var productVariant = new ProductVariant(category, key);
@@ -30,12 +30,28 @@ public sealed class ProductVariant : BaseEntity
 
     internal VoidResult SetKey(string key)
     {
-        if (string.IsNullOrWhiteSpace(key))
+        if (IsTextInvalid(key, out var errorMessage))
         {
-            return VoidResult.Failure($"{nameof(key)} is required");
+            return VoidResult.Failure(errorMessage);
         }
         
         Key = key;
         return VoidResult.Success();
     }
+
+    #region validation
+    private static bool IsTextInvalid(string text, out string errorMessage)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            errorMessage = $"{nameof(text)} is required";
+            return true;
+        }
+        
+        errorMessage = string.Empty;
+        return false;
+    }
+    #endregion
 }
+
+public record ProductVariantInfo(string Key);
