@@ -3,6 +3,7 @@ using Wolfix.Domain.Shared.Interfaces;
 
 namespace Wolfix.Domain.Catalog.Interfaces;
 
-public interface IProductRepository : IBaseRepository<Product>
+public interface IProductRepository
+    : IBaseRepository<Product>, IPaginationRepository
 {
 }

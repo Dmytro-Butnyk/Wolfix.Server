@@ -11,25 +11,11 @@ namespace Wolfix.API.Extensions;
 
 public static class WebApplicationBuilderExtension
 {
-    // public static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
-    // {
-    //     
-    // }
     //
     // public static WebApplicationBuilder AddIntegrationServices(this WebApplicationBuilder builder)
     // {
     //     
     // }
-    //
-    public static WebApplicationBuilder AddRepositories(this WebApplicationBuilder builder)
-    {
-        builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-        builder.Services.AddScoped<IProductRepository, ProductRepository>();
-        builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-
-        return builder;
-    }
-
     //
     // public static WebApplicationBuilder AddOptions(this WebApplicationBuilder builder)
     // {
@@ -45,7 +31,6 @@ public static class WebApplicationBuilderExtension
 
         return builder;
     }
-
     //
     // public static WebApplicationBuilder AddFluentValidation(this WebApplicationBuilder builder)
     // {

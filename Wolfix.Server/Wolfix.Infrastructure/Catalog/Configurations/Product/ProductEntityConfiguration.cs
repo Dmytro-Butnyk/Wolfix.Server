@@ -4,7 +4,7 @@ using Wolfix.Domain.Catalog.ProductAggregate.Entities;
 
 namespace Wolfix.Infrastructure.Catalog.Configurations.Product;
 
-public sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Domain.Catalog.ProductAggregate.Product>
+internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Domain.Catalog.ProductAggregate.Product>
 {
     public void Configure(EntityTypeBuilder<Domain.Catalog.ProductAggregate.Product> builder)
     {

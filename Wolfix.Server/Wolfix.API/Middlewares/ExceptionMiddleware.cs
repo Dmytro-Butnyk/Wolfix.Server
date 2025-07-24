@@ -8,12 +8,29 @@ public sealed class ExceptionMiddleware(RequestDelegate next)
         {
             await next(context);
         }
+        catch (OperationCanceledException ex)
+        {
+            await HandleExceptionAsync(
+                context,
+                StatusCodes.Status499ClientClosedRequest,
+                ex.Message
+            );
+        }
         catch (Exception ex)
         {
-            context.Response.StatusCode = 500;
-            context.Response.ContentType = "text/plain";
-        
-            await context.Response.WriteAsync(ex.Message);
+            await HandleExceptionAsync(
+                context,
+                StatusCodes.Status500InternalServerError,
+                ex.Message
+            );
         }
+    }
+
+    private async Task HandleExceptionAsync(HttpContext context, int statusCode, string message)
+    {
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "text/plain";
+        
+        await context.Response.WriteAsync(message);
     }
 }

@@ -4,7 +4,7 @@ using Wolfix.Domain.Catalog.CategoryAggregate.Entities;
 
 namespace Wolfix.Infrastructure.Catalog.Configurations.Category;
 
-public sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Domain.Catalog.CategoryAggregate.Category>
+internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Domain.Catalog.CategoryAggregate.Category>
 {
     public void Configure(EntityTypeBuilder<Domain.Catalog.CategoryAggregate.Category> builder)
     {

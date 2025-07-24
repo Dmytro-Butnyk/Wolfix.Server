@@ -4,7 +4,7 @@ using Wolfix.Infrastructure.Shared.Repositories;
 
 namespace Wolfix.Infrastructure.Catalog.Repositories;
 
-public sealed class CategoryRepository(WolfixStoreContext context) :
+internal sealed class CategoryRepository(WolfixStoreContext context) :
     BaseRepository<Category>(context), ICategoryRepository
 {
     //todo: category repository
