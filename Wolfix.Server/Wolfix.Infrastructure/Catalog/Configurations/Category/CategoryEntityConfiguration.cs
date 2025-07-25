@@ -10,8 +10,6 @@ internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Dom
     {
         builder.ToTable("Categories");
         
-        builder.HasKey(c => c.Id);
-
         builder.HasOne(c => c.Parent)
             .WithMany()
             .HasForeignKey("ParentId")
@@ -19,13 +17,12 @@ internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Dom
 
         builder.Property(c => c.Name).IsRequired();
         builder.Property(c => c.Description).IsRequired(false);
+
+        //ProductIds
+        builder.Ignore(c => c.ProductIds);
         
-        builder.HasMany<Domain.Catalog.ProductAggregate.Product>("_productIds")
-            .WithOne()
-            .HasForeignKey("CategoryId")
-            .IsRequired(false);
-        builder.Navigation("_productIds")
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        //ProductVariants
+        builder.Ignore(c => c.ProductVariants);
         
         builder.HasMany<ProductVariant>("_productVariants")
             .WithOne(pv => pv.Category)
@@ -33,6 +30,9 @@ internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Dom
             .IsRequired(false);
         builder.Navigation("_productVariants")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        //ProductAttributes
+        builder.Ignore(c => c.ProductAttributes);
         
         builder.HasMany<ProductAttribute>("_productAttributes")
             .WithOne(pa => pa.Category)

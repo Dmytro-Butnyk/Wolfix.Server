@@ -1,6 +1,7 @@
 using DotNetEnv;
 using Wolfix.API.Extensions;
 using Wolfix.API.Middlewares;
+using Wolfix.Application.Extensions;
 using Wolfix.Infrastructure.Extensions;
 
 if (File.Exists(".env"))
@@ -13,10 +14,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder
     .AddDbContext()
+    .AddRepositories()
+    .AddApplicationServices()
     .AddResponseCompression();
-
-builder.Services
-    .AddRepositories();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

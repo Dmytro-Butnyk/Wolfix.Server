@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Wolfix.Domain.Catalog.ProductAggregate.Entities;
 
-namespace Wolfix.API.Сontrollers.Catalog;
+namespace Wolfix.API.Controllers.Catalog;
 
 [Route("api/[controller]")]
 [ApiController]

@@ -234,7 +234,7 @@ public sealed class Category : BaseEntity
     {
         var existingProductAttribute = _productAttributes.FirstOrDefault(pa => pa.Key == key);
 
-        if (existingProductAttribute == null)
+        if (existingProductAttribute != null)
         {
             return VoidResult.Failure($"{nameof(existingProductAttribute)} already exists", HttpStatusCode.Conflict);
         }
@@ -279,8 +279,12 @@ public sealed class Category : BaseEntity
             return VoidResult.Failure($"{nameof(existingProductAttribute)} does not exist", HttpStatusCode.NotFound);
         }
 
-        _productAttributes.Remove(existingProductAttribute);
-        return VoidResult.Success();
+        var setProductAttributeKeyResult = existingProductAttribute.SetKey(key);
+
+        return setProductAttributeKeyResult.Map(
+            onSuccess: () => VoidResult.Success(),
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, setProductAttributeKeyResult.StatusCode)
+        );
     }
     #endregion
     

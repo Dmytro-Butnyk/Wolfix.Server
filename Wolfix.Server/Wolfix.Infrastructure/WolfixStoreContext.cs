@@ -4,6 +4,9 @@ using Wolfix.Domain.Catalog.CategoryAggregate.Entities;
 using Wolfix.Domain.Catalog.Interfaces;
 using Wolfix.Domain.Catalog.ProductAggregate;
 using Wolfix.Domain.Catalog.ProductAggregate.Entities;
+using Wolfix.Domain.Shared;
+using Wolfix.Infrastructure.Catalog.Configurations.Category;
+using Wolfix.Infrastructure.Catalog.Configurations.Product;
 
 namespace Wolfix.Infrastructure;
 
@@ -13,6 +16,27 @@ public sealed class WolfixStoreContext : DbContext
     
     public WolfixStoreContext(DbContextOptions<WolfixStoreContext> options)
         : base(options) { }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Ignore<BaseEntity>();
+        
+        #region Catalog
+        #region Category
+        modelBuilder.ApplyConfiguration(new CategoryEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ProductAttributeEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ProductVariantEntityConfiguration());
+        #endregion
+        
+        #region Product
+        modelBuilder.ApplyConfiguration(new DiscountEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ProductAttributeValueEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ProductEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ProductVariantValueEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ReviewEntityConfiguration());
+        #endregion
+        #endregion
+    }
     
     #region CATALOG
     internal DbSet<Product> Products { get; set; } // Aggregate 

@@ -4,7 +4,7 @@ using Wolfix.Domain.Shared.Interfaces;
 
 namespace Wolfix.Infrastructure.Shared.Repositories;
 
-internal abstract class BaseRepository<TEntity>(WolfixStoreContext context)
+internal class BaseRepository<TEntity>(WolfixStoreContext context)
     : IBaseRepository<TEntity> where TEntity: BaseEntity
 {
     //todo: если будет проблема с репозиториями, то она тут

@@ -10,8 +10,6 @@ internal sealed class ProductVariantEntityConfiguration : IEntityTypeConfigurati
     {
         builder.ToTable("ProductVariants");
         
-        builder.HasKey(pv => pv.Id);
-        
         builder.HasOne(pa => pa.Category)
             .WithMany("_productVariants")
             .HasForeignKey("CategoryId")

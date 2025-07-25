@@ -10,8 +10,6 @@ internal sealed class DiscountEntityConfiguration : IEntityTypeConfiguration<Dis
     {
         builder.ToTable("Discounts");
         
-        builder.HasKey(d => d.Id);
-        
         builder.Property(d => d.Percent).IsRequired();
         builder.Property(d => d.ExpirationDateTime).IsRequired();
         builder.Property(d => d.Status).IsRequired().HasConversion<string>();

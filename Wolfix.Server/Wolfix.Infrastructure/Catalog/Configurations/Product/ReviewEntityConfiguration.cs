@@ -10,8 +10,6 @@ internal sealed class ReviewEntityConfiguration : IEntityTypeConfiguration<Revie
     {
         builder.ToTable("Reviews");
         
-        builder.HasKey(r => r.Id);
-
         builder.Property(r => r.Title).IsRequired();
         builder.Property(r => r.Text).IsRequired();
         builder.Property(r => r.Rating).IsRequired();

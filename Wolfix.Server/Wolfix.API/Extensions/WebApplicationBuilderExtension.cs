@@ -1,16 +1,24 @@
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Wolfix.Application.Extensions;
 using Wolfix.Domain.Catalog.Interfaces;
 using Wolfix.Domain.Shared.Interfaces;
 using Wolfix.Infrastructure;
 using Wolfix.Infrastructure.Catalog.Repositories;
+using Wolfix.Infrastructure.Extensions;
 using Wolfix.Infrastructure.Shared.Repositories;
 
 namespace Wolfix.API.Extensions;
 
 public static class WebApplicationBuilderExtension
 {
+    public static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddApplicationServices();
+
+        return builder;
+    }
     //
     // public static WebApplicationBuilder AddIntegrationServices(this WebApplicationBuilder builder)
     // {
@@ -22,6 +30,13 @@ public static class WebApplicationBuilderExtension
     //     
     // }
     //
+    public static WebApplicationBuilder AddRepositories(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddRepositories();
+
+        return builder;
+    }
+    
     public static WebApplicationBuilder AddDbContext(this WebApplicationBuilder builder)
     {
         string connectionString = EnvironmentExtension.GetEnvironmentVariableOrThrow("DB_CONNECTION_STRING");

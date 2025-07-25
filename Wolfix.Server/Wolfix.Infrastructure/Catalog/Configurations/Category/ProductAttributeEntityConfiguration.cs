@@ -10,8 +10,6 @@ internal sealed class ProductAttributeEntityConfiguration : IEntityTypeConfigura
     {
         builder.ToTable("ProductAttributes");
         
-        builder.HasKey(pa => pa.Id);
-        
         builder.HasOne(pa => pa.Category)
             .WithMany("_productAttributes")
             .HasForeignKey("CategoryId")

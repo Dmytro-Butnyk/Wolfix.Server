@@ -10,8 +10,6 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
     {
         builder.ToTable("Products");
         
-        builder.HasKey(p => p.Id);
-        
         builder.Property(p => p.Title).IsRequired();
         builder.Property(p => p.Description).IsRequired();
         builder.Property(p => p.Price).IsRequired();
@@ -38,6 +36,8 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
         //todo: blob resources
         
         //Reviews
+        builder.Ignore(r => r.Reviews);
+        
         builder.HasMany<Review>("_reviews")
             .WithOne(r => r.Product)
             .HasForeignKey("ProductId")
@@ -46,6 +46,8 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
             .UsePropertyAccessMode(PropertyAccessMode.Field);
         
         //ProductAttributeValues
+        builder.Ignore(r => r.ProductsAttributeValues);
+        
         builder.HasMany<ProductAttributeValue>("_productsAttributeValues")
             .WithOne(pav => pav.Product)
             .HasForeignKey("ProductId")
@@ -54,6 +56,8 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
             .UsePropertyAccessMode(PropertyAccessMode.Field);
         
         //ProductVariantValues
+        builder.Ignore(r => r.ProductVariantValues);
+        
         builder.HasMany<ProductVariantValue>("_productVariantValues")
             .WithOne(pvv => pvv.Product)
             .HasForeignKey("ProductId")

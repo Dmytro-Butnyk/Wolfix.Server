@@ -10,8 +10,6 @@ internal sealed class ProductVariantValueEntityConfiguration : IEntityTypeConfig
     {
         builder.ToTable("ProductVariantValues");
         
-        builder.HasKey(pvv => pvv.Id);
-        
         builder.HasOne(pvv => pvv.Product)
             .WithMany("_productVariantValues")
             .HasForeignKey("ProductId")
