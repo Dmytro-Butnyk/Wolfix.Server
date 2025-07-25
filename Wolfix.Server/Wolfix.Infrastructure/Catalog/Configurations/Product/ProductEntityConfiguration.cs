@@ -16,6 +16,7 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
         builder.Property(p => p.Status).IsRequired().HasConversion<string>();
         
         //Discount
+        //todo: указать явно дискаунт
         builder.HasOne(typeof(Discount), "Discount")
             .WithOne()
             .HasForeignKey(typeof(Discount), "ProductId")
