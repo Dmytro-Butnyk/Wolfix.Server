@@ -34,6 +34,7 @@ public sealed class Product : BaseEntity
     public uint Bonuses => (uint)Math.Round(Price * BonusPercent);
 
     //todo: AverageRating
+    //todo: поменять на событийный вариант
     
     public Guid CategoryId { get; private set; }
     
