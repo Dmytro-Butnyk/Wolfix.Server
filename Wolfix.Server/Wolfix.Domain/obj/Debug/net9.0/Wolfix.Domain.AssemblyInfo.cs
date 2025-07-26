@@ -16,7 +16,7 @@ using System.Runtime.CompilerServices;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Wolfix.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1342a9053b5840fd2c60235e29a764940d9fd6c5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+21dbe44420cddfbdd3a550c94046454e3e6a1986")]
 [assembly: System.Reflection.AssemblyProductAttribute("Wolfix.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Wolfix.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
