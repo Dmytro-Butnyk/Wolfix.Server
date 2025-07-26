@@ -1,8 +1,6 @@
 using DotNetEnv;
 using Wolfix.API.Extensions;
 using Wolfix.API.Middlewares;
-using Wolfix.Application.Extensions;
-using Wolfix.Infrastructure.Extensions;
 
 if (File.Exists(".env"))
 {
@@ -18,8 +16,6 @@ builder
     .AddApplicationServices()
     .AddResponseCompression();
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -27,7 +23,8 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseStaticFiles();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -40,7 +37,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 
 app.UseMiddleware<ExceptionMiddleware>();
 
