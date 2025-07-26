@@ -12,7 +12,6 @@ internal sealed class CategoryRepository(WolfixStoreContext context) :
 {
     private readonly DbSet<Category> _categories = context.Categories;
     
-    //todo: category repository
     public async Task<IEnumerable<CategoryShortProjection>> GetAllParentCategoriesAsNoTrackingAsync(
         CancellationToken ct)
     {
