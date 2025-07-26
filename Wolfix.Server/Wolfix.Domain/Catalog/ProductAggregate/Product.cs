@@ -32,6 +32,8 @@ public sealed class Product : BaseEntity
     
     private const decimal BonusPercent = 0.01m;
     public uint Bonuses => (uint)Math.Round(Price * BonusPercent);
+
+    //todo: AverageRating
     
     public Guid CategoryId { get; private set; }
     
