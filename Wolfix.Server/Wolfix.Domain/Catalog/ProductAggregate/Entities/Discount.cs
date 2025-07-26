@@ -12,17 +12,21 @@ internal sealed class Discount : BaseEntity
 
     public DiscountStatus Status { get; private set; } = DiscountStatus.Active;
     
+    public Product Product { get; private set; }
+    
     public Guid ProductId { get; private set; }
     
     private Discount() { }
     
-    private Discount(uint percent, DateTime expirationDateTime)
+    private Discount(uint percent, DateTime expirationDateTime, Product product)
     {
         Percent = percent;
         ExpirationDateTime = expirationDateTime;
+        Product = product;
+        ProductId = product.Id;
     }
 
-    internal static Result<Discount> Create(uint percent, DateTime expirationDateTime)
+    internal static Result<Discount> Create(uint percent, DateTime expirationDateTime, Product product)
     {
         if (IsPercentInvalid(percent, out var percentErrorMessage))
         {
@@ -34,7 +38,7 @@ internal sealed class Discount : BaseEntity
             return Result<Discount>.Failure(expirationDateTimeErrorMessage);
         }
 
-        var discount = new Discount(percent, expirationDateTime);
+        var discount = new Discount(percent, expirationDateTime, product);
         return Result<Discount>.Success(discount, HttpStatusCode.Created);
     }
     

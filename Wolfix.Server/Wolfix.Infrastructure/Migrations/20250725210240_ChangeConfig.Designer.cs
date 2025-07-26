@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Wolfix.Infrastructure;
@@ -11,9 +12,11 @@ using Wolfix.Infrastructure;
 namespace Wolfix.Infrastructure.Migrations
 {
     [DbContext(typeof(WolfixStoreContext))]
-    partial class WolfixStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250725210240_ChangeConfig")]
+    partial class ChangeConfig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

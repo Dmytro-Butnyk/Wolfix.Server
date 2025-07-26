@@ -228,7 +228,7 @@ public sealed class Product : BaseEntity
     
     public VoidResult AddDiscount(uint percent, DateTime expirationDateTime)
     {
-        var createDiscountResult = Discount.Create(percent, expirationDateTime);
+        var createDiscountResult = Discount.Create(percent, expirationDateTime, this);
 
         return createDiscountResult.Map(
             onSuccess: discount =>

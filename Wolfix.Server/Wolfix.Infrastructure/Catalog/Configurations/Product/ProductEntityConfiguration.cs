@@ -15,28 +15,30 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
         builder.Property(p => p.Price).IsRequired();
         builder.Property(p => p.Status).IsRequired().HasConversion<string>();
         
-        //Discount
-        //todo: указать явно дискаунт
-        builder.HasOne(typeof(Discount), "Discount")
-            .WithOne()
-            .HasForeignKey(typeof(Discount), "ProductId")
+        #region Discount
+        builder.HasOne<Discount>("Discount")
+            .WithOne(d => d.Product)
+            .HasForeignKey<Discount>(d => d.ProductId)
+            .OnDelete(DeleteBehavior.Cascade)
             .IsRequired(false);
         builder.Navigation("Discount")
             .UsePropertyAccessMode(PropertyAccessMode.Property);
+        #endregion
         
         builder.Ignore(p => p.FinalPrice);
         builder.Ignore(p => p.Bonuses);
 
-        //Category
+        #region Category
         builder.HasOne<Domain.Catalog.CategoryAggregate.Category>()
             .WithMany()
             .HasForeignKey(p => p.CategoryId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
+        #endregion
         
         //todo: blob resources
         
-        //Reviews
+        #region Reviews
         builder.Ignore(r => r.Reviews);
         
         builder.HasMany<Review>("_reviews")
@@ -45,8 +47,9 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
             .IsRequired(false);
         builder.Navigation("_reviews")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+        #endregion
         
-        //ProductAttributeValues
+        #region ProductAttributeValues
         builder.Ignore(r => r.ProductsAttributeValues);
         
         builder.HasMany<ProductAttributeValue>("_productsAttributeValues")
@@ -55,8 +58,9 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
             .IsRequired(false);
         builder.Navigation("_productsAttributeValues")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+        #endregion
         
-        //ProductVariantValues
+        #region ProductVariantValues
         builder.Ignore(r => r.ProductVariantValues);
         
         builder.HasMany<ProductVariantValue>("_productVariantValues")
@@ -65,5 +69,6 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
             .IsRequired(false);
         builder.Navigation("_productVariantValues")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+        #endregion
     }
 }

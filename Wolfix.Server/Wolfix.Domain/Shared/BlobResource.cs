@@ -6,5 +6,5 @@ public sealed class BlobResource : BaseEntity
     
     public required BlobResourceType Type { get; set; }
     
-    public required BaseEntity Entity { get; set; }
+    // public required BaseEntity Entity { get; set; }
 }

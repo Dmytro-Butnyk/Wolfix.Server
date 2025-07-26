@@ -14,7 +14,14 @@ internal sealed class DiscountEntityConfiguration : IEntityTypeConfiguration<Dis
         builder.Property(d => d.ExpirationDateTime).IsRequired();
         builder.Property(d => d.Status).IsRequired().HasConversion<string>();
         
-        builder.Property(d => d.ProductId).IsRequired();
-        builder.HasIndex(d => d.ProductId);
+        #region Product
+        builder.HasOne<Domain.Catalog.ProductAggregate.Product>(d => d.Product)
+            .WithOne("Discount")
+            .HasForeignKey<Discount>(d => d.ProductId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false);
+        builder.Navigation(d => d.Product)
+            .UsePropertyAccessMode(PropertyAccessMode.Property);
+        #endregion
     }
 }

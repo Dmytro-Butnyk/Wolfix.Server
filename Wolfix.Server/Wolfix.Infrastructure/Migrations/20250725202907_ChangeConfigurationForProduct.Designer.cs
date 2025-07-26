@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Wolfix.Infrastructure;
@@ -11,9 +12,11 @@ using Wolfix.Infrastructure;
 namespace Wolfix.Infrastructure.Migrations
 {
     [DbContext(typeof(WolfixStoreContext))]
-    partial class WolfixStoreContextModelSnapshot : ModelSnapshot
+    [Migration("20250725202907_ChangeConfigurationForProduct")]
+    partial class ChangeConfigurationForProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -278,12 +281,9 @@ namespace Wolfix.Infrastructure.Migrations
 
             modelBuilder.Entity("Wolfix.Domain.Catalog.ProductAggregate.Entities.Discount", b =>
                 {
-                    b.HasOne("Wolfix.Domain.Catalog.ProductAggregate.Product", "Product")
+                    b.HasOne("Wolfix.Domain.Catalog.ProductAggregate.Product", null)
                         .WithOne("Discount")
-                        .HasForeignKey("Wolfix.Domain.Catalog.ProductAggregate.Entities.Discount", "ProductId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Product");
+                        .HasForeignKey("Wolfix.Domain.Catalog.ProductAggregate.Entities.Discount", "ProductId");
                 });
 
             modelBuilder.Entity("Wolfix.Domain.Catalog.ProductAggregate.Entities.ProductAttributeValue", b =>
