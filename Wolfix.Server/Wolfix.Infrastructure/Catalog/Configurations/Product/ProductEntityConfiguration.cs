@@ -12,6 +12,9 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
         
         builder.Property(p => p.Title).IsRequired();
         builder.Property(p => p.Description).IsRequired();
+        builder.Property(p => p.FinalPrice).IsRequired();
+        builder.Property(p => p.Bonuses).IsRequired();
+        builder.Property(p => p.AverageRating).IsRequired(false);
         builder.Property(p => p.Price).IsRequired();
         builder.Property(p => p.Status).IsRequired().HasConversion<string>();
         
@@ -25,9 +28,6 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
             .UsePropertyAccessMode(PropertyAccessMode.Property);
         #endregion
         
-        builder.Ignore(p => p.FinalPrice);
-        builder.Ignore(p => p.Bonuses);
-
         #region Category
         builder.HasOne<Domain.Catalog.CategoryAggregate.Category>()
             .WithMany()

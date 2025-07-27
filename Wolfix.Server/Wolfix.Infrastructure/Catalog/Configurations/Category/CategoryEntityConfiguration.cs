@@ -17,6 +17,7 @@ internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Dom
 
         builder.Property(c => c.Name).IsRequired();
         builder.Property(c => c.Description).IsRequired(false);
+        builder.Property(c => c.ProductsCount).IsRequired();
 
         //ProductIds
         builder.Ignore(c => c.ProductIds);
@@ -40,7 +41,5 @@ internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Dom
             .IsRequired(false);
         builder.Navigation("_productAttributes")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
-
-        builder.Ignore(c => c.ProductsCount);
     }
 }

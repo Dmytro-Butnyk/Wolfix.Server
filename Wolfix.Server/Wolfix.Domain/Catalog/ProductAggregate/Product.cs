@@ -17,24 +17,31 @@ public sealed class Product : BaseEntity
     
     private Discount? Discount { get; set; }
     
-    public decimal FinalPrice
+    public decimal FinalPrice { get; private set; }
+    private void RecalculateFinalPrice()
     {
-        get
+        if (IsDiscountExists(out _) || IsDiscountExpired(out _))
         {
-            if (IsDiscountExists(out _) || IsDiscountExpired(out _))
-            {
-                return Price;
-            }
-
-            return Price * (100 - Discount!.Percent) / 100;
+            FinalPrice = Price;
         }
+        
+        FinalPrice = Price * (100 - Discount!.Percent) / 100;
     }
     
     private const decimal BonusPercent = 0.01m;
-    public uint Bonuses => (uint)Math.Round(Price * BonusPercent);
+    public uint Bonuses { get; private set; }
+    private void RecalculateBonuses()
+    {
+        Bonuses = (uint)Math.Round(Price * BonusPercent);
+    }
 
-    //todo: AverageRating
-    //todo: поменять на событийный вариант
+    public double? AverageRating { get; private set; }
+    private void RecalculateAverageRating()
+    {
+        AverageRating = _reviews.Count == 0
+            ? null
+            : Math.Round(_reviews.Average(r => r.Rating), MidpointRounding.AwayFromZero);
+    }
     
     public Guid CategoryId { get; private set; }
     
@@ -100,6 +107,9 @@ public sealed class Product : BaseEntity
         }
 
         var product = new Product(title, description, price, status, categoryId);
+        
+        product.RecalculateBonuses();
+        
         return Result<Product>.Success(product, HttpStatusCode.Created);
     }
 
@@ -133,6 +143,10 @@ public sealed class Product : BaseEntity
         }
         
         Price = price;
+        
+        RecalculateFinalPrice();
+        RecalculateBonuses();
+        
         return VoidResult.Success();
     }
 
@@ -237,6 +251,7 @@ public sealed class Product : BaseEntity
             onSuccess: discount =>
             {
                 Discount = discount;
+                RecalculateFinalPrice();
                 return VoidResult.Success();
             },
             onFailure: errorMessage => VoidResult.Failure(errorMessage, createDiscountResult.StatusCode)
@@ -251,6 +266,7 @@ public sealed class Product : BaseEntity
         }
         
         Discount = null;
+        RecalculateFinalPrice();
         return VoidResult.Success();
     }
 
@@ -264,7 +280,11 @@ public sealed class Product : BaseEntity
         var setStatusResult = Discount!.SetStatus(DiscountStatus.Expired);
         
         return setStatusResult.Map(
-            onSuccess: () => VoidResult.Success(),
+            onSuccess: () =>
+            {
+                RecalculateFinalPrice();
+                return VoidResult.Success();
+            },
             onFailure: errorMessage => VoidResult.Failure(errorMessage, setStatusResult.StatusCode)
         );
     }
@@ -332,6 +352,7 @@ public sealed class Product : BaseEntity
             onSuccess: review =>
             {
                 _reviews.Add(review);
+                RecalculateAverageRating();
                 return VoidResult.Success();
             },
             onFailure: errorMessage => VoidResult.Failure(errorMessage, createReviewResult.StatusCode)
@@ -348,12 +369,14 @@ public sealed class Product : BaseEntity
         }
         
         _reviews.Remove(review);
+        RecalculateAverageRating();
         return VoidResult.Success();
     }
 
     public VoidResult RemoveAllReviews()
     {
         _reviews.Clear();
+        AverageRating = null;
         return VoidResult.Success();
     }
 
@@ -403,7 +426,11 @@ public sealed class Product : BaseEntity
         var setReviewRatingResult = review.SetRating(rating);
         
         return setReviewRatingResult.Map(
-            onSuccess: () => VoidResult.Success(),
+            onSuccess: () =>
+            {
+                RecalculateAverageRating();
+                return VoidResult.Success();
+            },
             onFailure: errorMessage => VoidResult.Failure(errorMessage, setReviewRatingResult.StatusCode)
         );
     }

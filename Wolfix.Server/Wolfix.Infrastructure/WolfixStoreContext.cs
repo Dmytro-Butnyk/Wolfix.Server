@@ -37,6 +37,14 @@ public sealed class WolfixStoreContext : DbContext
         #endregion
         #endregion
     }
+
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    // {
+    //     if (optionsBuilder.IsConfigured) return;
+    //     
+    //     var connectionString = env_connection_string;
+    //     optionsBuilder.UseNpgsql(connectionString);
+    // }
     
     #region CATALOG
     internal DbSet<Product> Products { get; set; } // Aggregate 

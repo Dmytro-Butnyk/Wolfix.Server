@@ -27,7 +27,11 @@ public sealed class Category : BaseEntity
         .ToList()
         .AsReadOnly();
 
-    public int ProductsCount => _productIds.Count;
+    public int ProductsCount { get; private set; }
+    private void RecalculateProductsCount()
+    {
+        ProductsCount = _productIds.Count;
+    }
     
     private Category() { }
 
@@ -90,6 +94,7 @@ public sealed class Category : BaseEntity
         }
         
         _productIds.Add(productId);
+        RecalculateProductsCount();
         return VoidResult.Success();
     }
 
@@ -106,12 +111,14 @@ public sealed class Category : BaseEntity
         }
         
         _productIds.Remove(productId);
+        RecalculateProductsCount();
         return VoidResult.Success();
     }
 
     public VoidResult RemoveAllProductIds()
     {
         _productIds.Clear();
+        RecalculateProductsCount();
         return VoidResult.Success();
     }
     #endregion
