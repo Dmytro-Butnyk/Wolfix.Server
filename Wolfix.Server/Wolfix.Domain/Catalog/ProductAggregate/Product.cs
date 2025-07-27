@@ -23,6 +23,7 @@ public sealed class Product : BaseEntity
         if (IsDiscountExists(out _) || IsDiscountExpired(out _))
         {
             FinalPrice = Price;
+            return;
         }
         
         FinalPrice = Price * (100 - Discount!.Percent) / 100;
