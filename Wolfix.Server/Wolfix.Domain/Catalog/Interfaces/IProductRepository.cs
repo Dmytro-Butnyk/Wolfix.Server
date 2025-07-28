@@ -14,5 +14,5 @@ public interface IProductRepository
     
     Task<int> GetProductCountAsync(CancellationToken ct);
 
-    Task<IEnumerable<ProductShortProjection>> GetForMainPage(int randomSkip, int pageSize, CancellationToken ct);
+    Task<IEnumerable<ProductShortProjection>> GetRandom(int randomSkip, int pageSize, CancellationToken ct);
 }

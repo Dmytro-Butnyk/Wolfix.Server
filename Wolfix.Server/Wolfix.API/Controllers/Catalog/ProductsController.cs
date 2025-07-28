@@ -33,7 +33,17 @@ public sealed class ProductsController(IProductService productService) : Control
             onFailure: errorMessage => NotFound(errorMessage)
         );
     }
-    
-    // todo: get random products method.
-    
+
+    // todo: review
+    [HttpGet("random")]
+    public async Task<IActionResult> GetRandomProducts([FromQuery] int pageSize, CancellationToken ct)
+    {
+        Result<IEnumerable<ProductShortDto>> getRandomProductsResult =
+            await productService.GetRandomProducts(pageSize, ct);
+
+        return getRandomProductsResult.Map<IActionResult>(
+            onSuccess: randomProducts => Ok(randomProducts),
+            onFailure: errorMessage => NotFound(errorMessage)
+        );
+    }
 }

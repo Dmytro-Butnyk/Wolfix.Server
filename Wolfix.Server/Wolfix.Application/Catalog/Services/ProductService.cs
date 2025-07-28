@@ -53,7 +53,7 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
         return Result<IEnumerable<ProductShortDto>>.Success(productShortDtos);
     }
 
-    public async Task<Result<IEnumerable<ProductShortDto>>> GetProductsForMainPage(int pageSize, CancellationToken ct)
+    public async Task<Result<IEnumerable<ProductShortDto>>> GetRandomProducts(int pageSize, CancellationToken ct)
     {
         int productCount = await productRepository.GetProductCountAsync(ct);
 
@@ -69,7 +69,7 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
         int randomSkip = random.Next(1, productCount);
 
         List<ProductShortProjection> products = (await productRepository
-            .GetForMainPage(randomSkip, pageSize, ct))
+            .GetRandom(randomSkip, pageSize, ct))
             .ToList();
 
         if (products.Count == 0)

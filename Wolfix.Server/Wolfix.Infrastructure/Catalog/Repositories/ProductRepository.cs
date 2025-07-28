@@ -73,7 +73,7 @@ internal sealed class ProductRepository(WolfixStoreContext context)
         return productCount;
     }
 
-    public async Task<IEnumerable<ProductShortProjection>> GetForMainPage(int randomSkip, int pageSize,
+    public async Task<IEnumerable<ProductShortProjection>> GetRandom(int randomSkip, int pageSize,
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
