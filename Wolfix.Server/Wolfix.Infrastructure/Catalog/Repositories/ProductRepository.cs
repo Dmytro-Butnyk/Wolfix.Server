@@ -69,7 +69,7 @@ internal sealed class ProductRepository(WolfixStoreContext context)
     {
         ct.ThrowIfCancellationRequested();
 
-        var totalCount = await _products.CountAsync(ct);
+        int totalCount = await _products.CountAsync(ct);
 
         if (totalCount == 0)
             return new List<ProductShortProjection>();
@@ -78,7 +78,7 @@ internal sealed class ProductRepository(WolfixStoreContext context)
 
         int takeFromEnd = Math.Min(pageSize, totalCount - randomSkip);
 
-        var products = await _products
+        List<ProductShortProjection> products = await _products
             .Include(p => p.Discount)
             .AsNoTracking()
             .OrderBy(p => p.Id)
@@ -90,8 +90,8 @@ internal sealed class ProductRepository(WolfixStoreContext context)
 
         if (takeFromEnd < pageSize)
         {
-            var takeFromStart = pageSize - takeFromEnd;
-            var productsFromStart = await _products
+            int takeFromStart = pageSize - takeFromEnd;
+            List<ProductShortProjection> productsFromStart = await _products
                 .Include(p => p.Discount)
                 .AsNoTracking()
                 .OrderBy(p => p.Id)
