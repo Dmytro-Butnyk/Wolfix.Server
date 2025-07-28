@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Wolfix.Domain.Catalog.Interfaces;
 using Wolfix.Domain.Catalog.ProductAggregate;
 using Wolfix.Domain.Catalog.ProductAggregate.Enums;
