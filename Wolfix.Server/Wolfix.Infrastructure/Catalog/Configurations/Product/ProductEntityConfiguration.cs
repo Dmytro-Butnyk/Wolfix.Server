@@ -19,12 +19,12 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
         builder.Property(p => p.Status).IsRequired().HasConversion<string>();
         
         #region Discount
-        builder.HasOne<Discount>("Discount")
+        builder.HasOne<Discount>(p => p.Discount)
             .WithOne(d => d.Product)
             .HasForeignKey<Discount>(d => d.ProductId)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired(false);
-        builder.Navigation("Discount")
+        builder.Navigation(p => p.Discount)
             .UsePropertyAccessMode(PropertyAccessMode.Property);
         #endregion
         

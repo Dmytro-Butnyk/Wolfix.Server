@@ -1,5 +1,6 @@
 using Wolfix.Application.Catalog.Dto.Category;
 using Wolfix.Domain.Catalog.Projections;
+using Wolfix.Domain.Catalog.Projections.Category;
 
 namespace Wolfix.Application.Catalog.Mapping.Category;
 

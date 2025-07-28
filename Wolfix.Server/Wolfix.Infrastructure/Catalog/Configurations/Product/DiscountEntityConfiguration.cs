@@ -16,7 +16,7 @@ internal sealed class DiscountEntityConfiguration : IEntityTypeConfiguration<Dis
         
         #region Product
         builder.HasOne<Domain.Catalog.ProductAggregate.Product>(d => d.Product)
-            .WithOne("Discount")
+            .WithOne(p => p.Discount)
             .HasForeignKey<Discount>(d => d.ProductId)
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired(false);

@@ -12,34 +12,18 @@ namespace Wolfix.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "BaseEntity",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BaseEntity", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ParentId = table.Column<Guid>(type: "uuid", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true)
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    ProductsCount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Categories_BaseEntity_Id",
-                        column: x => x.Id,
-                        principalTable: "BaseEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Categories_Categories_ParentId",
                         column: x => x.ParentId,
@@ -60,12 +44,6 @@ namespace Wolfix.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_ProductAttributes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductAttributes_BaseEntity_Id",
-                        column: x => x.Id,
-                        principalTable: "BaseEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_ProductAttributes_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
@@ -82,17 +60,14 @@ namespace Wolfix.Infrastructure.Migrations
                     Description = table.Column<string>(type: "text", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
+                    FinalPrice = table.Column<decimal>(type: "numeric", nullable: false),
+                    Bonuses = table.Column<long>(type: "bigint", nullable: false),
+                    AverageRating = table.Column<double>(type: "double precision", nullable: true),
                     CategoryId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Products_BaseEntity_Id",
-                        column: x => x.Id,
-                        principalTable: "BaseEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Products_Categories_CategoryId",
                         column: x => x.CategoryId,
@@ -113,12 +88,6 @@ namespace Wolfix.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_ProductVariants", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductVariants_BaseEntity_Id",
-                        column: x => x.Id,
-                        principalTable: "BaseEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_ProductVariants_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
@@ -133,24 +102,11 @@ namespace Wolfix.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Url = table.Column<string>(type: "text", nullable: false),
                     Type = table.Column<byte>(type: "smallint", nullable: false),
-                    EntityId = table.Column<Guid>(type: "uuid", nullable: false),
                     ProductId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_BlobResource", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_BlobResource_BaseEntity_EntityId",
-                        column: x => x.EntityId,
-                        principalTable: "BaseEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BlobResource_BaseEntity_Id",
-                        column: x => x.Id,
-                        principalTable: "BaseEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_BlobResource_Products_ProductId",
                         column: x => x.ProductId,
@@ -172,16 +128,11 @@ namespace Wolfix.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Discounts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Discounts_BaseEntity_Id",
-                        column: x => x.Id,
-                        principalTable: "BaseEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Discounts_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -196,12 +147,6 @@ namespace Wolfix.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProductAttributeValues", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ProductAttributeValues_BaseEntity_Id",
-                        column: x => x.Id,
-                        principalTable: "BaseEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ProductAttributeValues_Products_ProductId",
                         column: x => x.ProductId,
@@ -222,12 +167,6 @@ namespace Wolfix.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProductVariantValues", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ProductVariantValues_BaseEntity_Id",
-                        column: x => x.Id,
-                        principalTable: "BaseEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ProductVariantValues_Products_ProductId",
                         column: x => x.ProductId,
@@ -251,23 +190,12 @@ namespace Wolfix.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Reviews", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Reviews_BaseEntity_Id",
-                        column: x => x.Id,
-                        principalTable: "BaseEntity",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Reviews_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BlobResource_EntityId",
-                table: "BlobResource",
-                column: "EntityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BlobResource_ProductId",
@@ -345,9 +273,6 @@ namespace Wolfix.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Categories");
-
-            migrationBuilder.DropTable(
-                name: "BaseEntity");
         }
     }
 }

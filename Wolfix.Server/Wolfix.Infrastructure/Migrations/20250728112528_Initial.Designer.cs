@@ -12,8 +12,8 @@ using Wolfix.Infrastructure;
 namespace Wolfix.Infrastructure.Migrations
 {
     [DbContext(typeof(WolfixStoreContext))]
-    [Migration("20250727213356_ChangeDynamicProperties")]
-    partial class ChangeDynamicProperties
+    [Migration("20250728112528_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

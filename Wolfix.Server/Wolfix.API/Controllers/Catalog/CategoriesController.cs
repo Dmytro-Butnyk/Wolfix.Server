@@ -5,7 +5,7 @@ using Wolfix.Domain.Shared;
 
 namespace Wolfix.API.Controllers.Catalog;
 
-[Route("api/сategories")]
+[Route("api/categories")]
 [ApiController]
 public sealed class CategoriesController(ICategoryService categoryService) : ControllerBase
 {

@@ -42,7 +42,7 @@ public sealed class WolfixStoreContext : DbContext
     // {
     //     if (optionsBuilder.IsConfigured) return;
     //     
-    //     var connectionString = env_connection_string;
+    //     var connectionString = "connection_string";
     //     optionsBuilder.UseNpgsql(connectionString);
     // }
     

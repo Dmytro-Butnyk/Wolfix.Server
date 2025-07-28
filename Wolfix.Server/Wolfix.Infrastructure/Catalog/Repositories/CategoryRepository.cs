@@ -2,6 +2,7 @@
 using Wolfix.Domain.Catalog.CategoryAggregate;
 using Wolfix.Domain.Catalog.Interfaces;
 using Wolfix.Domain.Catalog.Projections;
+using Wolfix.Domain.Catalog.Projections.Category;
 using Wolfix.Domain.Shared;
 using Wolfix.Infrastructure.Shared.Repositories;
 

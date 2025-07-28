@@ -4,6 +4,7 @@ using Wolfix.Application.Catalog.Interfaces;
 using Wolfix.Application.Catalog.Mapping.Category;
 using Wolfix.Domain.Catalog.Interfaces;
 using Wolfix.Domain.Catalog.Projections;
+using Wolfix.Domain.Catalog.Projections.Category;
 using Wolfix.Domain.Shared;
 
 namespace Wolfix.Application.Catalog.Services;

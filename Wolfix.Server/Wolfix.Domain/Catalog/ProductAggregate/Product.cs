@@ -15,7 +15,7 @@ public sealed class Product : BaseEntity
     
     public ProductStatus Status { get; private set; }
     
-    private Discount? Discount { get; set; }
+    internal Discount? Discount { get; set; }
     
     public decimal FinalPrice { get; private set; }
     private void RecalculateFinalPrice()
@@ -109,6 +109,7 @@ public sealed class Product : BaseEntity
         var product = new Product(title, description, price, status, categoryId);
         
         product.RecalculateBonuses();
+        product.FinalPrice = price;
         
         return Result<Product>.Success(product, HttpStatusCode.Created);
     }
