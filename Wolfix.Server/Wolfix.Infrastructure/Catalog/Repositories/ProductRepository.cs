@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Wolfix.Domain.Catalog.Interfaces;
 using Wolfix.Domain.Catalog.ProductAggregate;
 using Wolfix.Domain.Catalog.ProductAggregate.Enums;
@@ -78,6 +78,7 @@ internal sealed class ProductRepository(WolfixStoreContext context)
 
         int takeFromEnd = Math.Min(pageSize, totalCount - randomSkip);
 
+        //todo: AsNoTracking()
         var products = await _products
             .Include(p => p.Discount)
             .AsNoTracking()
@@ -91,6 +92,7 @@ internal sealed class ProductRepository(WolfixStoreContext context)
         if (takeFromEnd < pageSize)
         {
             var takeFromStart = pageSize - takeFromEnd;
+            //todo: AsNoTracking()
             var productsFromStart = await _products
                 .Include(p => p.Discount)
                 .AsNoTracking()
