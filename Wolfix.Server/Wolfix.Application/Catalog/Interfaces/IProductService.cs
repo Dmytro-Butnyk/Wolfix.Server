@@ -7,4 +7,5 @@ public interface IProductService
 {
     Task<Result<IEnumerable<ProductShortDto>>> GetAllByCategoryIdAsync(Guid childCategoryId, CancellationToken ct);
     Task<Result<IEnumerable<ProductShortDto>>> GetForPageWithDiscountAsync(int page, int pageSize, CancellationToken ct);
+    Task<Result<IEnumerable<ProductShortDto>>> GetProductsForMainPage(int pageSize, CancellationToken ct);
 }

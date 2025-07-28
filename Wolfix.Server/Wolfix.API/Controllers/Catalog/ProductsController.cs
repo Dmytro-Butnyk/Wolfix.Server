@@ -33,4 +33,7 @@ public sealed class ProductsController(IProductService productService) : Control
             onFailure: errorMessage => NotFound(errorMessage)
         );
     }
+    
+    // todo: get random products method.
+    
 }

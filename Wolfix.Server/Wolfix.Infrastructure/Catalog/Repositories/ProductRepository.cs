@@ -7,11 +7,11 @@ using Wolfix.Infrastructure.Shared.Repositories;
 
 namespace Wolfix.Infrastructure.Catalog.Repositories;
 
-internal sealed class ProductRepository(WolfixStoreContext context) 
+internal sealed class ProductRepository(WolfixStoreContext context)
     : BaseRepository<Product>(context), IProductRepository
 {
     private readonly DbSet<Product> _products = context.Products;
-    
+
     //todo: product repository
     public async Task<int> GetTotalCountAsync(CancellationToken ct)
     {
@@ -25,7 +25,7 @@ internal sealed class ProductRepository(WolfixStoreContext context)
     public async Task<IEnumerable<ProductShortProjection>> GetForPageAsync(int page, int pageSize, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        
+
         //todo
         return Enumerable.Empty<ProductShortProjection>();
     }
@@ -34,7 +34,7 @@ internal sealed class ProductRepository(WolfixStoreContext context)
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        
+
         List<ProductShortProjection> productsByCategory = await _products
             .AsNoTracking()
             .Where(product => product.CategoryId == childCategoryId)
@@ -45,10 +45,11 @@ internal sealed class ProductRepository(WolfixStoreContext context)
         return productsByCategory;
     }
 
-    public async Task<IEnumerable<ProductShortProjection>> GetForPageWithDiscountAsync(int page, int pageSize, CancellationToken ct)
+    public async Task<IEnumerable<ProductShortProjection>> GetForPageWithDiscountAsync(int page, int pageSize,
+        CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        
+
         List<ProductShortProjection> productsWithDiscount = await _products
             .Include(p => p.Discount)
             .AsNoTracking()
@@ -61,5 +62,56 @@ internal sealed class ProductRepository(WolfixStoreContext context)
             .ToListAsync(ct);
 
         return productsWithDiscount;
+    }
+
+    public async Task<int> GetProductCountAsync(CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        int productCount = await _products.CountAsync(ct);
+
+        return productCount;
+    }
+
+    public async Task<IEnumerable<ProductShortProjection>> GetForMainPage(int randomSkip, int pageSize,
+        CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        var totalCount = await _products.CountAsync(ct);
+
+        if (totalCount == 0)
+            return new List<ProductShortProjection>();
+
+        randomSkip %= totalCount;
+
+        int takeFromEnd = Math.Min(pageSize, totalCount - randomSkip);
+
+        var products = await _products
+            .Include(p => p.Discount)
+            .AsNoTracking()
+            .OrderBy(p => p.Id)
+            .Skip(randomSkip)
+            .Take(takeFromEnd)
+            .Select(p => 
+                new ProductShortProjection(p.Id, p.Title, p.AverageRating, p.Price, p.FinalPrice, p.Bonuses))
+            .ToListAsync(ct);
+
+        if (takeFromEnd < pageSize)
+        {
+            var takeFromStart = pageSize - takeFromEnd;
+            var productsFromStart = await _products
+                .Include(p => p.Discount)
+                .AsNoTracking()
+                .OrderBy(p => p.Id)
+                .Take(takeFromStart)
+                .Select(p =>
+                    new ProductShortProjection(p.Id, p.Title, p.AverageRating, p.Price, p.FinalPrice, p.Bonuses))
+                .ToListAsync(ct);
+
+            products.AddRange(productsFromStart);
+        }
+
+        return products;
     }
 }
