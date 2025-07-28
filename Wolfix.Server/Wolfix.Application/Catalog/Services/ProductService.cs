@@ -55,7 +55,7 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
 
     public async Task<Result<IEnumerable<ProductShortDto>>> GetRandomProducts(int pageSize, CancellationToken ct)
     {
-        int productCount = await productRepository.GetProductCountAsync(ct);
+        int productCount = await productRepository.GetTotalCountAsync(ct);
 
         if (productCount == 0)
         {

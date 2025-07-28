@@ -64,15 +64,6 @@ internal sealed class ProductRepository(WolfixStoreContext context)
         return productsWithDiscount;
     }
 
-    public async Task<int> GetProductCountAsync(CancellationToken ct)
-    {
-        ct.ThrowIfCancellationRequested();
-
-        int productCount = await _products.CountAsync(ct);
-
-        return productCount;
-    }
-
     public async Task<IEnumerable<ProductShortProjection>> GetRandom(int randomSkip, int pageSize,
         CancellationToken ct)
     {
