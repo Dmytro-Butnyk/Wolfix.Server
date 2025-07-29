@@ -7,8 +7,13 @@ namespace Wolfix.Domain.Catalog.Interfaces;
 public interface IProductRepository
     : IBaseRepository<Product>, IPaginationRepository<ProductShortProjection>
 {
-    Task<IEnumerable<ProductShortProjection>> GetAllByCategoryIdAsNoTrackingAsync(Guid childCategoryId,
+    Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdAsNoTrackingAsync(Guid childCategoryId,
         CancellationToken ct);
     
-    Task<IEnumerable<ProductShortProjection>> GetForPageWithDiscountAsync(int page, int pageSize, CancellationToken ct);
+    Task<IReadOnlyCollection<ProductShortProjection>> GetForPageWithDiscountAsync(int page, int pageSize,
+        CancellationToken ct);
+    
+    Task<IReadOnlyCollection<ProductShortProjection>> GetRecommendedForPageAsync(int pageSize,
+        List<Guid> visitedCategoriesIds,
+        CancellationToken ct);
 }

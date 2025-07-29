@@ -22,15 +22,17 @@ internal sealed class ProductRepository(WolfixStoreContext context)
         return totalCount;
     }
 
-    public async Task<IEnumerable<ProductShortProjection>> GetForPageAsync(int page, int pageSize, CancellationToken ct)
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetForPageAsync(int page, int pageSize,
+        CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         
         //todo
-        return Enumerable.Empty<ProductShortProjection>();
+        return new List<ProductShortProjection>();
     }
 
-    public async Task<IEnumerable<ProductShortProjection>> GetAllByCategoryIdAsNoTrackingAsync(Guid childCategoryId,
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdAsNoTrackingAsync(
+        Guid childCategoryId,
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
@@ -45,7 +47,8 @@ internal sealed class ProductRepository(WolfixStoreContext context)
         return productsByCategory;
     }
 
-    public async Task<IEnumerable<ProductShortProjection>> GetForPageWithDiscountAsync(int page, int pageSize, CancellationToken ct)
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetForPageWithDiscountAsync(int page, int pageSize,
+        CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         
@@ -61,5 +64,46 @@ internal sealed class ProductRepository(WolfixStoreContext context)
             .ToListAsync(ct);
 
         return productsWithDiscount;
+    }
+
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetRecommendedForPageAsync(int pageSize,
+        List<Guid> visitedCategoriesIds,
+        CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        
+        List<Product> recommendedProducts = [];
+        Random random = new();
+        
+        int productsByCategorySize = pageSize / visitedCategoriesIds.Count;
+        int remainder = pageSize % visitedCategoriesIds.Count;
+        
+        for (int i = 0; i < visitedCategoriesIds.Count; ++i)
+        {
+            int count = productsByCategorySize + (i < remainder ? 1 : 0);
+            Guid id = visitedCategoriesIds[i];
+            
+            List<Product> recommendedByCategory = await GetRecommendedByCategoryIdAsync(id, count, random, ct);
+            recommendedProducts.AddRange(recommendedByCategory);
+        }
+        
+        return recommendedProducts
+            .Select(product => new ProductShortProjection(product.Id, product.Title, product.AverageRating,
+                product.Price, product.FinalPrice, product.Bonuses))
+            .ToList();
+    }
+
+    private async Task<List<Product>> GetRecommendedByCategoryIdAsync(Guid categoryId, int productsByCategorySize,
+        Random random, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        
+        return await _products
+            .AsNoTracking()
+            .Include(p => p.Discount)
+            .Where(product => product.CategoryId == categoryId)
+            .OrderBy(_ => random.Next())
+            .Take(productsByCategorySize)
+            .ToListAsync(ct);
     }
 }

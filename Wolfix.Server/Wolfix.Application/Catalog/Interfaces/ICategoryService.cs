@@ -5,6 +5,7 @@ namespace Wolfix.Application.Catalog.Interfaces;
 
 public interface ICategoryService
 {
-    Task<Result<IEnumerable<CategoryShortDto>>> GetAllParentCategoriesAsync(CancellationToken ct);
-    Task<Result<IEnumerable<CategoryShortDto>>> GetAllChildCategoriesByParentAsync(Guid parentId, CancellationToken ct);
+    Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllParentCategoriesAsync(CancellationToken ct);
+    Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllChildCategoriesByParentAsync(Guid parentId,
+        CancellationToken ct);
 }

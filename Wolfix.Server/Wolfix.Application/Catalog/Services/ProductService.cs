@@ -10,16 +10,15 @@ namespace Wolfix.Application.Catalog.Services;
 
 internal sealed class ProductService(IProductRepository productRepository) : IProductService
 {
-    public async Task<Result<IEnumerable<ProductShortDto>>> GetAllByCategoryIdAsync(Guid childCategoryId,
+    public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetAllByCategoryIdAsync(Guid childCategoryId,
         CancellationToken ct)
     {
-        List<ProductShortProjection> productsByCategory =
-            (await productRepository.GetAllByCategoryIdAsNoTrackingAsync(childCategoryId, ct))
-            .ToList();
+        IReadOnlyCollection<ProductShortProjection> productsByCategory =
+            await productRepository.GetAllByCategoryIdAsNoTrackingAsync(childCategoryId, ct);
 
         if (productsByCategory.Count == 0)
         {
-            return Result<IEnumerable<ProductShortDto>>.Failure(
+            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(
                 $"Products by category: {childCategoryId} not found",
                 HttpStatusCode.NotFound
             );
@@ -29,18 +28,18 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
             .Select(product => product.ToShortDto())
             .ToList();
         
-        return Result<IEnumerable<ProductShortDto>>.Success(productShortDtos);
+        return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
     }
 
-    public async Task<Result<IEnumerable<ProductShortDto>>> GetForPageWithDiscountAsync(int page, int pageSize, CancellationToken ct)
+    public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetForPageWithDiscountAsync(int page, int pageSize,
+        CancellationToken ct)
     {
-        List<ProductShortProjection> productsWithDiscount =
-            (await productRepository.GetForPageWithDiscountAsync(page, pageSize, ct))
-            .ToList();
+        IReadOnlyCollection<ProductShortProjection> productsWithDiscount =
+            await productRepository.GetForPageWithDiscountAsync(page, pageSize, ct);
 
         if (productsWithDiscount.Count == 0)
         {
-            return Result<IEnumerable<ProductShortDto>>.Failure(
+            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(
                 "Products with discount not found",    
                 HttpStatusCode.NotFound
             );
@@ -50,6 +49,28 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
             .Select(product => product.ToShortDto())
             .ToList();
         
-        return Result<IEnumerable<ProductShortDto>>.Success(productShortDtos);
+        return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
+    }
+
+    public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRecommendedForPageAsync(int pageSize,
+        List<Guid> visitedCategoriesIds,
+        CancellationToken ct)
+    {
+        IReadOnlyCollection<ProductShortProjection> recommendedProducts =
+            await productRepository.GetRecommendedForPageAsync(pageSize, visitedCategoriesIds, ct);
+
+        if (recommendedProducts.Count == 0)
+        {
+            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(
+                "Recommended products not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        List<ProductShortDto> productShortDtos = recommendedProducts
+            .Select(product => product.ToShortDto())
+            .ToList();
+        
+        return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
     }
 }

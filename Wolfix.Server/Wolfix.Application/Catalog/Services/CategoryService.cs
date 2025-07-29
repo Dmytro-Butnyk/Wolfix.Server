@@ -11,15 +11,13 @@ namespace Wolfix.Application.Catalog.Services;
 
 internal sealed class CategoryService(ICategoryRepository categoryRepository) : ICategoryService
 {
-    public async Task<Result<IEnumerable<CategoryShortDto>>> GetAllParentCategoriesAsync(CancellationToken ct)
+    public async Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllParentCategoriesAsync(CancellationToken ct)
     {
-        List<CategoryShortProjection> parentCategories =
-            (await categoryRepository.GetAllParentCategoriesAsNoTrackingAsync(ct))
-            .ToList();
+        IReadOnlyCollection<CategoryShortProjection> parentCategories = await categoryRepository.GetAllParentCategoriesAsNoTrackingAsync(ct);
 
         if (parentCategories.Count == 0)
         {
-            return Result<IEnumerable<CategoryShortDto>>.Failure(
+            return Result<IReadOnlyCollection<CategoryShortDto>>.Failure(
                 "No parent categories found",
                 HttpStatusCode.NotFound
             );
@@ -29,19 +27,18 @@ internal sealed class CategoryService(ICategoryRepository categoryRepository) : 
             .Select(category => category.ToShortDto())
             .ToList();
 
-        return Result<IEnumerable<CategoryShortDto>>.Success(parentCategoriesDto);
+        return Result<IReadOnlyCollection<CategoryShortDto>>.Success(parentCategoriesDto);
     }
 
-    public async Task<Result<IEnumerable<CategoryShortDto>>> GetAllChildCategoriesByParentAsync(
-        Guid parentId, CancellationToken ct)
+    public async Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllChildCategoriesByParentAsync(Guid parentId,
+        CancellationToken ct)
     {
-        List<CategoryShortProjection> childCategories =
-            (await categoryRepository.GetAllChildCategoriesByParentAsNoTrackingAsync(parentId, ct))
-            .ToList();
+        IReadOnlyCollection<CategoryShortProjection> childCategories =
+            await categoryRepository.GetAllChildCategoriesByParentAsNoTrackingAsync(parentId, ct);
 
         if (childCategories.Count == 0)
         {
-            return Result<IEnumerable<CategoryShortDto>>.Failure(
+            return Result<IReadOnlyCollection<CategoryShortDto>>.Failure(
                 "No child categories found",
                 HttpStatusCode.NotFound
             );
@@ -51,6 +48,6 @@ internal sealed class CategoryService(ICategoryRepository categoryRepository) : 
             .Select(category => category.ToShortDto())
             .ToList();
         
-        return Result<IEnumerable<CategoryShortDto>>.Success(childCategoriesDto);
+        return Result<IReadOnlyCollection<CategoryShortDto>>.Success(childCategoriesDto);
     }
 }

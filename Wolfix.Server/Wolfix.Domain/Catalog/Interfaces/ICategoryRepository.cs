@@ -8,6 +8,7 @@ namespace Wolfix.Domain.Catalog.Interfaces;
 
 public interface ICategoryRepository : IBaseRepository<Category>
 {
-    Task<IEnumerable<CategoryShortProjection>> GetAllParentCategoriesAsNoTrackingAsync(CancellationToken ct);
-    Task<IEnumerable<CategoryShortProjection>> GetAllChildCategoriesByParentAsNoTrackingAsync(Guid parentId, CancellationToken ct);
+    Task<IReadOnlyCollection<CategoryShortProjection>> GetAllParentCategoriesAsNoTrackingAsync(CancellationToken ct);
+    Task<IReadOnlyCollection<CategoryShortProjection>> GetAllChildCategoriesByParentAsNoTrackingAsync(Guid parentId,
+        CancellationToken ct);
 }

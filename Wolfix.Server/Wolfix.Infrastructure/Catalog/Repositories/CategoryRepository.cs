@@ -13,7 +13,7 @@ internal sealed class CategoryRepository(WolfixStoreContext context) :
 {
     private readonly DbSet<Category> _categories = context.Categories;
     
-    public async Task<IEnumerable<CategoryShortProjection>> GetAllParentCategoriesAsNoTrackingAsync(
+    public async Task<IReadOnlyCollection<CategoryShortProjection>> GetAllParentCategoriesAsNoTrackingAsync(
         CancellationToken ct)
     {
         List<CategoryShortProjection> parentCategories = await _categories
@@ -25,7 +25,7 @@ internal sealed class CategoryRepository(WolfixStoreContext context) :
         return parentCategories;
     }
 
-    public async Task<IEnumerable<CategoryShortProjection>> GetAllChildCategoriesByParentAsNoTrackingAsync(
+    public async Task<IReadOnlyCollection<CategoryShortProjection>> GetAllChildCategoriesByParentAsNoTrackingAsync(
         Guid parentId, CancellationToken ct)
     {
         List<CategoryShortProjection> childCategories = await _categories
