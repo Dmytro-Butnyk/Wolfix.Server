@@ -97,12 +97,14 @@ internal sealed class ProductRepository(WolfixStoreContext context)
         Random random, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
+
+        int randomNumber = random.Next();
         
         return await _products
             .AsNoTracking()
             .Include(p => p.Discount)
             .Where(product => product.CategoryId == categoryId)
-            .OrderBy(_ => random.Next())
+            .OrderBy(_ => randomNumber)
             .Take(productsByCategorySize)
             .ToListAsync(ct);
     }

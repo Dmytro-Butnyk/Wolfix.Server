@@ -53,8 +53,7 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
     }
 
     public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRecommendedForPageAsync(int pageSize,
-        List<Guid> visitedCategoriesIds,
-        CancellationToken ct)
+        List<Guid> visitedCategoriesIds, CancellationToken ct)
     {
         IReadOnlyCollection<ProductShortProjection> recommendedProducts =
             await productRepository.GetRecommendedForPageAsync(pageSize, visitedCategoriesIds, ct);
