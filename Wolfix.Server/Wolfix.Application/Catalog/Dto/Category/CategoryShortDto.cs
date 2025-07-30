@@ -1,4 +1,5 @@
 using Wolfix.Application.Shared;
+using Wolfix.Application.Shared.Dto;
 
 namespace Wolfix.Application.Catalog.Dto.Category;
 

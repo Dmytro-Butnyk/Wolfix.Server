@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Wolfix.Application.Catalog.Dto.Product;
 using Wolfix.Application.Catalog.Interfaces;
+using Wolfix.Application.Shared.Dto;
 using Wolfix.Domain.Shared;
 
 namespace Wolfix.API.Controllers.Catalog;
@@ -9,11 +10,22 @@ namespace Wolfix.API.Controllers.Catalog;
 [ApiController]
 public sealed class ProductsController(IProductService productService) : ControllerBase
 {
-    [HttpGet("{childCategoryId:guid}")]
-    public async Task<IActionResult> GetAllProductsByCategory([FromRoute] Guid childCategoryId, CancellationToken ct)
+    [HttpGet("category/{childCategoryId:guid}/page/{page:int}")]
+    public async Task<IActionResult> GetAllProductsByCategoryForPage([FromRoute] Guid childCategoryId, [FromRoute] int page,
+        [FromQuery] int pageSize, CancellationToken ct)
     {
-        Result<IReadOnlyCollection<ProductShortDto>> getProductsByCategoryResult =
-            await productService.GetAllByCategoryIdAsync(childCategoryId, ct);
+        if (page < 1)
+        {
+            return BadRequest("Page must be greater than 0");
+        }
+
+        if (pageSize < 1)
+        {
+            return BadRequest("Page size must be greater than 0");
+        }
+        
+        Result<PaginationDto<ProductShortDto>> getProductsByCategoryResult =
+            await productService.GetForPageByCategoryIdAsync(page, pageSize, childCategoryId, ct);
 
         return getProductsByCategoryResult.Map<IActionResult>(
             onSuccess: parentCategories => Ok(parentCategories),
@@ -21,7 +33,7 @@ public sealed class ProductsController(IProductService productService) : Control
         );
     }
 
-    [HttpGet("page/{page:int}")]
+    [HttpGet("with-discount/page/{page:int}")]
     public async Task<IActionResult> GetProductsWithDiscountForPage([FromRoute] int page, [FromQuery] int pageSize,
         CancellationToken ct)
     {
@@ -35,7 +47,7 @@ public sealed class ProductsController(IProductService productService) : Control
             return BadRequest("Page size must be greater than 0");
         }
         
-        Result<IReadOnlyCollection<ProductShortDto>> getProductsWithDiscountResult =
+        Result<PaginationDto<ProductShortDto>> getProductsWithDiscountResult =
             await productService.GetForPageWithDiscountAsync(page, pageSize, ct);
 
         return getProductsWithDiscountResult.Map<IActionResult>(

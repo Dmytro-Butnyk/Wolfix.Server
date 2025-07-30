@@ -9,7 +9,7 @@ namespace Wolfix.API.Controllers.Catalog;
 [ApiController]
 public sealed class CategoriesController(ICategoryService categoryService) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("parent")]
     public async Task<IActionResult> GetAllParentCategories(CancellationToken ct)
     {
         Result<IReadOnlyCollection<CategoryShortDto>> getParentCategoriesResult = await categoryService.GetAllParentCategoriesAsync(ct);
@@ -20,7 +20,7 @@ public sealed class CategoriesController(ICategoryService categoryService) : Con
         );
     }
 
-    [HttpGet("{parentId:guid}")]
+    [HttpGet("child/{parentId:guid}")]
     public async Task<IActionResult> GetAllChildCategoriesByParent([FromRoute] Guid parentId, CancellationToken ct)
     {
         Result<IReadOnlyCollection<CategoryShortDto>> getChildCategoriesResult =

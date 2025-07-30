@@ -1,3 +1,3 @@
-namespace Wolfix.Application.Shared;
+namespace Wolfix.Application.Shared.Dto;
 
 public abstract record BaseDto(Guid Id);
