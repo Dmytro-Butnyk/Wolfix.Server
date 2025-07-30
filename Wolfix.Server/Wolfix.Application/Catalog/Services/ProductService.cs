@@ -3,6 +3,7 @@ using Wolfix.Application.Catalog.Dto.Product;
 using Wolfix.Application.Catalog.Interfaces;
 using Wolfix.Application.Catalog.Mapping.Product;
 using Wolfix.Domain.Catalog.Interfaces;
+using Wolfix.Domain.Catalog.ProductAggregate;
 using Wolfix.Domain.Catalog.Projections.Product;
 using Wolfix.Domain.Shared;
 
@@ -55,8 +56,22 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
     public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRecommendedForPageAsync(int pageSize,
         List<Guid> visitedCategoriesIds, CancellationToken ct)
     {
-        IReadOnlyCollection<ProductShortProjection> recommendedProducts =
-            await productRepository.GetRecommendedForPageAsync(pageSize, visitedCategoriesIds, ct);
+        Random random = new();
+        List<ProductShortProjection> recommendedProducts = [];
+        
+        int productsByCategorySize = pageSize / visitedCategoriesIds.Count;
+        int remainder = pageSize % visitedCategoriesIds.Count;
+        
+        for (int i = 0; i < visitedCategoriesIds.Count; ++i)
+        {
+            int count = productsByCategorySize + (i < remainder ? 1 : 0);
+            Guid id = visitedCategoriesIds[i];
+            int randomNumber = random.Next();
+            
+            IReadOnlyCollection<ProductShortProjection> recommendedByCategory =
+                await productRepository.GetRecommendedByCategoryIdAsync(id, count, ct);
+            recommendedProducts.AddRange(recommendedByCategory);
+        }
 
         if (recommendedProducts.Count == 0)
         {

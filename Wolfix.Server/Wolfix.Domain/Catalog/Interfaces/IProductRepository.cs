@@ -12,8 +12,7 @@ public interface IProductRepository
     
     Task<IReadOnlyCollection<ProductShortProjection>> GetForPageWithDiscountAsync(int page, int pageSize,
         CancellationToken ct);
-    
-    Task<IReadOnlyCollection<ProductShortProjection>> GetRecommendedForPageAsync(int pageSize,
-        List<Guid> visitedCategoriesIds,
-        CancellationToken ct);
+
+    Task<IReadOnlyCollection<ProductShortProjection>> GetRecommendedByCategoryIdAsync(Guid categoryId,
+        int productsByCategorySize, CancellationToken ct);
 }
