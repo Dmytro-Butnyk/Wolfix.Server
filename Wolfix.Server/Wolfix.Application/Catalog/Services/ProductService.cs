@@ -56,7 +56,6 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
     public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRecommendedForPageAsync(int pageSize,
         List<Guid> visitedCategoriesIds, CancellationToken ct)
     {
-        Random random = new();
         List<ProductShortProjection> recommendedProducts = [];
         
         int productsByCategorySize = pageSize / visitedCategoriesIds.Count;
@@ -66,7 +65,6 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
         {
             int count = productsByCategorySize + (i < remainder ? 1 : 0);
             Guid id = visitedCategoriesIds[i];
-            int randomNumber = random.Next();
             
             IReadOnlyCollection<ProductShortProjection> recommendedByCategory =
                 await productRepository.GetRecommendedByCategoryIdAsync(id, count, ct);
