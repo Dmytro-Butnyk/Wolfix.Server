@@ -85,6 +85,7 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
     public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRecommendedForPageAsync(int pageSize,
         List<Guid> visitedCategoriesIds, CancellationToken ct)
     {
+        //todo: указать сразу количество эллементов списка
         List<ProductShortProjection> recommendedProducts = [];
         
         int productsByCategorySize = pageSize / visitedCategoriesIds.Count;
