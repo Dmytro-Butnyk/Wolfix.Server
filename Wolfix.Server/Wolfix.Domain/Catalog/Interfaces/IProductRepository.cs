@@ -8,7 +8,7 @@ public interface IProductRepository
     : IBaseRepository<Product>, IPaginationRepository<ProductShortProjection>
 {
     Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdAsNoTrackingAsync(Guid childCategoryId,
-        CancellationToken ct);
+        int pageSize, Guid? cursor, CancellationToken ct);
     
     Task<IReadOnlyCollection<ProductShortProjection>> GetForPageWithDiscountAsync(int page, int pageSize,
         CancellationToken ct);

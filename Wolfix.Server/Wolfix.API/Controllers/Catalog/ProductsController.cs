@@ -11,24 +11,19 @@ namespace Wolfix.API.Controllers.Catalog;
 public sealed class ProductsController(IProductService productService) : ControllerBase
 {
     [HttpGet("category/{childCategoryId:guid}/page/{page:int}")]
-    public async Task<IActionResult> GetAllProductsByCategoryForPage([FromRoute] Guid childCategoryId, [FromRoute] int page,
-        [FromQuery] int pageSize, CancellationToken ct)
+    public async Task<IActionResult> GetAllProductsByCategoryForPage([FromRoute] Guid childCategoryId,
+        [FromQuery] int pageSize, [FromQuery] Guid? cursor, CancellationToken ct)
     {
-        if (page < 1)
-        {
-            return BadRequest("Page must be greater than 0");
-        }
-
         if (pageSize < 1)
         {
             return BadRequest("Page size must be greater than 0");
         }
         
-        Result<PaginationDto<ProductShortDto>> getProductsByCategoryResult =
-            await productService.GetForPageByCategoryIdAsync(page, pageSize, childCategoryId, ct);
+        Result<CursorPaginationDto<ProductShortDto>> getProductsByCategoryResult =
+            await productService.GetForPageByCategoryIdAsync(pageSize, childCategoryId, cursor, ct);
 
         return getProductsByCategoryResult.Map<IActionResult>(
-            onSuccess: parentCategories => Ok(parentCategories),
+            onSuccess: productsByCategory => Ok(productsByCategory),
             onFailure: errorMessage => NotFound(errorMessage)
         );
     }

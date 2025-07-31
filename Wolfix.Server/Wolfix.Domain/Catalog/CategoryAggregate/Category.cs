@@ -54,7 +54,11 @@ public sealed class Category : BaseEntity
             return Result<Category>.Failure(descriptionErrorMessage);
         }
 
-        var category = new Category(name, description, parent);
+        var category = new Category(name, description, parent)
+        {
+            ProductsCount = 0
+        };
+
         return Result<Category>.Success(category, HttpStatusCode.Created);
     }
 

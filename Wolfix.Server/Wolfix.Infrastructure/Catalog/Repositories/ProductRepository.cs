@@ -31,15 +31,24 @@ internal sealed class ProductRepository(WolfixStoreContext context)
         return new List<ProductShortProjection>();
     }
 
-    public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdAsNoTrackingAsync(
-        Guid childCategoryId,
-        CancellationToken ct)
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdAsNoTrackingAsync(Guid childCategoryId, int pageSize,
+        Guid? cursor, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         
-        List<ProductShortProjection> productsByCategory = await _products
+        var query = _products
+            .Include(p => p.Discount)
             .AsNoTracking()
-            .Where(product => product.CategoryId == childCategoryId)
+            .Where(product => product.CategoryId == childCategoryId);
+
+        if (cursor.HasValue)
+        {
+            query = query.Where(product => product.Id > cursor.Value);
+        }
+
+        List<ProductShortProjection> productsByCategory = await query
+            .OrderBy(product => product.Id)
+            .Take(pageSize)
             .Select(product => new ProductShortProjection(product.Id, product.Title, product.AverageRating,
                 product.Price, product.FinalPrice, product.Bonuses))
             .ToListAsync(ct);
