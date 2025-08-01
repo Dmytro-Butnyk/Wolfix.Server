@@ -7,7 +7,7 @@ namespace Wolfix.Domain.Catalog.Interfaces;
 public interface IProductRepository
     : IBaseRepository<Product>, IPaginationRepository<ProductShortProjection>
 {
-    Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdAsNoTrackingAsync(Guid childCategoryId,
+    Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdForPageAsync(Guid childCategoryId,
         int page, int pageSize, CancellationToken ct);
     
     Task<IReadOnlyCollection<ProductShortProjection>> GetForPageWithDiscountAsync(int page, int pageSize,
@@ -20,5 +20,5 @@ public interface IProductRepository
     
     Task<int> GetTotalCountByCategoryAsync(Guid categoryId, CancellationToken ct);
 
-    Task<IEnumerable<ProductShortProjection>> GetRandom(int randomSkip, int pageSize, CancellationToken ct);
+    Task<IReadOnlyCollection<ProductShortProjection>> GetRandomAsync(int randomSkip, int pageSize, CancellationToken ct);
 }

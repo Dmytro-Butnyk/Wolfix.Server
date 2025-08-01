@@ -44,12 +44,12 @@ public sealed class Category : BaseEntity
 
     public static Result<Category> Create(string name, string? description = null, Category? parent = null)
     {
-        if (IsTextInvalid(name, out var nameErrorMessage))
+        if (IsTextInvalid(name, out string nameErrorMessage))
         {
             return Result<Category>.Failure(nameErrorMessage);
         }
         
-        if (description != null && IsTextInvalid(description, out var descriptionErrorMessage))
+        if (description != null && IsTextInvalid(description, out string descriptionErrorMessage))
         {
             return Result<Category>.Failure(descriptionErrorMessage);
         }
@@ -64,7 +64,7 @@ public sealed class Category : BaseEntity
 
     public VoidResult ChangeName(string name)
     {
-        if (IsTextInvalid(name, out var errorMessage))
+        if (IsTextInvalid(name, out string errorMessage))
         {
             return VoidResult.Failure(errorMessage);
         }
@@ -87,7 +87,7 @@ public sealed class Category : BaseEntity
     #region productIds
     public VoidResult AddProductId(Guid productId)
     {
-        if (IsGuidInvalid(productId, out var errorMessage))
+        if (IsGuidInvalid(productId, out string errorMessage))
         {
             return VoidResult.Failure(errorMessage);
         }
@@ -104,7 +104,7 @@ public sealed class Category : BaseEntity
 
     public VoidResult RemoveProductId(Guid productId)
     {
-        if (IsGuidInvalid(productId, out var errorMessage))
+        if (IsGuidInvalid(productId, out string errorMessage))
         {
             return VoidResult.Failure(errorMessage);
         }
@@ -130,7 +130,7 @@ public sealed class Category : BaseEntity
     #region productVariant
     public Result<ProductVariantInfo> GetProductVariant(Guid productVariantId)
     {
-        var productVariant = _productVariants.FirstOrDefault(pv => pv.Id == productVariantId);
+        ProductVariant? productVariant = _productVariants.FirstOrDefault(pv => pv.Id == productVariantId);
 
         if (productVariant == null)
         {
@@ -143,7 +143,7 @@ public sealed class Category : BaseEntity
 
     public Result<string> GetProductVariantKey(Guid productVariantId)
     {
-        var productVariant = _productVariants.FirstOrDefault(pv => pv.Id == productVariantId);
+        ProductVariant? productVariant = _productVariants.FirstOrDefault(pv => pv.Id == productVariantId);
         
         if (productVariant == null)
         {
@@ -157,14 +157,14 @@ public sealed class Category : BaseEntity
     #region productVariants
     public VoidResult AddProductVariant(string key)
     {
-        var existingProductVariant = _productVariants.FirstOrDefault(pv => pv.Key == key);
+        ProductVariant? existingProductVariant = _productVariants.FirstOrDefault(pv => pv.Key == key);
 
         if (existingProductVariant != null)
         {
             return VoidResult.Failure($"{nameof(existingProductVariant)} already exists", HttpStatusCode.Conflict);
         }
         
-        var createProductVariantResult = ProductVariant.Create(this, key);
+        Result<ProductVariant> createProductVariantResult = ProductVariant.Create(this, key);
 
         return createProductVariantResult.Map(
             onSuccess: productVariant =>
@@ -178,7 +178,7 @@ public sealed class Category : BaseEntity
 
     public VoidResult RemoveProductVariant(Guid productVariantId)
     {
-        var existingProductVariant = _productVariants.FirstOrDefault(pv => pv.Id == productVariantId);
+        ProductVariant? existingProductVariant = _productVariants.FirstOrDefault(pv => pv.Id == productVariantId);
         
         if (existingProductVariant == null)
         {
@@ -197,14 +197,14 @@ public sealed class Category : BaseEntity
 
     public VoidResult ChangeProductVariantKey(Guid productVariantId, string key)
     {
-        var existingProductVariant = _productVariants.FirstOrDefault(pv => pv.Id == productVariantId);
+        ProductVariant? existingProductVariant = _productVariants.FirstOrDefault(pv => pv.Id == productVariantId);
         
         if (existingProductVariant == null)
         {
             return VoidResult.Failure($"{nameof(existingProductVariant)} does not exist", HttpStatusCode.NotFound);
         }
         
-        var setProductVariantKeyResult = existingProductVariant.SetKey(key);
+        VoidResult setProductVariantKeyResult = existingProductVariant.SetKey(key);
 
         return setProductVariantKeyResult.Map(
             onSuccess: () => VoidResult.Success(),
@@ -216,7 +216,7 @@ public sealed class Category : BaseEntity
     #region productAttribute
     public Result<ProductAttributeInfo> GetProductAttribute(Guid productAttributeId)
     {
-        var productAttribute = _productAttributes.FirstOrDefault(pa => pa.Id == productAttributeId);
+        ProductAttribute? productAttribute = _productAttributes.FirstOrDefault(pa => pa.Id == productAttributeId);
         
         if (productAttribute == null)
         {
@@ -229,7 +229,7 @@ public sealed class Category : BaseEntity
 
     public Result<string> GetProductAttributeKey(Guid productAttributeId)
     {
-        var productAttribute = _productAttributes.FirstOrDefault(pa => pa.Id == productAttributeId);
+        ProductAttribute? productAttribute = _productAttributes.FirstOrDefault(pa => pa.Id == productAttributeId);
         
         if (productAttribute == null)
         {
@@ -243,14 +243,14 @@ public sealed class Category : BaseEntity
     #region productAttributes
     public VoidResult AddProductAttribute(string key)
     {
-        var existingProductAttribute = _productAttributes.FirstOrDefault(pa => pa.Key == key);
+        ProductAttribute? existingProductAttribute = _productAttributes.FirstOrDefault(pa => pa.Key == key);
 
         if (existingProductAttribute != null)
         {
             return VoidResult.Failure($"{nameof(existingProductAttribute)} already exists", HttpStatusCode.Conflict);
         }
         
-        var createProductAttributeResult = ProductAttribute.Create(this, key);
+        Result<ProductAttribute> createProductAttributeResult = ProductAttribute.Create(this, key);
 
         return createProductAttributeResult.Map(
             onSuccess: productAttribute =>
@@ -264,7 +264,7 @@ public sealed class Category : BaseEntity
 
     public VoidResult RemoveProductAttribute(Guid productAttributeId)
     {
-        var existingProductAttribute = _productAttributes.FirstOrDefault(pa => pa.Id == productAttributeId);
+        ProductAttribute? existingProductAttribute = _productAttributes.FirstOrDefault(pa => pa.Id == productAttributeId);
         
         if (existingProductAttribute == null)
         {
@@ -283,14 +283,14 @@ public sealed class Category : BaseEntity
 
     public VoidResult ChangeProductAttributeKey(Guid productAttributeId, string key)
     {
-        var existingProductAttribute = _productAttributes.FirstOrDefault(pa => pa.Id == productAttributeId);
+        ProductAttribute? existingProductAttribute = _productAttributes.FirstOrDefault(pa => pa.Id == productAttributeId);
 
         if (existingProductAttribute == null)
         {
             return VoidResult.Failure($"{nameof(existingProductAttribute)} does not exist", HttpStatusCode.NotFound);
         }
 
-        var setProductAttributeKeyResult = existingProductAttribute.SetKey(key);
+        VoidResult setProductAttributeKeyResult = existingProductAttribute.SetKey(key);
 
         return setProductAttributeKeyResult.Map(
             onSuccess: () => VoidResult.Success(),

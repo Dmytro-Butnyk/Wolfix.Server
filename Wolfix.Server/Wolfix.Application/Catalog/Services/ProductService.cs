@@ -28,7 +28,7 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
         }
         
         IReadOnlyCollection<ProductShortProjection> productsByCategory =
-            await productRepository.GetAllByCategoryIdAsNoTrackingAsync(childCategoryId, page, pageSize, ct);
+            await productRepository.GetAllByCategoryIdForPageAsync(childCategoryId, page, pageSize, ct);
 
         if (productsByCategory.Count == 0)
         {
@@ -117,28 +117,29 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
         return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
     }
 
-    public async Task<Result<IEnumerable<ProductShortDto>>> GetRandomProducts(int pageSize, CancellationToken ct)
+    public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRandomProductsAsync(int pageSize,
+        CancellationToken ct)
     {
         int productCount = await productRepository.GetTotalCountAsync(ct);
 
         if (productCount == 0)
         {
-            return Result<IEnumerable<ProductShortDto>>.Failure(
+            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(
                 "Products list is empty",    
                 HttpStatusCode.NotFound
             );
         }
         
-        Random random = new Random();
+        var random = new Random();
         int randomSkip = random.Next(1, productCount);
 
         List<ProductShortProjection> products = (await productRepository
-            .GetRandom(randomSkip, pageSize, ct))
+            .GetRandomAsync(randomSkip, pageSize, ct))
             .ToList();
 
         if (products.Count == 0)
         {
-            return Result<IEnumerable<ProductShortDto>>.Failure(
+            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(
                 "Products not found",    
                 HttpStatusCode.NotFound
             );
@@ -148,6 +149,6 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
             .Select(product => product.ToShortDto())
             .ToList();
 
-        return Result<IEnumerable<ProductShortDto>>.Success(randomProducts);
+        return Result<IReadOnlyCollection<ProductShortDto>>.Success(randomProducts);
     }
 }

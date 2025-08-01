@@ -11,10 +11,10 @@ namespace Wolfix.API.Controllers.Catalog;
 public sealed class ProductsController(IProductService productService) : ControllerBase
 {
     [HttpGet("category/{childCategoryId:guid}/page/{page:int}")]
-    public async Task<IActionResult> GetAllProductsByCategoryForPage([FromRoute] Guid childCategoryId,
+    public async Task<IActionResult> GetAllByCategoryForPage([FromRoute] Guid childCategoryId,
         [FromRoute] int page, [FromQuery] int pageSize, CancellationToken ct)
     {
-        if (IsPaginationRequestInvalid(page, pageSize, out var message))
+        if (IsPaginationRequestInvalid(page, pageSize, out string message))
         {
             return BadRequest(message);
         }
@@ -32,7 +32,7 @@ public sealed class ProductsController(IProductService productService) : Control
     public async Task<IActionResult> GetProductsWithDiscountForPage([FromRoute] int page, [FromQuery] int pageSize,
         CancellationToken ct)
     {
-        if (IsPaginationRequestInvalid(page, pageSize, out var message))
+        if (IsPaginationRequestInvalid(page, pageSize, out string message))
         {
             return BadRequest(message);
         }
@@ -81,12 +81,12 @@ public sealed class ProductsController(IProductService productService) : Control
         return false;
     }
 
-    // todo: review
+    //todo: review
     [HttpGet("random")]
     public async Task<IActionResult> GetRandomProducts([FromQuery] int pageSize, CancellationToken ct)
     {
-        Result<IEnumerable<ProductShortDto>> getRandomProductsResult =
-            await productService.GetRandomProducts(pageSize, ct);
+        Result<IReadOnlyCollection<ProductShortDto>> getRandomProductsResult =
+            await productService.GetRandomProductsAsync(pageSize, ct);
 
         return getRandomProductsResult.Map<IActionResult>(
             onSuccess: randomProducts => Ok(randomProducts),

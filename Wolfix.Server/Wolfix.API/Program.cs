@@ -8,7 +8,7 @@ if (File.Exists(".env"))
     Env.Load(options: loadOptions);
 }
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder
     .AddDbContext()
@@ -21,7 +21,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 app.UseStaticFiles();
 

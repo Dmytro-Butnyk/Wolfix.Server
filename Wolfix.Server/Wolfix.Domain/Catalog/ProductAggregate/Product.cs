@@ -82,27 +82,27 @@ public sealed class Product : BaseEntity
 
     public static Result<Product> Create(string title, string description, decimal price, ProductStatus status, Guid categoryId)
     {
-        if (IsTextInvalid(title, out var titleErrorMessage))
+        if (IsTextInvalid(title, out string titleErrorMessage))
         {
             return Result<Product>.Failure(titleErrorMessage);
         }
 
-        if (IsTextInvalid(description, out var descriptionErrorMessage))
+        if (IsTextInvalid(description, out string descriptionErrorMessage))
         {
             return Result<Product>.Failure(descriptionErrorMessage);
         }
 
-        if (IsPriceInvalid(price, out var priceErrorMessage))
+        if (IsPriceInvalid(price, out string priceErrorMessage))
         {
             return Result<Product>.Failure(priceErrorMessage);
         }
 
-        if (IsStatusInvalid(status, out var statusErrorMessage))
+        if (IsStatusInvalid(status, out string statusErrorMessage))
         {
             return Result<Product>.Failure(statusErrorMessage);
         }
 
-        if (IsGuidInvalid(categoryId, out var categoryIdErrorMessage))
+        if (IsGuidInvalid(categoryId, out string categoryIdErrorMessage))
         {
             return Result<Product>.Failure(categoryIdErrorMessage);
         }
@@ -117,7 +117,7 @@ public sealed class Product : BaseEntity
 
     public VoidResult ChangeTitle(string title)
     {
-        if (IsTextInvalid(title, out var titleErrorMessage))
+        if (IsTextInvalid(title, out string titleErrorMessage))
         {
             return VoidResult.Failure(titleErrorMessage);
         }
@@ -128,7 +128,7 @@ public sealed class Product : BaseEntity
     
     public VoidResult ChangeDescription(string description)
     {
-        if (IsTextInvalid(description, out var descriptionErrorMessage))
+        if (IsTextInvalid(description, out string descriptionErrorMessage))
         {
             return VoidResult.Failure(descriptionErrorMessage);
         }
@@ -139,7 +139,7 @@ public sealed class Product : BaseEntity
 
     public VoidResult ChangePrice(decimal price)
     {
-        if (IsPriceInvalid(price, out var priceErrorMessage))
+        if (IsPriceInvalid(price, out string priceErrorMessage))
         {
             return VoidResult.Failure(priceErrorMessage);
         }
@@ -154,7 +154,7 @@ public sealed class Product : BaseEntity
 
     public VoidResult ChangeStatus(ProductStatus status)
     {
-        if (IsStatusInvalid(status, out var errorMessage))
+        if (IsStatusInvalid(status, out string errorMessage))
         {
             return VoidResult.Failure(errorMessage);
         }
@@ -166,7 +166,7 @@ public sealed class Product : BaseEntity
     #region categoryId
     public VoidResult ChangeCategory(Guid categoryId)
     {
-        if (IsGuidInvalid(categoryId, out var errorMessage))
+        if (IsGuidInvalid(categoryId, out string errorMessage))
         {
             return VoidResult.Failure(errorMessage);
         }
@@ -184,7 +184,7 @@ public sealed class Product : BaseEntity
     #region discount
     public Result<DiscountInfo> GetDiscount()
     {
-        if (IsDiscountExists(out var errorMessage))
+        if (IsDiscountExists(out string errorMessage))
         {
             return Result<DiscountInfo>.Failure(errorMessage);
         }
@@ -195,7 +195,7 @@ public sealed class Product : BaseEntity
 
     public Result<Guid> GetDiscountId()
     {
-        if (IsDiscountExists(out var errorMessage))
+        if (IsDiscountExists(out string errorMessage))
         {
             return Result<Guid>.Failure(errorMessage);
         }
@@ -205,13 +205,13 @@ public sealed class Product : BaseEntity
     
     public Result<uint> GetDiscountPercent()
     {
-        if (IsDiscountExists(out var discountInvalidErrorMessage))
+        if (IsDiscountExists(out string discountInvalidErrorMessage))
         {
             return Result<uint>.Failure(discountInvalidErrorMessage);
         }
         
         //todo:?
-        if (IsDiscountExpired(out var discountExpiredErrorMessage))
+        if (IsDiscountExpired(out string discountExpiredErrorMessage))
         {
             return Result<uint>.Failure(discountExpiredErrorMessage);
         }
@@ -221,13 +221,13 @@ public sealed class Product : BaseEntity
 
     public Result<DateTime> GetDiscountExpirationDateTime()
     {
-        if (IsDiscountExists(out var discountInvalidErrorMessage))
+        if (IsDiscountExists(out string discountInvalidErrorMessage))
         {
             return Result<DateTime>.Failure(discountInvalidErrorMessage);
         }
         
         //todo:?
-        if (IsDiscountExpired(out var discountExpiredErrorMessage))
+        if (IsDiscountExpired(out string discountExpiredErrorMessage))
         {
             return Result<DateTime>.Failure(discountExpiredErrorMessage);
         }
@@ -237,7 +237,7 @@ public sealed class Product : BaseEntity
 
     public Result<DiscountStatus> GetDiscountStatus()
     {
-        if (IsDiscountExists(out var errorMessage))
+        if (IsDiscountExists(out string errorMessage))
         {
             return Result<DiscountStatus>.Failure(errorMessage);
         }
@@ -247,7 +247,7 @@ public sealed class Product : BaseEntity
     
     public VoidResult AddDiscount(uint percent, DateTime expirationDateTime)
     {
-        var createDiscountResult = Discount.Create(percent, expirationDateTime, this);
+        Result<Discount> createDiscountResult = Discount.Create(percent, expirationDateTime, this);
 
         return createDiscountResult.Map(
             onSuccess: discount =>
@@ -262,7 +262,7 @@ public sealed class Product : BaseEntity
 
     public VoidResult RemoveDiscount()
     {
-        if (IsDiscountExists(out var errorMessage))
+        if (IsDiscountExists(out string errorMessage))
         {
             return VoidResult.Failure(errorMessage);
         }
@@ -274,12 +274,12 @@ public sealed class Product : BaseEntity
 
     public VoidResult MakeDiscountExpired()
     {
-        if (IsDiscountExists(out var discountInvalidErrorMessage))
+        if (IsDiscountExists(out string discountInvalidErrorMessage))
         {
             return VoidResult.Failure(discountInvalidErrorMessage);
         }
 
-        var setStatusResult = Discount!.SetStatus(DiscountStatus.Expired);
+        VoidResult setStatusResult = Discount!.SetStatus(DiscountStatus.Expired);
         
         return setStatusResult.Map(
             onSuccess: () =>
@@ -295,7 +295,7 @@ public sealed class Product : BaseEntity
     #region review
     public Result<ReviewInfo> GetReview(Guid reviewId)
     {
-        var review = _reviews.FirstOrDefault(r => r.Id == reviewId);
+        Review? review = _reviews.FirstOrDefault(r => r.Id == reviewId);
 
         if (review == null)
         {
@@ -308,7 +308,7 @@ public sealed class Product : BaseEntity
 
     public Result<string> GetReviewTitle(Guid reviewId)
     {
-        var review = _reviews.FirstOrDefault(r => r.Id == reviewId);
+        Review? review = _reviews.FirstOrDefault(r => r.Id == reviewId);
         
         if (review == null)
         {
@@ -320,7 +320,7 @@ public sealed class Product : BaseEntity
 
     public Result<string> GetReviewText(Guid reviewId)
     {
-        var review = _reviews.FirstOrDefault(r => r.Id == reviewId);
+        Review? review = _reviews.FirstOrDefault(r => r.Id == reviewId);
         
         if (review == null)
         {
@@ -332,7 +332,7 @@ public sealed class Product : BaseEntity
 
     public Result<uint> GetReviewRating(Guid reviewId)
     {
-        var review = _reviews.FirstOrDefault(r => r.Id == reviewId);
+        Review? review = _reviews.FirstOrDefault(r => r.Id == reviewId);
         
         if (review == null)
         {
@@ -348,7 +348,7 @@ public sealed class Product : BaseEntity
     #region reviews
     public VoidResult AddReview(string title, string text, uint rating)
     {
-        var createReviewResult = Review.Create(title, text, rating, this);
+        Result<Review> createReviewResult = Review.Create(title, text, rating, this);
 
         return createReviewResult.Map(
             onSuccess: review =>
@@ -363,7 +363,7 @@ public sealed class Product : BaseEntity
     
     public VoidResult RemoveReview(Guid reviewId)
     {
-        var review = _reviews.FirstOrDefault(r => r.Id == reviewId);
+        Review? review = _reviews.FirstOrDefault(r => r.Id == reviewId);
 
         if (review == null)
         {
@@ -384,14 +384,14 @@ public sealed class Product : BaseEntity
 
     public VoidResult ChangeReviewTitle(Guid reviewId, string title)
     {
-        var review = _reviews.FirstOrDefault(r => r.Id == reviewId);
+        Review? review = _reviews.FirstOrDefault(r => r.Id == reviewId);
 
         if (review == null)
         {
             return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
-        var setReviewTitleResult = review.SetTitle(title);
+        VoidResult setReviewTitleResult = review.SetTitle(title);
         
         return setReviewTitleResult.Map(
             onSuccess: () => VoidResult.Success(),
@@ -401,14 +401,14 @@ public sealed class Product : BaseEntity
 
     public VoidResult ChangeReviewText(Guid reviewId, string text)
     {
-        var review = _reviews.FirstOrDefault(r => r.Id == reviewId);
+        Review? review = _reviews.FirstOrDefault(r => r.Id == reviewId);
 
         if (review == null)
         {
             return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
-        var setReviewTextResult = review.SetText(text);
+        VoidResult setReviewTextResult = review.SetText(text);
         
         return setReviewTextResult.Map(
             onSuccess: () => VoidResult.Success(),
@@ -418,14 +418,14 @@ public sealed class Product : BaseEntity
 
     public VoidResult ChangeReviewRating(Guid reviewId, uint rating)
     {
-        var review = _reviews.FirstOrDefault(r => r.Id == reviewId);
+        Review? review = _reviews.FirstOrDefault(r => r.Id == reviewId);
 
         if (review == null)
         {
             return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
-        var setReviewRatingResult = review.SetRating(rating);
+        VoidResult setReviewRatingResult = review.SetRating(rating);
         
         return setReviewRatingResult.Map(
             onSuccess: () =>
@@ -441,7 +441,7 @@ public sealed class Product : BaseEntity
     #region productAttributeValue
     public Result<ProductAttributeValueInfo> GetProductAttributeValue(Guid productAttributeValueId)
     {
-        var productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
 
         if (productAttributeValue == null)
         {
@@ -454,7 +454,7 @@ public sealed class Product : BaseEntity
 
     public Result<string> GetProductAttributeValueKey(Guid productAttributeValueId)
     {
-        var productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
         
         if (productAttributeValue == null)
         {
@@ -466,7 +466,7 @@ public sealed class Product : BaseEntity
 
     public Result<string> GetProductAttributeValueValue(Guid productAttributeValueId)
     {
-        var productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
         
         if (productAttributeValue == null)
         {
@@ -480,14 +480,14 @@ public sealed class Product : BaseEntity
     #region productAttributeValues
     public VoidResult AddProductAttributeValue(string key, string value)
     {
-        var existingProductAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Value == value);
+        ProductAttributeValue? existingProductAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Value == value);
 
         if (existingProductAttributeValue != null)
         {
             return VoidResult.Failure($"{nameof(existingProductAttributeValue)} already exists", HttpStatusCode.Conflict);
         }
         
-        var createProductAttributeValueResult = ProductAttributeValue.Create(this, key, value);
+        Result<ProductAttributeValue> createProductAttributeValueResult = ProductAttributeValue.Create(this, key, value);
 
         return createProductAttributeValueResult.Map(
             onSuccess: productAttributeValue =>
@@ -501,7 +501,7 @@ public sealed class Product : BaseEntity
 
     public VoidResult RemoveProductAttributeValue(Guid productAttributeValueId)
     {
-        var productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
         
         if (productAttributeValue == null)
         {
@@ -520,14 +520,14 @@ public sealed class Product : BaseEntity
 
     public VoidResult ChangeProductAttributeKey(Guid productAttributeValueId, string key)
     {
-        var productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
         
         if (productAttributeValue == null)
         {
             return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
-        var setProductAttributeKeyResult = productAttributeValue.SetKey(key);
+        VoidResult setProductAttributeKeyResult = productAttributeValue.SetKey(key);
 
         return setProductAttributeKeyResult.Map(
             onSuccess: () => VoidResult.Success(),
@@ -537,14 +537,14 @@ public sealed class Product : BaseEntity
 
     public VoidResult ChangeProductAttributeValue(Guid productAttributeValueId, string value)
     {
-        var productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
         
         if (productAttributeValue == null)
         {
             return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
-        var setProductAttributeValueResult = productAttributeValue.SetValue(value);
+        VoidResult setProductAttributeValueResult = productAttributeValue.SetValue(value);
 
         return setProductAttributeValueResult.Map(
             onSuccess: () => VoidResult.Success(),
@@ -556,7 +556,7 @@ public sealed class Product : BaseEntity
     #region productVariantValue
     public Result<ProductVariantValueInfo> GetProductVariantValue(Guid productVariantValueId)
     {
-        var productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
+        ProductVariantValue? productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
 
         if (productVariantValue == null)
         {
@@ -569,7 +569,7 @@ public sealed class Product : BaseEntity
 
     public Result<string> GetProductVariantValueKey(Guid productVariantValueId)
     {
-        var productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
+        ProductVariantValue? productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
         
         if (productVariantValue == null)
         {
@@ -581,7 +581,7 @@ public sealed class Product : BaseEntity
 
     public Result<string> GetProductVariantValueValue(Guid productVariantValueId)
     {
-        var productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
+        ProductVariantValue? productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
         
         if (productVariantValue == null)
         {
@@ -596,14 +596,14 @@ public sealed class Product : BaseEntity
     #region productVariantValues
     public VoidResult AddProductVariantValue(string key, string value)
     {
-        var existingProductVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Value == value);
+        ProductVariantValue? existingProductVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Value == value);
 
         if (existingProductVariantValue != null)
         {
             return VoidResult.Failure($"{nameof(existingProductVariantValue)} already exists", HttpStatusCode.Conflict);
         }
         
-        var createProductVariantValueResult = ProductVariantValue.Create(this, key, value);
+        Result<ProductVariantValue> createProductVariantValueResult = ProductVariantValue.Create(this, key, value);
 
         return createProductVariantValueResult.Map(
             onSuccess: productVariantValue =>
@@ -617,7 +617,7 @@ public sealed class Product : BaseEntity
 
     public VoidResult RemoveProductVariantValue(Guid productVariantValueId)
     {
-        var productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
+        ProductVariantValue? productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
         
         if (productVariantValue == null)
         {
@@ -636,14 +636,14 @@ public sealed class Product : BaseEntity
     
     public VoidResult ChangeProductVariantKey(Guid productVariantValueId, string key)
     {
-        var productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
+        ProductVariantValue? productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
         
         if (productVariantValue == null)
         {
             return VoidResult.Failure($"{nameof(productVariantValue)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
-        var setProductVariantKeyResult = productVariantValue.SetKey(key);
+        VoidResult setProductVariantKeyResult = productVariantValue.SetKey(key);
 
         return setProductVariantKeyResult.Map(
             onSuccess: () => VoidResult.Success(),
@@ -653,14 +653,14 @@ public sealed class Product : BaseEntity
 
     public VoidResult ChangeProductVariantValue(Guid productVariantValueId, string value)
     {
-        var productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
+        ProductVariantValue? productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
         
         if (productVariantValue == null)
         {
             return VoidResult.Failure($"{nameof(productVariantValue)} is null. Nothing to change.", HttpStatusCode.NotFound);
         }
         
-        var setProductVariantValueResult = productVariantValue.SetValue(value);
+        VoidResult setProductVariantValueResult = productVariantValue.SetValue(value);
 
         return setProductVariantValueResult.Map(
             onSuccess: () => VoidResult.Success(),

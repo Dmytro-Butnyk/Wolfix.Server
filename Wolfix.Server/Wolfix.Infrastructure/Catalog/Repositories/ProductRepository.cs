@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Wolfix.Domain.Catalog.Interfaces;
 using Wolfix.Domain.Catalog.ProductAggregate;
 using Wolfix.Domain.Catalog.ProductAggregate.Enums;
@@ -32,7 +32,8 @@ internal sealed class ProductRepository(WolfixStoreContext context)
         return new List<ProductShortProjection>();
     }
 
-    public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdAsNoTrackingAsync(Guid childCategoryId, int page,
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdForPageAsync(Guid childCategoryId,
+        int page,
         int pageSize, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
@@ -111,7 +112,7 @@ internal sealed class ProductRepository(WolfixStoreContext context)
         return totalCount;
     }
 
-    public async Task<IEnumerable<ProductShortProjection>> GetRandom(int randomSkip, int pageSize,
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetRandomAsync(int randomSkip, int pageSize,
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();

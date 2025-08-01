@@ -6,7 +6,7 @@ public static class EnvironmentExtension
 {
     public static string GetEnvironmentVariableOrThrow(string key)
     {
-        var value = Environment.GetEnvironmentVariable(key);
+        string? value = Environment.GetEnvironmentVariable(key);
 
         if (value is null)
         {
