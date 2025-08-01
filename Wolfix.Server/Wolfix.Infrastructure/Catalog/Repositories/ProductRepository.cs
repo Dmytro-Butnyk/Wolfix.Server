@@ -12,12 +12,13 @@ internal sealed class ProductRepository(WolfixStoreContext context)
 {
     private readonly DbSet<Product> _products = context.Products;
     
-    //todo: product repository
     public async Task<int> GetTotalCountAsync(CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-        int totalCount = await _products.CountAsync(ct);
+        int totalCount = await _products
+            .AsNoTracking()
+            .CountAsync(ct);
 
         return totalCount;
     }
@@ -31,23 +32,17 @@ internal sealed class ProductRepository(WolfixStoreContext context)
         return new List<ProductShortProjection>();
     }
 
-    public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdAsNoTrackingAsync(Guid childCategoryId, int pageSize,
-        Guid? cursor, CancellationToken ct)
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdAsNoTrackingAsync(Guid childCategoryId, int page,
+        int pageSize, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         
-        var query = _products
+        List<ProductShortProjection> productsByCategory = await _products
             .Include(p => p.Discount)
             .AsNoTracking()
-            .Where(product => product.CategoryId == childCategoryId);
-
-        if (cursor.HasValue)
-        {
-            query = query.Where(product => product.Id > cursor.Value);
-        }
-
-        List<ProductShortProjection> productsByCategory = await query
-            .OrderBy(product => product.Id)
+            .Where(product => product.CategoryId == childCategoryId)
+            .OrderBy(product => product.FinalPrice)
+            .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(product => new ProductShortProjection(product.Id, product.Title, product.AverageRating,
                 product.Price, product.FinalPrice, product.Bonuses))
@@ -89,5 +84,30 @@ internal sealed class ProductRepository(WolfixStoreContext context)
             .Select(product => new ProductShortProjection(product.Id, product.Title, product.AverageRating,
                 product.Price, product.FinalPrice, product.Bonuses))
             .ToListAsync(ct);
+    }
+
+    public async Task<int> GetTotalCountWithDiscountAsync(CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        
+        int totalCount = await _products
+            .Include(p => p.Discount)
+            .AsNoTracking()
+            .Where(product => product.Discount != null && product.Discount.Status == DiscountStatus.Active)
+            .CountAsync(ct);
+        
+        return totalCount;
+    }
+
+    public async Task<int> GetTotalCountByCategoryAsync(Guid categoryId, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        
+        int totalCount = await _products
+            .AsNoTracking()
+            .Where(product => product.CategoryId == categoryId)
+            .CountAsync(ct);
+        
+        return totalCount;
     }
 }

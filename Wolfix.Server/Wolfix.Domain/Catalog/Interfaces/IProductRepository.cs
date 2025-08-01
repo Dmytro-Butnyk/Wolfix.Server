@@ -8,11 +8,15 @@ public interface IProductRepository
     : IBaseRepository<Product>, IPaginationRepository<ProductShortProjection>
 {
     Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdAsNoTrackingAsync(Guid childCategoryId,
-        int pageSize, Guid? cursor, CancellationToken ct);
+        int page, int pageSize, CancellationToken ct);
     
     Task<IReadOnlyCollection<ProductShortProjection>> GetForPageWithDiscountAsync(int page, int pageSize,
         CancellationToken ct);
 
     Task<IReadOnlyCollection<ProductShortProjection>> GetRecommendedByCategoryIdAsync(Guid categoryId,
         int productsByCategorySize, CancellationToken ct);
+    
+    Task<int> GetTotalCountWithDiscountAsync(CancellationToken ct);
+    
+    Task<int> GetTotalCountByCategoryAsync(Guid categoryId, CancellationToken ct);
 }

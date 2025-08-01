@@ -6,8 +6,8 @@ namespace Wolfix.Application.Catalog.Interfaces;
 
 public interface IProductService
 {
-    Task<Result<CursorPaginationDto<ProductShortDto>>> GetForPageByCategoryIdAsync(int pageSize, Guid childCategoryId,
-        Guid? cursor, CancellationToken ct);
+    Task<Result<PaginationDto<ProductShortDto>>> GetForPageByCategoryIdAsync(Guid childCategoryId,
+        int page, int pageSize, CancellationToken ct);
     Task<Result<PaginationDto<ProductShortDto>>> GetForPageWithDiscountAsync(int page, int pageSize,
         CancellationToken ct);
     Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRecommendedForPageAsync(int pageSize,

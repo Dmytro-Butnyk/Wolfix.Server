@@ -12,39 +12,52 @@ namespace Wolfix.Application.Catalog.Services;
 
 internal sealed class ProductService(IProductRepository productRepository) : IProductService
 {
-    public async Task<Result<CursorPaginationDto<ProductShortDto>>> GetForPageByCategoryIdAsync(int pageSize, Guid childCategoryId,
-        Guid? cursor, CancellationToken ct)
+    public async Task<Result<PaginationDto<ProductShortDto>>> GetForPageByCategoryIdAsync(Guid childCategoryId,
+        int page, int pageSize, CancellationToken ct)
     {
-        IReadOnlyCollection<ProductShortProjection> productsByCategory =
-            await productRepository.GetAllByCategoryIdAsNoTrackingAsync(childCategoryId, pageSize, cursor, ct);
+        var errorMessage = $"Products by category: {childCategoryId} not found";
+        
+        int totalCount = await productRepository.GetTotalCountByCategoryAsync(childCategoryId, ct);
 
-        if (productsByCategory.Count == 0)
+        if (totalCount == 0)
         {
-            return Result<CursorPaginationDto<ProductShortDto>>.Failure(
-                $"Products by category: {childCategoryId} not found",
+            return Result<PaginationDto<ProductShortDto>>.Failure(
+                errorMessage,
                 HttpStatusCode.NotFound
             );
         }
+        
+        IReadOnlyCollection<ProductShortProjection> productsByCategory =
+            await productRepository.GetAllByCategoryIdAsNoTrackingAsync(childCategoryId, page, pageSize, ct);
+
+        if (productsByCategory.Count == 0)
+        {
+            return Result<PaginationDto<ProductShortDto>>.Failure(
+                errorMessage,
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
         
         List<ProductShortDto> productShortDtos = productsByCategory
             .Select(product => product.ToShortDto())
             .ToList();
         
-        Guid nextCursor = productShortDtos.Last().Id;
-        CursorPaginationDto<ProductShortDto> paginationDto = new(productShortDtos, nextCursor);
+        PaginationDto<ProductShortDto> paginationDto = new(page, totalPages, totalCount, productShortDtos);
         
-        return Result<CursorPaginationDto<ProductShortDto>>.Success(paginationDto);
+        return Result<PaginationDto<ProductShortDto>>.Success(paginationDto);
     }
 
     public async Task<Result<PaginationDto<ProductShortDto>>> GetForPageWithDiscountAsync(int page, int pageSize,
         CancellationToken ct)
     {
-        int totalCount = await productRepository.GetTotalCountAsync(ct);
+        int totalCount = await productRepository.GetTotalCountWithDiscountAsync(ct);
 
         if (totalCount == 0)
         {
             return Result<PaginationDto<ProductShortDto>>.Failure(
-                "Products not found",    
+                "Products with discount not found",    
                 HttpStatusCode.NotFound
             );
         }
@@ -60,7 +73,7 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
             );
         }
         
-        int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
         
         List<ProductShortDto> productShortDtos = productsWithDiscount
             .Select(product => product.ToShortDto())
@@ -79,7 +92,7 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
         int productsByCategorySize = pageSize / visitedCategoriesIds.Count;
         int remainder = pageSize % visitedCategoriesIds.Count;
         
-        for (int i = 0; i < visitedCategoriesIds.Count; ++i)
+        for (var i = 0; i < visitedCategoriesIds.Count; ++i)
         {
             int count = productsByCategorySize + (i < remainder ? 1 : 0);
             Guid id = visitedCategoriesIds[i];

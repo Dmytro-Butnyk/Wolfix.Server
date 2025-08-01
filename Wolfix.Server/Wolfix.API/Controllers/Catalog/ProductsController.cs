@@ -12,15 +12,15 @@ public sealed class ProductsController(IProductService productService) : Control
 {
     [HttpGet("category/{childCategoryId:guid}/page/{page:int}")]
     public async Task<IActionResult> GetAllProductsByCategoryForPage([FromRoute] Guid childCategoryId,
-        [FromQuery] int pageSize, [FromQuery] Guid? cursor, CancellationToken ct)
+        [FromRoute] int page, [FromQuery] int pageSize, CancellationToken ct)
     {
-        if (pageSize < 1)
+        if (IsPaginationRequestInvalid(page, pageSize, out var message))
         {
-            return BadRequest("Page size must be greater than 0");
+            return BadRequest(message);
         }
         
-        Result<CursorPaginationDto<ProductShortDto>> getProductsByCategoryResult =
-            await productService.GetForPageByCategoryIdAsync(pageSize, childCategoryId, cursor, ct);
+        Result<PaginationDto<ProductShortDto>> getProductsByCategoryResult =
+            await productService.GetForPageByCategoryIdAsync(childCategoryId, page, pageSize, ct);
 
         return getProductsByCategoryResult.Map<IActionResult>(
             onSuccess: productsByCategory => Ok(productsByCategory),
@@ -32,14 +32,9 @@ public sealed class ProductsController(IProductService productService) : Control
     public async Task<IActionResult> GetProductsWithDiscountForPage([FromRoute] int page, [FromQuery] int pageSize,
         CancellationToken ct)
     {
-        if (page < 1)
+        if (IsPaginationRequestInvalid(page, pageSize, out var message))
         {
-            return BadRequest("Page must be greater than 0");
-        }
-
-        if (pageSize < 1)
-        {
-            return BadRequest("Page size must be greater than 0");
+            return BadRequest(message);
         }
         
         Result<PaginationDto<ProductShortDto>> getProductsWithDiscountResult =
@@ -72,5 +67,17 @@ public sealed class ProductsController(IProductService productService) : Control
             onSuccess: recommendedProducts => Ok(recommendedProducts),    
             onFailure: errorMessage => NotFound(errorMessage)
         );
+    }
+
+    private bool IsPaginationRequestInvalid(int page, int pageSize, out string message)
+    {
+        if (page < 1 || pageSize < 1)
+        {
+            message = "Page and page size must be greater than 0";
+            return true;
+        }
+        
+        message = string.Empty;
+        return false;
     }
 }
