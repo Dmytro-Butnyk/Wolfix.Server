@@ -9,12 +9,12 @@ internal sealed class ProductVariantEntityConfiguration : IEntityTypeConfigurati
     public void Configure(EntityTypeBuilder<ProductVariant> builder)
     {
         builder.ToTable("ProductVariants");
-        
+
         builder.HasOne(pa => pa.Category)
             .WithMany("_productVariants")
             .HasForeignKey("CategoryId")
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired();
         builder.Navigation(pa => pa.Category)
             .UsePropertyAccessMode(PropertyAccessMode.Property);
         

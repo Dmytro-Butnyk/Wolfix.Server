@@ -2,11 +2,11 @@ namespace Wolfix.Domain.Shared;
 
 public sealed class BlobResource : BaseEntity
 {
-    public required string Url { get; set; }
+    public string Url { get; private set; }
     
-    public required string BlobName { get; set; }
+    public string BlobName { get; private set; }
     
-    public required BlobResourceType Type { get; set; }
+    public BlobResourceType Type { get; private set; }
     
     // public required BaseEntity Entity { get; set; }
 }

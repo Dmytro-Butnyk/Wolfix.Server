@@ -13,7 +13,7 @@ internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Dom
         builder.HasOne(c => c.Parent)
             .WithMany()
             .HasForeignKey("ParentId")
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(c => c.Name).IsRequired();
         builder.Property(c => c.Description).IsRequired(false);
@@ -28,6 +28,7 @@ internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Dom
         builder.HasMany<ProductVariant>("_productVariants")
             .WithOne(pv => pv.Category)
             .HasForeignKey("CategoryId")
+            .OnDelete(DeleteBehavior.Cascade)
             .IsRequired(false);
         builder.Navigation("_productVariants")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
@@ -38,6 +39,7 @@ internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Dom
         builder.HasMany<ProductAttribute>("_productAttributes")
             .WithOne(pa => pa.Category)
             .HasForeignKey("CategoryId")
+            .OnDelete(DeleteBehavior.Cascade)
             .IsRequired(false);
         builder.Navigation("_productAttributes")
             .UsePropertyAccessMode(PropertyAccessMode.Field);

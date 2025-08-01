@@ -48,8 +48,8 @@ public sealed class Product : BaseEntity
     
     //todo: seller ID (именно ID, потому что другой контекст)
     
-    private readonly List<BlobResource> _resources = [];
-    public IReadOnlyCollection<BlobResource> Resources => _resources.AsReadOnly();
+    internal BlobResource Photo { get; private set; } //todo
+    public Guid PhotoId { get; private set; }
     
     private readonly List<Review> _reviews = [];
     public IReadOnlyCollection<ReviewInfo> Reviews => _reviews
@@ -162,6 +162,10 @@ public sealed class Product : BaseEntity
         Status = status;
         return VoidResult.Success();
     }
+    
+    #region photo
+    
+    #endregion
 
     #region categoryId
     public VoidResult ChangeCategory(Guid categoryId)

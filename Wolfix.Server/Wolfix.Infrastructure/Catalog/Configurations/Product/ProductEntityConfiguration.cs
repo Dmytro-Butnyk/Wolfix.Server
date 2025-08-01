@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Wolfix.Domain.Catalog.ProductAggregate.Entities;
+using Wolfix.Domain.Shared;
 
 namespace Wolfix.Infrastructure.Catalog.Configurations.Product;
 
@@ -33,10 +34,18 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
             .WithMany()
             .HasForeignKey(p => p.CategoryId)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
         #endregion
         
-        //todo: blob resources
+        #region BlobResource
+        builder.HasOne<BlobResource>(p => p.Photo)
+            .WithMany()
+            .HasForeignKey(p => p.PhotoId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .IsRequired();
+        builder.Navigation(p => p.Photo)
+            .UsePropertyAccessMode(PropertyAccessMode.Property);
+        #endregion
         
         #region Reviews
         builder.Ignore(r => r.Reviews);
@@ -44,6 +53,7 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
         builder.HasMany<Review>("_reviews")
             .WithOne(r => r.Product)
             .HasForeignKey("ProductId")
+            .OnDelete(DeleteBehavior.Cascade)
             .IsRequired(false);
         builder.Navigation("_reviews")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
@@ -55,6 +65,7 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
         builder.HasMany<ProductAttributeValue>("_productsAttributeValues")
             .WithOne(pav => pav.Product)
             .HasForeignKey("ProductId")
+            .OnDelete(DeleteBehavior.Cascade)
             .IsRequired(false);
         builder.Navigation("_productsAttributeValues")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
@@ -66,6 +77,7 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
         builder.HasMany<ProductVariantValue>("_productVariantValues")
             .WithOne(pvv => pvv.Product)
             .HasForeignKey("ProductId")
+            .OnDelete(DeleteBehavior.Cascade)
             .IsRequired(false);
         builder.Navigation("_productVariantValues")
             .UsePropertyAccessMode(PropertyAccessMode.Field);

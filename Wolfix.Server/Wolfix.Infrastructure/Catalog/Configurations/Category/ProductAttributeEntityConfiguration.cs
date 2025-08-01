@@ -13,8 +13,8 @@ internal sealed class ProductAttributeEntityConfiguration : IEntityTypeConfigura
         builder.HasOne(pa => pa.Category)
             .WithMany("_productAttributes")
             .HasForeignKey("CategoryId")
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired();
         builder.Navigation(pa => pa.Category)
             .UsePropertyAccessMode(PropertyAccessMode.Property);
 
