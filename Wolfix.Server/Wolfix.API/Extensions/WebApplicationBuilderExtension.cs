@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Wolfix.Application.Extensions;
 using Wolfix.Domain.Catalog.Interfaces;
 using Wolfix.Domain.Shared.Interfaces;
@@ -30,6 +31,15 @@ public static class WebApplicationBuilderExtension
     //     
     // }
     //
+    public static WebApplicationBuilder AddAppCache(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddMemoryCache();
+
+        builder.Services.AddAppCache();
+        
+        return builder;
+    }
+    
     public static WebApplicationBuilder AddRepositories(this WebApplicationBuilder builder)
     {
         builder.Services.AddRepositories();

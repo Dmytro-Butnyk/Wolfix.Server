@@ -11,6 +11,7 @@ if (File.Exists(".env"))
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder
+    .AddAppCache()
     .AddDbContext()
     .AddRepositories()
     .AddApplicationServices()

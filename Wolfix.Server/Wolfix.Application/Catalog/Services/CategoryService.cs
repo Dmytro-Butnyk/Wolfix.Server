@@ -1,16 +1,21 @@
 using System.Net;
+using Microsoft.Extensions.Caching.Memory;
 using Wolfix.Application.Catalog.Dto.Category;
 using Wolfix.Application.Catalog.Interfaces;
 using Wolfix.Application.Catalog.Mapping.Category;
+using Wolfix.Application.Shared.Interfaces;
 using Wolfix.Domain.Catalog.Interfaces;
-using Wolfix.Domain.Catalog.Projections;
 using Wolfix.Domain.Catalog.Projections.Category;
 using Wolfix.Domain.Shared;
 
 namespace Wolfix.Application.Catalog.Services;
 
-internal sealed class CategoryService(ICategoryRepository categoryRepository) : ICategoryService
+internal sealed class CategoryService(
+    ICategoryRepository categoryRepository,
+    IAppCache appCache
+    ) : ICategoryService
 {
+    //todo: внедрить кэш
     public async Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllParentCategoriesAsync(CancellationToken ct)
     {
         IReadOnlyCollection<CategoryShortProjection> parentCategories = await categoryRepository.GetAllParentCategoriesAsNoTrackingAsync(ct);
