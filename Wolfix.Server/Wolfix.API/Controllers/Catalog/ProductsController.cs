@@ -80,4 +80,17 @@ public sealed class ProductsController(IProductService productService) : Control
         message = string.Empty;
         return false;
     }
+
+    // todo: review
+    [HttpGet("random")]
+    public async Task<IActionResult> GetRandomProducts([FromQuery] int pageSize, CancellationToken ct)
+    {
+        Result<IEnumerable<ProductShortDto>> getRandomProductsResult =
+            await productService.GetRandomProducts(pageSize, ct);
+
+        return getRandomProductsResult.Map<IActionResult>(
+            onSuccess: randomProducts => Ok(randomProducts),
+            onFailure: errorMessage => NotFound(errorMessage)
+        );
+    }
 }

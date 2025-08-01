@@ -19,4 +19,6 @@ public interface IProductRepository
     Task<int> GetTotalCountWithDiscountAsync(CancellationToken ct);
     
     Task<int> GetTotalCountByCategoryAsync(Guid categoryId, CancellationToken ct);
+
+    Task<IEnumerable<ProductShortProjection>> GetRandom(int randomSkip, int pageSize, CancellationToken ct);
 }

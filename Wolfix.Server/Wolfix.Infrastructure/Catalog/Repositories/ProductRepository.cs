@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Wolfix.Domain.Catalog.Interfaces;
 using Wolfix.Domain.Catalog.ProductAggregate;
 using Wolfix.Domain.Catalog.ProductAggregate.Enums;
@@ -7,7 +7,7 @@ using Wolfix.Infrastructure.Shared.Repositories;
 
 namespace Wolfix.Infrastructure.Catalog.Repositories;
 
-internal sealed class ProductRepository(WolfixStoreContext context) 
+internal sealed class ProductRepository(WolfixStoreContext context)
     : BaseRepository<Product>(context), IProductRepository
 {
     private readonly DbSet<Product> _products = context.Products;
@@ -109,5 +109,47 @@ internal sealed class ProductRepository(WolfixStoreContext context)
             .CountAsync(ct);
         
         return totalCount;
+    }
+
+    public async Task<IEnumerable<ProductShortProjection>> GetRandom(int randomSkip, int pageSize,
+        CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        int totalCount = await _products.CountAsync(ct);
+
+        if (totalCount == 0)
+            return new List<ProductShortProjection>();
+
+        randomSkip %= totalCount;
+
+        int takeFromEnd = Math.Min(pageSize, totalCount - randomSkip);
+
+        List<ProductShortProjection> products = await _products
+            .Include(p => p.Discount)
+            .AsNoTracking()
+            .OrderBy(p => p.Id)
+            .Skip(randomSkip)
+            .Take(takeFromEnd)
+            .Select(p => 
+                new ProductShortProjection(p.Id, p.Title, p.AverageRating, p.Price, p.FinalPrice, p.Bonuses))
+            .ToListAsync(ct);
+
+        if (takeFromEnd < pageSize)
+        {
+            int takeFromStart = pageSize - takeFromEnd;
+            List<ProductShortProjection> productsFromStart = await _products
+                .Include(p => p.Discount)
+                .AsNoTracking()
+                .OrderBy(p => p.Id)
+                .Take(takeFromStart)
+                .Select(p =>
+                    new ProductShortProjection(p.Id, p.Title, p.AverageRating, p.Price, p.FinalPrice, p.Bonuses))
+                .ToListAsync(ct);
+
+            products.AddRange(productsFromStart);
+        }
+
+        return products;
     }
 }

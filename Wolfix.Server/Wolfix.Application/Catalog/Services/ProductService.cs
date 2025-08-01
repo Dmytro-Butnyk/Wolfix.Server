@@ -116,4 +116,38 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
         
         return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
     }
+
+    public async Task<Result<IEnumerable<ProductShortDto>>> GetRandomProducts(int pageSize, CancellationToken ct)
+    {
+        int productCount = await productRepository.GetTotalCountAsync(ct);
+
+        if (productCount == 0)
+        {
+            return Result<IEnumerable<ProductShortDto>>.Failure(
+                "Products list is empty",    
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        Random random = new Random();
+        int randomSkip = random.Next(1, productCount);
+
+        List<ProductShortProjection> products = (await productRepository
+            .GetRandom(randomSkip, pageSize, ct))
+            .ToList();
+
+        if (products.Count == 0)
+        {
+            return Result<IEnumerable<ProductShortDto>>.Failure(
+                "Products not found",    
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        List<ProductShortDto> randomProducts = products
+            .Select(product => product.ToShortDto())
+            .ToList();
+
+        return Result<IEnumerable<ProductShortDto>>.Success(randomProducts);
+    }
 }

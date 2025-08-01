@@ -6,6 +6,8 @@ namespace Wolfix.Application.Catalog.Interfaces;
 
 public interface IProductService
 {
+    Task<Result<IEnumerable<ProductShortDto>>> GetAllByCategoryIdAsync(Guid childCategoryId, CancellationToken ct);
+    Task<Result<IEnumerable<ProductShortDto>>> GetRandomProducts(int pageSize, CancellationToken ct);
     Task<Result<PaginationDto<ProductShortDto>>> GetForPageByCategoryIdAsync(Guid childCategoryId,
         int page, int pageSize, CancellationToken ct);
     Task<Result<PaginationDto<ProductShortDto>>> GetForPageWithDiscountAsync(int page, int pageSize,

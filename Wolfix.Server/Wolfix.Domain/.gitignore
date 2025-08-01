@@ -1,6 +1,13 @@
 # .NET
 bin/
-obj/
+
+**/obj/
+# DO NOT IGNORE ASSEMBLYINFO
+!Wolfix.Server/Wolfix.Domain/obj/
+!Wolfix.Server/Wolfix.Domain/obj/Debug/
+!Wolfix.Server/Wolfix.Domain/obj/Debug/net9.0/
+!Wolfix.Server/Wolfix.Domain/obj/Debug/net9.0/Wolfix.Domain.AssemblyInfo.cs
+
 .vs/
 .vscode/
 .idea/
