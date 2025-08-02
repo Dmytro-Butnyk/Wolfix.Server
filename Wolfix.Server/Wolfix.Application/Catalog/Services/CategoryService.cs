@@ -43,8 +43,7 @@ internal sealed class CategoryService(
     public async Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllChildCategoriesByParentAsync(Guid parentId,
         CancellationToken ct)
     {
-        //todo: cacheKey = $"child_categories_by_parent_{parentId}"
-        const string cacheKey = "all_child_categories";
+        var cacheKey = $"child_categories_by_parent_{parentId}";
         
         List<CategoryShortDto> childCategoriesDto = await appCache.GetOrCreateAsync(cacheKey, async ctx =>
         {

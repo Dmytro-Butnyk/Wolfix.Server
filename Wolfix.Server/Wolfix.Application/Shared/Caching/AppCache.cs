@@ -6,7 +6,7 @@ namespace Wolfix.Application.Shared.Caching;
 internal sealed class AppCache(IMemoryCache memoryCache) : IAppCache
 {
     public async Task<T> GetOrCreateAsync<T>(string key, Func<CancellationToken, Task<T>> factory,
-        CancellationToken ct, TimeSpan? expiration = null)
+        CancellationToken ct, TimeSpan? expiration = null, TimeSpan? slidingExpiration = null)
     {
         if (memoryCache.TryGetValue(key, out T cacheEntry))
         {
@@ -17,7 +17,8 @@ internal sealed class AppCache(IMemoryCache memoryCache) : IAppCache
 
         var options = new MemoryCacheEntryOptions
         {
-            AbsoluteExpirationRelativeToNow = expiration ?? TimeSpan.FromMinutes(10)
+            AbsoluteExpirationRelativeToNow = expiration ?? TimeSpan.FromMinutes(10),
+            SlidingExpiration = slidingExpiration
         };
 
         memoryCache.Set(key, result, options);
