@@ -15,43 +15,53 @@ internal sealed class CategoryService(
     IAppCache appCache
     ) : ICategoryService
 {
-    //todo: внедрить кэш
     public async Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllParentCategoriesAsync(CancellationToken ct)
     {
-        IReadOnlyCollection<CategoryShortProjection> parentCategories = await categoryRepository.GetAllParentCategoriesAsNoTrackingAsync(ct);
+        const string cacheKey = "all_parent_categories";
 
-        if (parentCategories.Count == 0)
+        List<CategoryShortDto> parentCategoriesDto = await appCache.GetOrCreateAsync(cacheKey, async ctx =>
+        {
+            IReadOnlyCollection<CategoryShortProjection> parentCategories =
+                await categoryRepository.GetAllParentCategoriesAsNoTrackingAsync(ctx);
+
+            return parentCategories
+                .Select(category => category.ToShortDto())
+                .ToList();
+        }, ct, TimeSpan.FromMinutes(20));
+
+        if (parentCategoriesDto.Count == 0)
         {
             return Result<IReadOnlyCollection<CategoryShortDto>>.Failure(
                 "No parent categories found",
                 HttpStatusCode.NotFound
             );
         }
-
-        List<CategoryShortDto> parentCategoriesDto = parentCategories
-            .Select(category => category.ToShortDto())
-            .ToList();
-
+        
         return Result<IReadOnlyCollection<CategoryShortDto>>.Success(parentCategoriesDto);
     }
 
     public async Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllChildCategoriesByParentAsync(Guid parentId,
         CancellationToken ct)
     {
-        IReadOnlyCollection<CategoryShortProjection> childCategories =
-            await categoryRepository.GetAllChildCategoriesByParentAsNoTrackingAsync(parentId, ct);
+        const string cacheKey = "all_child_categories";
+        
+        List<CategoryShortDto> childCategoriesDto = await appCache.GetOrCreateAsync(cacheKey, async ctx =>
+        {
+            IReadOnlyCollection<CategoryShortProjection> childCategories =
+                await categoryRepository.GetAllChildCategoriesByParentAsNoTrackingAsync(parentId, ctx);
 
-        if (childCategories.Count == 0)
+            return childCategories
+                .Select(category => category.ToShortDto())
+                .ToList();
+        }, ct, TimeSpan.FromMinutes(20));
+        
+        if (childCategoriesDto.Count == 0)
         {
             return Result<IReadOnlyCollection<CategoryShortDto>>.Failure(
                 "No child categories found",
                 HttpStatusCode.NotFound
             );
         }
-        
-        List<CategoryShortDto> childCategoriesDto = childCategories
-            .Select(category => category.ToShortDto())
-            .ToList();
         
         return Result<IReadOnlyCollection<CategoryShortDto>>.Success(childCategoriesDto);
     }

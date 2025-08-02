@@ -5,14 +5,15 @@ namespace Wolfix.Application.Shared.Caching;
 
 internal sealed class AppCache(IMemoryCache memoryCache) : IAppCache
 {
-    public async Task<T> GetOrCreateAsync<T>(string key, Func<Task<T>> factory, TimeSpan? expiration = null)
+    public async Task<T> GetOrCreateAsync<T>(string key, Func<CancellationToken, Task<T>> factory,
+        CancellationToken ct, TimeSpan? expiration = null)
     {
         if (memoryCache.TryGetValue(key, out T cacheEntry))
         {
             return cacheEntry;
         }
 
-        T result = await factory();
+        T result = await factory(ct);
 
         var options = new MemoryCacheEntryOptions
         {
