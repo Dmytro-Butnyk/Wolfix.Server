@@ -10,6 +10,19 @@ internal sealed class ProductAttributeValueEntityConfiguration : IEntityTypeConf
     {
         builder.ToTable("ProductAttributeValues");
         
+        ConfigureBasicProperties(builder);
+        
+        ConfigureProductRelation(builder);
+    }
+
+    private void ConfigureBasicProperties(EntityTypeBuilder<ProductAttributeValue> builder)
+    {
+        builder.Property(pav => pav.Key).IsRequired();
+        builder.Property(pav => pav.Value).IsRequired();
+    }
+    
+    private void ConfigureProductRelation(EntityTypeBuilder<ProductAttributeValue> builder)
+    {
         builder.HasOne(pav => pav.Product)
             .WithMany("_productsAttributeValues")
             .HasForeignKey("ProductId")
@@ -17,8 +30,5 @@ internal sealed class ProductAttributeValueEntityConfiguration : IEntityTypeConf
             .OnDelete(DeleteBehavior.Cascade);
         builder.Navigation("Product")
             .UsePropertyAccessMode(PropertyAccessMode.Property);
-        
-        builder.Property(pav => pav.Key).IsRequired();
-        builder.Property(pav => pav.Value).IsRequired();
     }
 }

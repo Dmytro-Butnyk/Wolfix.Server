@@ -10,11 +10,21 @@ internal sealed class ReviewEntityConfiguration : IEntityTypeConfiguration<Revie
     {
         builder.ToTable("Reviews");
         
+        ConfigureBasicProperties(builder);
+
+        ConfigureProductRelation(builder);
+    }
+
+    private void ConfigureBasicProperties(EntityTypeBuilder<Review> builder)
+    {
         builder.Property(r => r.Title).IsRequired();
         builder.Property(r => r.Text).IsRequired();
         builder.Property(r => r.Rating).IsRequired();
         builder.Property(r => r.CreatedAt).IsRequired();
+    }
 
+    private void ConfigureProductRelation(EntityTypeBuilder<Review> builder)
+    {
         builder.HasOne(r => r.Product)
             .WithMany("_reviews")
             .HasForeignKey("ProductId")

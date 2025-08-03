@@ -10,6 +10,18 @@ internal sealed class ProductAttributeEntityConfiguration : IEntityTypeConfigura
     {
         builder.ToTable("ProductAttributes");
         
+        ConfigureBasicProperties(builder);
+        
+        ConfigureCategoryRelation(builder);
+    }
+
+    private void ConfigureBasicProperties(EntityTypeBuilder<ProductAttribute> builder)
+    {
+        builder.Property(pa => pa.Key).IsRequired();
+    }
+
+    private void ConfigureCategoryRelation(EntityTypeBuilder<ProductAttribute> builder)
+    {
         builder.HasOne(pa => pa.Category)
             .WithMany("_productAttributes")
             .HasForeignKey("CategoryId")
@@ -17,7 +29,5 @@ internal sealed class ProductAttributeEntityConfiguration : IEntityTypeConfigura
             .IsRequired();
         builder.Navigation(pa => pa.Category)
             .UsePropertyAccessMode(PropertyAccessMode.Property);
-
-        builder.Property(pa => pa.Key).IsRequired();
     }
 }

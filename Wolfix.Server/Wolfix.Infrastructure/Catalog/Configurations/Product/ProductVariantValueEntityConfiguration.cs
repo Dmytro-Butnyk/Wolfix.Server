@@ -10,6 +10,19 @@ internal sealed class ProductVariantValueEntityConfiguration : IEntityTypeConfig
     {
         builder.ToTable("ProductVariantValues");
         
+        ConfigureBasicProperties(builder);
+        
+        ConfigureProductRelation(builder);
+    }
+
+    private void ConfigureBasicProperties(EntityTypeBuilder<ProductVariantValue> builder)
+    {
+        builder.Property(pvv => pvv.Key).IsRequired();
+        builder.Property(pvv => pvv.Value).IsRequired();
+    }
+
+    private void ConfigureProductRelation(EntityTypeBuilder<ProductVariantValue> builder)
+    {
         builder.HasOne(pvv => pvv.Product)
             .WithMany("_productVariantValues")
             .HasForeignKey("ProductId")
@@ -17,8 +30,5 @@ internal sealed class ProductVariantValueEntityConfiguration : IEntityTypeConfig
             .OnDelete(DeleteBehavior.Cascade);
         builder.Navigation("Product")
             .UsePropertyAccessMode(PropertyAccessMode.Property);
-        
-        builder.Property(pvv => pvv.Key).IsRequired();
-        builder.Property(pvv => pvv.Value).IsRequired();
     }
 }

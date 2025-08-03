@@ -11,6 +11,23 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
     {
         builder.ToTable("Products");
         
+        ConfigureBasicProperties(builder);
+        
+        ConfigureDiscountRelation(builder);
+        
+        ConfigureCategoryRelation(builder);
+        
+        ConfigureBlobResourceRelation(builder);
+        
+        ConfigureReviewsRelation(builder);
+        
+        ConfigureProductAttributeValuesRelation(builder);
+        
+        ConfigureProductVariantValuesRelation(builder);
+    }
+
+    private void ConfigureBasicProperties(EntityTypeBuilder<Domain.Catalog.ProductAggregate.Product> builder)
+    {
         builder.Property(p => p.Title).IsRequired();
         builder.Property(p => p.Description).IsRequired();
         builder.Property(p => p.FinalPrice).IsRequired();
@@ -19,7 +36,13 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
         builder.Property(p => p.Price).IsRequired();
         builder.Property(p => p.Status).IsRequired().HasConversion<string>();
         
-        #region Discount
+        builder.Ignore(r => r.Reviews);
+        builder.Ignore(r => r.ProductsAttributeValues);
+        builder.Ignore(r => r.ProductVariantValues);
+    }
+    
+    private void ConfigureDiscountRelation(EntityTypeBuilder<Domain.Catalog.ProductAggregate.Product> builder)
+    {
         builder.HasOne<Discount>(p => p.Discount)
             .WithOne(d => d.Product)
             .HasForeignKey<Discount>(d => d.ProductId)
@@ -27,17 +50,19 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
             .IsRequired(false);
         builder.Navigation(p => p.Discount)
             .UsePropertyAccessMode(PropertyAccessMode.Property);
-        #endregion
-        
-        #region Category
+    }
+
+    private void ConfigureCategoryRelation(EntityTypeBuilder<Domain.Catalog.ProductAggregate.Product> builder)
+    {
         builder.HasOne<Domain.Catalog.CategoryAggregate.Category>()
             .WithMany()
             .HasForeignKey(p => p.CategoryId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
-        #endregion
-        
-        #region BlobResource
+    }
+
+    private void ConfigureBlobResourceRelation(EntityTypeBuilder<Domain.Catalog.ProductAggregate.Product> builder)
+    {
         builder.HasOne<BlobResource>(p => p.Photo)
             .WithMany()
             .HasForeignKey(p => p.PhotoId)
@@ -45,11 +70,10 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
             .IsRequired();
         builder.Navigation(p => p.Photo)
             .UsePropertyAccessMode(PropertyAccessMode.Property);
-        #endregion
-        
-        #region Reviews
-        builder.Ignore(r => r.Reviews);
-        
+    }
+
+    private void ConfigureReviewsRelation(EntityTypeBuilder<Domain.Catalog.ProductAggregate.Product> builder)
+    {
         builder.HasMany<Review>("_reviews")
             .WithOne(r => r.Product)
             .HasForeignKey("ProductId")
@@ -57,11 +81,10 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
             .IsRequired(false);
         builder.Navigation("_reviews")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
-        #endregion
-        
-        #region ProductAttributeValues
-        builder.Ignore(r => r.ProductsAttributeValues);
-        
+    }
+
+    private void ConfigureProductAttributeValuesRelation(EntityTypeBuilder<Domain.Catalog.ProductAggregate.Product> builder)
+    {
         builder.HasMany<ProductAttributeValue>("_productsAttributeValues")
             .WithOne(pav => pav.Product)
             .HasForeignKey("ProductId")
@@ -69,11 +92,10 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
             .IsRequired(false);
         builder.Navigation("_productsAttributeValues")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
-        #endregion
-        
-        #region ProductVariantValues
-        builder.Ignore(r => r.ProductVariantValues);
-        
+    }
+
+    private void ConfigureProductVariantValuesRelation(EntityTypeBuilder<Domain.Catalog.ProductAggregate.Product> builder)
+    {
         builder.HasMany<ProductVariantValue>("_productVariantValues")
             .WithOne(pvv => pvv.Product)
             .HasForeignKey("ProductId")
@@ -81,6 +103,5 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Doma
             .IsRequired(false);
         builder.Navigation("_productVariantValues")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
-        #endregion
     }
 }

@@ -10,11 +10,20 @@ internal sealed class DiscountEntityConfiguration : IEntityTypeConfiguration<Dis
     {
         builder.ToTable("Discounts");
         
+        ConfigureBasicProperties(builder);
+        
+        ConfigureProductRelation(builder);
+    }
+
+    private void ConfigureBasicProperties(EntityTypeBuilder<Discount> builder)
+    {
         builder.Property(d => d.Percent).IsRequired();
         builder.Property(d => d.ExpirationDateTime).IsRequired();
         builder.Property(d => d.Status).IsRequired().HasConversion<string>();
-        
-        #region Product
+    }
+
+    private void ConfigureProductRelation(EntityTypeBuilder<Discount> builder)
+    {
         builder.HasOne<Domain.Catalog.ProductAggregate.Product>(d => d.Product)
             .WithOne(p => p.Discount)
             .HasForeignKey<Discount>(d => d.ProductId)
@@ -22,6 +31,5 @@ internal sealed class DiscountEntityConfiguration : IEntityTypeConfiguration<Dis
             .IsRequired(false);
         builder.Navigation(d => d.Product)
             .UsePropertyAccessMode(PropertyAccessMode.Property);
-        #endregion
     }
 }

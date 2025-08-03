@@ -9,7 +9,19 @@ internal sealed class ProductVariantEntityConfiguration : IEntityTypeConfigurati
     public void Configure(EntityTypeBuilder<ProductVariant> builder)
     {
         builder.ToTable("ProductVariants");
+        
+        ConfigureBasicProperties(builder);
 
+        ConfigureCategoryRelation(builder);
+    }
+
+    private void ConfigureBasicProperties(EntityTypeBuilder<ProductVariant> builder)
+    {
+        builder.Property(pv => pv.Key).IsRequired();
+    }
+    
+    private void ConfigureCategoryRelation(EntityTypeBuilder<ProductVariant> builder)
+    {
         builder.HasOne(pa => pa.Category)
             .WithMany("_productVariants")
             .HasForeignKey("CategoryId")
@@ -17,7 +29,5 @@ internal sealed class ProductVariantEntityConfiguration : IEntityTypeConfigurati
             .IsRequired();
         builder.Navigation(pa => pa.Category)
             .UsePropertyAccessMode(PropertyAccessMode.Property);
-        
-        builder.Property(pv => pv.Key).IsRequired();
     }
 }
