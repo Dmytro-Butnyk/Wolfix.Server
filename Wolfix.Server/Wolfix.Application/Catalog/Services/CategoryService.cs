@@ -1,5 +1,4 @@
 using System.Net;
-using Microsoft.Extensions.Caching.Memory;
 using Wolfix.Application.Catalog.Dto.Category;
 using Wolfix.Application.Catalog.Interfaces;
 using Wolfix.Application.Catalog.Mapping.Category;

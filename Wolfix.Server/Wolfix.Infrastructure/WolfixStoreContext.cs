@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Wolfix.Domain.Catalog.CategoryAggregate;
 using Wolfix.Domain.Catalog.CategoryAggregate.Entities;
-using Wolfix.Domain.Catalog.Interfaces;
 using Wolfix.Domain.Catalog.ProductAggregate;
 using Wolfix.Domain.Catalog.ProductAggregate.Entities;
 using Wolfix.Domain.Shared;

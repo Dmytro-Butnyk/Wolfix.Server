@@ -4,7 +4,6 @@ using Wolfix.Application.Catalog.Interfaces;
 using Wolfix.Application.Catalog.Mapping.Product;
 using Wolfix.Application.Shared.Dto;
 using Wolfix.Domain.Catalog.Interfaces;
-using Wolfix.Domain.Catalog.ProductAggregate;
 using Wolfix.Domain.Catalog.Projections.Product;
 using Wolfix.Domain.Shared;
 
