@@ -44,3 +44,5 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseResponseCompression();
 
 app.Run();
+
+//todo: постараться убрать регионы все
