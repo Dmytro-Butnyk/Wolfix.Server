@@ -21,21 +21,22 @@ public sealed class WolfixStoreContext : DbContext
     {
         modelBuilder.Ignore<BaseEntity>();
         
-        #region Catalog
-        #region Category
+        ApplyCatalogConfigurations(modelBuilder);
+    }
+
+    private void ApplyCatalogConfigurations(ModelBuilder modelBuilder)
+    {
+        //Category
         modelBuilder.ApplyConfiguration(new CategoryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ProductAttributeEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ProductVariantEntityConfiguration());
-        #endregion
         
-        #region Product
+        //Product
         modelBuilder.ApplyConfiguration(new DiscountEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ProductAttributeValueEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ProductEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ProductVariantValueEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ReviewEntityConfiguration());
-        #endregion
-        #endregion
     }
 
     // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
