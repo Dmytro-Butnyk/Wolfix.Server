@@ -1,0 +1,12 @@
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Shared.Domain/bin/Debug/net9.0/Shared.Domain.deps.json
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Shared.Domain/bin/Debug/net9.0/Shared.Domain.dll
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Shared.Domain/bin/Debug/net9.0/Shared.Domain.pdb
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Shared.Domain/obj/Debug/net9.0/Shared.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Shared.Domain/obj/Debug/net9.0/Shared.Domain.AssemblyInfoInputs.cache
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Shared.Domain/obj/Debug/net9.0/Shared.Domain.AssemblyInfo.cs
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Shared.Domain/obj/Debug/net9.0/Shared.Domain.csproj.CoreCompileInputs.cache
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Shared.Domain/obj/Debug/net9.0/Shared.Domain.sourcelink.json
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Shared.Domain/obj/Debug/net9.0/Shared.Domain.dll
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Shared.Domain/obj/Debug/net9.0/refint/Shared.Domain.dll
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Shared.Domain/obj/Debug/net9.0/Shared.Domain.pdb
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Shared.Domain/obj/Debug/net9.0/ref/Shared.Domain.dll

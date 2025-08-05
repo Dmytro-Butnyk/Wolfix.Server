@@ -1,0 +1,16 @@
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/bin/Debug/net9.0/Catalog.Domain.deps.json
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/bin/Debug/net9.0/Catalog.Domain.dll
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/bin/Debug/net9.0/Catalog.Domain.pdb
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/bin/Debug/net9.0/Shared.Domain.dll
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/bin/Debug/net9.0/Shared.Domain.pdb
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/obj/Debug/net9.0/Catalog.Domain.csproj.AssemblyReference.cache
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/obj/Debug/net9.0/Catalog.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/obj/Debug/net9.0/Catalog.Domain.AssemblyInfoInputs.cache
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/obj/Debug/net9.0/Catalog.Domain.AssemblyInfo.cs
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/obj/Debug/net9.0/Catalog.Domain.csproj.CoreCompileInputs.cache
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/obj/Debug/net9.0/Catalog.Domain.sourcelink.json
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/obj/Debug/net9.0/Catalog..A0AFAC00.Up2Date
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/obj/Debug/net9.0/Catalog.Domain.dll
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/obj/Debug/net9.0/refint/Catalog.Domain.dll
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/obj/Debug/net9.0/Catalog.Domain.pdb
+/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Catalog.Domain/obj/Debug/net9.0/ref/Catalog.Domain.dll

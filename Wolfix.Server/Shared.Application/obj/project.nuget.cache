@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "MnZlGGsaYLQ=",
+  "success": true,
+  "projectFilePath": "/Users/admin/Documents/GitHub/Wolfix.Server/Wolfix.Server/Shared.Application/Shared.Application.csproj",
+  "expectedPackageFiles": [
+    "/Users/admin/.nuget/packages/microsoft.extensions.caching.abstractions/9.0.7/microsoft.extensions.caching.abstractions.9.0.7.nupkg.sha512",
+    "/Users/admin/.nuget/packages/microsoft.extensions.dependencyinjection.abstractions/9.0.7/microsoft.extensions.dependencyinjection.abstractions.9.0.7.nupkg.sha512",
+    "/Users/admin/.nuget/packages/microsoft.extensions.primitives/9.0.7/microsoft.extensions.primitives.9.0.7.nupkg.sha512"
+  ],
+  "logs": []
+}
