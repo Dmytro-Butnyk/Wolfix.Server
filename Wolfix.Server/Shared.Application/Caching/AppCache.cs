@@ -3,7 +3,7 @@ using Shared.Application.Interfaces;
 
 namespace Shared.Application.Caching;
 
-public sealed class AppCache(IMemoryCache memoryCache) : IAppCache
+internal sealed class AppCache(IMemoryCache memoryCache) : IAppCache
 {
     public async Task<T> GetOrCreateAsync<T>(string key, Func<CancellationToken, Task<T>> factory,
         CancellationToken ct, TimeSpan? expiration = null, TimeSpan? slidingExpiration = null)

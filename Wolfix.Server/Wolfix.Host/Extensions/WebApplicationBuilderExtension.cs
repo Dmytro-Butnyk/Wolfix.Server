@@ -2,11 +2,19 @@ using Catalog.API.Extensions;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Shared.Application.Extensions;
+using Shared.Infrastructure.Extensions;
 
 namespace Wolfix.Host.Extensions;
 
 public static class WebApplicationBuilderExtension
 {
+    public static WebApplicationBuilder AddSharedRepositories(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddSharedRepositories();
+        
+        return builder;
+    }
+    
     public static WebApplicationBuilder AddCatalogModule(this WebApplicationBuilder builder)
     {
         string connectionString = EnvironmentExtension.GetEnvironmentVariableOrThrow("DB_CONNECTION_STRING");

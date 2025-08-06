@@ -13,6 +13,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder
     .AddAppCache()
     .AddResponseCompression()
+    .AddSharedRepositories()
     .AddCatalogModule();
 
 builder.Services.AddOpenApi();

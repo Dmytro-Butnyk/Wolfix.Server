@@ -10,7 +10,7 @@ using Shared.Infrastructure;
 
 namespace Catalog.Infrastructure;
 
-public sealed class CatalogContext : DbContext, IBaseContext
+internal sealed class CatalogContext : DbContext, IBaseContext
 {
     public CatalogContext() {}
     

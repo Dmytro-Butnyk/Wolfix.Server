@@ -3,7 +3,7 @@ using Shared.Domain.Interfaces;
 
 namespace Shared.Infrastructure.Repositories;
 
-public sealed class BlobRepository : IBlobRepository
+internal sealed class BlobRepository : IBlobRepository
 {
     private readonly BlobServiceClient _blobServiceClient;
 
