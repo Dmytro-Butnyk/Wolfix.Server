@@ -1,11 +1,6 @@
-/Wolfix.Server/.idea/
-/Wolfix.Server/Wolfix.Server.sln
-
-.env
-
 # .NET
-**/bin/
-**/obj/
+bin/
+obj/
 .vs/
 .vscode/
 .idea/
@@ -25,11 +20,13 @@ Desktop.ini
 # ASP.NET Core
 project.lock.json
 project.fragment.lock.json
-**/artifacts/
+artifacts/
 
 # NuGet
+# User-specific files
 .nuget/
 
+# Windows Installer files
 # Windows Installer files
 *.cab
 *.msi
@@ -38,3 +35,4 @@ project.fragment.lock.json
 
 # Log files
 *.log
+/obj/
