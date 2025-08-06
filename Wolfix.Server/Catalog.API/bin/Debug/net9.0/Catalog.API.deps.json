@@ -1782,8 +1782,8 @@
       "Shared.Infrastructure/1.0.0": {
         "dependencies": {
           "Azure.Storage.Blobs": "12.25.0",
-          "Catalog.Domain": "1.0.0",
-          "Microsoft.EntityFrameworkCore": "9.0.7"
+          "Microsoft.EntityFrameworkCore": "9.0.7",
+          "Shared.Domain": "1.0.0"
         },
         "runtime": {
           "Shared.Infrastructure.dll": {

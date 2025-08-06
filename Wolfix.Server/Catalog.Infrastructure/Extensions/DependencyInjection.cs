@@ -21,7 +21,6 @@ public static class DependencyInjection
     
     public static IServiceCollection AddCatalogRepositories(this IServiceCollection services)
     {
-        //todo: может быть тут проблема
         services.AddScoped(typeof(IBaseRepository<Product>), typeof(BaseRepository<CatalogContext, Product>));
         services.AddScoped(typeof(IBaseRepository<Category>), typeof(BaseRepository<CatalogContext, Category>));
         

@@ -7,14 +7,11 @@ namespace Wolfix.Host.Extensions;
 
 public static class WebApplicationBuilderExtension
 {
-    private static string GetDbConnectionString()
-    {
-        return EnvironmentExtension.GetEnvironmentVariableOrThrow("DB_CONNECTION_STRING");
-    }
-    
     public static WebApplicationBuilder AddCatalogModule(this WebApplicationBuilder builder)
     {
-        builder.Services.AddCatalogModule(GetDbConnectionString());
+        string connectionString = EnvironmentExtension.GetEnvironmentVariableOrThrow("DB_CONNECTION_STRING");
+        
+        builder.Services.AddCatalogModule(connectionString);
 
         return builder;
     }
