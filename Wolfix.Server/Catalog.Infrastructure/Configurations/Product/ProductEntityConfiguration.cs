@@ -16,8 +16,8 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
         ConfigureDiscountRelation(builder);
         
         ConfigureCategoryRelation(builder);
-        
-        ConfigureBlobResourceRelation(builder);
+        // todo - implement blob resource relation
+        // ConfigureBlobResourceRelation(builder);
         
         ConfigureReviewsRelation(builder);
         
@@ -60,17 +60,18 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
     }
-
-    private void ConfigureBlobResourceRelation(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
-    {
-        builder.HasOne<BlobResource>(p => p.Photo)
-            .WithMany()
-            .HasForeignKey(p => p.PhotoId)
-            .OnDelete(DeleteBehavior.SetNull)
-            .IsRequired();
-        builder.Navigation(p => p.Photo)
-            .UsePropertyAccessMode(PropertyAccessMode.Property);
-    }
+    
+    // todo - implement blob resource relation
+    // private void ConfigureBlobResourceRelation(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
+    // {
+    //     builder.HasOne<BlobResource>(p => p.Photo)
+    //         .WithMany()
+    //         .HasForeignKey(p => p.PhotoId)
+    //         .OnDelete(DeleteBehavior.SetNull)
+    //         .IsRequired();
+    //     builder.Navigation(p => p.Photo)
+    //         .UsePropertyAccessMode(PropertyAccessMode.Property);
+    // }
 
     private void ConfigureReviewsRelation(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
     {
