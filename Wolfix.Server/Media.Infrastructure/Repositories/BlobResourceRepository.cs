@@ -1,6 +1,11 @@
-﻿namespace Media.Infrastructure.Repositories;
+﻿using Media.Domain.BlobAggregate;
+using Media.Domain.Interfaces;
+using Shared.Infrastructure.Repositories;
 
-public sealed class BlobResourceRepository
+namespace Media.Infrastructure.Repositories;
+
+public sealed class BlobResourceRepository(MediaContext context):
+    BaseRepository<MediaContext, BlobResource>(context), IBlobResourceRepository
 {
     
 }

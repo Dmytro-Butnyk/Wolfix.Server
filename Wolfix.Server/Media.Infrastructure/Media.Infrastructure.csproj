@@ -9,10 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Media.Domain\Media.Domain.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Extensions\" />
+      <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>
