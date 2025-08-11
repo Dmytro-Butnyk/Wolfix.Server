@@ -1,3 +1,5 @@
+using Catalog.Endpoints.Endpoints;
+using Catalog.Endpoints.Extensions;
 using DotNetEnv;
 using Wolfix.Host.Extensions;
 using Wolfix.Host.Middlewares;
@@ -41,5 +43,8 @@ app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseResponseCompression();
+
+app
+    .MapCatalogEndpoints();
 
 app.Run();

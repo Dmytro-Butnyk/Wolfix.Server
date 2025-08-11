@@ -9,16 +9,15 @@
     <ItemGroup>
         <PackageReference Include="DotNetEnv" Version="3.1.1" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4"/>
-        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="wwwroot\" />
+      <ProjectReference Include="..\Catalog.Endpoints\Catalog.Endpoints.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Catalog.API\Catalog.API.csproj" />
+      <Folder Include="wwwroot\" />
     </ItemGroup>
 
 </Project>

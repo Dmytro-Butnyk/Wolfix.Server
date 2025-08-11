@@ -1,6 +1,5 @@
-using Catalog.API.Extensions;
+using Catalog.Endpoints.Extensions;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.EntityFrameworkCore;
 using Shared.Application.Extensions;
 using Shared.Infrastructure.Extensions;
 
