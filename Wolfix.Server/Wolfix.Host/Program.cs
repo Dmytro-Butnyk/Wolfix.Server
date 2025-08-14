@@ -1,6 +1,7 @@
 using Catalog.Endpoints.Endpoints;
 using Catalog.Endpoints.Extensions;
 using DotNetEnv;
+using Identity.Endpoints.Extensions;
 using Wolfix.Host.Extensions;
 using Wolfix.Host.Middlewares;
 
@@ -12,11 +13,15 @@ if (File.Exists(".env"))
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication();
+
 builder
     .AddAppCache()
     .AddResponseCompression()
     .AddSharedRepositories()
-    .AddCatalogModule();
+    .AddCatalogModule()
+    .AddIdentityModule();
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
@@ -45,6 +50,7 @@ app.UseMiddleware<ExceptionMiddleware>();
 app.UseResponseCompression();
 
 app
-    .MapCatalogEndpoints();
+    .MapCatalogApi()
+    .MapIdentityApi();
 
 app.Run();

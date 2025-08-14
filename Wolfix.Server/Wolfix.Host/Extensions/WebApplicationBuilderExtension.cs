@@ -1,4 +1,5 @@
 using Catalog.Endpoints.Extensions;
+using Identity.Endpoints.Extensions;
 using Microsoft.AspNetCore.ResponseCompression;
 using Shared.Application.Extensions;
 using Shared.Infrastructure.Extensions;
@@ -20,6 +21,19 @@ public static class WebApplicationBuilderExtension
         
         builder.Services.AddCatalogModule(connectionString);
 
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddIdentityModule(this WebApplicationBuilder builder)
+    {
+        string connectionString = EnvironmentExtension.GetEnvironmentVariableOrThrow("DB_CONNECTION_STRING");
+        string tokenIssuer = EnvironmentExtension.GetEnvironmentVariableOrThrow("TOKEN_ISSUER");
+        string tokenAudience = EnvironmentExtension.GetEnvironmentVariableOrThrow("TOKEN_AUDIENCE");
+        string tokenKey = EnvironmentExtension.GetEnvironmentVariableOrThrow("TOKEN_KEY");
+        string tokenLifetime = EnvironmentExtension.GetEnvironmentVariableOrThrow("TOKEN_LIFETIME");
+        
+        builder.Services.AddIdentityModule(connectionString, tokenIssuer, tokenAudience, tokenKey, tokenLifetime);
+        
         return builder;
     }
     //

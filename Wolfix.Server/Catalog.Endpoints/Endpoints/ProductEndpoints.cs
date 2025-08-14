@@ -19,10 +19,15 @@ internal static class ProductEndpoints
         var productGroup = app.MapGroup(Route)
             .WithTags("Products");
         
-        productGroup.MapGet("category/{childCategoryId:guid}/page/{page:int}", GetAllByCategoryForPage);
-        productGroup.MapGet("with-discount/page/{page:int}", GetProductsWithDiscountForPage);
-        productGroup.MapGet("recommended", GetRecommendedProductsForPage);
-        productGroup.MapGet("random", GetRandomProducts);
+        MapGetEndpoints(productGroup);
+    }
+
+    private static void MapGetEndpoints(RouteGroupBuilder group)
+    {
+        group.MapGet("category/{childCategoryId:guid}/page/{page:int}", GetAllByCategoryForPage);
+        group.MapGet("with-discount/page/{page:int}", GetProductsWithDiscountForPage);
+        group.MapGet("recommended", GetRecommendedProductsForPage);
+        group.MapGet("random", GetRandomProducts);
     }
 
     private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, NotFound<string>>> GetAllByCategoryForPage(

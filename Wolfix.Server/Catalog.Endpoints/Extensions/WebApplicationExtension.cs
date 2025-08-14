@@ -5,7 +5,7 @@ namespace Catalog.Endpoints.Extensions;
 
 public static class WebApplicationExtension
 {
-    public static WebApplication MapCatalogEndpoints(this WebApplication app)
+    public static WebApplication MapCatalogApi(this WebApplication app)
     {
         app.MapProductEndpoints();
         app.MapCategoryEndpoints();
