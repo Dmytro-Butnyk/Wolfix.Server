@@ -19,7 +19,11 @@ internal sealed class CatalogContext : DbContext, IBaseContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        
         ApplyConfigurations(modelBuilder);
+        
+        modelBuilder.HasDefaultSchema("catalog");
     }
     
     public void ApplyConfigurations(ModelBuilder modelBuilder)

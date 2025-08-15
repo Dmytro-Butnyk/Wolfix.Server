@@ -5,9 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Infrastructure;
 
-public sealed class IdentityContext
-    : IdentityDbContext<Account, Role, Guid, IdentityUserClaim<Guid>, AccountRole,
-        IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
+public sealed class IdentityContext : IdentityDbContext<Account, Role, Guid>
 {
     public IdentityContext() { }
 
@@ -21,4 +19,11 @@ public sealed class IdentityContext
     //     var connectionString = "connection_string";
     //     optionsBuilder.UseNpgsql(connectionString);
     // }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        
+        builder.HasDefaultSchema("identity");
+    }
 }

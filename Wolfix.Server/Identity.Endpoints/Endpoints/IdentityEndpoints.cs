@@ -1,3 +1,4 @@
+using System.Net;
 using Identity.Application.Dto;
 using Identity.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Builder;
@@ -21,33 +22,39 @@ internal static class IdentityEndpoints
         identityGroup.MapPost("login", LogIn);
         identityGroup.MapPost("register", Register);
     }
-    //todo: все прочекать от начала до конца, привести в порядок и разобраться!!!!!!!!!!!!
-    private static async Task<Results<Ok<string>, NotFound<string>>> LogIn(
+    
+    private static async Task<Results<Ok<string>, NotFound<string>, ForbidHttpResult>> LogIn(
         [FromBody] LogInDto logInDto,
         [FromQuery] string role,
-        CancellationToken ct,
         [FromServices] IAuthService authService)
     {
         Result<string> logInResult = await authService.LogInAsync(logInDto.Email, logInDto.Password, role);
 
         if (!logInResult.IsSuccess)
         {
-            return TypedResults.NotFound(logInResult.ErrorMessage);
+            return logInResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(logInResult.ErrorMessage),
+                HttpStatusCode.Forbidden => TypedResults.Forbid()
+            };
         }
         
         return TypedResults.Ok(logInResult.Value);
     }
 
-    private static async Task<Results<Ok<string>, Conflict<string>>> Register(
+    private static async Task<Results<Ok<string>, Conflict<string>, InternalServerError<string>>> Register(
         [FromBody] RegisterDto registerDto,
-        CancellationToken ct,
         [FromServices] IAuthService authService)
     {
         Result<string> registerResult = await authService.RegisterAsync(registerDto.Email, registerDto.Password);
 
         if (!registerResult.IsSuccess)
         {
-            return TypedResults.Conflict(registerResult.ErrorMessage);
+            return registerResult.StatusCode switch
+            {
+                HttpStatusCode.Conflict => TypedResults.Conflict(registerResult.ErrorMessage),
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(registerResult.ErrorMessage)
+            };
         }
         
         return TypedResults.Ok(registerResult.Value);

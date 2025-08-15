@@ -1,46 +1,46 @@
+using System.Net;
 using Identity.Application.Interfaces.Repositories;
 using Identity.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
+using Shared.Domain.Models;
 
 namespace Identity.Infrastructure.Stores;
 
-internal sealed class AuthStore(
-    UserManager<Account> userManager,
-    RoleManager<Role> roleManager) : IAuthStore
+internal sealed class AuthStore(UserManager<Account> userManager) : IAuthStore
 {
-    public async Task<Guid?> LogInAndGetUserIdAsync(string email, string password, string role)
+    public async Task<Result<Guid>> LogInAndGetUserIdAsync(string email, string password, string role)
     {
         Account? user = await userManager.FindByEmailAsync(email);
         
         if (user == null)
         {
-            return null;
+            return Result<Guid>.Failure($"User with email: {email} not found", HttpStatusCode.NotFound);
         }
         
         bool isPasswordCorrect = await userManager.CheckPasswordAsync(user, password);
         
         if (!isPasswordCorrect)
         {
-            return null;
+            return Result<Guid>.Failure("Invalid password");
         }
         
         bool hasRole = await userManager.IsInRoleAsync(user, role);
 
         if (!hasRole)
         {
-            return null;
+            return Result<Guid>.Failure("User does not have required role", HttpStatusCode.Forbidden);
         }
         
-        return user.Id;
+        return Result<Guid>.Success(user.Id);
     }
 
-    public async Task<Guid?> RegisterAndGetUserIdAsync(string email, string password)
+    public async Task<Result<Guid>> RegisterAndGetUserIdAsync(string email, string password)
     {
         Account? existingUser = await userManager.FindByEmailAsync(email);
         
         if (existingUser != null)
         {
-            return null;
+            return Result<Guid>.Failure("User already exists", HttpStatusCode.Conflict);
         }
 
         var user = new Account
@@ -53,16 +53,16 @@ internal sealed class AuthStore(
         
         if (!createResult.Succeeded)
         {
-            return null;
+            return Result<Guid>.Failure("Failed to create user", HttpStatusCode.InternalServerError);
         }
         
         IdentityResult addRoleResult = await userManager.AddToRoleAsync(user, "User");
 
         if (!addRoleResult.Succeeded)
         {
-            return null;
+            return Result<Guid>.Failure("Failed to add a role to user", HttpStatusCode.InternalServerError);
         }
         
-        return user.Id;
+        return Result<Guid>.Success(user.Id);
     }
 }

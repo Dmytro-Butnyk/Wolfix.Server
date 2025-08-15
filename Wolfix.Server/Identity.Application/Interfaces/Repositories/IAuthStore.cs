@@ -1,8 +1,10 @@
+using Shared.Domain.Models;
+
 namespace Identity.Application.Interfaces.Repositories;
 
 public interface IAuthStore
 {
-    Task<Guid?> LogInAndGetUserIdAsync(string email, string password, string role);
+    Task<Result<Guid>> LogInAndGetUserIdAsync(string email, string password, string role);
     
-    Task<Guid?> RegisterAndGetUserIdAsync(string email, string password);
+    Task<Result<Guid>> RegisterAndGetUserIdAsync(string email, string password);
 }
