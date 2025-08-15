@@ -16,6 +16,8 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
 
+//todo: проверить в каждый резалт фейлур!!!
+
 builder
     .AddAppCache()
     .AddResponseCompression()

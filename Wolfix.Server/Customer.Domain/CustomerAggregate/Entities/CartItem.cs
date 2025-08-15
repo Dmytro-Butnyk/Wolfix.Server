@@ -5,33 +5,31 @@ namespace Customer.Domain.CustomerAggregate.Entities;
 
 internal sealed class CartItem : BaseEntity
 {
-    public Guid CustomerId { get; private set; }
-    
+    //todo: maybe setters
     public string PhotoUrl { get; private set; }
     
     public string Title { get; private set; }
     
     public decimal Price { get; private set; }
     
+    public Customer Customer { get; private set; }
+    public Guid CustomerId { get; private set; }
+    
     private CartItem() { }
     
-    private CartItem(Guid customerId, string photoUrl, string title,
+    private CartItem(Customer customer, string photoUrl, string title,
         decimal price)
     {
-        CustomerId = customerId;
+        Customer = customer;
+        CustomerId = customer.Id;
         PhotoUrl = photoUrl;
         Title = title;
         Price = price;
     }
 
-    public static Result<CartItem> Create(Guid customerId, string photoUrl, string title,
+    public static Result<CartItem> Create(Customer customer, string photoUrl, string title,
         decimal price)
     {
-        if (customerId == Guid.Empty)
-        {
-            return Result<CartItem>.Failure($"{nameof(customerId)} cannot be empty");
-        }
-
         if (string.IsNullOrWhiteSpace(photoUrl))
         {
             return Result<CartItem>.Failure($"{nameof(photoUrl)} cannot be null or empty");
@@ -47,19 +45,12 @@ internal sealed class CartItem : BaseEntity
             return Result<CartItem>.Failure($"{nameof(price)} cannot be less than or equal to zero");
         }
 
-        CartItem cartItem = new(customerId, photoUrl, title, price);
+        CartItem cartItem = new(customer, photoUrl, title, price);
         return Result<CartItem>.Success(cartItem);
     }
 
-    public VoidResult SetCustomerId(Guid customerId)
-    {
-        if (customerId == Guid.Empty)
-        {
-            return VoidResult.Failure($"{nameof(customerId)} cannot be empty");
-        }
-        
-        return VoidResult.Success();
-    }
+    public static explicit operator CartItemInfo(CartItem cartItem)
+        => new(cartItem.CustomerId, cartItem.PhotoUrl, cartItem.Title, cartItem.Price);
 }
 
 public sealed record CartItemInfo(Guid CustomerId, string PhotoUrl, string Title,

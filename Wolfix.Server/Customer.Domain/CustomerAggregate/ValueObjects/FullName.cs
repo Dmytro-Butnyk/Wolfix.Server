@@ -42,4 +42,21 @@ internal sealed class FullName
     {
         return $"{FirstName} {LastName} {MiddleName}";
     }
+
+    public static explicit operator FullName(string fullNameString)
+    {
+        if (string.IsNullOrWhiteSpace(fullNameString))
+        {
+            throw new ArgumentException("Full name string cannot be null or empty.", nameof(fullNameString));
+        }
+
+        string[] parts = fullNameString.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        if (parts.Length != 3)
+        {
+            throw new ArgumentException("Full name must consist of first name, last name, and middle name separated by spaces.");
+        }
+
+        return new FullName(parts[0], parts[1], parts[2]);
+    }
 }

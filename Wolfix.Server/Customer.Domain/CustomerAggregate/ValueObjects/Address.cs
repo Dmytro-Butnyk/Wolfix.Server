@@ -41,4 +41,36 @@ internal sealed class Address
         string apartmentNumber = ApartmentNumber.HasValue ? $", кв.{ApartmentNumber}" : string.Empty;
         return $"м.{City}, вул.{Street}, буд.{HouseNumber}{apartmentNumber}";
     }
+
+    public static explicit operator Address(string addressString)
+    {
+        if (string.IsNullOrWhiteSpace(addressString))
+        {
+            throw new ArgumentException("Address string cannot be null or empty.");
+        }
+
+        try
+        {
+            string[] parts = addressString.Split(',', StringSplitOptions.TrimEntries);
+
+            string city = parts.First(p => p.StartsWith("м.")).Replace("м.", "").Trim();
+            string street = parts.First(p => p.StartsWith("вул.")).Replace("вул.", "").Trim();
+
+            string housePart = parts.First(p => p.StartsWith("буд."));
+            uint houseNumber = uint.Parse(housePart.Replace("буд.", "").Trim());
+
+            uint? apartmentNumber = null;
+            string? apartmentPart = parts.FirstOrDefault(p => p.StartsWith("кв."));
+            if (apartmentPart != null)
+            {
+                apartmentNumber = uint.Parse(apartmentPart.Replace("кв.", "").Trim());
+            }
+
+            return Create(city, street, houseNumber, apartmentNumber).Value!;
+        }
+        catch
+        {
+            throw new FormatException("Invalid address string format.");
+        }
+    }
 }

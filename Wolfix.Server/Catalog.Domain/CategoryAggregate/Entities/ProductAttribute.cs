@@ -43,6 +43,9 @@ internal sealed class ProductAttribute : BaseEntity
     {
         return string.IsNullOrWhiteSpace(key);
     } 
+    
+    public static explicit operator ProductAttributeInfo(ProductAttribute productAttribute)
+        => new(productAttribute.Key);
 }
 
 public record ProductAttributeInfo(string Key);

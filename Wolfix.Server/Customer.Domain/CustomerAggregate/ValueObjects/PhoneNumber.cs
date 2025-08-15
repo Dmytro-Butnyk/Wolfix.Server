@@ -29,4 +29,16 @@ internal sealed class PhoneNumber
         PhoneNumber phoneNumber = new(value);
         return Result<PhoneNumber>.Success(phoneNumber);
     }
+
+    public static explicit operator PhoneNumber(string phoneNumberString)
+    {
+        Result<PhoneNumber> createPhoneNumberResult = Create(phoneNumberString);
+        
+        if (!createPhoneNumberResult.IsSuccess)
+        {
+            throw new ArgumentException(createPhoneNumberResult.ErrorMessage, nameof(phoneNumberString));
+        }
+        
+        return createPhoneNumberResult.Value!;
+    }
 }

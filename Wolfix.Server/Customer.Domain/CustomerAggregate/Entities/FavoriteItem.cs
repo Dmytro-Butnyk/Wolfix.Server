@@ -5,8 +5,7 @@ namespace Customer.Domain.CustomerAggregate.Entities;
 
 internal sealed class FavoriteItem : BaseEntity
 {
-    public Guid CustomerId { get; private set; }
-    
+    //todo: maybe setters
     public string PhotoUrl { get; private set; }
     
     public string Title { get; private set; }
@@ -18,13 +17,17 @@ internal sealed class FavoriteItem : BaseEntity
     public decimal? FinalPrice { get; private set; }
     
     public uint Bonuses { get; private set; }
+    
+    public Customer Customer { get; private set; }
+    public Guid CustomerId { get; private set; }
 
     private FavoriteItem() { }
 
-    private FavoriteItem(Guid customerId, string photoUrl, string title,
+    private FavoriteItem(Customer customer, string photoUrl, string title,
         decimal price, uint bonuses, double? averageRating = null, decimal? finalPrice = null)
     {
-        CustomerId = customerId;
+        Customer = customer;
+        CustomerId = customer.Id;
         PhotoUrl = photoUrl;
         Title = title;
         AverageRating = averageRating;
@@ -33,14 +36,9 @@ internal sealed class FavoriteItem : BaseEntity
         Bonuses = bonuses;
     }
 
-    public static Result<FavoriteItem> Create(Guid customerId, string photoUrl, string title,
+    public static Result<FavoriteItem> Create(Customer customer, string photoUrl, string title,
         decimal price, uint bonuses, double? averageRating = null, decimal? finalPrice = null)
     {
-        if (customerId == Guid.Empty)
-        {
-            return Result<FavoriteItem>.Failure($"{nameof(customerId)} cannot be empty");
-        }
-
         if (string.IsNullOrWhiteSpace(photoUrl))
         {
             return Result<FavoriteItem>.Failure($"{nameof(photoUrl)} cannot be null or empty");
@@ -61,19 +59,13 @@ internal sealed class FavoriteItem : BaseEntity
             return Result<FavoriteItem>.Failure($"{nameof(bonuses)} cannot be less than or equal to zero");
         }
 
-        FavoriteItem favoriteItem = new(customerId, photoUrl, title, price, bonuses, averageRating, finalPrice);
+        FavoriteItem favoriteItem = new(customer, photoUrl, title, price, bonuses, averageRating, finalPrice);
         return Result<FavoriteItem>.Success(favoriteItem);
     }
-    
-    public VoidResult SetCustomerId(Guid customerId)
-    {
-        if (customerId == Guid.Empty)
-        {
-            return VoidResult.Failure($"{nameof(customerId)} cannot be empty");
-        }
-        
-        return VoidResult.Success();
-    }
+
+    public static explicit operator FavoriteItemInfo(FavoriteItem favoriteItem)
+        => new(favoriteItem.CustomerId, favoriteItem.PhotoUrl, favoriteItem.Title,
+            favoriteItem.AverageRating, favoriteItem.Price, favoriteItem.FinalPrice, favoriteItem.Bonuses);
 }
 
 public sealed record FavoriteItemInfo(Guid CustomerId, string PhotoUrl, string Title, double? AverageRating,

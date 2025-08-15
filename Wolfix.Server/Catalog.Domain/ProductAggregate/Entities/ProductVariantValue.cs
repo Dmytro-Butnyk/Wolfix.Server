@@ -72,6 +72,9 @@ internal sealed class ProductVariantValue : BaseEntity
         return false;
     }
     #endregion
+    
+    public static explicit operator ProductVariantValueInfo(ProductVariantValue productVariantValue)
+        => new(productVariantValue.Id, productVariantValue.Key, productVariantValue.Value);
 }
 
 public record ProductVariantValueInfo(Guid Id, string Key, string Value);

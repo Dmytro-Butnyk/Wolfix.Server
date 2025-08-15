@@ -18,13 +18,13 @@ public sealed class Category : BaseEntity
     
     private readonly List<ProductVariant> _productVariants = [];
     public IReadOnlyCollection<ProductVariantInfo> ProductVariants => _productVariants
-        .Select(pv => new ProductVariantInfo(pv.Key))
+        .Select(pv => (ProductVariantInfo)pv)
         .ToList()
         .AsReadOnly();
 
     private readonly List<ProductAttribute> _productAttributes = [];
     public IReadOnlyCollection<ProductAttributeInfo> ProductAttributes => _productAttributes
-        .Select(pa => new ProductAttributeInfo(pa.Key))
+        .Select(pa => (ProductAttributeInfo)pa)
         .ToList()
         .AsReadOnly();
 
@@ -138,20 +138,7 @@ public sealed class Category : BaseEntity
             return Result<ProductVariantInfo>.Failure($"{nameof(productVariant)} is null. Nothing to get.");
         }
         
-        var productVariantInfo = new ProductVariantInfo(productVariant.Key);
-        return Result<ProductVariantInfo>.Success(productVariantInfo);
-    }
-
-    public Result<string> GetProductVariantKey(Guid productVariantId)
-    {
-        ProductVariant? productVariant = _productVariants.FirstOrDefault(pv => pv.Id == productVariantId);
-        
-        if (productVariant == null)
-        {
-            return Result<string>.Failure($"{nameof(productVariant)} is null. Nothing to get.");
-        }
-        
-        return Result<string>.Success(productVariant.Key);
+        return Result<ProductVariantInfo>.Success((ProductVariantInfo)productVariant);
     }
     #endregion
     
@@ -221,23 +208,10 @@ public sealed class Category : BaseEntity
         
         if (productAttribute == null)
         {
-            return Result<ProductAttributeInfo>.Failure($"{nameof(productAttribute)} is null. Nothing to get.");
+            return Result<ProductAttributeInfo>.Failure($"{nameof(productAttribute)} is null. Nothing to get.", HttpStatusCode.NotFound);
         }
         
-        var productAttributeInfo = new ProductAttributeInfo(productAttribute.Key);
-        return Result<ProductAttributeInfo>.Success(productAttributeInfo);
-    }
-
-    public Result<string> GetProductAttributeKey(Guid productAttributeId)
-    {
-        ProductAttribute? productAttribute = _productAttributes.FirstOrDefault(pa => pa.Id == productAttributeId);
-        
-        if (productAttribute == null)
-        {
-            return Result<string>.Failure($"{nameof(productAttribute)} is null. Nothing to get.");
-        }
-        
-        return Result<string>.Success(productAttribute.Key);
+        return Result<ProductAttributeInfo>.Success((ProductAttributeInfo)productAttribute);
     }
     #endregion
     

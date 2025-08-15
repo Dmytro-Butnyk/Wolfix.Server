@@ -38,4 +38,16 @@ internal sealed class BirthDate
     {
         return Value.ToString("dd.MM.yyyy");
     }
+
+    public static explicit operator BirthDate(string dateOnlyString)
+    {
+        Result<BirthDate> createBirthDateResult = Create(DateOnly.Parse(dateOnlyString));
+
+        if (!createBirthDateResult.IsSuccess)
+        {
+            throw new ArgumentException(createBirthDateResult.ErrorMessage, nameof(dateOnlyString));
+        }
+        
+        return createBirthDateResult.Value!;
+    }
 }

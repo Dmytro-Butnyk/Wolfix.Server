@@ -102,6 +102,9 @@ internal sealed class Discount : BaseEntity
         return false;
     }
     #endregion
+    
+    public static explicit operator DiscountInfo(Discount discount)
+        => new(discount.Id, discount.Percent, discount.ExpirationDateTime, discount.Status);
 }
 
 public record DiscountInfo(Guid Id, uint Percent, DateTime ExpirationDateTime, DiscountStatus Status);

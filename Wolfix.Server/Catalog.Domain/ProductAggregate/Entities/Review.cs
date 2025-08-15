@@ -15,6 +15,7 @@ internal sealed class Review : BaseEntity
     public DateTime CreatedAt { get; } = DateTime.UtcNow;
     
     public Product Product { get; private set; }
+    public Guid ProductId { get; private set; }
     
     //todo: user id
     
@@ -26,6 +27,7 @@ internal sealed class Review : BaseEntity
         Text = text;
         Rating = rating;
         Product = product;
+        ProductId = product.Id;
     }
 
     internal static Result<Review> Create(string title, string text, uint rating, Product product)
@@ -107,6 +109,9 @@ internal sealed class Review : BaseEntity
         return false;
     }
     #endregion
+    
+    public static explicit operator ReviewInfo(Review review)
+        => new(review.Id, review.Title, review.Text, review.Rating, review.CreatedAt);
 }
 
 public record ReviewInfo(Guid Id, string Title, string Text, uint Rating, DateTime CreatedAt);

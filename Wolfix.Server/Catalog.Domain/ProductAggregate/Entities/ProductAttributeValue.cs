@@ -70,6 +70,9 @@ internal sealed class ProductAttributeValue : BaseEntity
         return false;
     }
     #endregion
+    
+    public static explicit operator ProductAttributeValueInfo(ProductAttributeValue productAttributeValue)
+        => new(productAttributeValue.Id, productAttributeValue.Key, productAttributeValue.Value);
 }
 
 public record ProductAttributeValueInfo(Guid Id, string Key, string Value);

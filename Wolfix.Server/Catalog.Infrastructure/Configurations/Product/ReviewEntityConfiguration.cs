@@ -27,10 +27,10 @@ internal sealed class ReviewEntityConfiguration : IEntityTypeConfiguration<Revie
     {
         builder.HasOne(r => r.Product)
             .WithMany("_reviews")
-            .HasForeignKey("ProductId")
+            .HasForeignKey(r => r.ProductId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
-        builder.Navigation("Product")
+        builder.Navigation(r => r.Product)
             .UsePropertyAccessMode(PropertyAccessMode.Property);
     }
 }

@@ -54,19 +54,19 @@ public sealed class Product : BaseEntity
     
     private readonly List<Review> _reviews = [];
     public IReadOnlyCollection<ReviewInfo> Reviews => _reviews
-        .Select(r => new ReviewInfo(r.Id, r.Title, r.Text, r.Rating, r.CreatedAt))
+        .Select(r => (ReviewInfo)r)
         .ToList()
         .AsReadOnly();
 
     private readonly List<ProductAttributeValue> _productsAttributeValues = [];
     public IReadOnlyCollection<ProductAttributeValueInfo> ProductsAttributeValues => _productsAttributeValues
-        .Select(pav => new ProductAttributeValueInfo(pav.Id, pav.Key, pav.Value))
+        .Select(pav => (ProductAttributeValueInfo)pav)
         .ToList()
         .AsReadOnly();
     
     private readonly List<ProductVariantValue> _productVariantValues = [];
     public IReadOnlyCollection<ProductVariantValueInfo> ProductVariantValues => _productVariantValues
-        .Select(pvv => new ProductVariantValueInfo(pvv.Id, pvv.Key, pvv.Value))
+        .Select(pvv => (ProductVariantValueInfo)pvv)
         .ToList()
         .AsReadOnly();
     
@@ -116,6 +116,7 @@ public sealed class Product : BaseEntity
         return Result<Product>.Success(product, HttpStatusCode.Created);
     }
 
+    #region Setters
     public VoidResult ChangeTitle(string title)
     {
         if (IsTextInvalid(title, out string titleErrorMessage))
@@ -163,6 +164,7 @@ public sealed class Product : BaseEntity
         Status = status;
         return VoidResult.Success();
     }
+    #endregion
     
     #region photo
     
@@ -194,60 +196,7 @@ public sealed class Product : BaseEntity
             return Result<DiscountInfo>.Failure(errorMessage);
         }
         
-        var discountInfo = new DiscountInfo(Discount!.Id, Discount.Percent, Discount.ExpirationDateTime, Discount.Status);
-        return Result<DiscountInfo>.Success(discountInfo);
-    }
-
-    public Result<Guid> GetDiscountId()
-    {
-        if (IsDiscountExists(out string errorMessage))
-        {
-            return Result<Guid>.Failure(errorMessage);
-        }
-        
-        return Result<Guid>.Success(Discount!.Id);
-    }
-    
-    public Result<uint> GetDiscountPercent()
-    {
-        if (IsDiscountExists(out string discountInvalidErrorMessage))
-        {
-            return Result<uint>.Failure(discountInvalidErrorMessage);
-        }
-        
-        //todo:?
-        if (IsDiscountExpired(out string discountExpiredErrorMessage))
-        {
-            return Result<uint>.Failure(discountExpiredErrorMessage);
-        }
-        
-        return Result<uint>.Success(Discount!.Percent);
-    }
-
-    public Result<DateTime> GetDiscountExpirationDateTime()
-    {
-        if (IsDiscountExists(out string discountInvalidErrorMessage))
-        {
-            return Result<DateTime>.Failure(discountInvalidErrorMessage);
-        }
-        
-        //todo:?
-        if (IsDiscountExpired(out string discountExpiredErrorMessage))
-        {
-            return Result<DateTime>.Failure(discountExpiredErrorMessage);
-        }
-        
-        return Result<DateTime>.Success(Discount!.ExpirationDateTime);
-    }
-
-    public Result<DiscountStatus> GetDiscountStatus()
-    {
-        if (IsDiscountExists(out string errorMessage))
-        {
-            return Result<DiscountStatus>.Failure(errorMessage);
-        }
-        
-        return Result<DiscountStatus>.Success(Discount!.Status);
+        return Result<DiscountInfo>.Success((DiscountInfo)Discount!);
     }
     
     public VoidResult AddDiscount(uint percent, DateTime expirationDateTime)
@@ -307,8 +256,7 @@ public sealed class Product : BaseEntity
             return Result<ReviewInfo>.Failure($"{nameof(review)} is null. Nothing to get.");
         }
         
-        var reviewInfo = new ReviewInfo(review.Id, review.Title, review.Text, review.Rating, review.CreatedAt);
-        return Result<ReviewInfo>.Success(reviewInfo);
+        return Result<ReviewInfo>.Success((ReviewInfo)review);
     }
 
     public Result<string> GetReviewTitle(Guid reviewId)
@@ -380,11 +328,10 @@ public sealed class Product : BaseEntity
         return VoidResult.Success();
     }
 
-    public VoidResult RemoveAllReviews()
+    public void RemoveAllReviews()
     {
         _reviews.Clear();
         AverageRating = null;
-        return VoidResult.Success();
     }
 
     public VoidResult ChangeReviewTitle(Guid reviewId, string title)
@@ -453,32 +400,7 @@ public sealed class Product : BaseEntity
             return Result<ProductAttributeValueInfo>.Failure($"{nameof(productAttributeValue)} is null. Nothing to get.");
         }
         
-        var productAttributeValueInfo = new ProductAttributeValueInfo(productAttributeValue.Id, productAttributeValue.Key, productAttributeValue.Value);
-        return Result<ProductAttributeValueInfo>.Success(productAttributeValueInfo);
-    }
-
-    public Result<string> GetProductAttributeValueKey(Guid productAttributeValueId)
-    {
-        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
-        
-        if (productAttributeValue == null)
-        {
-            return Result<string>.Failure($"{nameof(productAttributeValue)} is null. Nothing to get.");
-        }
-        
-        return Result<string>.Success(productAttributeValue.Key);
-    }
-
-    public Result<string> GetProductAttributeValueValue(Guid productAttributeValueId)
-    {
-        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
-        
-        if (productAttributeValue == null)
-        {
-            return Result<string>.Failure($"{nameof(productAttributeValue)} is null. Nothing to get.");
-        }
-        
-        return Result<string>.Success(productAttributeValue.Value);
+        return Result<ProductAttributeValueInfo>.Success((ProductAttributeValueInfo)productAttributeValue);
     }
     #endregion
 
@@ -568,32 +490,7 @@ public sealed class Product : BaseEntity
             return Result<ProductVariantValueInfo>.Failure($"{nameof(productVariantValue)} is null. Nothing to get.");
         }
         
-        var productVariantValueInfo = new ProductVariantValueInfo(productVariantValue.Id, productVariantValue.Key, productVariantValue.Value);
-        return Result<ProductVariantValueInfo>.Success(productVariantValueInfo);
-    }
-
-    public Result<string> GetProductVariantValueKey(Guid productVariantValueId)
-    {
-        ProductVariantValue? productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
-        
-        if (productVariantValue == null)
-        {
-            return Result<string>.Failure($"{nameof(productVariantValue)} is null. Nothing to get.");
-        }
-        
-        return Result<string>.Success(productVariantValue.Key);
-    }
-
-    public Result<string> GetProductVariantValueValue(Guid productVariantValueId)
-    {
-        ProductVariantValue? productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
-        
-        if (productVariantValue == null)
-        {
-            return Result<string>.Failure($"{nameof(productVariantValue)} is null. Nothing to get.");
-        }
-        
-        return Result<string>.Success(productVariantValue.Value);
+        return Result<ProductVariantValueInfo>.Success((ProductVariantValueInfo)productVariantValue);
     }
     #endregion
     

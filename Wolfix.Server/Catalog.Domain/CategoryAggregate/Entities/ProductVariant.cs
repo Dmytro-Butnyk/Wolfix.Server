@@ -53,6 +53,9 @@ internal sealed class ProductVariant : BaseEntity
         return false;
     }
     #endregion
+    
+    public static explicit operator ProductVariantInfo(ProductVariant productVariant)
+        => new(productVariant.Key);
 }
 
 public record ProductVariantInfo(string Key);
