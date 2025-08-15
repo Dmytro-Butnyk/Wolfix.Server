@@ -14,19 +14,27 @@ public static class WebApplicationBuilderExtension
         
         return builder;
     }
-    
-    public static WebApplicationBuilder AddCatalogModule(this WebApplicationBuilder builder)
+
+    public static WebApplicationBuilder AddAllModules(this WebApplicationBuilder builder)
     {
         string connectionString = EnvironmentExtension.GetEnvironmentVariableOrThrow("DB_CONNECTION_STRING");
+
+        builder
+            .AddCatalogModule(connectionString)
+            .AddIdentityModule(connectionString);
         
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddCatalogModule(this WebApplicationBuilder builder, string connectionString)
+    {
         builder.Services.AddCatalogModule(connectionString);
 
         return builder;
     }
 
-    public static WebApplicationBuilder AddIdentityModule(this WebApplicationBuilder builder)
+    private static WebApplicationBuilder AddIdentityModule(this WebApplicationBuilder builder, string connectionString)
     {
-        string connectionString = EnvironmentExtension.GetEnvironmentVariableOrThrow("DB_CONNECTION_STRING");
         string tokenIssuer = EnvironmentExtension.GetEnvironmentVariableOrThrow("TOKEN_ISSUER");
         string tokenAudience = EnvironmentExtension.GetEnvironmentVariableOrThrow("TOKEN_AUDIENCE");
         string tokenKey = EnvironmentExtension.GetEnvironmentVariableOrThrow("TOKEN_KEY");

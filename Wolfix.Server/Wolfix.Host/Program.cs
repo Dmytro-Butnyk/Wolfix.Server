@@ -20,8 +20,7 @@ builder
     .AddAppCache()
     .AddResponseCompression()
     .AddSharedRepositories()
-    .AddCatalogModule()
-    .AddIdentityModule();
+    .AddAllModules();
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
@@ -49,8 +48,6 @@ app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseResponseCompression();
 
-app
-    .MapCatalogApi()
-    .MapIdentityApi();
+app.MapAllEndpoints();
 
 app.Run();
