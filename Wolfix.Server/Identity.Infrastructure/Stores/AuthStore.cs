@@ -1,37 +1,62 @@
 using System.Net;
 using Identity.Application.Interfaces.Repositories;
+using Identity.Application.Projections;
 using Identity.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Shared.Domain.Models;
 
 namespace Identity.Infrastructure.Stores;
 
-internal sealed class AuthStore(UserManager<Account> userManager) : IAuthStore
+internal sealed class AuthStore(
+    UserManager<Account> userManager,
+    RoleManager<Role> roleManager) : IAuthStore
 {
-    public async Task<Result<Guid>> LogInAndGetUserIdAsync(string email, string password, string role)
+    public async Task<Result<UserRolesProjection>> LogInAndGetUserRolesAsync(string email, string password)
     {
         Account? user = await userManager.FindByEmailAsync(email);
-        
+
         if (user == null)
         {
-            return Result<Guid>.Failure($"User with email: {email} not found", HttpStatusCode.NotFound);
+            return Result<UserRolesProjection>.Failure($"User with email: {email} not found", HttpStatusCode.NotFound);
         }
         
         bool isPasswordCorrect = await userManager.CheckPasswordAsync(user, password);
         
         if (!isPasswordCorrect)
         {
-            return Result<Guid>.Failure("Invalid password");
+            return Result<UserRolesProjection>.Failure("Invalid password");
+        }
+        
+        IList<string> userRoles = await userManager.GetRolesAsync(user);
+        
+        UserRolesProjection userRolesProjection = new(user.Id, user.Email!, userRoles);
+        return Result<UserRolesProjection>.Success(userRolesProjection);
+    }
+
+    public async Task<VoidResult> CheckUserExistsAndHasRole(Guid userId, string role)
+    {
+        Account? user = await userManager.FindByIdAsync(userId.ToString());
+        
+        if (user == null)
+        {
+            return VoidResult.Failure($"User with id: {userId} not found", HttpStatusCode.NotFound);
+        }
+        
+        bool isRoleExists = await roleManager.RoleExistsAsync(role);
+
+        if (!isRoleExists)
+        {
+            return VoidResult.Failure("Role does not exist", HttpStatusCode.NotFound);
         }
         
         bool hasRole = await userManager.IsInRoleAsync(user, role);
 
         if (!hasRole)
         {
-            return Result<Guid>.Failure("User does not have required role", HttpStatusCode.Forbidden);
+            return VoidResult.Failure("User does not have required role", HttpStatusCode.Forbidden);
         }
         
-        return Result<Guid>.Success(user.Id);
+        return VoidResult.Success();
     }
 
     public async Task<Result<Guid>> RegisterAndGetUserIdAsync(string email, string password)
@@ -40,7 +65,7 @@ internal sealed class AuthStore(UserManager<Account> userManager) : IAuthStore
         
         if (existingUser != null)
         {
-            return Result<Guid>.Failure("User already exists", HttpStatusCode.Conflict);
+            return Result<Guid>.Failure("This email already taken", HttpStatusCode.Conflict);
         }
 
         var user = new Account

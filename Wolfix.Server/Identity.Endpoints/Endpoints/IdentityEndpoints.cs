@@ -1,5 +1,7 @@
 using System.Net;
 using Identity.Application.Dto;
+using Identity.Application.Dto.Requests;
+using Identity.Application.Dto.Responses;
 using Identity.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -19,27 +21,45 @@ internal static class IdentityEndpoints
         var identityGroup = app.MapGroup(Route)
             .WithTags("Identity");
 
-        identityGroup.MapPost("login", LogIn);
+        identityGroup.MapPost("roles", LogInAndGetUserRoles);
+        identityGroup.MapPost("token", GetTokenByRole);
         identityGroup.MapPost("register", Register);
     }
     
-    private static async Task<Results<Ok<string>, NotFound<string>, ForbidHttpResult>> LogIn(
+    private static async Task<Results<Ok<UserRolesDto>, NotFound<string>, BadRequest<string>>> LogInAndGetUserRoles(
         [FromBody] LogInDto logInDto,
-        [FromQuery] string role,
         [FromServices] IAuthService authService)
     {
-        Result<string> logInResult = await authService.LogInAsync(logInDto.Email, logInDto.Password, role);
+        Result<UserRolesDto> logInResult = await authService.LogInAndGetUserRolesAsync(logInDto.Email, logInDto.Password);
 
         if (!logInResult.IsSuccess)
         {
             return logInResult.StatusCode switch
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(logInResult.ErrorMessage),
-                HttpStatusCode.Forbidden => TypedResults.Forbid()
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(logInResult.ErrorMessage)
             };
         }
         
         return TypedResults.Ok(logInResult.Value);
+    }
+
+    private static async Task<Results<Ok<string>, NotFound<string>, ForbidHttpResult>> GetTokenByRole(
+        [FromBody] TokenDto tokenDto,
+        [FromServices] IAuthService authService)
+    {
+        Result<string> getTokenResult = await authService.GetTokenByRoleAsync(tokenDto.UserId, tokenDto.Email, tokenDto.Role);
+
+        if (!getTokenResult.IsSuccess)
+        {
+            return getTokenResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(getTokenResult.ErrorMessage),
+                HttpStatusCode.Forbidden => TypedResults.Forbid()
+            };
+        }
+        
+        return TypedResults.Ok(getTokenResult.Value);
     }
 
     private static async Task<Results<Ok<string>, Conflict<string>, InternalServerError<string>>> Register(
