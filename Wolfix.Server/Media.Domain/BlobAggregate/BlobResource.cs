@@ -7,27 +7,21 @@ namespace Media.Domain.BlobAggregate;
 public sealed class BlobResource : BaseEntity
 {
     public string Name { get; private set; }
-    public string Url { get; private set; }
+    public string Url { get; private set; } = String.Empty;
     public BlobResourceType Type { get; private set; }
 
     private BlobResource()
     {
     }
 
-    private BlobResource(string name, string url, BlobResourceType type)
+    private BlobResource(string name, BlobResourceType type)
     {
         Name = name;
-        Url = url;
         Type = type;
     }
 
-    public static Result<BlobResource> Create(string url, BlobResourceType type)
+    public static Result<BlobResource> Create(BlobResourceType type)
     {
-        if (IsTextInvalid(url, out var errorMessage))
-        {
-            return Result<BlobResource>.Failure(errorMessage);
-        }
-
         if (!Enum.IsDefined(type))
         {
             return Result<BlobResource>.Failure("Invalid blob resource type");
@@ -35,7 +29,7 @@ public sealed class BlobResource : BaseEntity
 
         string name = $"{Guid.NewGuid():N}-{type.ToString().ToLowerInvariant()}";
 
-        BlobResource blobResource = new BlobResource(name, url, type);
+        BlobResource blobResource = new BlobResource(name, type);
 
         return Result<BlobResource>.Success(blobResource);
     }
