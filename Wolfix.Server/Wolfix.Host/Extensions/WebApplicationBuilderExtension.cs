@@ -1,4 +1,5 @@
 using Catalog.Endpoints.Extensions;
+using Media.Api;
 using Microsoft.AspNetCore.ResponseCompression;
 using Shared.Application.Extensions;
 
@@ -12,6 +13,15 @@ public static class WebApplicationBuilderExtension
         
         builder.Services.AddCatalogModule(connectionString);
 
+        return builder;
+    }
+    
+    public static WebApplicationBuilder AddMediaModule(this WebApplicationBuilder builder)
+    {
+        string connectionString = EnvironmentExtension.GetEnvironmentVariableOrThrow("DB_CONNECTION_STRING");
+        
+        builder.Services.AddMediaModule(connectionString, builder.Configuration);
+        
         return builder;
     }
     //

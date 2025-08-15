@@ -16,6 +16,14 @@ public sealed class MediaContext : DbContext
         ApplyConfigurations(modelBuilder);
     }
     
+    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    // {
+    //     if (optionsBuilder.IsConfigured) return;
+    //     
+    //     var connectionString = "";
+    //     optionsBuilder.UseNpgsql(connectionString);
+    // }
+    
     public void ApplyConfigurations(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new BlobResourceEntityConfiguration());

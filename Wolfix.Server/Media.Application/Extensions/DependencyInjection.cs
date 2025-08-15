@@ -6,7 +6,7 @@ namespace Media.Application.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddOptions(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddMediaOptions(this IServiceCollection services, IConfiguration configuration)
     {
         services
             .AddOptions<AzureBlobContainersNames>()

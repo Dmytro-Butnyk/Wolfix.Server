@@ -15,7 +15,8 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder
     .AddAppCache()
     .AddResponseCompression()
-    .AddCatalogModule();
+    .AddCatalogModule()
+    .AddMediaModule();
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
