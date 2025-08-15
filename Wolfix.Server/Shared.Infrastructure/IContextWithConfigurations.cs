@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Shared.Infrastructure;
 
-public interface IBaseContext
+public interface IContextWithConfigurations
 {
     void ApplyConfigurations(ModelBuilder modelBuilder);
 }

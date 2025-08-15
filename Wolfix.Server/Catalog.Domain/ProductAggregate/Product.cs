@@ -689,7 +689,7 @@ public sealed class Product : BaseEntity
 
     private static bool IsPriceInvalid(decimal price, out string errorMessage)
     {
-        if (price < 0)
+        if (price <= 0)
         {
             errorMessage = $"{nameof(price)} must be positive";
             return true;

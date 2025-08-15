@@ -7,6 +7,7 @@ using Shared.Domain.Models;
 
 namespace Identity.Infrastructure.Stores;
 
+//todo: разделить методы по логике
 internal sealed class AuthStore(
     UserManager<Account> userManager,
     RoleManager<Role> roleManager) : IAuthStore
@@ -28,6 +29,11 @@ internal sealed class AuthStore(
         }
         
         IList<string> userRoles = await userManager.GetRolesAsync(user);
+
+        if (userRoles.Count == 0)
+        {
+            return Result<UserRolesProjection>.Failure("User does not have any roles", HttpStatusCode.InternalServerError);
+        }
         
         UserRolesProjection userRolesProjection = new(user.Id, user.Email!, userRoles);
         return Result<UserRolesProjection>.Success(userRolesProjection);

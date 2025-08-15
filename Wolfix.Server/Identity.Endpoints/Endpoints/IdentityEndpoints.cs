@@ -26,7 +26,7 @@ internal static class IdentityEndpoints
         identityGroup.MapPost("register", Register);
     }
     
-    private static async Task<Results<Ok<UserRolesDto>, NotFound<string>, BadRequest<string>>> LogInAndGetUserRoles(
+    private static async Task<Results<Ok<UserRolesDto>, NotFound<string>, BadRequest<string>, InternalServerError<string>>> LogInAndGetUserRoles(
         [FromBody] LogInDto logInDto,
         [FromServices] IAuthService authService)
     {
@@ -37,7 +37,8 @@ internal static class IdentityEndpoints
             return logInResult.StatusCode switch
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(logInResult.ErrorMessage),
-                HttpStatusCode.BadRequest => TypedResults.BadRequest(logInResult.ErrorMessage)
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(logInResult.ErrorMessage),
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(logInResult.ErrorMessage)
             };
         }
         
