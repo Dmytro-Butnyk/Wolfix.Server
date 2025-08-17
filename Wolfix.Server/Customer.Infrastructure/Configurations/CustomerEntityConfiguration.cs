@@ -20,36 +20,39 @@ internal sealed class CustomerEntityConfiguration : IEntityTypeConfiguration<Dom
 
     private void ConfigureBasicProperties(EntityTypeBuilder<Domain.CustomerAggregate.Customer> builder)
     {
+        const string nullMarker = "_____NULL_____";
+        
         builder.Property(c => c.FullName)
-            .IsRequired()
+            .IsRequired(false)
             .HasConversion<string>(
-                fullName => fullName.ToString(),
-                fullNameString => (FullName)fullNameString
+                fullName => fullName == null ? nullMarker : fullName.ToString(),
+                fullNameString => fullNameString == nullMarker ? null : (FullName)fullNameString
             );
         
         builder.Property(c => c.PhoneNumber)
-            .IsRequired()
+            .IsRequired(false)
             .HasConversion<string>(
-                phoneNumber => phoneNumber.Value,
-                phoneNumberString => (PhoneNumber)phoneNumberString
+                phoneNumber => phoneNumber == null ? nullMarker : phoneNumber.Value,
+                phoneNumberString => phoneNumberString == nullMarker ? null : (PhoneNumber)phoneNumberString
             );
 
         builder.Property(c => c.Address)
-            .IsRequired()
+            .IsRequired(false)
             .HasConversion<string>(
-                address => address.ToString(),
-                addressString => (Address)addressString
+                address => address == null ? nullMarker : address.ToString(),
+                addressString => addressString == nullMarker ? null : (Address)addressString
             );
 
         builder.Property(c => c.BirthDate)
-            .IsRequired()
+            .IsRequired(false)
             .HasConversion<string>(
-                birthDate => birthDate.ToString(),
-                birthDateString => (BirthDate)birthDateString
+                birthDate => birthDate == null ? nullMarker : birthDate.ToString(),
+                birthDateString => birthDateString == nullMarker ? null : (BirthDate)birthDateString
             );
 
         builder.Property(c => c.BonusesAmount)
-            .IsRequired();
+            .IsRequired()
+            .HasDefaultValue(0);
 
         builder.Property(c => c.AccountId)
             .IsRequired();

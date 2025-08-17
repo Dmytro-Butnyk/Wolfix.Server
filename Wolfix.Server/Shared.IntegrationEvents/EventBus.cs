@@ -1,11 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Domain.Models;
 using Shared.IntegrationEvents.Inerfaces;
 
 namespace Shared.IntegrationEvents;
 
 public sealed class EventBus(IServiceScopeFactory serviceProvider) : IEventBus
 {
-    public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IIntegrationEvent
+    public async Task<VoidResult> PublishAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IIntegrationEvent
     {
         using var scope = serviceProvider.CreateScope();
         
@@ -15,12 +16,20 @@ public sealed class EventBus(IServiceScopeFactory serviceProvider) : IEventBus
 
         foreach (var handler in handlers)
         {
-            await handler.HandleAsync(@event, ct);
+            VoidResult result = await handler.HandleAsync(@event, ct);
+
+            if (!result.IsSuccess)
+            {
+                return VoidResult.Failure(result.ErrorMessage!, result.StatusCode);
+            }
         }
+        
+        return VoidResult.Success();
     }
 
-    public async Task PublishForParallelAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IIntegrationEvent
+    public async Task<VoidResult> PublishForParallelAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IIntegrationEvent
     {
+        //todo
         using var scope = serviceProvider.CreateScope();
         
         var handlers = scope.ServiceProvider
@@ -28,6 +37,15 @@ public sealed class EventBus(IServiceScopeFactory serviceProvider) : IEventBus
             .ToList();
 
         var tasks = handlers.Select(handler => handler.HandleAsync(@event, ct));
-        await Task.WhenAll(tasks);
+        
+        var results = await Task.WhenAll(tasks);
+        
+        if (results.Any(result => !result.IsSuccess))
+        {
+            VoidResult firstUnsuccessResult = results.First(result => !result.IsSuccess);
+            return VoidResult.Failure(firstUnsuccessResult.ErrorMessage!, firstUnsuccessResult.StatusCode);
+        }
+        
+        return VoidResult.Success();
     }
 }

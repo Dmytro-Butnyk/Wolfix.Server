@@ -1,7 +1,9 @@
+using Shared.Domain.Models;
+
 namespace Shared.IntegrationEvents.Inerfaces;
 
 public interface IIntegrationEventHandler<TEvent>
     where TEvent : IIntegrationEvent
 {
-    Task HandleAsync(TEvent @event, CancellationToken ct);
+    Task<VoidResult> HandleAsync(TEvent @event, CancellationToken ct);
 }

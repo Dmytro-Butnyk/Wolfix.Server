@@ -8,14 +8,14 @@ namespace Customer.Domain.CustomerAggregate;
 
 public sealed class Customer : BaseEntity
 {
-    internal FullName FullName { get; private set; }
+    internal FullName? FullName { get; private set; }
+
+    internal PhoneNumber? PhoneNumber { get; private set; }
     
-    internal PhoneNumber PhoneNumber { get; private set; }
+    internal Address? Address { get; private set; }
     
-    internal Address Address { get; private set; }
-    
-    internal BirthDate BirthDate { get; private set; }
-    
+    internal BirthDate? BirthDate { get; private set; }
+
     public decimal BonusesAmount { get; private set; }
     
     public Guid AccountId { get; private set; }
@@ -34,103 +34,56 @@ public sealed class Customer : BaseEntity
 
     private Customer() { }
 
-    private Customer(FullName fullName, PhoneNumber phoneNumber, Address address,
-        BirthDate birthDate, decimal bonusesAmount, Guid accountId)
+    private Customer(Guid accountId)
     {
-        FullName = fullName;
-        PhoneNumber = phoneNumber;
-        Address = address;
-        BirthDate = birthDate;
-        BonusesAmount = bonusesAmount;
         AccountId = accountId;
     }
 
-    public static Result<Customer> Create(string firstName, string lastName, string middleName, string phoneNumberString,
-        string city, string street, uint houseNumber, uint? apartmentNumber, DateOnly birthDate, decimal bonusesAmount, Guid accountId)
+    public static Result<Customer> Create(Guid accountId)
     {
-        Result<FullName> createFullNameResult = FullName.Create(firstName, lastName, middleName);
-        
-        if (!createFullNameResult.IsSuccess)
-        {
-            return Result<Customer>.Failure(createFullNameResult.ErrorMessage!);
-        }
-        
-        FullName fullName = createFullNameResult.Value!;
-        
-        Result<PhoneNumber> createPhoneNumberResult = PhoneNumber.Create(phoneNumberString);
-
-        if (!createPhoneNumberResult.IsSuccess)
-        {
-            return Result<Customer>.Failure(createPhoneNumberResult.ErrorMessage!);
-        }
-        
-        PhoneNumber phoneNumber = createPhoneNumberResult.Value!;
-        
-        Result<Address> createAddressResult = Address.Create(city, street, houseNumber, apartmentNumber);
-        
-        if (!createAddressResult.IsSuccess)
-        {
-            return Result<Customer>.Failure(createAddressResult.ErrorMessage!);
-        }
-        
-        Address address = createAddressResult.Value!;
-        
-        Result<BirthDate> createBirthDateResult = BirthDate.Create(birthDate);
-        
-        if (!createBirthDateResult.IsSuccess)
-        {
-            return Result<Customer>.Failure(createBirthDateResult.ErrorMessage!);
-        }
-        
-        BirthDate customerBirthDate = createBirthDateResult.Value!;
-
-        if (bonusesAmount <= 0)
-        {
-            return Result<Customer>.Failure($"{nameof(bonusesAmount)} cannot be less than or equal to zero");
-        }
-
         if (accountId == Guid.Empty)
         {
             return Result<Customer>.Failure($"{nameof(accountId)} cannot be empty");
         }
 
-        Customer customer = new(fullName, phoneNumber, address, customerBirthDate, bonusesAmount, accountId);
+        Customer customer = new(accountId);
         return Result<Customer>.Success(customer);
     }
     
     #region Getters
+    private const string DefaultStringValue = "Не зазначено";
     public string GetFullName()
-        => FullName.ToString();
+        => FullName == null ? DefaultStringValue : FullName.ToString();
     
     public string GetFirstName()
-        => FullName.FirstName;
+        => FullName == null ? DefaultStringValue : FullName.FirstName;
 
     public string GetLastName()
-        => FullName.LastName;
+        => FullName == null ? DefaultStringValue : FullName.LastName;
 
     public string GetMiddleName()
-        => FullName.MiddleName;
+        => FullName == null ? DefaultStringValue : FullName.MiddleName;
 
     public string GetPhoneNumber()
-        => PhoneNumber.Value;
+        => PhoneNumber == null ? DefaultStringValue : PhoneNumber.Value;
 
     public string GetAddress()
-        => Address.ToString();
+        => Address == null ? DefaultStringValue : Address.ToString();
     
     public string GetCity()
-        => Address.City;
+        => Address == null ? DefaultStringValue : Address.City;
 
     public string GetStreet()
-        => Address.Street;
+        => Address == null ? DefaultStringValue : Address.Street;
 
-    public uint GetHouseNumber()
-        => Address.HouseNumber;
+    public uint? GetHouseNumber()
+        => Address?.HouseNumber;
     
     public uint? GetApartmentNumber()
-        => Address.ApartmentNumber;
+        => Address?.ApartmentNumber;
     
-    public DateOnly GetBirthDate()
-        => BirthDate.Value;
+    public DateOnly? GetBirthDate()
+        => BirthDate?.Value;
     #endregion
 
     #region Setters
@@ -140,7 +93,7 @@ public sealed class Customer : BaseEntity
         
         if (!createFullNameResult.IsSuccess)
         {
-            return VoidResult.Failure(createFullNameResult.ErrorMessage!);
+            return VoidResult.Failure(createFullNameResult.ErrorMessage!, createFullNameResult.StatusCode);
         }
         
         FullName = createFullNameResult.Value!;
@@ -153,7 +106,7 @@ public sealed class Customer : BaseEntity
 
         if (!createPhoneNumberResult.IsSuccess)
         {
-            return VoidResult.Failure(createPhoneNumberResult.ErrorMessage!);
+            return VoidResult.Failure(createPhoneNumberResult.ErrorMessage!, createPhoneNumberResult.StatusCode);
         }
         
         PhoneNumber = createPhoneNumberResult.Value!;
@@ -166,7 +119,7 @@ public sealed class Customer : BaseEntity
         
         if (!createAddressResult.IsSuccess)
         {
-            return VoidResult.Failure(createAddressResult.ErrorMessage!);
+            return VoidResult.Failure(createAddressResult.ErrorMessage!, createAddressResult.StatusCode);
         }
         
         Address = createAddressResult.Value!;
@@ -179,7 +132,7 @@ public sealed class Customer : BaseEntity
         
         if (!createBirthDateResult.IsSuccess)
         {
-            return VoidResult.Failure(createBirthDateResult.ErrorMessage!);
+            return VoidResult.Failure(createBirthDateResult.ErrorMessage!, createBirthDateResult.StatusCode);
         }
         
         BirthDate = createBirthDateResult.Value!;
@@ -231,7 +184,7 @@ public sealed class Customer : BaseEntity
         
         if (!createFavoriteItemResult.IsSuccess)
         {
-            return VoidResult.Failure(createFavoriteItemResult.ErrorMessage!);
+            return VoidResult.Failure(createFavoriteItemResult.ErrorMessage!, createFavoriteItemResult.StatusCode);;
         }
         
         FavoriteItem favoriteItem = createFavoriteItemResult.Value!;

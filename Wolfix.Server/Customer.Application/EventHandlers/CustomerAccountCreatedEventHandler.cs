@@ -8,17 +8,18 @@ namespace Customer.Application.EventHandlers;
 public sealed class CustomerAccountCreatedEventHandler(ICustomerRepository customerRepository)
     : IIntegrationEventHandler<CustomerAccountCreated>
 {
-    //todo: прописать нормально
-    public async Task HandleAsync(CustomerAccountCreated @event, CancellationToken ct)
+    public async Task<VoidResult> HandleAsync(CustomerAccountCreated @event, CancellationToken ct)
     {
         Result<Customer.Domain.CustomerAggregate.Customer> createCustomerResult =
             Domain.CustomerAggregate.Customer.Create(@event.AccountId);
         
         if (!createCustomerResult.IsSuccess)
         {
-            throw new Exception(createCustomerResult.ErrorMessage);
+            VoidResult.Failure(createCustomerResult.ErrorMessage!, createCustomerResult.StatusCode);
         }
 
         await customerRepository.AddAsync(createCustomerResult.Value!, ct);
+        
+        return VoidResult.Success();
     }
 }

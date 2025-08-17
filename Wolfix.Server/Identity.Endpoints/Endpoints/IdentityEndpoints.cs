@@ -69,7 +69,7 @@ internal static class IdentityEndpoints
         return TypedResults.Ok(getTokenResult.Value);
     }
 
-    private static async Task<Results<Ok<string>, Conflict<string>, InternalServerError<string>>> RegisterAsCustomer(
+    private static async Task<Results<Ok<string>, Conflict<string>, InternalServerError<string>, BadRequest<string>>> RegisterAsCustomer(
         [FromBody] RegisterDto registerDto,
         [FromServices] IAuthService authService,
         CancellationToken ct)
@@ -81,7 +81,8 @@ internal static class IdentityEndpoints
             return registerResult.StatusCode switch
             {
                 HttpStatusCode.Conflict => TypedResults.Conflict(registerResult.ErrorMessage),
-                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(registerResult.ErrorMessage)
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(registerResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(registerResult.ErrorMessage)
             };
         }
         

@@ -55,10 +55,15 @@ internal sealed class AuthService(
         
         string token = jwtService.GenerateToken(createdUserId, email, "User");
 
-        await eventBus.PublishAsync(new CustomerAccountCreated
+        VoidResult publishResult = await eventBus.PublishAsync(new CustomerAccountCreated
         {
             AccountId = createdUserId
         }, ct);
+
+        if (!publishResult.IsSuccess)
+        {
+            return Result<string>.Failure(publishResult.ErrorMessage!, publishResult.StatusCode);
+        }
         
         return Result<string>.Success(token);
     }
