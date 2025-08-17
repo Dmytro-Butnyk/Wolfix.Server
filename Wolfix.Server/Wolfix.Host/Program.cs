@@ -17,6 +17,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
 
 //todo: проверить каждый резалт фейлур!!!
+//todo: перенести EventBus в Shared.Application???
 
 builder
     .AddAppCache()
