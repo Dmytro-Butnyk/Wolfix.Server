@@ -51,6 +51,9 @@ internal sealed class CustomerEntityConfiguration : IEntityTypeConfiguration<Dom
         builder.Property(c => c.BonusesAmount)
             .IsRequired();
 
+        builder.Property(c => c.AccountId)
+            .IsRequired();
+
         builder.Ignore(c => c.FavoriteItems);
 
         builder.Ignore(c => c.CartItems);

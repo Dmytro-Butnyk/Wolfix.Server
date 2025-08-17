@@ -65,7 +65,7 @@ internal sealed class AuthStore(
         return VoidResult.Success();
     }
 
-    public async Task<Result<Guid>> RegisterAndGetUserIdAsync(string email, string password)
+    public async Task<Result<Guid>> RegisterAsCustomerAndGetUserIdAsync(string email, string password)
     {
         Account? existingUser = await userManager.FindByEmailAsync(email);
         

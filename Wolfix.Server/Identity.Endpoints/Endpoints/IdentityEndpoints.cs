@@ -21,9 +21,15 @@ internal static class IdentityEndpoints
         var identityGroup = app.MapGroup(Route)
             .WithTags("Identity");
 
-        identityGroup.MapPost("roles", LogInAndGetUserRoles);
-        identityGroup.MapPost("token", GetTokenByRole);
-        identityGroup.MapPost("register", Register);
+        var customerGroup = identityGroup.MapGroup("customer");
+        MapCustomerEndpoints(customerGroup);
+    }
+
+    private static void MapCustomerEndpoints(RouteGroupBuilder customerGroup)
+    {
+        customerGroup.MapPost("roles", LogInAndGetUserRoles);
+        customerGroup.MapPost("token", GetTokenByRole);
+        customerGroup.MapPost("register", RegisterAsCustomer);
     }
     
     private static async Task<Results<Ok<UserRolesDto>, NotFound<string>, BadRequest<string>, InternalServerError<string>>> LogInAndGetUserRoles(
@@ -63,11 +69,12 @@ internal static class IdentityEndpoints
         return TypedResults.Ok(getTokenResult.Value);
     }
 
-    private static async Task<Results<Ok<string>, Conflict<string>, InternalServerError<string>>> Register(
+    private static async Task<Results<Ok<string>, Conflict<string>, InternalServerError<string>>> RegisterAsCustomer(
         [FromBody] RegisterDto registerDto,
-        [FromServices] IAuthService authService)
+        [FromServices] IAuthService authService,
+        CancellationToken ct)
     {
-        Result<string> registerResult = await authService.RegisterAsync(registerDto.Email, registerDto.Password);
+        Result<string> registerResult = await authService.RegisterAsCustomerAsync(registerDto.Email, registerDto.Password, ct);
 
         if (!registerResult.IsSuccess)
         {

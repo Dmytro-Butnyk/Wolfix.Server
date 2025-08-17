@@ -9,5 +9,5 @@ public interface IAuthStore
     
     Task<VoidResult> CheckUserExistsAndHasRole(Guid userId, string role);
     
-    Task<Result<Guid>> RegisterAndGetUserIdAsync(string email, string password);
+    Task<Result<Guid>> RegisterAsCustomerAndGetUserIdAsync(string email, string password);
 }

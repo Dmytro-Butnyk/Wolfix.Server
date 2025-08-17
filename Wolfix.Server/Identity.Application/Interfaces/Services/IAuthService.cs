@@ -7,5 +7,5 @@ public interface IAuthService
 {
     Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(string email, string password);
     Task<Result<string>> GetTokenByRoleAsync(Guid userId, string email, string role);
-    Task<Result<string>> RegisterAsync(string email, string password);
+    Task<Result<string>> RegisterAsCustomerAsync(string email, string password, CancellationToken ct);
 }

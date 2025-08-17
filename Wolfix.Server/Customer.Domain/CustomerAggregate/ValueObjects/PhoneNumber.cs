@@ -21,7 +21,7 @@ internal sealed class PhoneNumber
             return Result<PhoneNumber>.Failure($"{nameof(value)} cannot be null or empty");
         }
 
-        if (Regex.IsMatch(value))
+        if (!Regex.IsMatch(value))
         {
             return Result<PhoneNumber>.Failure($"{nameof(value)} is not valid");
         }

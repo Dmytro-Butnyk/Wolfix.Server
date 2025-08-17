@@ -1,8 +1,11 @@
 using Catalog.Endpoints.Extensions;
+using Customer.Endpoints.Extensions;
 using Identity.Endpoints.Extensions;
 using Microsoft.AspNetCore.ResponseCompression;
 using Shared.Application.Extensions;
 using Shared.Infrastructure.Extensions;
+using Shared.IntegrationEvents;
+using Shared.IntegrationEvents.Inerfaces;
 
 namespace Wolfix.Host.Extensions;
 
@@ -21,7 +24,8 @@ public static class WebApplicationBuilderExtension
 
         builder
             .AddCatalogModule(connectionString)
-            .AddIdentityModule(connectionString);
+            .AddIdentityModule(connectionString)
+            .AddCustomerModule(connectionString);
         
         return builder;
     }
@@ -41,6 +45,20 @@ public static class WebApplicationBuilderExtension
         string tokenLifetime = EnvironmentExtension.GetEnvironmentVariableOrThrow("TOKEN_LIFETIME");
         
         builder.Services.AddIdentityModule(connectionString, tokenIssuer, tokenAudience, tokenKey, tokenLifetime);
+        
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddCustomerModule(this WebApplicationBuilder builder, string connectionString)
+    {
+        builder.Services.AddCustomerModule(connectionString);
+        
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddEventBus(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddSingleton<IEventBus, EventBus>();
         
         return builder;
     }

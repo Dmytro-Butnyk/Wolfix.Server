@@ -5,13 +5,16 @@ using Identity.Application.Interfaces.Repositories;
 using Identity.Application.Interfaces.Services;
 using Identity.Application.Mapping;
 using Identity.Application.Projections;
+using Identity.IntegrationEvents;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents.Inerfaces;
 
 namespace Identity.Application.Services;
 
 internal sealed class AuthService(
     IAuthStore authStore,
-    IJwtService jwtService) : IAuthService
+    IJwtService jwtService,
+    IEventBus eventBus) : IAuthService
 {
     public async Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(string email, string password)
     {
@@ -39,17 +42,23 @@ internal sealed class AuthService(
         return Result<string>.Success(token);
     }
 
-    public async Task<Result<string>> RegisterAsync(string email, string password)
+    public async Task<Result<string>> RegisterAsCustomerAsync(string email, string password, CancellationToken ct)
     {
-        Result<Guid> registerResult = await authStore.RegisterAndGetUserIdAsync(email, password);
+        Result<Guid> registerResult = await authStore.RegisterAsCustomerAndGetUserIdAsync(email, password);
 
         if (!registerResult.IsSuccess)
         {
             return Result<string>.Failure(registerResult.ErrorMessage!, registerResult.StatusCode);
         }
         
-        //todo: решить как роль передавать
-        string token = jwtService.GenerateToken(registerResult.Value, email, "user");
+        Guid createdUserId = registerResult.Value;
+        
+        string token = jwtService.GenerateToken(createdUserId, email, "User");
+
+        await eventBus.PublishAsync(new CustomerAccountCreated
+        {
+            AccountId = createdUserId
+        }, ct);
         
         return Result<string>.Success(token);
     }

@@ -7,11 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Shared.Domain\Shared.Domain.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Projections\" />
+      <ProjectReference Include="..\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj" />
     </ItemGroup>
 
 </Project>

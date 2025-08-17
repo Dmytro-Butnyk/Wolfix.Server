@@ -16,10 +16,11 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
 
-//todo: проверить в каждый резалт фейлур!!!
+//todo: проверить каждый резалт фейлур!!!
 
 builder
     .AddAppCache()
+    .AddEventBus()
     .AddResponseCompression()
     .AddSharedRepositories()
     .AddAllModules();

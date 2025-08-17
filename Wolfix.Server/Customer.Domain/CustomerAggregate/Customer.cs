@@ -17,6 +17,8 @@ public sealed class Customer : BaseEntity
     internal BirthDate BirthDate { get; private set; }
     
     public decimal BonusesAmount { get; private set; }
+    
+    public Guid AccountId { get; private set; }
 
     private readonly List<FavoriteItem> _favoriteItems = [];
     public IReadOnlyCollection<FavoriteItemInfo> FavoriteItems => _favoriteItems
@@ -33,17 +35,18 @@ public sealed class Customer : BaseEntity
     private Customer() { }
 
     private Customer(FullName fullName, PhoneNumber phoneNumber, Address address,
-        BirthDate birthDate, decimal bonusesAmount)
+        BirthDate birthDate, decimal bonusesAmount, Guid accountId)
     {
         FullName = fullName;
         PhoneNumber = phoneNumber;
         Address = address;
         BirthDate = birthDate;
         BonusesAmount = bonusesAmount;
+        AccountId = accountId;
     }
 
     public static Result<Customer> Create(string firstName, string lastName, string middleName, string phoneNumberString,
-        string city, string street, uint houseNumber, uint? apartmentNumber, DateOnly birthDate, decimal bonusesAmount)
+        string city, string street, uint houseNumber, uint? apartmentNumber, DateOnly birthDate, decimal bonusesAmount, Guid accountId)
     {
         Result<FullName> createFullNameResult = FullName.Create(firstName, lastName, middleName);
         
@@ -86,7 +89,12 @@ public sealed class Customer : BaseEntity
             return Result<Customer>.Failure($"{nameof(bonusesAmount)} cannot be less than or equal to zero");
         }
 
-        Customer customer = new(fullName, phoneNumber, address, customerBirthDate, bonusesAmount);
+        if (accountId == Guid.Empty)
+        {
+            return Result<Customer>.Failure($"{nameof(accountId)} cannot be empty");
+        }
+
+        Customer customer = new(fullName, phoneNumber, address, customerBirthDate, bonusesAmount, accountId);
         return Result<Customer>.Success(customer);
     }
     

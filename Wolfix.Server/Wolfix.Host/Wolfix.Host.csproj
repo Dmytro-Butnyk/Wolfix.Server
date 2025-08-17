@@ -14,6 +14,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Catalog.Endpoints\Catalog.Endpoints.csproj" />
+      <ProjectReference Include="..\Customer.Endpoints\Customer.Endpoints.csproj" />
       <ProjectReference Include="..\Identity.Endpoints\Identity.Endpoints.csproj" />
     </ItemGroup>
 
