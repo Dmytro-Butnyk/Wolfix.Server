@@ -18,6 +18,7 @@ builder.Services.AddAuthentication();
 
 //todo: проверить каждый резалт фейлур!!!
 //todo: перенести EventBus в Shared.Application???
+//todo: добавить свойство PhotoUrl в Customer
 
 builder
     .AddAppCache()
