@@ -19,6 +19,7 @@ builder.Services.AddAuthentication();
 //todo: проверить каждый резалт фейлур!!!
 //todo: перенести EventBus в Shared.Application???
 //todo: добавить свойство PhotoUrl в Customer
+//todo: приватные конструкторы всех классов сделать через инициализатор, и добавить required где нужно
 
 builder
     .AddAppCache()
