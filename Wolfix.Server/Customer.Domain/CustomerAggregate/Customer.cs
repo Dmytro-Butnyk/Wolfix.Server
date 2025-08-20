@@ -9,6 +9,7 @@ namespace Customer.Domain.CustomerAggregate;
 public sealed class Customer : BaseEntity
 {
     public string? PhotoUrl { get; private set; }
+    
     internal FullName? FullName { get; private set; }
 
     internal PhoneNumber? PhoneNumber { get; private set; }
