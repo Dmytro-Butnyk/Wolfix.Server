@@ -1,7 +1,7 @@
 using Customer.Application.EventHandlers;
 using Identity.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.IntegrationEvents.Inerfaces;
+using Shared.IntegrationEvents.Interfaces;
 
 namespace Customer.Application.Extensions;
 

@@ -2,8 +2,8 @@ using Catalog.Endpoints.Endpoints;
 using Catalog.Endpoints.Extensions;
 using DotNetEnv;
 using Identity.Endpoints.Extensions;
+using Wolfix.Host.ExceptionHandlers;
 using Wolfix.Host.Extensions;
-using Wolfix.Host.Middlewares;
 
 if (File.Exists(".env"))
 {
@@ -30,6 +30,9 @@ builder
     .AddSharedRepositories()
     .AddAllModules();
 
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ExceptionHandler>();
+
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -52,7 +55,7 @@ app.MapControllers();
 
 app.UseHttpsRedirection();
 
-app.UseMiddleware<ExceptionMiddleware>();
+app.UseExceptionHandler();
 
 app.UseResponseCompression();
 
