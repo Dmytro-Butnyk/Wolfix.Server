@@ -1,4 +1,4 @@
-using Shared.IntegrationEvents.Inerfaces;
+using Shared.IntegrationEvents.Interfaces;
 
 namespace Identity.IntegrationEvents;
 

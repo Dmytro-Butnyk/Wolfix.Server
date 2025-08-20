@@ -1,7 +1,9 @@
 using Customer.Application.EventHandlers;
+using Customer.Application.Interfaces;
+using Customer.Application.Services;
 using Identity.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
-using Shared.IntegrationEvents.Inerfaces;
+using Shared.IntegrationEvents.Interfaces;
 
 namespace Customer.Application.Extensions;
 
@@ -9,7 +11,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddCustomerApplicationServices(this IServiceCollection services)
     {
-        //todo:!!!
+        services.AddScoped<ICustomerService, CustomerService>();
         
         return services;
     }

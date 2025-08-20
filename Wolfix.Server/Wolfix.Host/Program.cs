@@ -2,8 +2,8 @@ using Catalog.Endpoints.Endpoints;
 using Catalog.Endpoints.Extensions;
 using DotNetEnv;
 using Identity.Endpoints.Extensions;
+using Wolfix.Host.ExceptionHandlers;
 using Wolfix.Host.Extensions;
-using Wolfix.Host.Middlewares;
 
 if (File.Exists(".env"))
 {
@@ -16,15 +16,17 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
 
-//todo: проверить каждый резалт фейлур!!!
 //todo: перенести EventBus в Shared.Application???
-//todo: добавить свойство PhotoUrl в Customer
+//todo: написать юнит тесты в каждом модуле и сделать CI/CD
 
 builder
     .AddAppCache()
     .AddEventBus()
     .AddResponseCompression()
     .AddAllModules();
+
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<ExceptionHandler>();
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
@@ -48,7 +50,7 @@ app.MapControllers();
 
 app.UseHttpsRedirection();
 
-app.UseMiddleware<ExceptionMiddleware>();
+app.UseExceptionHandler();
 
 app.UseResponseCompression();
 

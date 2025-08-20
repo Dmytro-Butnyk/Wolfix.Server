@@ -1,7 +1,7 @@
 using Customer.Domain.Interfaces;
 using Identity.IntegrationEvents;
 using Shared.Domain.Models;
-using Shared.IntegrationEvents.Inerfaces;
+using Shared.IntegrationEvents.Interfaces;
 
 namespace Customer.Application.EventHandlers;
 

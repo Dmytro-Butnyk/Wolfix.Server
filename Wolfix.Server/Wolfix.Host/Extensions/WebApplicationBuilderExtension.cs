@@ -5,7 +5,7 @@ using Media.Api;
 using Microsoft.AspNetCore.ResponseCompression;
 using Shared.Application.Extensions;
 using Shared.IntegrationEvents;
-using Shared.IntegrationEvents.Inerfaces;
+using Shared.IntegrationEvents.Interfaces;
 
 namespace Wolfix.Host.Extensions;
 

@@ -8,6 +8,8 @@ namespace Customer.Domain.CustomerAggregate;
 
 public sealed class Customer : BaseEntity
 {
+    public string? PhotoUrl { get; private set; }
+    
     internal FullName? FullName { get; private set; }
 
     internal PhoneNumber? PhoneNumber { get; private set; }
@@ -87,6 +89,17 @@ public sealed class Customer : BaseEntity
     #endregion
 
     #region Setters
+    public VoidResult ChangePhoto(string photoUrl)
+    {
+        if (string.IsNullOrWhiteSpace(photoUrl))
+        {
+            return VoidResult.Failure($"{nameof(photoUrl)} cannot be empty");
+        }
+        
+        PhotoUrl = photoUrl;
+        return VoidResult.Success();
+    }
+    
     public VoidResult ChangeFullName(string firstName, string lastName, string middleName)
     {
         Result<FullName> createFullNameResult = FullName.Create(firstName, lastName, middleName);

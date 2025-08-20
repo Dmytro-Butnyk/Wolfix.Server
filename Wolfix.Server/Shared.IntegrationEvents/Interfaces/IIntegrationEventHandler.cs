@@ -1,6 +1,6 @@
 using Shared.Domain.Models;
 
-namespace Shared.IntegrationEvents.Inerfaces;
+namespace Shared.IntegrationEvents.Interfaces;
 
 public interface IIntegrationEventHandler<TEvent>
     where TEvent : IIntegrationEvent

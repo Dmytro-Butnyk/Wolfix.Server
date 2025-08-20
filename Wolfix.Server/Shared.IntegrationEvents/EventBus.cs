@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Domain.Models;
-using Shared.IntegrationEvents.Inerfaces;
+using Shared.IntegrationEvents.Interfaces;
 
 namespace Shared.IntegrationEvents;
 

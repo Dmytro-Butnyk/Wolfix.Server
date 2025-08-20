@@ -7,7 +7,7 @@ using Identity.Application.Mapping;
 using Identity.Application.Projections;
 using Identity.IntegrationEvents;
 using Shared.Domain.Models;
-using Shared.IntegrationEvents.Inerfaces;
+using Shared.IntegrationEvents.Interfaces;
 
 namespace Identity.Application.Services;
 
