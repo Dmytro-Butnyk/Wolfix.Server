@@ -22,6 +22,9 @@ internal sealed class CustomerEntityConfiguration : IEntityTypeConfiguration<Dom
     {
         const string nullMarker = "_____NULL_____";
         
+        builder.Property(c => c.PhotoUrl)
+            .IsRequired(false);
+        
         builder.Property(c => c.FullName)
             .IsRequired(false)
             .HasConversion<string>(
