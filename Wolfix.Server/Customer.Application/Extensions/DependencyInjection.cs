@@ -1,3 +1,4 @@
+using Catalog.IntegrationEvents;
 using Customer.Application.EventHandlers;
 using Customer.Application.Interfaces;
 using Customer.Application.Services;
@@ -19,6 +20,9 @@ public static class DependencyInjection
     public static IServiceCollection AddCustomerEventHandlers(this IServiceCollection services)
     {
         services.AddScoped<IIntegrationEventHandler<CustomerAccountCreated>, CustomerAccountCreatedEventHandler>();
+        services
+            .AddScoped<IIntegrationEventHandler<ProductExistsForAddingToFavorite>,
+                ProductExistsForAddingToFavoriteEventHandler>();
 
         return services;
     }

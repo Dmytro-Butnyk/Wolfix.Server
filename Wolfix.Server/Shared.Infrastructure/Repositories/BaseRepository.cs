@@ -54,4 +54,11 @@ public class BaseRepository<TContext, TEntity>(TContext context)
         
         return entity;
     }
+
+    public async Task SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        
+        await context.SaveChangesAsync(cancellationToken);
+    }
 }

@@ -1,3 +1,4 @@
+using System.Net;
 using Customer.Application.Dto;
 using Customer.Application.Interfaces;
 using Microsoft.AspNetCore.Builder;
@@ -17,9 +18,11 @@ internal static class CustomerEndpoints
     {
         var customerGroup = app.MapGroup(Route)
             .WithTags("Customer");
+        
+        customerGroup.MapPost("add-product-to-favorite", AddProductToFavorite);
     }
-
-    private static async Task<Results<Ok, BadRequest<string>>> AddProductToFavorite(
+    
+    private static async Task<Results<Ok, NotFound<string>, Conflict<string>, BadRequest<string>>> AddProductToFavorite(
         [FromBody] AddProductToFavoriteDto request,
         [FromServices] ICustomerService customerService,
         CancellationToken ct)
@@ -28,7 +31,13 @@ internal static class CustomerEndpoints
 
         if (!addProductToFavoriteResult.IsSuccess)
         {
-            
+            return addProductToFavoriteResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(addProductToFavoriteResult.ErrorMessage),
+                HttpStatusCode.Conflict => TypedResults.Conflict(addProductToFavoriteResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(addProductToFavoriteResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
         }
 
         return TypedResults.Ok();

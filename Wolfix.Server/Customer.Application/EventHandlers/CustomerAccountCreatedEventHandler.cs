@@ -15,7 +15,7 @@ public sealed class CustomerAccountCreatedEventHandler(ICustomerRepository custo
         
         if (!createCustomerResult.IsSuccess)
         {
-            VoidResult.Failure(createCustomerResult.ErrorMessage!, createCustomerResult.StatusCode);
+            return VoidResult.Failure(createCustomerResult.ErrorMessage!, createCustomerResult.StatusCode);
         }
 
         await customerRepository.AddAsync(createCustomerResult.Value!, ct);

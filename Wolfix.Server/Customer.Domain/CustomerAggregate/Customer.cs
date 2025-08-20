@@ -197,7 +197,7 @@ public sealed class Customer : BaseEntity
         
         if (!createFavoriteItemResult.IsSuccess)
         {
-            return VoidResult.Failure(createFavoriteItemResult.ErrorMessage!, createFavoriteItemResult.StatusCode);;
+            return VoidResult.Failure(createFavoriteItemResult.ErrorMessage!, createFavoriteItemResult.StatusCode);
         }
         
         FavoriteItem favoriteItem = createFavoriteItemResult.Value!;

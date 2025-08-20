@@ -9,4 +9,6 @@ public interface IBaseRepository<TEntity> where TEntity : BaseEntity
     Task DeleteAsync(TEntity entity,  CancellationToken cancellationToken);
     Task<TEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<TEntity?> GetByIdAsNoTrackingAsync(Guid id, CancellationToken cancellationToken);
+    
+    Task SaveChangesAsync(CancellationToken cancellationToken);
 }
