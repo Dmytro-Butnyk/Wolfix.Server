@@ -29,6 +29,19 @@ internal static class ProductEndpoints
         group.MapGet("recommended", GetRecommendedProductsForPage);
         group.MapGet("random", GetRandomProducts);
     }
+    
+    #region ADD PRODUCT ENDPOINTS HERE
+
+    private static async Task<VoidResult> AddProduct(
+        
+        )
+    {
+        
+        
+        return VoidResult.Success();
+    }
+    
+    #endregion
 
     private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, NotFound<string>>> GetAllByCategoryForPage(
         [FromRoute] Guid childCategoryId,
