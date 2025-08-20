@@ -21,6 +21,7 @@ builder.Services.AddAuthentication();
 //todo: добавить свойство PhotoUrl в Customer
 //todo: приватные конструкторы всех классов сделать через инициализатор, и добавить required где нужно
 //todo: поменять ExceptionMiddleware на IExceptionHandler
+//todo: написать юнит тесты в каждом модуле и сделать CI/CD
 
 builder
     .AddAppCache()
