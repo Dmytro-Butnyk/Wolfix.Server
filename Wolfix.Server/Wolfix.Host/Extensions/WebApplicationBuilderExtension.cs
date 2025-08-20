@@ -1,6 +1,7 @@
 using Catalog.Endpoints.Extensions;
 using Customer.Endpoints.Extensions;
 using Identity.Endpoints.Extensions;
+using Media.Api;
 using Microsoft.AspNetCore.ResponseCompression;
 using Shared.Application.Extensions;
 using Shared.Infrastructure.Extensions;
@@ -11,13 +12,7 @@ namespace Wolfix.Host.Extensions;
 
 public static class WebApplicationBuilderExtension
 {
-    public static WebApplicationBuilder AddSharedRepositories(this WebApplicationBuilder builder)
-    {
-        builder.Services.AddSharedRepositories();
-        
-        return builder;
-    }
-
+    
     public static WebApplicationBuilder AddAllModules(this WebApplicationBuilder builder)
     {
         string connectionString = EnvironmentExtension.GetEnvironmentVariableOrThrow("DB_CONNECTION_STRING");
@@ -25,7 +20,15 @@ public static class WebApplicationBuilderExtension
         builder
             .AddCatalogModule(connectionString)
             .AddIdentityModule(connectionString)
-            .AddCustomerModule(connectionString);
+            .AddCustomerModule(connectionString)
+            .AddMediaModule(connectionString);
+        
+        return builder;
+    }
+    
+    private static WebApplicationBuilder AddMediaModule(this WebApplicationBuilder builder, string connectionString)
+    {
+        builder.Services.AddMediaModule(connectionString, builder.Configuration);
         
         return builder;
     }
@@ -62,6 +65,7 @@ public static class WebApplicationBuilderExtension
         
         return builder;
     }
+    
     //
     // public static WebApplicationBuilder AddIntegrationServices(this WebApplicationBuilder builder)
     // {

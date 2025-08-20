@@ -49,7 +49,8 @@ public sealed class Product : BaseEntity
     
     //todo: seller ID (именно ID, потому что другой контекст)
     
-    internal BlobResource Photo { get; private set; } //todo
+    // todo: photo
+    // internal BlobResource Photo { get; private set; } //todo
     public Guid PhotoId { get; private set; }
     
     private readonly List<Review> _reviews = [];

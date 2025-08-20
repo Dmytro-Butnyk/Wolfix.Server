@@ -1,13 +1,13 @@
 using Azure.Storage.Blobs;
-using Shared.Domain.Interfaces;
+using Media.Domain.Interfaces;
 
-namespace Shared.Infrastructure.Repositories;
+namespace Media.Infrastructure.Repositories;
 
-internal sealed class BlobRepository : IBlobRepository
+internal sealed class AzureBlobRepository : IAzureBlobRepository
 {
     private readonly BlobServiceClient _blobServiceClient;
 
-    public BlobRepository()
+    public AzureBlobRepository()
     {
         string? connectionString = Environment.GetEnvironmentVariable("BLOB_STORAGE_CONNECTION_STRING");
         

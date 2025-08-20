@@ -24,7 +24,6 @@ builder
     .AddAppCache()
     .AddEventBus()
     .AddResponseCompression()
-    .AddSharedRepositories()
     .AddAllModules();
 
 builder.Services.AddOpenApi();
