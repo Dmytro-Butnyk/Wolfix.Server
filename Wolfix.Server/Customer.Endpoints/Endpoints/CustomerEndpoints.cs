@@ -19,8 +19,17 @@ internal static class CustomerEndpoints
         var customerGroup = app.MapGroup(Route)
             .WithTags("Customer");
         
-        customerGroup.MapPost("add-product-to-favorite", AddProductToFavorite);
+        var favoriteItemsGroup = customerGroup.MapGroup("favorites");
+        MapFavoriteItemsEndpoints(favoriteItemsGroup);
     }
+    
+    private static void MapFavoriteItemsEndpoints(RouteGroupBuilder group)
+    {
+        
+        group.MapPost("", AddProductToFavorite);
+    }
+    
+    //todo: доделать все ендпоинты
     
     private static async Task<Results<Ok, NotFound<string>, Conflict<string>, BadRequest<string>>> AddProductToFavorite(
         [FromBody] AddProductToFavoriteDto request,
