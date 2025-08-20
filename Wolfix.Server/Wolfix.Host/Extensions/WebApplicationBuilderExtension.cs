@@ -4,7 +4,6 @@ using Identity.Endpoints.Extensions;
 using Media.Api;
 using Microsoft.AspNetCore.ResponseCompression;
 using Shared.Application.Extensions;
-using Shared.Infrastructure.Extensions;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Inerfaces;
 
