@@ -2,6 +2,7 @@ using System.Net;
 using Catalog.Domain.ProductAggregate.Entities;
 using Catalog.Domain.ProductAggregate.Enums;
 using Shared.Domain.Entities;
+using Shared.Domain.Enums;
 using Shared.Domain.Models;
 
 namespace Catalog.Domain.ProductAggregate;
@@ -19,6 +20,8 @@ public sealed class Product : BaseEntity
     internal Discount? Discount { get; set; }
     
     public decimal FinalPrice { get; private set; }
+    
+    
     private void RecalculateFinalPrice()
     {
         if (IsDiscountExists(out _) || IsDiscountExpired(out _))
@@ -49,9 +52,11 @@ public sealed class Product : BaseEntity
     
     //todo: seller ID (именно ID, потому что другой контекст)
     
-    // todo: photo
-    // internal BlobResource Photo { get; private set; } //todo
-    public Guid PhotoId { get; private set; }
+    private readonly List<ProductMedia> _productMedias = [];
+    public IReadOnlyCollection<ProductMediaInfo> ProductMedias => _productMedias
+        .Select(pm => (ProductMediaInfo)pm)
+        .ToList()
+        .AsReadOnly();
     
     private readonly List<Review> _reviews = [];
     public IReadOnlyCollection<ReviewInfo> Reviews => _reviews
@@ -246,6 +251,70 @@ public sealed class Product : BaseEntity
         );
     }
     #endregion
+
+    #region productMedia
+    public Result<ProductMediaInfo> GetProductMedia(Guid productMediaId)
+    {
+        ProductMedia? productMedia = _productMedias
+            .FirstOrDefault(p => p.Id == productMediaId);
+
+        if (productMedia == null)
+        {
+            return Result<ProductMediaInfo>.Failure($"{nameof(productMedia)} is null. Nothing to get.");
+        }
+        
+        return Result<ProductMediaInfo>.Success((ProductMediaInfo)productMedia);
+    }
+    #endregion
+    
+    #region productMedias
+    public VoidResult AddProductMedia(
+        Guid mediaId,
+        BlobResourceType mediaType,
+        string mediaUrl)
+    {
+        if (IsGuidInvalid(mediaId, out string mediaIdErrorMessage))
+        {
+            return VoidResult.Failure(mediaIdErrorMessage);
+        }
+
+        if (string.IsNullOrWhiteSpace(mediaUrl))
+        {
+            return VoidResult.Failure($"{nameof(mediaUrl)} is required");
+        }
+        
+        Result<ProductMedia> createProductMediaResult = ProductMedia.Create(this, mediaId, mediaType, mediaUrl);
+
+        return createProductMediaResult.Map(
+            onSuccess: productMedia =>
+            {
+                _productMedias.Add(productMedia);
+                return VoidResult.Success();
+            },
+            onFailure: errorMessage => VoidResult.Failure(errorMessage, createProductMediaResult.StatusCode)
+        );
+    }
+
+    public VoidResult RemoveProductMedia(Guid mediaId)
+    {
+        ProductMedia? productMedia = _productMedias.FirstOrDefault(p => p.Id == mediaId);
+
+        if (productMedia == null)
+        {
+            return VoidResult.Failure($"{nameof(productMedia)} is null. Nothing to remove.");
+        }
+        
+        _productMedias.Remove(productMedia);
+        
+        return VoidResult.Success();
+    }
+    
+    public void RemoveAllProductMedias()
+    {
+        _productMedias.Clear();
+    }
+    
+    #endregion
     
     #region review
     public Result<ReviewInfo> GetReview(Guid reviewId)
@@ -260,41 +329,6 @@ public sealed class Product : BaseEntity
         return Result<ReviewInfo>.Success((ReviewInfo)review);
     }
 
-    public Result<string> GetReviewTitle(Guid reviewId)
-    {
-        Review? review = _reviews.FirstOrDefault(r => r.Id == reviewId);
-        
-        if (review == null)
-        {
-            return Result<string>.Failure($"{nameof(review)} is null. Nothing to get.");
-        }
-        
-        return Result<string>.Success(review.Title);
-    }
-
-    public Result<string> GetReviewText(Guid reviewId)
-    {
-        Review? review = _reviews.FirstOrDefault(r => r.Id == reviewId);
-        
-        if (review == null)
-        {
-            return Result<string>.Failure($"{nameof(review)} is null. Nothing to get.");
-        }
-        
-        return Result<string>.Success(review.Text);
-    }
-
-    public Result<uint> GetReviewRating(Guid reviewId)
-    {
-        Review? review = _reviews.FirstOrDefault(r => r.Id == reviewId);
-        
-        if (review == null)
-        {
-            return Result<uint>.Failure($"{nameof(review)} is null. Nothing to get.");
-        }
-        
-        return Result<uint>.Success(review.Rating);
-    }
     #endregion
     
     //todo: userId

@@ -13,7 +13,11 @@ public sealed class MediaContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        
         ApplyConfigurations(modelBuilder);
+        
+        modelBuilder.HasDefaultSchema("media");
     }
     
     // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

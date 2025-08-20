@@ -39,19 +39,21 @@ internal sealed class CatalogContext : DbContext, IContextWithConfigurations
         modelBuilder.ApplyConfiguration(new ProductEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ProductVariantValueEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ReviewEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ProductMediaConfiguration());
     }
 
     // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     // {
     //     if (optionsBuilder.IsConfigured) return;
     //     
-    //     var connectionString = "connection_string";
+    //     var connectionString = "";
     //     optionsBuilder.UseNpgsql(connectionString);
     // }
     
     internal DbSet<Product> Products { get; set; } // Aggregate 
     internal DbSet<ProductAttribute> ProductAttributes  { get; set; }
     internal DbSet<ProductVariant> ProductVariants  { get; set; }
+    internal DbSet<ProductMedia> ProductMedias { get; set; }
     
     internal DbSet<Category> Categories { get; set; } // Aggregate
     internal DbSet<Discount>  Discounts { get; set; }

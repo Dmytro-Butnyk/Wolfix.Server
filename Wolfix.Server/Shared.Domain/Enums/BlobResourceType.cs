@@ -1,4 +1,4 @@
-namespace Media.Domain.BlobAggregate.Enums;
+namespace Shared.Domain.Enums;
 
 public enum BlobResourceType : byte
 {

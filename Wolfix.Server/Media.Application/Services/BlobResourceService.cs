@@ -1,9 +1,9 @@
 ﻿using Media.Application.Interfaces;
 using Media.Application.Options;
 using Media.Domain.BlobAggregate;
-using Media.Domain.BlobAggregate.Enums;
 using Media.Domain.Interfaces;
 using Microsoft.Extensions.Options;
+using Shared.Domain.Enums;
 using Shared.Domain.Models;
 
 namespace Media.Application.Services;

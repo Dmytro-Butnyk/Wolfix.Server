@@ -1,5 +1,5 @@
-﻿using Media.Domain.BlobAggregate.Enums;
-using Shared.Domain.Entities;
+﻿using Shared.Domain.Entities;
+using Shared.Domain.Enums;
 using Shared.Domain.Models;
 
 namespace Media.Domain.BlobAggregate;

@@ -16,14 +16,14 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
         ConfigureDiscountRelation(builder);
         
         ConfigureCategoryRelation(builder);
-        // todo - implement blob resource relation
-        // ConfigureBlobResourceRelation(builder);
         
         ConfigureReviewsRelation(builder);
         
         ConfigureProductAttributeValuesRelation(builder);
         
         ConfigureProductVariantValuesRelation(builder);
+
+        ConfigureProductMediaRelation(builder);
     }
 
     private void ConfigureBasicProperties(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
@@ -39,6 +39,7 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
         builder.Ignore(r => r.Reviews);
         builder.Ignore(r => r.ProductsAttributeValues);
         builder.Ignore(r => r.ProductVariantValues);
+        builder.Ignore(r => r.ProductMedias);
     }
     
     private void ConfigureDiscountRelation(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
@@ -61,17 +62,16 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
             .OnDelete(DeleteBehavior.Cascade);
     }
     
-    // todo - implement blob resource relation
-    // private void ConfigureBlobResourceRelation(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
-    // {
-    //     builder.HasOne<BlobResource>(p => p.Photo)
-    //         .WithMany()
-    //         .HasForeignKey(p => p.PhotoId)
-    //         .OnDelete(DeleteBehavior.SetNull)
-    //         .IsRequired();
-    //     builder.Navigation(p => p.Photo)
-    //         .UsePropertyAccessMode(PropertyAccessMode.Property);
-    // }
+    private void ConfigureProductMediaRelation(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
+    {
+        builder.HasMany<ProductMedia>("_productMedias")
+            .WithOne(pm => pm.Product)
+            .HasForeignKey(pm => pm.ProductId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired();
+        builder.Navigation("_productMedias")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+    }
 
     private void ConfigureReviewsRelation(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
     {

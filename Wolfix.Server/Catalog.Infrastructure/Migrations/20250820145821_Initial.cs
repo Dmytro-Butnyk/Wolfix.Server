@@ -15,21 +15,6 @@ namespace Catalog.Infrastructure.Migrations
                 name: "catalog");
 
             migrationBuilder.CreateTable(
-                name: "BlobResource",
-                schema: "catalog",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Url = table.Column<string>(type: "text", nullable: false),
-                    BlobName = table.Column<string>(type: "text", nullable: false),
-                    Type = table.Column<byte>(type: "smallint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BlobResource", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Categories",
                 schema: "catalog",
                 columns: table => new
@@ -86,19 +71,11 @@ namespace Catalog.Infrastructure.Migrations
                     FinalPrice = table.Column<decimal>(type: "numeric", nullable: false),
                     Bonuses = table.Column<long>(type: "bigint", nullable: false),
                     AverageRating = table.Column<double>(type: "double precision", nullable: true),
-                    CategoryId = table.Column<Guid>(type: "uuid", nullable: false),
-                    PhotoId = table.Column<Guid>(type: "uuid", nullable: false)
+                    CategoryId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Products_BlobResource_PhotoId",
-                        column: x => x.PhotoId,
-                        principalSchema: "catalog",
-                        principalTable: "BlobResource",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Products_Categories_CategoryId",
                         column: x => x.CategoryId,
@@ -167,6 +144,29 @@ namespace Catalog.Infrastructure.Migrations
                     table.PrimaryKey("PK_ProductAttributeValues", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ProductAttributeValues_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalSchema: "catalog",
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProductMedias",
+                schema: "catalog",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    MediaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    MediaType = table.Column<string>(type: "text", nullable: false),
+                    MediaUrl = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductMedias", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductMedias_Products_ProductId",
                         column: x => x.ProductId,
                         principalSchema: "catalog",
                         principalTable: "Products",
@@ -246,16 +246,16 @@ namespace Catalog.Infrastructure.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductMedias_ProductId",
+                schema: "catalog",
+                table: "ProductMedias",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryId",
                 schema: "catalog",
                 table: "Products",
                 column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Products_PhotoId",
-                schema: "catalog",
-                table: "Products",
-                column: "PhotoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductVariants_CategoryId",
@@ -292,6 +292,10 @@ namespace Catalog.Infrastructure.Migrations
                 schema: "catalog");
 
             migrationBuilder.DropTable(
+                name: "ProductMedias",
+                schema: "catalog");
+
+            migrationBuilder.DropTable(
                 name: "ProductVariants",
                 schema: "catalog");
 
@@ -305,10 +309,6 @@ namespace Catalog.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Products",
-                schema: "catalog");
-
-            migrationBuilder.DropTable(
-                name: "BlobResource",
                 schema: "catalog");
 
             migrationBuilder.DropTable(

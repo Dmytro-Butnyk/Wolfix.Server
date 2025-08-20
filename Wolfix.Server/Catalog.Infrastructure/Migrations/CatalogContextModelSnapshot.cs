@@ -140,6 +140,33 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("ProductAttributeValues", "catalog");
                 });
 
+            modelBuilder.Entity("Catalog.Domain.ProductAggregate.Entities.ProductMedia", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("MediaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("MediaType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MediaUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductMedias", "catalog");
+                });
+
             modelBuilder.Entity("Catalog.Domain.ProductAggregate.Entities.ProductVariantValue", b =>
                 {
                     b.Property<Guid>("Id")
@@ -216,9 +243,6 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<decimal>("FinalPrice")
                         .HasColumnType("numeric");
 
-                    b.Property<Guid>("PhotoId")
-                        .HasColumnType("uuid");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
 
@@ -234,31 +258,7 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("PhotoId");
-
                     b.ToTable("Products", "catalog");
-                });
-
-            modelBuilder.Entity("Shared.Domain.Entities.BlobResource", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("BlobName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<byte>("Type")
-                        .HasColumnType("smallint");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("BlobResource", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.CategoryAggregate.Category", b =>
@@ -313,6 +313,17 @@ namespace Catalog.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Catalog.Domain.ProductAggregate.Entities.ProductMedia", b =>
+                {
+                    b.HasOne("Catalog.Domain.ProductAggregate.Product", "Product")
+                        .WithMany("_productMedias")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Catalog.Domain.ProductAggregate.Entities.ProductVariantValue", b =>
                 {
                     b.HasOne("Catalog.Domain.ProductAggregate.Product", "Product")
@@ -342,14 +353,6 @@ namespace Catalog.Infrastructure.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Shared.Domain.Entities.BlobResource", "Photo")
-                        .WithMany()
-                        .HasForeignKey("PhotoId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
-
-                    b.Navigation("Photo");
                 });
 
             modelBuilder.Entity("Catalog.Domain.CategoryAggregate.Category", b =>
@@ -362,6 +365,8 @@ namespace Catalog.Infrastructure.Migrations
             modelBuilder.Entity("Catalog.Domain.ProductAggregate.Product", b =>
                 {
                     b.Navigation("Discount");
+
+                    b.Navigation("_productMedias");
 
                     b.Navigation("_productVariantValues");
 
