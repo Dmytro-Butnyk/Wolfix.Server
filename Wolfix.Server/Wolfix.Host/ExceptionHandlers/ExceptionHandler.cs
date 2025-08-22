@@ -27,7 +27,7 @@ public sealed class ExceptionHandler(IProblemDetailsService problemDetailsServic
         {
             HttpContext = httpContext,
             ProblemDetails = problemDetails,
-            Exception = exception,
+            Exception = exception
         });
     }
 }

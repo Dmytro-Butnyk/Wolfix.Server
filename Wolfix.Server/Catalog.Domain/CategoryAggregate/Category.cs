@@ -76,9 +76,9 @@ public sealed class Category : BaseEntity
     
     public VoidResult ChangeDescription(string? description)
     {
-        if (description == " ")
+        if (description is " " or "")
         {
-            return VoidResult.Failure($"{nameof(description)} cannot be white space");
+            return VoidResult.Failure($"{nameof(description)} cannot be empty or white space");
         }
         
         Description = description;
