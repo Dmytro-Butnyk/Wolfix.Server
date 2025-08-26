@@ -5,7 +5,7 @@ using Shared.IntegrationEvents.Interfaces;
 
 namespace Customer.Application.EventHandlers;
 
-public sealed class CustomerAccountCreatedEventHandler(ICustomerRepository customerRepository)
+internal sealed class CustomerAccountCreatedEventHandler(ICustomerRepository customerRepository)
     : IIntegrationEventHandler<CustomerAccountCreated>
 {
     public async Task<VoidResult> HandleAsync(CustomerAccountCreated @event, CancellationToken ct)

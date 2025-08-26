@@ -64,9 +64,9 @@ internal sealed class FavoriteItem : BaseEntity
     }
 
     public static explicit operator FavoriteItemInfo(FavoriteItem favoriteItem)
-        => new(favoriteItem.CustomerId, favoriteItem.PhotoUrl, favoriteItem.Title,
+        => new(favoriteItem.Id, favoriteItem.CustomerId, favoriteItem.PhotoUrl, favoriteItem.Title,
             favoriteItem.AverageRating, favoriteItem.Price, favoriteItem.FinalPrice, favoriteItem.Bonuses);
 }
 
-public sealed record FavoriteItemInfo(Guid CustomerId, string PhotoUrl, string Title, double? AverageRating,
+public sealed record FavoriteItemInfo(Guid Id, Guid CustomerId, string PhotoUrl, string Title, double? AverageRating,
     decimal Price, decimal? FinalPrice, uint Bonuses);

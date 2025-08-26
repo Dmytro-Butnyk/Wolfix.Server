@@ -27,16 +27,11 @@ internal static class CategoryEndpoints
         group.MapGet("child/{parentId:guid}", GetAllChildCategoriesByParent);
     }
 
-    private static async Task<Results<Ok<IReadOnlyCollection<CategoryShortDto>>, NotFound<string>>> GetAllParentCategories(
+    private static async Task<Ok<IReadOnlyCollection<CategoryShortDto>>> GetAllParentCategories(
         CancellationToken ct,
         [FromServices] ICategoryService categoryService)
     {
         Result<IReadOnlyCollection<CategoryShortDto>> getParentCategoriesResult = await categoryService.GetAllParentCategoriesAsync(ct);
-
-        if (!getParentCategoriesResult.IsSuccess)
-        {
-            return TypedResults.NotFound(getParentCategoriesResult.ErrorMessage);
-        }
         
         return TypedResults.Ok(getParentCategoriesResult.Value);
     }

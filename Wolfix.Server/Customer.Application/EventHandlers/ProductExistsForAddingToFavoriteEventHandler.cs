@@ -6,7 +6,7 @@ using Shared.IntegrationEvents.Interfaces;
 
 namespace Customer.Application.EventHandlers;
 
-public sealed class ProductExistsForAddingToFavoriteEventHandler(ICustomerRepository customerRepository)
+internal sealed class ProductExistsForAddingToFavoriteEventHandler(ICustomerRepository customerRepository)
     : IIntegrationEventHandler<ProductExistsForAddingToFavorite>
 {
     public async Task<VoidResult> HandleAsync(ProductExistsForAddingToFavorite @event, CancellationToken ct)
@@ -15,7 +15,10 @@ public sealed class ProductExistsForAddingToFavoriteEventHandler(ICustomerReposi
 
         if (customer is null)
         {
-            return VoidResult.Failure($"Customer with id {@event.CustomerId} not found", HttpStatusCode.NotFound);
+            return VoidResult.Failure(
+                $"Customer with id {@event.CustomerId} not found",
+                HttpStatusCode.NotFound
+            );
         }
 
         VoidResult addToFavoriteResult = customer.AddFavoriteItem(

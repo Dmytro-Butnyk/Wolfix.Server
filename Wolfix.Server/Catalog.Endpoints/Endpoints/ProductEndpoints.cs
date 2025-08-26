@@ -25,18 +25,28 @@ internal static class ProductEndpoints
     private static void MapGetEndpoints(RouteGroupBuilder group)
     {
         group.MapGet("category/{childCategoryId:guid}/page/{page:int}", GetAllByCategoryForPage);
-        group.MapGet("with-discount/page/{page:int}", GetProductsWithDiscountForPage);
+        group.MapGet("with-discount/page/{page:int}", GetWithDiscountForPage);
         group.MapGet("recommended", GetRecommendedProductsForPage);
         group.MapGet("random", GetRandomProducts);
     }
 
-    private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, NotFound<string>>> GetAllByCategoryForPage(
+    private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, BadRequest<string>, NotFound<string>>> GetAllByCategoryForPage(
         [FromRoute] Guid childCategoryId,
         [FromRoute] int page,
         [FromQuery] int pageSize,
-        CancellationToken ct,
-        [FromServices] IProductService productService)
+        [FromServices] IProductService productService,
+        CancellationToken ct)
     {
+        if (page < 1)
+        {
+            return TypedResults.BadRequest("Page must be greater than 0");
+        }
+        
+        if (pageSize < 1)
+        {
+            return TypedResults.BadRequest("Page size must be greater than 0");
+        }
+        
         Result<PaginationDto<ProductShortDto>> getProductsByCategoryResult =
             await productService.GetForPageByCategoryIdAsync(childCategoryId, page, pageSize, ct);
 
@@ -48,19 +58,24 @@ internal static class ProductEndpoints
         return TypedResults.Ok(getProductsByCategoryResult.Value);
     }
 
-    private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, NotFound<string>>> GetProductsWithDiscountForPage(
+    private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, BadRequest<string>>> GetWithDiscountForPage(
         [FromRoute] int page,
         [FromQuery] int pageSize,
-        CancellationToken ct,
-        [FromServices] IProductService productService)
+        [FromServices] IProductService productService,
+        CancellationToken ct)
     {
+        if (page < 1)
+        {
+            return TypedResults.BadRequest("Page must be greater than 0");
+        }
+        
+        if (pageSize < 1)
+        {
+            return TypedResults.BadRequest("Page size must be greater than 0");
+        }
+
         Result<PaginationDto<ProductShortDto>> getProductsWithDiscountResult =
             await productService.GetForPageWithDiscountAsync(page, pageSize, ct);
-
-        if (!getProductsWithDiscountResult.IsSuccess)
-        {
-            return TypedResults.NotFound(getProductsWithDiscountResult.ErrorMessage);
-        }
         
         return TypedResults.Ok(getProductsWithDiscountResult.Value);
     }
@@ -69,8 +84,8 @@ internal static class ProductEndpoints
         GetRecommendedProductsForPage(
             [FromQuery] int pageSize,
             [FromQuery] Guid[] visitedCategoriesIds,
-            CancellationToken ct,
-            [FromServices] IProductService productService)
+            [FromServices] IProductService productService,
+            CancellationToken ct)
     {
         if (pageSize < 1)
         {
@@ -93,18 +108,18 @@ internal static class ProductEndpoints
         return TypedResults.Ok(getRecommendedProductsResult.Value);
     }
 
-    private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, NotFound<string>>> GetRandomProducts(
+    private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>>> GetRandomProducts(
         [FromQuery] int pageSize,
-        CancellationToken ct,
-        [FromServices] IProductService productService)
+        [FromServices] IProductService productService,
+        CancellationToken ct)
     {
+        if (pageSize < 1)
+        {
+            return TypedResults.BadRequest("Page size must be greater than 0");
+        }
+
         Result<IReadOnlyCollection<ProductShortDto>> getRandomProductsResult =
             await productService.GetRandomProductsAsync(pageSize, ct);
-
-        if (!getRandomProductsResult.IsSuccess)
-        {
-            return TypedResults.NotFound(getRandomProductsResult.ErrorMessage);
-        }
         
         return TypedResults.Ok(getRandomProductsResult.Value);
     }

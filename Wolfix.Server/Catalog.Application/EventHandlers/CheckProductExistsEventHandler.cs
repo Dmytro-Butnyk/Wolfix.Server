@@ -7,7 +7,7 @@ using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.EventHandlers;
 
-public sealed class CheckProductExistsEventHandler(IProductRepository productRepository, IEventBus eventBus)
+internal sealed class CheckProductExistsEventHandler(IProductRepository productRepository, IEventBus eventBus)
     : IIntegrationEventHandler<CheckProductExists>
 {
     public async Task<VoidResult> HandleAsync(CheckProductExists @event, CancellationToken ct)
@@ -16,7 +16,10 @@ public sealed class CheckProductExistsEventHandler(IProductRepository productRep
 
         if (product is null)
         {
-            return VoidResult.Failure($"Product with id {@event.ProductId} not found", HttpStatusCode.NotFound);
+            return VoidResult.Failure(
+                $"Product with id {@event.ProductId} not found",
+                HttpStatusCode.NotFound
+            );
         }
 
         VoidResult result = await eventBus.PublishAsync(new ProductExistsForAddingToFavorite

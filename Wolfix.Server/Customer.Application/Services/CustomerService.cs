@@ -1,7 +1,11 @@
 using System.Net;
 using Customer.Application.Dto;
+using Customer.Application.Dto.FavoriteItem;
+using Customer.Application.Dto.Product;
 using Customer.Application.Interfaces;
+using Customer.Application.Mapping.FavoriteItem;
 using Customer.Domain.Interfaces;
+using Customer.Domain.Projections;
 using Customer.IntegrationEvents;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents.Interfaces;
@@ -12,11 +16,12 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
 {
     public async Task<VoidResult> AddProductToFavoriteAsync(AddProductToFavoriteDto request, CancellationToken ct)
     {
-        var customer = await customerRepository.GetByIdAsNoTrackingAsync(request.CustomerId, ct);
-
-        if (customer is null)
+        if (!await customerRepository.IsExistAsync(request.CustomerId, ct))
         {
-            return VoidResult.Failure("Customer not found", HttpStatusCode.NotFound);
+            return VoidResult.Failure(
+                "Customer not found", 
+                HttpStatusCode.NotFound
+            );
         }
 
         VoidResult result = await eventBus.PublishAsync(new CheckProductExists
@@ -26,5 +31,26 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
         }, ct);
 
         return result;
+    }
+
+    public async Task<Result<IReadOnlyCollection<FavoriteItemDto>>> GetFavoriteItemsAsync(Guid customerId,
+        CancellationToken ct)
+    {
+        if (!await customerRepository.IsExistAsync(customerId, ct))
+        {
+            return Result<IReadOnlyCollection<FavoriteItemDto>>.Failure(
+                "Customer not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        IReadOnlyCollection<FavoriteItemProjection> favoriteItems =
+            await customerRepository.GetFavoriteItemsAsync(customerId, ct);
+
+        List<FavoriteItemDto> favoriteItemsDtos = favoriteItems
+            .Select(fi => fi.ToDto())
+            .ToList();
+        
+        return Result<IReadOnlyCollection<FavoriteItemDto>>.Success(favoriteItemsDtos);
     }
 }

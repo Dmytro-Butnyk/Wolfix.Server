@@ -50,8 +50,8 @@ internal sealed class CartItem : BaseEntity
     }
 
     public static explicit operator CartItemInfo(CartItem cartItem)
-        => new(cartItem.CustomerId, cartItem.PhotoUrl, cartItem.Title, cartItem.Price);
+        => new(cartItem.Id, cartItem.CustomerId, cartItem.PhotoUrl, cartItem.Title, cartItem.Price);
 }
 
-public sealed record CartItemInfo(Guid CustomerId, string PhotoUrl, string Title,
+public sealed record CartItemInfo(Guid Id, Guid CustomerId, string PhotoUrl, string Title,
     decimal Price);

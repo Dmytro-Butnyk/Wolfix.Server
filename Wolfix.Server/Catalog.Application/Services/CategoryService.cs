@@ -27,14 +27,6 @@ internal sealed class CategoryService(
                 .Select(category => category.ToShortDto())
                 .ToList();
         }, ct, TimeSpan.FromMinutes(20));
-
-        if (parentCategoriesDto.Count == 0)
-        {
-            return Result<IReadOnlyCollection<CategoryShortDto>>.Failure(
-                "No parent categories found",
-                HttpStatusCode.NotFound
-            );
-        }
         
         return Result<IReadOnlyCollection<CategoryShortDto>>.Success(parentCategoriesDto);
     }
@@ -42,6 +34,14 @@ internal sealed class CategoryService(
     public async Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllChildCategoriesByParentAsync(Guid parentId,
         CancellationToken ct)
     {
+        if (!await categoryRepository.IsExistAsync(parentId, ct))
+        {
+            return Result<IReadOnlyCollection<CategoryShortDto>>.Failure(
+                $"Parent category with id: {parentId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
         var cacheKey = $"child_categories_by_parent_{parentId}";
         
         List<CategoryShortDto> childCategoriesDto = await appCache.GetOrCreateAsync(cacheKey, async ctx =>
@@ -53,14 +53,6 @@ internal sealed class CategoryService(
                 .Select(category => category.ToShortDto())
                 .ToList();
         }, ct, TimeSpan.FromMinutes(20));
-        
-        if (childCategoriesDto.Count == 0)
-        {
-            return Result<IReadOnlyCollection<CategoryShortDto>>.Failure(
-                "No child categories found",
-                HttpStatusCode.NotFound
-            );
-        }
         
         return Result<IReadOnlyCollection<CategoryShortDto>>.Success(childCategoriesDto);
     }
