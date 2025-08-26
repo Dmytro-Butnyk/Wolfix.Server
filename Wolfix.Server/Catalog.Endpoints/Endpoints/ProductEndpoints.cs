@@ -26,8 +26,8 @@ internal static class ProductEndpoints
     {
         group.MapGet("category/{childCategoryId:guid}/page/{page:int}", GetAllByCategoryForPage);
         group.MapGet("with-discount/page/{page:int}", GetWithDiscountForPage);
-        group.MapGet("recommended", GetRecommendedProductsForPage);
-        group.MapGet("random", GetRandomProducts);
+        group.MapGet("recommended", GetRecommendedForPage);
+        group.MapGet("random", GetRandom);
     }
 
     private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, BadRequest<string>, NotFound<string>>> GetAllByCategoryForPage(
@@ -81,7 +81,7 @@ internal static class ProductEndpoints
     }
 
     private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>, NotFound<string>>>
-        GetRecommendedProductsForPage(
+        GetRecommendedForPage(
             [FromQuery] int pageSize,
             [FromQuery] Guid[] visitedCategoriesIds,
             [FromServices] IProductService productService,
@@ -108,7 +108,7 @@ internal static class ProductEndpoints
         return TypedResults.Ok(getRecommendedProductsResult.Value);
     }
 
-    private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>>> GetRandomProducts(
+    private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>>> GetRandom(
         [FromQuery] int pageSize,
         [FromServices] IProductService productService,
         CancellationToken ct)
