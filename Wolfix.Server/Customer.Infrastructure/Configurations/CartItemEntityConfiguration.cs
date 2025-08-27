@@ -23,7 +23,7 @@ internal sealed class CartItemEntityConfiguration : IEntityTypeConfiguration<Car
         builder.Property(ci => ci.Title)
             .IsRequired();
 
-        builder.Property(ci => ci.Price)
+        builder.Property(ci => ci.PriceWithDiscount)
             .IsRequired();
     }
 

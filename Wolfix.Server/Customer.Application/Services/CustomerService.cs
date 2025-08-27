@@ -1,8 +1,10 @@
 using System.Net;
 using Customer.Application.Dto;
+using Customer.Application.Dto.CartItem;
 using Customer.Application.Dto.FavoriteItem;
 using Customer.Application.Dto.Product;
 using Customer.Application.Interfaces;
+using Customer.Application.Mapping.CartItem;
 using Customer.Application.Mapping.FavoriteItem;
 using Customer.Domain.Interfaces;
 using Customer.Domain.Projections;
@@ -19,17 +21,36 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
         if (!await customerRepository.IsExistAsync(request.CustomerId, ct))
         {
             return VoidResult.Failure(
-                "Customer not found", 
+                $"Customer with id: {request.CustomerId} not found", 
                 HttpStatusCode.NotFound
             );
         }
 
-        VoidResult result = await eventBus.PublishAsync(new CheckProductExists
+        VoidResult result = await eventBus.PublishAsync(new CheckProductExistsForAddingToFavorite
         {
             ProductId = request.ProductId,
             CustomerId = request.CustomerId
         }, ct);
 
+        return result;
+    }
+
+    public async Task<VoidResult> AddProductToCartAsync(AddProductToCartDto request, CancellationToken ct)
+    {
+        if (!await customerRepository.IsExistAsync(request.CustomerId, ct))
+        {
+            return VoidResult.Failure(
+                $"Customer with id: {request.CustomerId} not found", 
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        VoidResult result = await eventBus.PublishAsync(new CheckProductExistsForAddingToCart
+        {
+            ProductId = request.ProductId,
+            CustomerId = request.CustomerId
+        }, ct);
+        
         return result;
     }
 
@@ -39,7 +60,7 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
         if (!await customerRepository.IsExistAsync(customerId, ct))
         {
             return Result<IReadOnlyCollection<FavoriteItemDto>>.Failure(
-                "Customer not found",
+                $"Customer with id: {customerId} not found",
                 HttpStatusCode.NotFound
             );
         }
@@ -47,10 +68,30 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
         IReadOnlyCollection<FavoriteItemProjection> favoriteItems =
             await customerRepository.GetFavoriteItemsAsync(customerId, ct);
 
-        List<FavoriteItemDto> favoriteItemsDtos = favoriteItems
+        List<FavoriteItemDto> favoriteItemsDto = favoriteItems
             .Select(fi => fi.ToDto())
             .ToList();
         
-        return Result<IReadOnlyCollection<FavoriteItemDto>>.Success(favoriteItemsDtos);
+        return Result<IReadOnlyCollection<FavoriteItemDto>>.Success(favoriteItemsDto);
+    }
+
+    public async Task<Result<IReadOnlyCollection<CartItemDto>>> GetCartItemsAsync(Guid customerId, CancellationToken ct)
+    {
+        if (!await customerRepository.IsExistAsync(customerId, ct))
+        {
+            return Result<IReadOnlyCollection<CartItemDto>>.Failure(
+                $"Customer with id: {customerId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        IReadOnlyCollection<CartItemProjection> cartItems =
+            await customerRepository.GetCartItemsAsync(customerId, ct);
+
+        List<CartItemDto> cartItemsDto = cartItems
+            .Select(ci => ci.ToDto())
+            .ToList();
+        
+        return Result<IReadOnlyCollection<CartItemDto>>.Success(cartItemsDto);
     }
 }

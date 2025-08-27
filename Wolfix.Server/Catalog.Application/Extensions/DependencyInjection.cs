@@ -21,7 +21,8 @@ public static class DependencyInjection
 
     public static IServiceCollection AddCatalogEventHandlers(this IServiceCollection services)
     {
-        services.AddScoped<IIntegrationEventHandler<CheckProductExists>, CheckProductExistsEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<CheckProductExistsForAddingToFavorite>, CheckProductExistsForAddingToFavoriteEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<CheckProductExistsForAddingToCart>, CheckProductExistsForAddingToCartEventHandler>();
         
         return services;
     }

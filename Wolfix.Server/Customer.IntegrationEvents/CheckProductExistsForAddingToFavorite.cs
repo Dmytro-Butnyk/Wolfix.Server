@@ -2,7 +2,7 @@
 
 namespace Customer.IntegrationEvents;
 
-public sealed record CheckProductExists : IIntegrationEvent
+public sealed record CheckProductExistsForAddingToFavorite : IIntegrationEvent
 {
     public required Guid ProductId { get; init; }
     

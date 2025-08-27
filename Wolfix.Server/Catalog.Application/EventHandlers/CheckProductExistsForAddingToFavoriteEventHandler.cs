@@ -7,17 +7,17 @@ using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.EventHandlers;
 
-internal sealed class CheckProductExistsEventHandler(IProductRepository productRepository, IEventBus eventBus)
-    : IIntegrationEventHandler<CheckProductExists>
+internal sealed class CheckProductExistsForAddingToFavoriteEventHandler(IProductRepository productRepository, IEventBus eventBus)
+    : IIntegrationEventHandler<CheckProductExistsForAddingToFavorite>
 {
-    public async Task<VoidResult> HandleAsync(CheckProductExists @event, CancellationToken ct)
+    public async Task<VoidResult> HandleAsync(CheckProductExistsForAddingToFavorite @event, CancellationToken ct)
     {
         var product = await productRepository.GetByIdAsNoTrackingAsync(@event.ProductId, ct);
 
         if (product is null)
         {
             return VoidResult.Failure(
-                $"Product with id {@event.ProductId} not found",
+                $"Product with id: {@event.ProductId} not found",
                 HttpStatusCode.NotFound
             );
         }
@@ -32,11 +32,6 @@ internal sealed class CheckProductExistsEventHandler(IProductRepository productR
             FinalPrice = product.FinalPrice
         }, ct);
 
-        if (!result.IsSuccess)
-        {
-            return result;
-        }
-        
-        return VoidResult.Success();
+        return !result.IsSuccess ? result : VoidResult.Success();
     }
 }

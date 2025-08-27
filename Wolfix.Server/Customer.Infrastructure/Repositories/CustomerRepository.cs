@@ -29,4 +29,20 @@ public sealed class CustomerRepository(CustomerContext context)
                 fi.CustomerId))
             .ToListAsync(ct);
     }
+
+    public async Task<IReadOnlyCollection<CartItemProjection>> GetCartItemsAsync(Guid customerId, CancellationToken ct)
+    {
+        return await _customers
+            .AsNoTracking()
+            .Include("_cartItems")
+            .Where(customer => customer.Id == customerId)
+            .SelectMany(customer => EF.Property<List<CartItem>>(customer, "_cartItems"))
+            .Select(fi => new CartItemProjection(
+                fi.Id,
+                fi.CustomerId,
+                fi.PhotoUrl,
+                fi.Title,
+                fi.PriceWithDiscount))
+            .ToListAsync(ct);
+    }
 }
