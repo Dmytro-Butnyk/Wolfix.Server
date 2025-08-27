@@ -1,4 +1,5 @@
 using Catalog.Application.Dto.Product;
+using Catalog.Application.Dto.Product.Review;
 using Catalog.Application.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -28,6 +29,7 @@ internal static class ProductEndpoints
         group.MapGet("with-discount/page/{page:int}", GetWithDiscountForPage);
         group.MapGet("recommended", GetRecommendedForPage);
         group.MapGet("random", GetRandom);
+        group.MapGet("{productId:guid}/reviews", GetProductReviews);
     }
 
     private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, BadRequest<string>, NotFound<string>>> GetAllByCategoryForPage(
@@ -122,5 +124,22 @@ internal static class ProductEndpoints
             await productService.GetRandomProductsAsync(pageSize, ct);
         
         return TypedResults.Ok(getRandomProductsResult.Value);
+    }
+
+    private static async Task<Results<Ok<IReadOnlyCollection<ProductReviewDto>>, NotFound<string>>> GetProductReviews(
+        [FromRoute] Guid productId,
+        [FromServices] IProductService productService,
+        CancellationToken ct)
+    {
+        //todo: добавить везде пагинацию где забыл(прочекать все остальные ендпоинты)
+        Result<IReadOnlyCollection<ProductReviewDto>> getProductReviewsResult =
+            await productService.GetProductReviewsAsync(productId, ct);
+        
+        if (!getProductReviewsResult.IsSuccess)
+        {
+            return TypedResults.NotFound(getProductReviewsResult.ErrorMessage);
+        }
+        
+        return TypedResults.Ok(getProductReviewsResult.Value);
     }
 }

@@ -1,9 +1,12 @@
 using System.Net;
 using Catalog.Application.Dto.Product;
+using Catalog.Application.Dto.Product.Review;
 using Catalog.Application.Interfaces;
 using Catalog.Application.Mapping.Product;
+using Catalog.Application.Mapping.Product.Review;
 using Catalog.Domain.Interfaces;
 using Catalog.Domain.Projections.Product;
+using Catalog.Domain.Projections.Product.Review;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
 
@@ -96,6 +99,26 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
             .ToList();
         
         return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
+    }
+
+    public async Task<Result<IReadOnlyCollection<ProductReviewDto>>> GetProductReviewsAsync(Guid productId, CancellationToken ct)
+    {
+        if (!await productRepository.IsExistAsync(productId, ct))
+        {
+            return Result<IReadOnlyCollection<ProductReviewDto>>.Failure(
+                $"Product with id: {productId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        IReadOnlyCollection<ProductReviewProjection> productReviews =
+            await productRepository.GetProductReviewsAsync(productId, ct);
+
+        List<ProductReviewDto> productReviewsDto = productReviews
+            .Select(productReview => productReview.ToDto())
+            .ToList();
+        
+        return Result<IReadOnlyCollection<ProductReviewDto>>.Success(productReviewsDto);
     }
 
     public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRandomProductsAsync(int pageSize,

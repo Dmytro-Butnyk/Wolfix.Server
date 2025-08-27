@@ -1,7 +1,9 @@
 ﻿using Catalog.Domain.Interfaces;
 using Catalog.Domain.ProductAggregate;
+using Catalog.Domain.ProductAggregate.Entities;
 using Catalog.Domain.ProductAggregate.Enums;
 using Catalog.Domain.Projections.Product;
+using Catalog.Domain.Projections.Product.Review;
 using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.Repositories;
 
@@ -152,5 +154,22 @@ internal sealed class ProductRepository(CatalogContext context)
         }
 
         return products;
+    }
+
+    public async Task<IReadOnlyCollection<ProductReviewProjection>> GetProductReviewsAsync(Guid productId, CancellationToken ct)
+    {
+        return await _products
+            .AsNoTracking()
+            .Where(product => product.Id == productId)
+            .Include("_reviews")
+            .SelectMany(customer => EF.Property<List<Review>>(customer, "_reviews"))
+            .Select(review => new ProductReviewProjection(
+                review.Id,
+                review.Title,
+                review.Text,
+                review.Rating,
+                review.ProductId,
+                review.CreatedAt))
+            .ToListAsync(ct);
     }
 }
