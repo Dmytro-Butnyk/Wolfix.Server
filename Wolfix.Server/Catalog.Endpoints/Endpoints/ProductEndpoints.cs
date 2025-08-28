@@ -29,7 +29,7 @@ internal static class ProductEndpoints
         group.MapGet("with-discount/page/{page:int}", GetWithDiscountForPage);
         group.MapGet("recommended", GetRecommendedForPage);
         group.MapGet("random", GetRandom);
-        group.MapGet("{productId:guid}/reviews", GetProductReviews);
+        group.MapGet("{productId:guid}/reviews", GetReviews);
     }
 
     private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, BadRequest<string>, NotFound<string>>> GetAllByCategoryForPage(
@@ -106,7 +106,7 @@ internal static class ProductEndpoints
         return TypedResults.Ok(getRandomProductsResult.Value);
     }
 
-    private static async Task<Results<Ok<CursorPaginationDto<ProductReviewDto>>, NotFound<string>>> GetProductReviews(
+    private static async Task<Results<Ok<CursorPaginationDto<ProductReviewDto>>, NotFound<string>>> GetReviews(
         [FromRoute] Guid productId,
         [FromServices] IProductService productService,
         CancellationToken ct,
@@ -114,7 +114,7 @@ internal static class ProductEndpoints
         [FromQuery] Guid? lastId = null)
     {
         Result<CursorPaginationDto<ProductReviewDto>> getProductReviewsResult =
-            await productService.GetProductReviewsAsync(productId, pageSize, lastId, ct);
+            await productService.GetReviewsAsync(productId, pageSize, lastId, ct);
         
         if (!getProductReviewsResult.IsSuccess)
         {
@@ -122,5 +122,21 @@ internal static class ProductEndpoints
         }
         
         return TypedResults.Ok(getProductReviewsResult.Value);
+    }
+
+    private static async Task<Results<NoContent, NotFound<string>>> AddReview(
+        [FromBody] AddProductReview addProductReviewDto,
+        [FromRoute] Guid productId,
+        [FromServices] IProductService productService,
+        CancellationToken ct)
+    {
+        VoidResult addReviewResult = await productService.AddReviewAsync(productId, addProductReviewDto, ct);
+        
+        if (!addReviewResult.IsSuccess)
+        {
+            return TypedResults.NotFound(addReviewResult.ErrorMessage);
+        }
+        
+        return TypedResults.NoContent();
     }
 }

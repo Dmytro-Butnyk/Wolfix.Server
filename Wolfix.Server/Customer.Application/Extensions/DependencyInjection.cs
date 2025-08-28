@@ -23,6 +23,7 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<CustomerAccountCreated>, CustomerAccountCreatedEventHandler>();
         services.AddScoped<IIntegrationEventHandler<ProductExistsForAddingToFavorite>, ProductExistsForAddingToFavoriteEventHandler>();
         services.AddScoped<IIntegrationEventHandler<ProductExistsForAddingToCart>, ProductExistsForAddingToCartEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<CheckCustomerExistsForAddingReview>, CheckCustomerExistsForAddingReviewEventHandler>();
 
         return services;
     }

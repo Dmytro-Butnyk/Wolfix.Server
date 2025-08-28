@@ -5,14 +5,17 @@ using Catalog.Application.Interfaces;
 using Catalog.Application.Mapping.Product;
 using Catalog.Application.Mapping.Product.Review;
 using Catalog.Domain.Interfaces;
+using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.Projections.Product;
 using Catalog.Domain.Projections.Product.Review;
+using Catalog.IntegrationEvents;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.Services;
 
-internal sealed class ProductService(IProductRepository productRepository) : IProductService
+internal sealed class ProductService(IProductRepository productRepository, IEventBus eventBus) : IProductService
 {
     public async Task<Result<PaginationDto<ProductShortDto>>> GetForPageByCategoryIdAsync(Guid childCategoryId,
         int page, int pageSize, CancellationToken ct)
@@ -101,7 +104,7 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
         return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
     }
 
-    public async Task<Result<CursorPaginationDto<ProductReviewDto>>> GetProductReviewsAsync(Guid productId, int pageSize,
+    public async Task<Result<CursorPaginationDto<ProductReviewDto>>> GetReviewsAsync(Guid productId, int pageSize,
         Guid? lastId, CancellationToken ct)
     {
         if (!await productRepository.IsExistAsync(productId, ct))
@@ -127,6 +130,36 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
         CursorPaginationDto<ProductReviewDto> cursorPaginationDto = new(productReviewsDto, nextCursor);
         
         return Result<CursorPaginationDto<ProductReviewDto>>.Success(cursorPaginationDto);
+    }
+
+    public async Task<VoidResult> AddReviewAsync(Guid productId, AddProductReview addProductReviewDto, CancellationToken ct)
+    {
+        Product? product = await productRepository.GetByIdAsync(productId, ct);
+
+        if (product is null)
+        {
+            return VoidResult.Failure(
+                $"Product with id: {productId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        VoidResult result = await eventBus.PublishAsync(new CheckCustomerExistsForAddingReview
+        {
+            CustomerId = addProductReviewDto.CustomerId
+        }, ct);
+
+        if (!result.IsSuccess)
+        {
+            return result;
+        }
+
+        product.AddReview(addProductReviewDto.Title, addProductReviewDto.Text,
+            addProductReviewDto.Rating, addProductReviewDto.CustomerId);
+        
+        await productRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
     }
 
     public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRandomProductsAsync(int pageSize,

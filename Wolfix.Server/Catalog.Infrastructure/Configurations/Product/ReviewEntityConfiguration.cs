@@ -26,6 +26,7 @@ internal sealed class ReviewEntityConfiguration : IEntityTypeConfiguration<Revie
         builder.Property(r => r.Text).IsRequired();
         builder.Property(r => r.Rating).IsRequired();
         builder.Property(r => r.CreatedAt).IsRequired();
+        builder.Property(r => r.CustomerId).IsRequired();
     }
 
     private void ConfigureProductRelation(EntityTypeBuilder<Review> builder)

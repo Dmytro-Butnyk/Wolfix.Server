@@ -5,6 +5,7 @@ using Catalog.Domain.ProductAggregate.Enums;
 using Catalog.Domain.Projections.Product;
 using Catalog.Domain.Projections.Product.Review;
 using Microsoft.EntityFrameworkCore;
+using Shared.Domain.Models;
 using Shared.Infrastructure.Repositories;
 
 namespace Catalog.Infrastructure.Repositories;
@@ -146,8 +147,8 @@ internal sealed class ProductRepository(CatalogContext context)
                 .AsNoTracking()
                 .OrderBy(p => p.Id)
                 .Take(takeFromStart)
-                .Select(p =>
-                    new ProductShortProjection(p.Id, p.Title, p.AverageRating, p.Price, p.FinalPrice, p.Bonuses))
+                .Select(p => new ProductShortProjection(p.Id, p.Title, p.AverageRating,
+                    p.Price, p.FinalPrice, p.Bonuses))
                 .ToListAsync(ct);
 
             products.AddRange(productsFromStart);
@@ -162,7 +163,7 @@ internal sealed class ProductRepository(CatalogContext context)
             .AsNoTracking()
             .Where(product => product.Id == productId)
             .Include("_reviews")
-            .SelectMany(customer => EF.Property<List<Review>>(customer, "_reviews"))
+            .SelectMany(product => EF.Property<List<Review>>(product, "_reviews"))
             .OrderBy(review => review.CreatedAt)
             .Take(pageSize)
             .Select(review => new ProductReviewProjection(
@@ -181,7 +182,7 @@ internal sealed class ProductRepository(CatalogContext context)
             .AsNoTracking()
             .Where(product => product.Id == productId)
             .Include("_reviews")
-            .SelectMany(customer => EF.Property<List<Review>>(customer, "_reviews"))
+            .SelectMany(product => EF.Property<List<Review>>(product, "_reviews"))
             .Where(review => review.Id.CompareTo(lastId) > 0)
             .OrderBy(review => review.CreatedAt)
             .Take(pageSize)
