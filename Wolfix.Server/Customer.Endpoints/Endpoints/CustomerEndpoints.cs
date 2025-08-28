@@ -43,6 +43,7 @@ internal static class CustomerEndpoints
     
     //todo: доделать все ендпоинты
 
+    //todo: подумать надо ли тут пагинация
     private static async Task<Results<Ok<IReadOnlyCollection<FavoriteItemDto>>, NotFound<string>>> GetFavoriteProducts(
         [FromRoute] Guid customerId,
         [FromServices] ICustomerService customerService,
@@ -59,6 +60,7 @@ internal static class CustomerEndpoints
         return TypedResults.Ok(getFavoriteItemsResult.Value);
     }
 
+    //todo: подумать надо ли тут пагинация
     private static async Task<Results<Ok<IReadOnlyCollection<CartItemDto>>, NotFound<string>>> GetCartProducts(
         [FromRoute] Guid customerId,
         [FromServices] ICustomerService customerService,

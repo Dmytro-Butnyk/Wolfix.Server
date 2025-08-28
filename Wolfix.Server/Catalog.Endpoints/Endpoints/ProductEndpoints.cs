@@ -113,7 +113,6 @@ internal static class ProductEndpoints
         [FromQuery] int pageSize = 10,
         [FromQuery] Guid? lastId = null)
     {
-        //todo: добавить везде пагинацию где забыл(прочекать все остальные ендпоинты)
         Result<CursorPaginationDto<ProductReviewDto>> getProductReviewsResult =
             await productService.GetProductReviewsAsync(productId, pageSize, lastId, ct);
         
