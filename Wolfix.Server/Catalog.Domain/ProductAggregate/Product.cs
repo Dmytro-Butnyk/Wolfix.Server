@@ -293,8 +293,6 @@ public sealed class Product : BaseEntity
     }
     #endregion
     
-    //todo: userId
-    //todo: private method for get by id with null check
     #region reviews
     public VoidResult AddReview(string title, string text, uint rating, Guid customerId)
     {

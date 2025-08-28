@@ -37,6 +37,7 @@ internal static class ProductEndpoints
     private static void MapReviewEndpoints(RouteGroupBuilder group)
     {
         group.MapGet("", GetReviews);
+        //todo: протестить
         group.MapPost("", AddReview);
     }
 
