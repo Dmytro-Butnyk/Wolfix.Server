@@ -1,4 +1,5 @@
-﻿using Media.Application.Interfaces;
+﻿using Media.Application.Dto;
+using Media.Application.Interfaces;
 using Media.Application.Options;
 using Media.Domain.BlobAggregate;
 using Media.Domain.Interfaces;
@@ -13,7 +14,7 @@ public sealed class BlobResourceService(
     IBlobResourceRepository blobResourceRepository,
     IAzureBlobRepository azureBlobRepository) : IBlobResourceService
 {
-    public async Task<VoidResult> AddBlobResourceAsync(string contentType, Stream fileStream, CancellationToken ct)
+    public async Task<Result<BlobResourceShortDto>> AddBlobResourceAsync(string contentType, Stream fileStream, CancellationToken ct)
     {
 
         BlobResourceType blobResourceType = Enum.Parse<BlobResourceType>(contentType);
@@ -22,7 +23,7 @@ public sealed class BlobResourceService(
 
         if (!blobResource.IsSuccess)
         {
-            return VoidResult.Failure("Invalid blob resource data");
+            return Result<BlobResourceShortDto>.Failure("Invalid blob resource data");
         }
 
         string url = await azureBlobRepository.AddFileAndGetUrlAsync(
@@ -36,7 +37,13 @@ public sealed class BlobResourceService(
         
         await blobResourceRepository.AddAsync(blobResource.Value, ct);
         
-        return VoidResult.Success();
+        BlobResourceShortDto blobResourceShortDto = new()
+        {
+            ContentType = blobResource.Value.Type.ToString(),
+            Url = blobResource.Value.Url
+        };
+        
+        return Result<BlobResourceShortDto>.Success(blobResourceShortDto);
     }
 
     public async Task<VoidResult> DeleteBlobResourceAsync(Guid id, CancellationToken ct)

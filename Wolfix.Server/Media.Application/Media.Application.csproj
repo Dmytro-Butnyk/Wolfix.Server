@@ -7,7 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Catalog.IntegrationEvents\Catalog.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Media.Domain\Media.Domain.csproj" />
+      <ProjectReference Include="..\Media.IntegrationEvents\Media.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj" />
     </ItemGroup>
 
     <ItemGroup>
