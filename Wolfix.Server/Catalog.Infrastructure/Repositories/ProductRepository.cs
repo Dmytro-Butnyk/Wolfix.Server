@@ -156,13 +156,35 @@ internal sealed class ProductRepository(CatalogContext context)
         return products;
     }
 
-    public async Task<IReadOnlyCollection<ProductReviewProjection>> GetProductReviewsAsync(Guid productId, CancellationToken ct)
+    public async Task<IReadOnlyCollection<ProductReviewProjection>> GetProductReviewsAsync(Guid productId, int pageSize, CancellationToken ct)
     {
         return await _products
             .AsNoTracking()
             .Where(product => product.Id == productId)
             .Include("_reviews")
             .SelectMany(customer => EF.Property<List<Review>>(customer, "_reviews"))
+            .OrderBy(review => review.CreatedAt)
+            .Take(pageSize)
+            .Select(review => new ProductReviewProjection(
+                review.Id,
+                review.Title,
+                review.Text,
+                review.Rating,
+                review.ProductId,
+                review.CreatedAt))
+            .ToListAsync(ct);
+    }
+
+    public async Task<IReadOnlyCollection<ProductReviewProjection>> GetNextProductReviewsAsync(Guid productId, int pageSize, Guid lastId, CancellationToken ct)
+    {
+        return await _products
+            .AsNoTracking()
+            .Where(product => product.Id == productId)
+            .Include("_reviews")
+            .SelectMany(customer => EF.Property<List<Review>>(customer, "_reviews"))
+            .Where(review => review.Id.CompareTo(lastId) > 0)
+            .OrderBy(review => review.CreatedAt)
+            .Take(pageSize)
             .Select(review => new ProductReviewProjection(
                 review.Id,
                 review.Title,

@@ -18,5 +18,5 @@ public interface IProductService
     Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRecommendedForPageAsync(int pageSize,
         List<Guid> visitedCategoriesIds, CancellationToken ct);
     
-    Task<Result<IReadOnlyCollection<ProductReviewDto>>> GetProductReviewsAsync(Guid productId, CancellationToken ct);
+    Task<Result<CursorPaginationDto<ProductReviewDto>>> GetProductReviewsAsync(Guid productId, int pageSize, Guid? lastId, CancellationToken ct);
 }

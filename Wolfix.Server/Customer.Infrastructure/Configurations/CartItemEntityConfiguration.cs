@@ -1,6 +1,7 @@
 using Customer.Domain.CustomerAggregate.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Infrastructure.ValueGenerators;
 
 namespace Customer.Infrastructure.Configurations;
 
@@ -17,6 +18,10 @@ internal sealed class CartItemEntityConfiguration : IEntityTypeConfiguration<Car
 
     private void ConfigureBasicProperties(EntityTypeBuilder<CartItem> builder)
     {
+        builder.Property(p => p.Id)
+            .HasValueGenerator<GuidV7ValueGenerator>()
+            .ValueGeneratedOnAdd();
+        
         builder.Property(ci => ci.PhotoUrl)
             .IsRequired();
 

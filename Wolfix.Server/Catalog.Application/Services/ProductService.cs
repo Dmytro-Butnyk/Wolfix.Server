@@ -101,24 +101,32 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
         return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
     }
 
-    public async Task<Result<IReadOnlyCollection<ProductReviewDto>>> GetProductReviewsAsync(Guid productId, CancellationToken ct)
+    public async Task<Result<CursorPaginationDto<ProductReviewDto>>> GetProductReviewsAsync(Guid productId, int pageSize,
+        Guid? lastId, CancellationToken ct)
     {
         if (!await productRepository.IsExistAsync(productId, ct))
         {
-            return Result<IReadOnlyCollection<ProductReviewDto>>.Failure(
+            return Result<CursorPaginationDto<ProductReviewDto>>.Failure(
                 $"Product with id: {productId} not found",
                 HttpStatusCode.NotFound
             );
         }
+
+        IReadOnlyCollection<ProductReviewProjection> productReviews = lastId switch
+        {
+            null => await productRepository.GetProductReviewsAsync(productId, pageSize, ct),
+            _ => await productRepository.GetNextProductReviewsAsync(productId, pageSize, lastId.Value, ct)
+        };
         
-        IReadOnlyCollection<ProductReviewProjection> productReviews =
-            await productRepository.GetProductReviewsAsync(productId, ct);
+        Guid? nextCursor = productReviews.Count > 0 ? productReviews.Last().Id : null;
 
         List<ProductReviewDto> productReviewsDto = productReviews
             .Select(productReview => productReview.ToDto())
             .ToList();
         
-        return Result<IReadOnlyCollection<ProductReviewDto>>.Success(productReviewsDto);
+        CursorPaginationDto<ProductReviewDto> cursorPaginationDto = new(productReviewsDto, nextCursor);
+        
+        return Result<CursorPaginationDto<ProductReviewDto>>.Success(cursorPaginationDto);
     }
 
     public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRandomProductsAsync(int pageSize,

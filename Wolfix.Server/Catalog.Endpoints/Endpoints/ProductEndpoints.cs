@@ -35,18 +35,13 @@ internal static class ProductEndpoints
     private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, BadRequest<string>, NotFound<string>>> GetAllByCategoryForPage(
         [FromRoute] Guid childCategoryId,
         [FromRoute] int page,
-        [FromQuery] int pageSize,
         [FromServices] IProductService productService,
-        CancellationToken ct)
+        CancellationToken ct,
+        [FromQuery] int pageSize = 20)
     {
         if (page < 1)
         {
             return TypedResults.BadRequest("Page must be greater than 0");
-        }
-        
-        if (pageSize < 1)
-        {
-            return TypedResults.BadRequest("Page size must be greater than 0");
         }
         
         Result<PaginationDto<ProductShortDto>> getProductsByCategoryResult =
@@ -62,18 +57,13 @@ internal static class ProductEndpoints
 
     private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, BadRequest<string>>> GetWithDiscountForPage(
         [FromRoute] int page,
-        [FromQuery] int pageSize,
         [FromServices] IProductService productService,
-        CancellationToken ct)
+        CancellationToken ct,
+        [FromQuery] int pageSize = 4)
     {
         if (page < 1)
         {
             return TypedResults.BadRequest("Page must be greater than 0");
-        }
-        
-        if (pageSize < 1)
-        {
-            return TypedResults.BadRequest("Page size must be greater than 0");
         }
 
         Result<PaginationDto<ProductShortDto>> getProductsWithDiscountResult =
@@ -84,16 +74,11 @@ internal static class ProductEndpoints
 
     private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>, NotFound<string>>>
         GetRecommendedForPage(
-            [FromQuery] int pageSize,
             [FromQuery] Guid[] visitedCategoriesIds,
             [FromServices] IProductService productService,
-            CancellationToken ct)
+            CancellationToken ct,
+            [FromQuery] int pageSize = 12)
     {
-        if (pageSize < 1)
-        {
-            return TypedResults.BadRequest("Page size must be greater than 0");
-        }
-
         if (visitedCategoriesIds.Length == 0)
         {
             return TypedResults.BadRequest("Visited categories must be not empty");
@@ -110,30 +95,27 @@ internal static class ProductEndpoints
         return TypedResults.Ok(getRecommendedProductsResult.Value);
     }
 
-    private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>>> GetRandom(
-        [FromQuery] int pageSize,
+    private static async Task<Ok<IReadOnlyCollection<ProductShortDto>>> GetRandom(
         [FromServices] IProductService productService,
-        CancellationToken ct)
+        CancellationToken ct,
+        [FromQuery] int pageSize = 12)
     {
-        if (pageSize < 1)
-        {
-            return TypedResults.BadRequest("Page size must be greater than 0");
-        }
-
         Result<IReadOnlyCollection<ProductShortDto>> getRandomProductsResult =
             await productService.GetRandomProductsAsync(pageSize, ct);
         
         return TypedResults.Ok(getRandomProductsResult.Value);
     }
 
-    private static async Task<Results<Ok<IReadOnlyCollection<ProductReviewDto>>, NotFound<string>>> GetProductReviews(
+    private static async Task<Results<Ok<CursorPaginationDto<ProductReviewDto>>, NotFound<string>>> GetProductReviews(
         [FromRoute] Guid productId,
         [FromServices] IProductService productService,
-        CancellationToken ct)
+        CancellationToken ct,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] Guid? lastId = null)
     {
         //todo: добавить везде пагинацию где забыл(прочекать все остальные ендпоинты)
-        Result<IReadOnlyCollection<ProductReviewDto>> getProductReviewsResult =
-            await productService.GetProductReviewsAsync(productId, ct);
+        Result<CursorPaginationDto<ProductReviewDto>> getProductReviewsResult =
+            await productService.GetProductReviewsAsync(productId, pageSize, lastId, ct);
         
         if (!getProductReviewsResult.IsSuccess)
         {

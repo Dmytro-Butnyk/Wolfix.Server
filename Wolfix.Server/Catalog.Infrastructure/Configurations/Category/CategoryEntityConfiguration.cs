@@ -1,6 +1,7 @@
 using Catalog.Domain.CategoryAggregate.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Infrastructure.ValueGenerators;
 
 namespace Catalog.Infrastructure.Configurations.Category;
 
@@ -29,6 +30,10 @@ internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Cat
 
     private void ConfigureBasicProperties(EntityTypeBuilder<Catalog.Domain.CategoryAggregate.Category> builder)
     {
+        builder.Property(p => p.Id)
+            .HasValueGenerator<GuidV7ValueGenerator>()
+            .ValueGeneratedOnAdd();
+        
         builder.Property(c => c.Name).IsRequired();
         builder.Property(c => c.Description).IsRequired(false);
         builder.Property(c => c.ProductsCount).IsRequired();

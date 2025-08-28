@@ -1,6 +1,7 @@
 using Catalog.Domain.ProductAggregate.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Infrastructure.ValueGenerators;
 
 namespace Catalog.Infrastructure.Configurations.Product;
 
@@ -17,6 +18,10 @@ internal sealed class ProductAttributeValueEntityConfiguration : IEntityTypeConf
 
     private void ConfigureBasicProperties(EntityTypeBuilder<ProductAttributeValue> builder)
     {
+        builder.Property(p => p.Id)
+            .HasValueGenerator<GuidV7ValueGenerator>()
+            .ValueGeneratedOnAdd();
+        
         builder.Property(pav => pav.Key).IsRequired();
         builder.Property(pav => pav.Value).IsRequired();
     }
