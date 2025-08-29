@@ -68,6 +68,8 @@ internal sealed class CustomerEntityConfiguration : IEntityTypeConfiguration<Dom
         builder.Ignore(c => c.FavoriteItems);
 
         builder.Ignore(c => c.CartItems);
+
+        builder.Ignore(c => c.TotalCartPriceWithoutBonuses);
     }
     
     private void ConfigureFavoriteItemsRelation(EntityTypeBuilder<Domain.CustomerAggregate.Customer> builder)

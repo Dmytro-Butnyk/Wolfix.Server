@@ -14,5 +14,5 @@ public interface ICustomerService
     
     Task<Result<IReadOnlyCollection<FavoriteItemDto>>> GetFavoriteItemsAsync(Guid customerId, CancellationToken ct);
     
-    Task<Result<IReadOnlyCollection<CartItemDto>>> GetCartItemsAsync(Guid customerId, CancellationToken ct);
+    Task<Result<CustomerCartItemsDto>> GetCartItemsAsync(Guid customerId, CancellationToken ct);
 }

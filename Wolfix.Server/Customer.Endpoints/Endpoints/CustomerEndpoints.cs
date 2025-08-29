@@ -41,8 +41,6 @@ internal static class CustomerEndpoints
         group.MapPost("", AddProductToCart);
     }
     
-    //todo: доделать все ендпоинты
-
     //todo: подумать надо ли тут пагинация
     private static async Task<Results<Ok<IReadOnlyCollection<FavoriteItemDto>>, NotFound<string>>> GetFavoriteProducts(
         [FromRoute] Guid customerId,
@@ -61,12 +59,12 @@ internal static class CustomerEndpoints
     }
 
     //todo: подумать надо ли тут пагинация
-    private static async Task<Results<Ok<IReadOnlyCollection<CartItemDto>>, NotFound<string>>> GetCartProducts(
+    private static async Task<Results<Ok<CustomerCartItemsDto>, NotFound<string>>> GetCartProducts(
         [FromRoute] Guid customerId,
         [FromServices] ICustomerService customerService,
         CancellationToken ct)
     {
-        Result<IReadOnlyCollection<CartItemDto>> getCartItemsResult =
+        Result<CustomerCartItemsDto> getCartItemsResult =
             await customerService.GetCartItemsAsync(customerId, ct);
         
         if (!getCartItemsResult.IsSuccess)

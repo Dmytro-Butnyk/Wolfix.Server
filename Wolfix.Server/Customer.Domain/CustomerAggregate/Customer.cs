@@ -33,6 +33,8 @@ public sealed class Customer : BaseEntity
         .Select(ci => (CartItemInfo)ci)
         .ToList()
         .AsReadOnly();
+    
+    public decimal TotalCartPriceWithoutBonuses => _cartItems.Sum(ci => ci.PriceWithDiscount);
 
     private Customer() { }
 

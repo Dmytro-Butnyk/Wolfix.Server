@@ -75,11 +75,13 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
         return Result<IReadOnlyCollection<FavoriteItemDto>>.Success(favoriteItemsDto);
     }
 
-    public async Task<Result<IReadOnlyCollection<CartItemDto>>> GetCartItemsAsync(Guid customerId, CancellationToken ct)
+    public async Task<Result<CustomerCartItemsDto>> GetCartItemsAsync(Guid customerId, CancellationToken ct)
     {
-        if (!await customerRepository.IsExistAsync(customerId, ct))
+        var customer = await customerRepository.GetByIdAsNoTrackingAsync(customerId, ct);
+
+        if (customer is null)
         {
-            return Result<IReadOnlyCollection<CartItemDto>>.Failure(
+            return Result<CustomerCartItemsDto>.Failure(
                 $"Customer with id: {customerId} not found",
                 HttpStatusCode.NotFound
             );
@@ -88,10 +90,18 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
         IReadOnlyCollection<CartItemProjection> cartItems =
             await customerRepository.GetCartItemsAsync(customerId, ct);
 
-        List<CartItemDto> cartItemsDto = cartItems
+        IReadOnlyCollection<CartItemDto> cartItemsDto = cartItems
             .Select(ci => ci.ToDto())
             .ToList();
+
+        CustomerCartItemsDto customerCartItemsDto = new()
+        {
+            Items = cartItemsDto,
+            CustomerId = customerId,
+            BonusesAmount = customer.BonusesAmount,
+            TotalCartPriceWithoutBonuses = customer.TotalCartPriceWithoutBonuses
+        };
         
-        return Result<IReadOnlyCollection<CartItemDto>>.Success(cartItemsDto);
+        return Result<CustomerCartItemsDto>.Success(customerCartItemsDto);
     }
 }
