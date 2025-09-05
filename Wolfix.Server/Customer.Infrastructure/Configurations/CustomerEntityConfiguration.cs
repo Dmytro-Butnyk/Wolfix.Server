@@ -23,7 +23,7 @@ internal sealed class CustomerEntityConfiguration : IEntityTypeConfiguration<Dom
     {
         const string nullMarker = "_____NULL_____";
         
-        builder.Property(p => p.Id)
+        builder.Property(c => c.Id)
             .HasValueGenerator<GuidV7ValueGenerator>()
             .ValueGeneratedOnAdd();
         
