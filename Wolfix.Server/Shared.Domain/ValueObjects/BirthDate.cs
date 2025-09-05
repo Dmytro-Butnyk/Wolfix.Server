@@ -1,8 +1,8 @@
 using Shared.Domain.Models;
 
-namespace Customer.Domain.CustomerAggregate.ValueObjects;
+namespace Shared.Domain.ValueObjects;
 
-internal sealed class BirthDate
+public sealed class BirthDate
 {
     public DateOnly Value { get; private set; }
 

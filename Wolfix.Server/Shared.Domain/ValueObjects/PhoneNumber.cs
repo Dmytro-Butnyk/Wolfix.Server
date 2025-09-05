@@ -1,9 +1,9 @@
 using System.Text.RegularExpressions;
 using Shared.Domain.Models;
 
-namespace Customer.Domain.CustomerAggregate.ValueObjects;
+namespace Shared.Domain.ValueObjects;
 
-internal sealed class PhoneNumber
+public sealed class PhoneNumber
 {
     private static readonly Regex Regex = new(@"^\+380\d{9}$", RegexOptions.Compiled);
     

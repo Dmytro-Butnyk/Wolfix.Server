@@ -1,7 +1,7 @@
 using Customer.Domain.CustomerAggregate.Entities;
-using Customer.Domain.CustomerAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Domain.ValueObjects;
 using Shared.Infrastructure.ValueGenerators;
 
 namespace Customer.Infrastructure.Configurations;

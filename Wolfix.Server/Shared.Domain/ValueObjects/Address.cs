@@ -1,8 +1,8 @@
 using Shared.Domain.Models;
 
-namespace Customer.Domain.CustomerAggregate.ValueObjects;
+namespace Shared.Domain.ValueObjects;
 
-internal sealed class Address
+public sealed class Address
 {
     public string City { get; private set; }
     
