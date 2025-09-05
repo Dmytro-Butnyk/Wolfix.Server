@@ -19,13 +19,25 @@ public sealed class BlobResourcesForProductAddedEventHandler(
             return VoidResult.Failure("Product not found");
         }
         
+        bool isAllSuccess = true;
+        
         foreach (var blobResource in @event.BlobResources)
         {
-            product.AddProductMedia(blobResource.Id, blobResource.ContentType, blobResource.Url);
+            VoidResult result = product.AddProductMedia(blobResource.Id, blobResource.ContentType, blobResource.Url);
+            
+            if (!result.IsSuccess)
+            {
+                isAllSuccess = false;
+            }
         }
         
-        //TODO: Handle possible concurrency issues
-        // await productRepository.SaveChangesAsync(ct);
+        await productRepository.SaveChangesAsync(ct);
         
+        if (!isAllSuccess)
+        {
+            return VoidResult.Failure("One or more media files could not be added to the product");
+        }
+        
+        return VoidResult.Success();
     }
 }
