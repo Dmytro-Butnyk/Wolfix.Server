@@ -33,6 +33,8 @@ public sealed class Customer : BaseEntity
         .Select(ci => (CartItemInfo)ci)
         .ToList()
         .AsReadOnly();
+    
+    public decimal TotalCartPriceWithoutBonuses => _cartItems.Sum(ci => ci.PriceWithDiscount);
 
     private Customer() { }
 
@@ -197,7 +199,7 @@ public sealed class Customer : BaseEntity
         
         if (!createFavoriteItemResult.IsSuccess)
         {
-            return VoidResult.Failure(createFavoriteItemResult.ErrorMessage!, createFavoriteItemResult.StatusCode);;
+            return VoidResult.Failure(createFavoriteItemResult.ErrorMessage!, createFavoriteItemResult.StatusCode);
         }
         
         FavoriteItem favoriteItem = createFavoriteItemResult.Value!;
@@ -245,18 +247,21 @@ public sealed class Customer : BaseEntity
     #endregion
     
     #region cartItems
-    public VoidResult AddCartItem(string photoUrl, string title, decimal price)
+    public VoidResult AddCartItem(string photoUrl, string title, decimal priceWithDiscount)
     {
-        if (_cartItems.Any(ci => ci.PhotoUrl == photoUrl && ci.Title == title && ci.Price == price))
+        if (_cartItems.Any(ci => ci.PhotoUrl == photoUrl && ci.Title == title && ci.PriceWithDiscount == priceWithDiscount))
         {
-            return VoidResult.Failure("This product already exists in cart", HttpStatusCode.Conflict);
+            return VoidResult.Failure(
+                "This product already exists in cart", 
+                HttpStatusCode.Conflict
+            );
         }
         
-        Result<CartItem> createCartItemResult = CartItem.Create(this, photoUrl, title, price);
+        Result<CartItem> createCartItemResult = CartItem.Create(this, photoUrl, title, priceWithDiscount);
         
         if (!createCartItemResult.IsSuccess)
         {
-            return VoidResult.Failure(createCartItemResult.ErrorMessage!);
+            return VoidResult.Failure(createCartItemResult.ErrorMessage!, createCartItemResult.StatusCode);
         }
         
         CartItem cartItem = createCartItemResult.Value!;

@@ -11,6 +11,7 @@ public static class WebApplicationBuilderExtension
         services.AddCatalogDbContext(connectionString);
         services.AddCatalogRepositories();
         services.AddCatalogApplicationServices();
+        services.AddCatalogEventHandlers();
         
         return services;
     }

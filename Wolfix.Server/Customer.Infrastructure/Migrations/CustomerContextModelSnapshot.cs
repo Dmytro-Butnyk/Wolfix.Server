@@ -70,7 +70,7 @@ namespace Customer.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal>("PriceWithDiscount")
                         .HasColumnType("numeric");
 
                     b.Property<string>("Title")

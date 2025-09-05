@@ -17,20 +17,21 @@ internal sealed class Review : BaseEntity
     public Product Product { get; private set; }
     public Guid ProductId { get; private set; }
     
-    //todo: user id
+    public Guid CustomerId { get; private set; }
     
     private Review() { }
     
-    private Review(string title, string text, uint rating, Product product)
+    private Review(string title, string text, uint rating, Product product, Guid customerId)
     {
         Title = title;
         Text = text;
         Rating = rating;
         Product = product;
         ProductId = product.Id;
+        CustomerId = customerId;
     }
 
-    internal static Result<Review> Create(string title, string text, uint rating, Product product)
+    internal static Result<Review> Create(string title, string text, uint rating, Product product, Guid customerId)
     {
         if (IsTextInvalid(title, out var titleErrorMessage))
         {
@@ -47,7 +48,12 @@ internal sealed class Review : BaseEntity
             return Result<Review>.Failure(ratingErrorMessage);
         }
 
-        var review = new Review(title, text, rating, product);
+        if (customerId == Guid.Empty)
+        {
+            return Result<Review>.Failure($"{nameof(customerId)} is required");
+        }
+
+        var review = new Review(title, text, rating, product, customerId);
         return Result<Review>.Success(review, HttpStatusCode.Created);
     }
 
@@ -111,7 +117,7 @@ internal sealed class Review : BaseEntity
     #endregion
     
     public static explicit operator ReviewInfo(Review review)
-        => new(review.Id, review.Title, review.Text, review.Rating, review.CreatedAt);
+        => new(review.Id, review.Title, review.Text, review.Rating, review.CustomerId, review.CreatedAt);
 }
 
-public record ReviewInfo(Guid Id, string Title, string Text, uint Rating, DateTime CreatedAt);
+public record ReviewInfo(Guid Id, string Title, string Text, uint Rating, Guid CustomerId, DateTime CreatedAt);

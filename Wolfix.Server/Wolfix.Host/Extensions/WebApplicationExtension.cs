@@ -1,4 +1,5 @@
 using Catalog.Endpoints.Extensions;
+using Customer.Endpoints.Extensions;
 using Identity.Endpoints.Extensions;
 
 namespace Wolfix.Host.Extensions;
@@ -9,5 +10,6 @@ public static class WebApplicationExtension
     {
         app.MapCatalogApi();
         app.MapIdentityApi();
+        app.MapCustomerApi();
     }
 }

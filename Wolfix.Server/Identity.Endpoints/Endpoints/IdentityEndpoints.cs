@@ -44,7 +44,8 @@ internal static class IdentityEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(logInResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(logInResult.ErrorMessage),
-                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(logInResult.ErrorMessage)
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(logInResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
             };
         }
         
@@ -62,7 +63,8 @@ internal static class IdentityEndpoints
             return getTokenResult.StatusCode switch
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(getTokenResult.ErrorMessage),
-                HttpStatusCode.Forbidden => TypedResults.Forbid()
+                HttpStatusCode.Forbidden => TypedResults.Forbid(),
+                _ => throw new Exception("Unknown status code")
             };
         }
         
@@ -82,7 +84,8 @@ internal static class IdentityEndpoints
             {
                 HttpStatusCode.Conflict => TypedResults.Conflict(registerResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(registerResult.ErrorMessage),
-                HttpStatusCode.BadRequest => TypedResults.BadRequest(registerResult.ErrorMessage)
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(registerResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
             };
         }
         

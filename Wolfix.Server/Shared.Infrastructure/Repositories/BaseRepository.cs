@@ -10,7 +10,16 @@ public class BaseRepository<TContext, TEntity>(TContext context)
     where TContext : DbContext
 {
     private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
-    
+
+    public async Task<bool> IsExistAsync(Guid id, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        
+        return await _dbSet
+            .AsNoTracking()
+            .AnyAsync(e => e.Id == id, cancellationToken);
+    }
+
     public async Task AddAsync(TEntity entity, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -53,5 +62,12 @@ public class BaseRepository<TContext, TEntity>(TContext context)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
         
         return entity;
+    }
+
+    public async Task SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        
+        await context.SaveChangesAsync(cancellationToken);
     }
 }

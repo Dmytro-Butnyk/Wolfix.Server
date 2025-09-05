@@ -1,41 +1,37 @@
 using System.Net;
 using Catalog.Application.Dto.Product;
+using Catalog.Application.Dto.Product.Review;
 using Catalog.Application.Interfaces;
 using Catalog.Application.Mapping.Product;
+using Catalog.Application.Mapping.Product.Review;
 using Catalog.Domain.Interfaces;
+using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.Projections.Product;
+using Catalog.Domain.Projections.Product.Review;
+using Catalog.IntegrationEvents;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.Services;
 
-internal sealed class ProductService(IProductRepository productRepository) : IProductService
+internal sealed class ProductService(IProductRepository productRepository, IEventBus eventBus) : IProductService
 {
     public async Task<Result<PaginationDto<ProductShortDto>>> GetForPageByCategoryIdAsync(Guid childCategoryId,
         int page, int pageSize, CancellationToken ct)
     {
-        var errorMessage = $"Products by category: {childCategoryId} not found";
+        //todo: добавить проверку на существование категории через доменный сервис(или событие) и кинуть нот фаунт если нету
         
         int totalCount = await productRepository.GetTotalCountByCategoryAsync(childCategoryId, ct);
 
         if (totalCount == 0)
         {
-            return Result<PaginationDto<ProductShortDto>>.Failure(
-                errorMessage,
-                HttpStatusCode.NotFound
-            );
+            PaginationDto<ProductShortDto> dto = new(1, 1, 0, new List<ProductShortDto>());
+            return Result<PaginationDto<ProductShortDto>>.Success(dto);
         }
         
         IReadOnlyCollection<ProductShortProjection> productsByCategory =
             await productRepository.GetAllByCategoryIdForPageAsync(childCategoryId, page, pageSize, ct);
-
-        if (productsByCategory.Count == 0)
-        {
-            return Result<PaginationDto<ProductShortDto>>.Failure(
-                errorMessage,
-                HttpStatusCode.NotFound
-            );
-        }
         
         var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
         
@@ -55,22 +51,12 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
 
         if (totalCount == 0)
         {
-            return Result<PaginationDto<ProductShortDto>>.Failure(
-                "Products with discount not found",    
-                HttpStatusCode.NotFound
-            );
+            PaginationDto<ProductShortDto> dto = new(1, 1, 0, new List<ProductShortDto>());
+            return Result<PaginationDto<ProductShortDto>>.Success(dto);
         }
         
         IReadOnlyCollection<ProductShortProjection> productsWithDiscount =
             await productRepository.GetForPageWithDiscountAsync(page, pageSize, ct);
-
-        if (productsWithDiscount.Count == 0)
-        {
-            return Result<PaginationDto<ProductShortDto>>.Failure(
-                "Products with discount not found",    
-                HttpStatusCode.NotFound
-            );
-        }
         
         var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
         
@@ -86,6 +72,8 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
     public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRecommendedForPageAsync(int pageSize,
         List<Guid> visitedCategoriesIds, CancellationToken ct)
     {
+        //todo: добавить проверку на существование категорий через доменный сервис(или событие) и кинуть нот фаунт если нету
+        
         List<ProductShortProjection> recommendedProducts = new(pageSize);
         
         int productsByCategorySize = pageSize / visitedCategoriesIds.Count;
@@ -116,6 +104,64 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
         return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
     }
 
+    public async Task<Result<CursorPaginationDto<ProductReviewDto>>> GetReviewsAsync(Guid productId, int pageSize,
+        Guid? lastId, CancellationToken ct)
+    {
+        if (!await productRepository.IsExistAsync(productId, ct))
+        {
+            return Result<CursorPaginationDto<ProductReviewDto>>.Failure(
+                $"Product with id: {productId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        IReadOnlyCollection<ProductReviewProjection> productReviews = lastId switch
+        {
+            null => await productRepository.GetProductReviewsAsync(productId, pageSize, ct),
+            _ => await productRepository.GetNextProductReviewsAsync(productId, pageSize, lastId.Value, ct)
+        };
+        
+        Guid? nextCursor = productReviews.Count > 0 ? productReviews.Last().Id : null;
+
+        List<ProductReviewDto> productReviewsDto = productReviews
+            .Select(productReview => productReview.ToDto())
+            .ToList();
+        
+        CursorPaginationDto<ProductReviewDto> cursorPaginationDto = new(productReviewsDto, nextCursor);
+        
+        return Result<CursorPaginationDto<ProductReviewDto>>.Success(cursorPaginationDto);
+    }
+
+    public async Task<VoidResult> AddReviewAsync(Guid productId, AddProductReview addProductReviewDto, CancellationToken ct)
+    {
+        Product? product = await productRepository.GetByIdAsync(productId, ct);
+
+        if (product is null)
+        {
+            return VoidResult.Failure(
+                $"Product with id: {productId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        VoidResult result = await eventBus.PublishAsync(new CheckCustomerExistsForAddingReview
+        {
+            CustomerId = addProductReviewDto.CustomerId
+        }, ct);
+
+        if (!result.IsSuccess)
+        {
+            return result;
+        }
+
+        product.AddReview(addProductReviewDto.Title, addProductReviewDto.Text,
+            addProductReviewDto.Rating, addProductReviewDto.CustomerId);
+        
+        await productRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
     public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRandomProductsAsync(int pageSize,
         CancellationToken ct)
     {
@@ -123,31 +169,23 @@ internal sealed class ProductService(IProductRepository productRepository) : IPr
 
         if (productCount == 0)
         {
-            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(
-                "Products list is empty",    
-                HttpStatusCode.NotFound
-            );
+            return Result<IReadOnlyCollection<ProductShortDto>>.Success([]);
         }
         
         var random = new Random();
         int randomSkip = random.Next(1, productCount);
 
-        List<ProductShortProjection> products = (await productRepository
-            .GetRandomAsync(randomSkip, pageSize, ct))
-            .ToList();
+        IReadOnlyCollection<ProductShortProjection> randomProducts = await productRepository.GetRandomAsync(randomSkip, pageSize, ct);
 
-        if (products.Count == 0)
+        if (randomProducts.Count == 0)
         {
-            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(
-                "Products not found",    
-                HttpStatusCode.NotFound
-            );
+            return Result<IReadOnlyCollection<ProductShortDto>>.Success([]);
         }
         
-        List<ProductShortDto> randomProducts = products
+        List<ProductShortDto> randomProductsDto = randomProducts
             .Select(product => product.ToShortDto())
             .ToList();
 
-        return Result<IReadOnlyCollection<ProductShortDto>>.Success(randomProducts);
+        return Result<IReadOnlyCollection<ProductShortDto>>.Success(randomProductsDto);
     }
 }

@@ -1,7 +1,9 @@
 using Catalog.Domain.ProductAggregate.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Npgsql.EntityFrameworkCore.PostgreSQL.ValueGeneration;
 using Shared.Domain.Entities;
+using Shared.Infrastructure.ValueGenerators;
 
 namespace Catalog.Infrastructure.Configurations.Product;
 
@@ -28,6 +30,10 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
 
     private void ConfigureBasicProperties(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
     {
+        builder.Property(p => p.Id)
+            .HasValueGenerator<GuidV7ValueGenerator>()
+            .ValueGeneratedOnAdd();
+        
         builder.Property(p => p.Title).IsRequired();
         builder.Property(p => p.Description).IsRequired();
         builder.Property(p => p.FinalPrice).IsRequired();

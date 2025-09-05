@@ -1,6 +1,7 @@
 using Catalog.Domain.ProductAggregate.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Infrastructure.ValueGenerators;
 
 namespace Catalog.Infrastructure.Configurations.Product;
 
@@ -17,10 +18,15 @@ internal sealed class ReviewEntityConfiguration : IEntityTypeConfiguration<Revie
 
     private void ConfigureBasicProperties(EntityTypeBuilder<Review> builder)
     {
+        builder.Property(p => p.Id)
+            .HasValueGenerator<GuidV7ValueGenerator>()
+            .ValueGeneratedOnAdd();
+        
         builder.Property(r => r.Title).IsRequired();
         builder.Property(r => r.Text).IsRequired();
         builder.Property(r => r.Rating).IsRequired();
         builder.Property(r => r.CreatedAt).IsRequired();
+        builder.Property(r => r.CustomerId).IsRequired();
     }
 
     private void ConfigureProductRelation(EntityTypeBuilder<Review> builder)

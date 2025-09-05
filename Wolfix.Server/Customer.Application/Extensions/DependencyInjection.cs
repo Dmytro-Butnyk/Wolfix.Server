@@ -1,6 +1,8 @@
+using Catalog.IntegrationEvents;
 using Customer.Application.EventHandlers;
 using Customer.Application.Interfaces;
 using Customer.Application.Services;
+using Customer.IntegrationEvents;
 using Identity.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.IntegrationEvents.Interfaces;
@@ -19,6 +21,9 @@ public static class DependencyInjection
     public static IServiceCollection AddCustomerEventHandlers(this IServiceCollection services)
     {
         services.AddScoped<IIntegrationEventHandler<CustomerAccountCreated>, CustomerAccountCreatedEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<ProductExistsForAddingToFavorite>, ProductExistsForAddingToFavoriteEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<ProductExistsForAddingToCart>, ProductExistsForAddingToCartEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<CheckCustomerExistsForAddingReview>, CheckCustomerExistsForAddingReviewEventHandler>();
 
         return services;
     }

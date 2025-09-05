@@ -327,12 +327,10 @@ public sealed class Product : BaseEntity
 
     #endregion
     
-    //todo: userId
-    //todo: private method for get by id with null check
     #region reviews
-    public VoidResult AddReview(string title, string text, uint rating)
+    public VoidResult AddReview(string title, string text, uint rating, Guid customerId)
     {
-        Result<Review> createReviewResult = Review.Create(title, text, rating, this);
+        Result<Review> createReviewResult = Review.Create(title, text, rating, this, customerId);
 
         return createReviewResult.Map(
             onSuccess: review =>

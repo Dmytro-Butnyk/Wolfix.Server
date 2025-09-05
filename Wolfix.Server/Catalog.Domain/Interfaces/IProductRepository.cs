@@ -1,6 +1,8 @@
 ﻿using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.Projections.Product;
+using Catalog.Domain.Projections.Product.Review;
 using Shared.Domain.Interfaces;
+using Shared.Domain.Models;
 
 namespace Catalog.Domain.Interfaces;
 
@@ -21,4 +23,7 @@ public interface IProductRepository
     Task<int> GetTotalCountByCategoryAsync(Guid categoryId, CancellationToken ct);
 
     Task<IReadOnlyCollection<ProductShortProjection>> GetRandomAsync(int randomSkip, int pageSize, CancellationToken ct);
+    
+    Task<IReadOnlyCollection<ProductReviewProjection>> GetProductReviewsAsync(Guid productId, int pageSize, CancellationToken ct);
+    Task<IReadOnlyCollection<ProductReviewProjection>> GetNextProductReviewsAsync(Guid productId, int pageSize, Guid lastId, CancellationToken ct);
 }

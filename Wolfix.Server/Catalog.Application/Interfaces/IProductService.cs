@@ -1,4 +1,5 @@
 using Catalog.Application.Dto.Product;
+using Catalog.Application.Dto.Product.Review;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
 
@@ -16,4 +17,9 @@ public interface IProductService
     
     Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRecommendedForPageAsync(int pageSize,
         List<Guid> visitedCategoriesIds, CancellationToken ct);
+    
+    Task<Result<CursorPaginationDto<ProductReviewDto>>> GetReviewsAsync(Guid productId, int pageSize, Guid? lastId,
+        CancellationToken ct);
+
+    Task<VoidResult> AddReviewAsync(Guid productId, AddProductReview addProductReviewDto, CancellationToken ct);
 }

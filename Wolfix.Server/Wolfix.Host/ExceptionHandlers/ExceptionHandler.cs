@@ -23,13 +23,11 @@ public sealed class ExceptionHandler(IProblemDetailsService problemDetailsServic
         
         httpContext.Response.StatusCode = statusCode;
 
-        bool isSuccess = await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
+        return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
         {
             HttpContext = httpContext,
             ProblemDetails = problemDetails,
-            Exception = exception,
+            Exception = exception
         });
-
-        return isSuccess;
     }
 }

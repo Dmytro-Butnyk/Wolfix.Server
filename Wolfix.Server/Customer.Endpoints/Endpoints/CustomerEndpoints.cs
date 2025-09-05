@@ -1,4 +1,6 @@
-using Customer.Application.Dto;
+using Customer.Application.Dto.CartItem;
+using Customer.Application.Dto.FavoriteItem;
+using Customer.Application.Dto.Product;
 using Customer.Application.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -17,9 +19,59 @@ internal static class CustomerEndpoints
     {
         var customerGroup = app.MapGroup(Route)
             .WithTags("Customer");
+        
+        var favoriteItemsGroup = customerGroup.MapGroup("favorites");
+        MapFavoriteItemsEndpoints(favoriteItemsGroup);
+        
+        var cartItemsGroup = customerGroup.MapGroup("cart-items");
+        MapCartItemsEndpoints(cartItemsGroup);
+    }
+    
+    private static void MapFavoriteItemsEndpoints(RouteGroupBuilder group)
+    {
+        group.MapGet("{customerId:guid}", GetFavoriteProducts);
+        group.MapPost("", AddProductToFavorite);
     }
 
-    private static async Task<Results<Ok, BadRequest<string>>> AddProductToFavorite(
+    private static void MapCartItemsEndpoints(RouteGroupBuilder group)
+    {
+        group.MapGet("{customerId:guid}", GetCartProducts);
+        group.MapPost("", AddProductToCart);
+    }
+    
+    private static async Task<Results<Ok<IReadOnlyCollection<FavoriteItemDto>>, NotFound<string>>> GetFavoriteProducts(
+        [FromRoute] Guid customerId,
+        [FromServices] ICustomerService customerService,
+        CancellationToken ct)
+    {
+        Result<IReadOnlyCollection<FavoriteItemDto>> getFavoriteItemsResult =
+            await customerService.GetFavoriteItemsAsync(customerId, ct);
+        
+        if (!getFavoriteItemsResult.IsSuccess)
+        {
+            return TypedResults.NotFound(getFavoriteItemsResult.ErrorMessage);
+        }
+        
+        return TypedResults.Ok(getFavoriteItemsResult.Value);
+    }
+
+    private static async Task<Results<Ok<CustomerCartItemsDto>, NotFound<string>>> GetCartProducts(
+        [FromRoute] Guid customerId,
+        [FromServices] ICustomerService customerService,
+        CancellationToken ct)
+    {
+        Result<CustomerCartItemsDto> getCartItemsResult =
+            await customerService.GetCartItemsAsync(customerId, ct);
+        
+        if (!getCartItemsResult.IsSuccess)
+        {
+            return TypedResults.NotFound(getCartItemsResult.ErrorMessage);
+        }
+        
+        return TypedResults.Ok(getCartItemsResult.Value);
+    }
+    
+    private static async Task<Results<NoContent, NotFound<string>>> AddProductToFavorite(
         [FromBody] AddProductToFavoriteDto request,
         [FromServices] ICustomerService customerService,
         CancellationToken ct)
@@ -28,9 +80,24 @@ internal static class CustomerEndpoints
 
         if (!addProductToFavoriteResult.IsSuccess)
         {
-            
+            return TypedResults.NotFound(addProductToFavoriteResult.ErrorMessage);
         }
 
-        return TypedResults.Ok();
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, NotFound<string>>> AddProductToCart(
+        [FromBody] AddProductToCartDto request,
+        [FromServices] ICustomerService customerService,
+        CancellationToken ct)
+    {
+        VoidResult addProductToCartResult = await customerService.AddProductToCartAsync(request, ct);
+
+        if (!addProductToCartResult.IsSuccess)
+        {
+            return TypedResults.NotFound(addProductToCartResult.ErrorMessage);
+        }
+        
+        return TypedResults.NoContent();
     }
 }

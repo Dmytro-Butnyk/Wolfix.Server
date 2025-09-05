@@ -2,6 +2,7 @@ using Customer.Domain.CustomerAggregate.Entities;
 using Customer.Domain.CustomerAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Infrastructure.ValueGenerators;
 
 namespace Customer.Infrastructure.Configurations;
 
@@ -21,6 +22,10 @@ internal sealed class CustomerEntityConfiguration : IEntityTypeConfiguration<Dom
     private void ConfigureBasicProperties(EntityTypeBuilder<Domain.CustomerAggregate.Customer> builder)
     {
         const string nullMarker = "_____NULL_____";
+        
+        builder.Property(p => p.Id)
+            .HasValueGenerator<GuidV7ValueGenerator>()
+            .ValueGeneratedOnAdd();
         
         builder.Property(c => c.PhotoUrl)
             .IsRequired(false);
@@ -63,6 +68,8 @@ internal sealed class CustomerEntityConfiguration : IEntityTypeConfiguration<Dom
         builder.Ignore(c => c.FavoriteItems);
 
         builder.Ignore(c => c.CartItems);
+
+        builder.Ignore(c => c.TotalCartPriceWithoutBonuses);
     }
     
     private void ConfigureFavoriteItemsRelation(EntityTypeBuilder<Domain.CustomerAggregate.Customer> builder)

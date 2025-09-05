@@ -1,6 +1,7 @@
 using Catalog.Domain.CategoryAggregate.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Infrastructure.ValueGenerators;
 
 namespace Catalog.Infrastructure.Configurations.Category;
 
@@ -17,6 +18,10 @@ internal sealed class ProductVariantEntityConfiguration : IEntityTypeConfigurati
 
     private void ConfigureBasicProperties(EntityTypeBuilder<ProductVariant> builder)
     {
+        builder.Property(p => p.Id)
+            .HasValueGenerator<GuidV7ValueGenerator>()
+            .ValueGeneratedOnAdd();
+        
         builder.Property(pv => pv.Key).IsRequired();
     }
     
