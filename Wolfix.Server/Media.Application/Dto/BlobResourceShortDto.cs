@@ -1,7 +1,10 @@
-﻿namespace Media.Application.Dto;
+﻿using Shared.Domain.Enums;
+
+namespace Media.Application.Dto;
 
 public sealed record BlobResourceShortDto
 {
-    public string ContentType { get; init; }
+    public Guid Id { get; init; }
+    public BlobResourceType ContentType { get; init; }
     public string Url { get; init; }
 }

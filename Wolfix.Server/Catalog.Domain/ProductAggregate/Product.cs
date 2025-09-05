@@ -172,10 +172,6 @@ public sealed class Product : BaseEntity
     }
     #endregion
     
-    #region photo
-    
-    #endregion
-
     #region categoryId
     public VoidResult ChangeCategory(Guid categoryId)
     {

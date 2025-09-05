@@ -40,10 +40,8 @@ public sealed class ProductMediaAddedEventHandler(
         }
         
         IReadOnlyCollection<BlobResourceAddedDto> blobResources = blobList
-            .Select(b => new BlobResourceAddedDto(b.ContentType, b.Url))
+            .Select(b => new BlobResourceAddedDto(b.Id, b.ContentType, b.Url))
             .ToList();
-        
-        //todo publish event MediaProcessed with blobList and productId
         
         VoidResult publishResult = await eventBus
             .PublishAsync(new BlobResourcesForProductAdded(@event.ProductId, blobResources), ct); 

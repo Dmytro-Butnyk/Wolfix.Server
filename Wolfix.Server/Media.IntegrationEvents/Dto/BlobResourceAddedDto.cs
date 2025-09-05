@@ -1,5 +1,8 @@
-﻿namespace Media.IntegrationEvents.Dto;
+﻿using Shared.Domain.Enums;
+
+namespace Media.IntegrationEvents.Dto;
 
 public record BlobResourceAddedDto(
-    string ContentType,
+    Guid Id,
+    BlobResourceType ContentType,
     string Url);

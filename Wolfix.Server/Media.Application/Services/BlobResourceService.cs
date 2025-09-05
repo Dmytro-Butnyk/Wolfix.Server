@@ -39,7 +39,8 @@ public sealed class BlobResourceService(
         
         BlobResourceShortDto blobResourceShortDto = new()
         {
-            ContentType = blobResource.Value.Type.ToString(),
+            Id = blobResource.Value.Id,
+            ContentType = blobResource.Value.Type,
             Url = blobResource.Value.Url
         };
         
