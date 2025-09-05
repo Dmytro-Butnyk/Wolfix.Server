@@ -1,5 +1,3 @@
-using System.Net;
-using Customer.Application.Dto;
 using Customer.Application.Dto.CartItem;
 using Customer.Application.Dto.FavoriteItem;
 using Customer.Application.Dto.Product;
@@ -41,7 +39,6 @@ internal static class CustomerEndpoints
         group.MapPost("", AddProductToCart);
     }
     
-    //todo: подумать надо ли тут пагинация
     private static async Task<Results<Ok<IReadOnlyCollection<FavoriteItemDto>>, NotFound<string>>> GetFavoriteProducts(
         [FromRoute] Guid customerId,
         [FromServices] ICustomerService customerService,
@@ -58,7 +55,6 @@ internal static class CustomerEndpoints
         return TypedResults.Ok(getFavoriteItemsResult.Value);
     }
 
-    //todo: подумать надо ли тут пагинация
     private static async Task<Results<Ok<CustomerCartItemsDto>, NotFound<string>>> GetCartProducts(
         [FromRoute] Guid customerId,
         [FromServices] ICustomerService customerService,
