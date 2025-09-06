@@ -12,6 +12,7 @@ internal sealed class ProductMedia : BaseEntity
     public Guid MediaId { get; private set; }
     public BlobResourceType MediaType { get; private set; }
     public string MediaUrl { get; private set; }
+    public bool IsMain { get; private set; }
     
     private ProductMedia() { }
 
@@ -19,26 +20,30 @@ internal sealed class ProductMedia : BaseEntity
         Product product,
         Guid mediaId,
         BlobResourceType mediaType,
-        string mediaUrl)
+        string mediaUrl,
+        bool isMain)
     {
         ProductId = product.Id;
         Product = product;
         MediaId = mediaId;
         MediaType = mediaType;
         MediaUrl = mediaUrl;
+        IsMain = isMain;
     }
 
     internal static Result<ProductMedia> Create(
         Product product,
         Guid mediaId,
         BlobResourceType mediaType,
-        string mediaUrl)
+        string mediaUrl,
+        bool isMain)
     {
         ProductMedia productMedia = new ProductMedia(
             product,
             mediaId,
             mediaType,
-            mediaUrl);
+            mediaUrl,
+            isMain);
         
         return Result<ProductMedia>.Success(productMedia, HttpStatusCode.Created);
     }
@@ -49,7 +54,8 @@ internal sealed class ProductMedia : BaseEntity
             productMedia.Id,
             productMedia.MediaId,
             productMedia.MediaType,
-            productMedia.MediaUrl);
+            productMedia.MediaUrl,
+            productMedia.IsMain);
     }
 }
 
@@ -57,4 +63,5 @@ public record ProductMediaInfo(
     Guid Id,
     Guid MediaId,
     BlobResourceType MediaType,
-    string MediaUrl);
+    string MediaUrl,
+    bool IsMain);

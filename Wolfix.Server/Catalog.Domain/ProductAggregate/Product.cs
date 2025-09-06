@@ -267,7 +267,7 @@ public sealed class Product : BaseEntity
     public VoidResult AddProductMedia(
         Guid mediaId,
         BlobResourceType mediaType,
-        string mediaUrl)
+        string mediaUrl, bool isMain)
     {
         if (IsGuidInvalid(mediaId, out string mediaIdErrorMessage))
         {
@@ -279,7 +279,7 @@ public sealed class Product : BaseEntity
             return VoidResult.Failure($"{nameof(mediaUrl)} is required");
         }
         
-        Result<ProductMedia> createProductMediaResult = ProductMedia.Create(this, mediaId, mediaType, mediaUrl);
+        Result<ProductMedia> createProductMediaResult = ProductMedia.Create(this, mediaId, mediaType, mediaUrl, isMain);
 
         return createProductMediaResult.Map(
             onSuccess: productMedia =>

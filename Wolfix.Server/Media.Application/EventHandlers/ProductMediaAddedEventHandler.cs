@@ -17,7 +17,7 @@ public sealed class ProductMediaAddedEventHandler(
 {
     public async Task<VoidResult> HandleAsync(ProductMediaAdded @event, CancellationToken ct)
     {
-        List<BlobResourceShortDto> blobList = new(@event.Medias.Count);
+        List<BlobResourceAddedDto> blobResources = new(@event.Medias.Count);
 
         bool isAllSuccess = true;
         foreach (var mediaEventDto in @event.Medias)
@@ -31,17 +31,13 @@ public sealed class ProductMediaAddedEventHandler(
                 continue;
             }
             
-            blobList.Add(result.Value!);
+            blobResources.Add(new BlobResourceAddedDto(result.Value.Id, result.Value.ContentType, result.Value.Url, mediaEventDto.IsMain));
         }
 
         if (!isAllSuccess)
         {
             return VoidResult.Failure("One or more media files could not be processed");
         }
-        
-        IReadOnlyCollection<BlobResourceAddedDto> blobResources = blobList
-            .Select(b => new BlobResourceAddedDto(b.Id, b.ContentType, b.Url))
-            .ToList();
         
         VoidResult publishResult = await eventBus
             .PublishAsync(new BlobResourcesForProductAdded(@event.ProductId, blobResources), ct); 

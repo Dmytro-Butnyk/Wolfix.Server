@@ -23,7 +23,7 @@ public sealed class BlobResourcesForProductAddedEventHandler(
         
         foreach (var blobResource in @event.BlobResources)
         {
-            VoidResult result = product.AddProductMedia(blobResource.Id, blobResource.ContentType, blobResource.Url);
+            VoidResult result = product.AddProductMedia(blobResource.Id, blobResource.ContentType, blobResource.Url, blobResource.IsMain);
             
             if (!result.IsSuccess)
             {
