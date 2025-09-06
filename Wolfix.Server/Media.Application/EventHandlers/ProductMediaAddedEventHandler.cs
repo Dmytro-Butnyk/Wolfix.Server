@@ -17,36 +17,25 @@ public sealed class ProductMediaAddedEventHandler(
 {
     public async Task<VoidResult> HandleAsync(ProductMediaAdded @event, CancellationToken ct)
     {
-        List<BlobResourceAddedDto> blobResources = new(@event.Medias.Count);
+        Result<BlobResourceShortDto> result = await blobResourceService
+            .AddBlobResourceAsync(@event.Media.ContentType, @event.Media.Filestream, ct);
 
-        bool isAllSuccess = true;
-        foreach (var mediaEventDto in @event.Medias)
+        if (!result.IsSuccess)
         {
-            Result<BlobResourceShortDto> result = await blobResourceService
-                    .AddBlobResourceAsync(mediaEventDto.ContentType, mediaEventDto.Filestream, ct);
-
-            if (!result.IsSuccess)
-            {
-                isAllSuccess = false;
-                continue;
-            }
-            
-            blobResources.Add(new BlobResourceAddedDto(result.Value.Id, result.Value.ContentType, result.Value.Url, mediaEventDto.IsMain));
+            return VoidResult.Failure("Media file could not be processed");
         }
 
-        if (!isAllSuccess)
-        {
-            return VoidResult.Failure("One or more media files could not be processed");
-        }
-        
+        BlobResourceAddedDto blobResourceAddedDto =
+            new(result.Value.Id, result.Value.ContentType, result.Value.Url, @event.Media.IsMain);
+
         VoidResult publishResult = await eventBus
-            .PublishAsync(new BlobResourcesForProductAdded(@event.ProductId, blobResources), ct); 
-        
+            .PublishAsync(new BlobResourcesForProductAdded(@event.ProductId, blobResourceAddedDto), ct);
+
         if (!publishResult.IsSuccess)
         {
             return VoidResult.Failure(publishResult.ErrorMessage!, publishResult.StatusCode);
         }
-        
+
         return VoidResult.Success();
     }
 }
