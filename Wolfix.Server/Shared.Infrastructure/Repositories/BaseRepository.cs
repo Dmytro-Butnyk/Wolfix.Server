@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using Shared.Domain.Entities;
 using Shared.Domain.Interfaces;
 
@@ -62,6 +63,22 @@ public class BaseRepository<TContext, TEntity>(TContext context)
             .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
         
         return entity;
+    }
+
+    public async Task ExecuteDeleteAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        await _dbSet.ExecuteDeleteAsync(cancellationToken);
+    }
+    
+    public async Task ExecuteDeleteAsync(Expression<Func<TEntity,bool>> condition, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        await _dbSet
+            .Where(condition)
+            .ExecuteDeleteAsync(cancellationToken);
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
