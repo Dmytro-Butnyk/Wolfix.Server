@@ -9,6 +9,7 @@ namespace Identity.Infrastructure.Stores;
 
 //todo: разделить методы по логике
 internal sealed class AuthStore(
+    IdentityContext context,
     UserManager<Account> userManager,
     RoleManager<Role> roleManager) : IAuthStore
 {
@@ -80,19 +81,26 @@ internal sealed class AuthStore(
             UserName = email
         };
 
+        //todo: разобраться с транзакцией
+        await using var transaction = await context.Database.BeginTransactionAsync();
+
         IdentityResult createResult = await userManager.CreateAsync(user, password);
         
         if (!createResult.Succeeded)
         {
+            await transaction.RollbackAsync();
             return Result<Guid>.Failure("Failed to create user", HttpStatusCode.InternalServerError);
         }
         
-        IdentityResult addRoleResult = await userManager.AddToRoleAsync(user, "User");
+        IdentityResult addRoleResult = await userManager.AddToRoleAsync(user, Roles.Customer);
 
         if (!addRoleResult.Succeeded)
         {
+            await transaction.RollbackAsync();
             return Result<Guid>.Failure("Failed to add a role to user", HttpStatusCode.InternalServerError);
         }
+        
+        await transaction.CommitAsync();
         
         return Result<Guid>.Success(user.Id);
     }

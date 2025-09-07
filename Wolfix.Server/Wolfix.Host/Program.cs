@@ -59,4 +59,6 @@ app.MapAllEndpoints();
 
 app.UseCors("AllowNextClient");
 
+await app.EnsureAllRolesExist();
+
 app.Run();
