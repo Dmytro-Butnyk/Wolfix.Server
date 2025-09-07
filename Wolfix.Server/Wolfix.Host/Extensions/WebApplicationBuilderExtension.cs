@@ -95,10 +95,21 @@ public static class WebApplicationBuilderExtension
     //     
     // }
     //
-    // public static WebApplicationBuilder AddCors(this WebApplicationBuilder builder)
-    // {
-    //     
-    // }
+    public static WebApplicationBuilder AddCors(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowNextClient", policy =>
+            {
+                policy.WithOrigins("http://localhost:3000")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
+        });
+
+        return builder;
+    }
     //
     // public static WebApplicationBuilder AddJwtBearer(this WebApplicationBuilder builder)
     // {

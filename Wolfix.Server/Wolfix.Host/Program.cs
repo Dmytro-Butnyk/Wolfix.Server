@@ -57,4 +57,6 @@ app.UseResponseCompression();
 
 app.MapAllEndpoints();
 
+app.UseCors("AllowNextClient");
+
 app.Run();
