@@ -130,6 +130,7 @@ internal sealed class ProductRepository(CatalogContext context)
 
         List<ProductShortProjection> products = await _products
             .Include(p => p.Discount)
+            .Include("_productMedias")
             .AsNoTracking()
             .OrderBy(p => p.Id)
             .Skip(randomSkip)
