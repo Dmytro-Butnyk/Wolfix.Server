@@ -24,7 +24,8 @@ builder
     .AddAppCache()
     .AddEventBus()
     .AddResponseCompression()
-    .AddAllModules();
+    .AddAllModules()
+    .AddCors();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ExceptionHandler>();
