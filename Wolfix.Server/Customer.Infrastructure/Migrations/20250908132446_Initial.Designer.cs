@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Customer.Infrastructure.Migrations
 {
     [DbContext(typeof(CustomerContext))]
-    [Migration("20250816153644_Initial")]
+    [Migration("20250908132446_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -32,23 +32,27 @@ namespace Customer.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("BirthDate")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<decimal>("BonusesAmount")
-                        .HasColumnType("numeric");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("numeric")
+                        .HasDefaultValue(0m);
 
                     b.Property<string>("FullName")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhotoUrl")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -69,7 +73,7 @@ namespace Customer.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal>("PriceWithDiscount")
                         .HasColumnType("numeric");
 
                     b.Property<string>("Title")

@@ -15,16 +15,16 @@ public sealed class MediaContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         
+        modelBuilder.HasDefaultSchema("media");
         ApplyConfigurations(modelBuilder);
         
-        modelBuilder.HasDefaultSchema("media");
     }
     
     // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     // {
     //     if (optionsBuilder.IsConfigured) return;
     //     
-    //     var connectionString = "";
+    //
     //     optionsBuilder.UseNpgsql(connectionString);
     // }
     

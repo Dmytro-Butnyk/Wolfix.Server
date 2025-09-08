@@ -24,4 +24,8 @@
       <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="Migrations\SellerContextModelSnapshot.cs" />
+    </ItemGroup>
+
 </Project>

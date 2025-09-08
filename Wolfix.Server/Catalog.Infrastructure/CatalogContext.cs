@@ -21,9 +21,9 @@ internal sealed class CatalogContext : DbContext, IContextWithConfigurations
     {
         base.OnModelCreating(modelBuilder);
         
+        modelBuilder.HasDefaultSchema("catalog");
         ApplyConfigurations(modelBuilder);
         
-        modelBuilder.HasDefaultSchema("catalog");
     }
     
     public void ApplyConfigurations(ModelBuilder modelBuilder)
@@ -46,7 +46,6 @@ internal sealed class CatalogContext : DbContext, IContextWithConfigurations
     // {
     //     if (optionsBuilder.IsConfigured) return;
     //     
-    //     var connectionString = "";
     //     optionsBuilder.UseNpgsql(connectionString);
     // }
     

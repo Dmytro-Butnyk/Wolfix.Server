@@ -16,7 +16,7 @@ public sealed class IdentityContext : IdentityDbContext<Account, Role, Guid>
     // {
     //     if (optionsBuilder.IsConfigured) return;
     //     
-    //     var connectionString = "connection_string";
+    //     
     //     optionsBuilder.UseNpgsql(connectionString);
     // }
 

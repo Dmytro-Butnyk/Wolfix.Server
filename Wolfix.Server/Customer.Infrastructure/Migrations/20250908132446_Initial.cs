@@ -20,11 +20,13 @@ namespace Customer.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    FullName = table.Column<string>(type: "text", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: false),
-                    Address = table.Column<string>(type: "text", nullable: false),
-                    BirthDate = table.Column<string>(type: "text", nullable: false),
-                    BonusesAmount = table.Column<decimal>(type: "numeric", nullable: false)
+                    PhotoUrl = table.Column<string>(type: "text", nullable: true),
+                    FullName = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    Address = table.Column<string>(type: "text", nullable: true),
+                    BirthDate = table.Column<string>(type: "text", nullable: true),
+                    BonusesAmount = table.Column<decimal>(type: "numeric", nullable: false, defaultValue: 0m),
+                    AccountId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -39,7 +41,7 @@ namespace Customer.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     PhotoUrl = table.Column<string>(type: "text", nullable: false),
                     Title = table.Column<string>(type: "text", nullable: false),
-                    Price = table.Column<decimal>(type: "numeric", nullable: false),
+                    PriceWithDiscount = table.Column<decimal>(type: "numeric", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>

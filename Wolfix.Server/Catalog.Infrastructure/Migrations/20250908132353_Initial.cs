@@ -160,7 +160,8 @@ namespace Catalog.Infrastructure.Migrations
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
                     MediaId = table.Column<Guid>(type: "uuid", nullable: false),
                     MediaType = table.Column<string>(type: "text", nullable: false),
-                    MediaUrl = table.Column<string>(type: "text", nullable: false)
+                    MediaUrl = table.Column<string>(type: "text", nullable: false),
+                    IsMain = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -206,7 +207,8 @@ namespace Catalog.Infrastructure.Migrations
                     Text = table.Column<string>(type: "text", nullable: false),
                     Rating = table.Column<long>(type: "bigint", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false)
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {

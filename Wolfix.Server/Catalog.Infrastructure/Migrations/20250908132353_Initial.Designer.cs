@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Catalog.Infrastructure.Migrations
 {
     [DbContext(typeof(CatalogContext))]
-    [Migration("20250820135309_Remove")]
-    partial class Remove
+    [Migration("20250908132353_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -143,6 +143,36 @@ namespace Catalog.Infrastructure.Migrations
                     b.ToTable("ProductAttributeValues", "catalog");
                 });
 
+            modelBuilder.Entity("Catalog.Domain.ProductAggregate.Entities.ProductMedia", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("MediaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("MediaType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("MediaUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductMedias", "catalog");
+                });
+
             modelBuilder.Entity("Catalog.Domain.ProductAggregate.Entities.ProductVariantValue", b =>
                 {
                     b.Property<Guid>("Id")
@@ -175,6 +205,9 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
@@ -289,6 +322,17 @@ namespace Catalog.Infrastructure.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("Catalog.Domain.ProductAggregate.Entities.ProductMedia", b =>
+                {
+                    b.HasOne("Catalog.Domain.ProductAggregate.Product", "Product")
+                        .WithMany("_productMedias")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Catalog.Domain.ProductAggregate.Entities.ProductVariantValue", b =>
                 {
                     b.HasOne("Catalog.Domain.ProductAggregate.Product", "Product")
@@ -330,6 +374,8 @@ namespace Catalog.Infrastructure.Migrations
             modelBuilder.Entity("Catalog.Domain.ProductAggregate.Product", b =>
                 {
                     b.Navigation("Discount");
+
+                    b.Navigation("_productMedias");
 
                     b.Navigation("_productVariantValues");
 

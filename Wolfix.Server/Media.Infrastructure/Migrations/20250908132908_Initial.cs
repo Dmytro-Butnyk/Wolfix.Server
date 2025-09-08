@@ -11,8 +11,12 @@ namespace Media.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "media");
+
             migrationBuilder.CreateTable(
                 name: "BlobResources",
+                schema: "media",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -30,7 +34,8 @@ namespace Media.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BlobResources");
+                name: "BlobResources",
+                schema: "media");
         }
     }
 }

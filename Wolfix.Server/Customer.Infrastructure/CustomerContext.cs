@@ -16,9 +16,9 @@ public sealed class CustomerContext : DbContext, IContextWithConfigurations
     {
         base.OnModelCreating(modelBuilder);
         
+        modelBuilder.HasDefaultSchema("customer");
         ApplyConfigurations(modelBuilder);
         
-        modelBuilder.HasDefaultSchema("customer");
     }
 
     public void ApplyConfigurations(ModelBuilder modelBuilder)
@@ -32,7 +32,7 @@ public sealed class CustomerContext : DbContext, IContextWithConfigurations
     // {
     //     if (optionsBuilder.IsConfigured) return;
     //     
-    //     var connectionString = "connection_string";
+    //     
     //     optionsBuilder.UseNpgsql(connectionString);
     // }
     

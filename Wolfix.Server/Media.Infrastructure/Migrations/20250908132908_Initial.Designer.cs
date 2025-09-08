@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Media.Infrastructure.Migrations
 {
     [DbContext(typeof(MediaContext))]
-    [Migration("20250820145535_schema")]
-    partial class schema
+    [Migration("20250908132908_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

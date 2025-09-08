@@ -16,9 +16,9 @@ public sealed class SellerContext : DbContext, IContextWithConfigurations
     {
         base.OnModelCreating(modelBuilder);
         
+        modelBuilder.HasDefaultSchema("seller");
         ApplyConfigurations(modelBuilder);
         
-        modelBuilder.HasDefaultSchema("seller");
     }
 
     public void ApplyConfigurations(ModelBuilder modelBuilder)
@@ -31,7 +31,7 @@ public sealed class SellerContext : DbContext, IContextWithConfigurations
     // {
     //     if (optionsBuilder.IsConfigured) return;
     //     
-    //     var connectionString = "connection_string";
+    //     
     //     optionsBuilder.UseNpgsql(connectionString);
     // }
     
