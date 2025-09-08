@@ -5,5 +5,5 @@ namespace Media.IntegrationEvents;
 
 public record BlobResourcesForProductAdded(
     Guid ProductId,
-    IReadOnlyCollection<BlobResourceAddedDto> BlobResources
+    BlobResourceAddedDto BlobResource
 ) : IIntegrationEvent;

@@ -8,36 +8,27 @@ namespace Catalog.Application.EventHandlers;
 
 public sealed class BlobResourcesForProductAddedEventHandler(
     IProductRepository productRepository
-    ) : IIntegrationEventHandler<BlobResourcesForProductAdded>
+) : IIntegrationEventHandler<BlobResourcesForProductAdded>
 {
     public async Task<VoidResult> HandleAsync(BlobResourcesForProductAdded @event, CancellationToken ct)
     {
         Product? product = await productRepository.GetByIdAsync(@event.ProductId, ct);
-        
+
         if (product is null)
         {
             return VoidResult.Failure("Product not found");
         }
-        
-        bool isAllSuccess = true;
-        
-        foreach (var blobResource in @event.BlobResources)
+
+        VoidResult result = product.AddProductMedia(@event.BlobResource.Id, @event.BlobResource.ContentType, @event.BlobResource.Url,
+            @event.BlobResource.IsMain);
+
+        if (!result.IsSuccess)
         {
-            VoidResult result = product.AddProductMedia(blobResource.Id, blobResource.ContentType, blobResource.Url);
-            
-            if (!result.IsSuccess)
-            {
-                isAllSuccess = false;
-            }
+            return VoidResult.Failure("Media file could not be added to the product");
         }
-        
+
         await productRepository.SaveChangesAsync(ct);
-        
-        if (!isAllSuccess)
-        {
-            return VoidResult.Failure("One or more media files could not be added to the product");
-        }
-        
+
         return VoidResult.Success();
     }
 }

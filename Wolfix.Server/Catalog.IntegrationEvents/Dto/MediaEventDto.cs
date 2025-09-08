@@ -2,4 +2,5 @@
 
 public sealed record MediaEventDto(
     string ContentType,
-    Stream Filestream);
+    Stream Filestream,
+    bool IsMain);

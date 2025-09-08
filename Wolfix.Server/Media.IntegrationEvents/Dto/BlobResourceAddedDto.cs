@@ -5,4 +5,5 @@ namespace Media.IntegrationEvents.Dto;
 public record BlobResourceAddedDto(
     Guid Id,
     BlobResourceType ContentType,
-    string Url);
+    string Url,
+    bool IsMain);
