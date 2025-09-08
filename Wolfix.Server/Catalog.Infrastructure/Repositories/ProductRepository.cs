@@ -49,7 +49,7 @@ internal sealed class ProductRepository(CatalogContext context)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(product => new ProductShortProjection(product.Id, product.Title, product.AverageRating,
-                product.Price, product.FinalPrice, product.Bonuses))
+                product.Price, product.FinalPrice, product.Bonuses, product.MainPhotoUrl))
             .ToListAsync(ct);
 
         return productsByCategory;
@@ -68,7 +68,7 @@ internal sealed class ProductRepository(CatalogContext context)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(product => new ProductShortProjection(product.Id, product.Title, product.AverageRating,
-                product.Price, product.FinalPrice, product.Bonuses))
+                product.Price, product.FinalPrice, product.Bonuses, product.MainPhotoUrl))
             .ToListAsync(ct);
 
         return productsWithDiscount;
@@ -86,7 +86,7 @@ internal sealed class ProductRepository(CatalogContext context)
             .OrderBy(_ => EF.Functions.Random())
             .Take(productsByCategorySize)
             .Select(product => new ProductShortProjection(product.Id, product.Title, product.AverageRating,
-                product.Price, product.FinalPrice, product.Bonuses))
+                product.Price, product.FinalPrice, product.Bonuses, product.MainPhotoUrl))
             .ToListAsync(ct);
     }
 
@@ -135,7 +135,7 @@ internal sealed class ProductRepository(CatalogContext context)
             .Skip(randomSkip)
             .Take(takeFromEnd)
             .Select(p => new ProductShortProjection(p.Id, p.Title, p.AverageRating, p.Price,
-                    p.FinalPrice, p.Bonuses))
+                    p.FinalPrice, p.Bonuses, p.MainPhotoUrl))
             .ToListAsync(ct);
 
         if (takeFromEnd < pageSize)
@@ -147,7 +147,7 @@ internal sealed class ProductRepository(CatalogContext context)
                 .OrderBy(p => p.Id)
                 .Take(takeFromStart)
                 .Select(p => new ProductShortProjection(p.Id, p.Title, p.AverageRating,
-                    p.Price, p.FinalPrice, p.Bonuses))
+                    p.Price, p.FinalPrice, p.Bonuses, p.MainPhotoUrl))
                 .ToListAsync(ct);
 
             products.AddRange(productsFromStart);

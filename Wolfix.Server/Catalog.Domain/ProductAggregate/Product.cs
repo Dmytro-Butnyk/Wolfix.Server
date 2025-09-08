@@ -20,7 +20,7 @@ public sealed class Product : BaseEntity
     internal Discount? Discount { get; set; }
     
     public decimal FinalPrice { get; private set; }
-    
+    public string? MainPhotoUrl => _productMedias.FirstOrDefault(pm => pm.IsMain)?.MediaUrl;
     
     private void RecalculateFinalPrice()
     {
@@ -249,7 +249,7 @@ public sealed class Product : BaseEntity
     #endregion
 
     #region productMedia
-    public Result<ProductMediaInfo> GetProductMedia(Guid productMediaId)
+    public Result<ProductMediaInfo> GetMedia(Guid productMediaId)
     {
         ProductMedia? productMedia = _productMedias
             .FirstOrDefault(p => p.Id == productMediaId);
@@ -260,6 +260,19 @@ public sealed class Product : BaseEntity
         }
         
         return Result<ProductMediaInfo>.Success((ProductMediaInfo)productMedia);
+    }
+    
+    public Result<string> GetMainPhoto()
+    {
+        ProductMedia? productMedia = _productMedias
+            .FirstOrDefault(p => p.IsMain);
+
+        if (productMedia == null)
+        {
+            return Result<string>.Failure($"Main photo is not set.");
+        }
+        
+        return Result<string>.Success(productMedia.MediaUrl);
     }
     #endregion
     

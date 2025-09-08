@@ -46,6 +46,7 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
         builder.Ignore(r => r.ProductsAttributeValues);
         builder.Ignore(r => r.ProductVariantValues);
         builder.Ignore(r => r.ProductMedias);
+        builder.Ignore(r => r.MainPhotoUrl);
     }
     
     private void ConfigureDiscountRelation(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
