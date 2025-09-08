@@ -23,7 +23,6 @@ internal sealed class CatalogContext : DbContext, IContextWithConfigurations
         
         modelBuilder.HasDefaultSchema("catalog");
         ApplyConfigurations(modelBuilder);
-        
     }
     
     public void ApplyConfigurations(ModelBuilder modelBuilder)
