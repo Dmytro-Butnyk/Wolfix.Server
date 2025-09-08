@@ -39,6 +39,8 @@ internal static class CustomerEndpoints
         group.MapPost("", AddProductToCart);
     }
     
+    //todo: эндпоинт для того чтобы отзыв оставить
+    
     private static async Task<Results<Ok<IReadOnlyCollection<FavoriteItemDto>>, NotFound<string>>> GetFavoriteProducts(
         [FromRoute] Guid customerId,
         [FromServices] ICustomerService customerService,

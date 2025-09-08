@@ -1,7 +1,7 @@
 using Customer.Domain.CustomerAggregate.Entities;
-using Customer.Domain.CustomerAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Domain.ValueObjects;
 using Shared.Infrastructure.ValueGenerators;
 
 namespace Customer.Infrastructure.Configurations;
@@ -23,7 +23,7 @@ internal sealed class CustomerEntityConfiguration : IEntityTypeConfiguration<Dom
     {
         const string nullMarker = "_____NULL_____";
         
-        builder.Property(p => p.Id)
+        builder.Property(c => c.Id)
             .HasValueGenerator<GuidV7ValueGenerator>()
             .ValueGeneratedOnAdd();
         

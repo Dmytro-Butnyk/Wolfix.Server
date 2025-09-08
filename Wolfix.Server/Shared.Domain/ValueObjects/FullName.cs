@@ -1,8 +1,8 @@
 using Shared.Domain.Models;
 
-namespace Customer.Domain.CustomerAggregate.ValueObjects;
+namespace Shared.Domain.ValueObjects;
 
-internal sealed class FullName
+public sealed class FullName
 {
     public string FirstName { get; private set; }
     

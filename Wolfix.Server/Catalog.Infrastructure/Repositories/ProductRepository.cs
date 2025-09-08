@@ -122,8 +122,7 @@ internal sealed class ProductRepository(CatalogContext context)
 
         int totalCount = await _products.CountAsync(ct);
 
-        if (totalCount == 0)
-            return new List<ProductShortProjection>();
+        if (totalCount == 0) return [];
 
         randomSkip %= totalCount;
 
@@ -135,8 +134,8 @@ internal sealed class ProductRepository(CatalogContext context)
             .OrderBy(p => p.Id)
             .Skip(randomSkip)
             .Take(takeFromEnd)
-            .Select(p => 
-                new ProductShortProjection(p.Id, p.Title, p.AverageRating, p.Price, p.FinalPrice, p.Bonuses))
+            .Select(p => new ProductShortProjection(p.Id, p.Title, p.AverageRating, p.Price,
+                    p.FinalPrice, p.Bonuses))
             .ToListAsync(ct);
 
         if (takeFromEnd < pageSize)

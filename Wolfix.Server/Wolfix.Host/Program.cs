@@ -24,7 +24,8 @@ builder
     .AddAppCache()
     .AddEventBus()
     .AddResponseCompression()
-    .AddAllModules();
+    .AddAllModules()
+    .AddCors();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ExceptionHandler>();
@@ -56,5 +57,9 @@ app.UseExceptionHandler();
 app.UseResponseCompression();
 
 app.MapAllEndpoints();
+
+app.UseCors("AllowNextClient");
+
+await app.EnsureAllRolesExist();
 
 app.Run();

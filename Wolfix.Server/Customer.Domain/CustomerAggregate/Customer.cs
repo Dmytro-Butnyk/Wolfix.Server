@@ -1,8 +1,8 @@
 using System.Net;
 using Customer.Domain.CustomerAggregate.Entities;
-using Customer.Domain.CustomerAggregate.ValueObjects;
 using Shared.Domain.Entities;
 using Shared.Domain.Models;
+using Shared.Domain.ValueObjects;
 
 namespace Customer.Domain.CustomerAggregate;
 
