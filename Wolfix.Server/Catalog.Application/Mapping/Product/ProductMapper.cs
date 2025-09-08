@@ -9,6 +9,7 @@ internal static class ProductMapper
     {
         return new ProductShortDto(productShortProjection.Id, productShortProjection.Title,
             productShortProjection.AverageRating,
-            productShortProjection.Price, productShortProjection.FinalPrice, productShortProjection.Bonuses);
+            productShortProjection.Price, productShortProjection.FinalPrice, productShortProjection.Bonuses,
+            productShortProjection.MainPhoto);
     }
 }
