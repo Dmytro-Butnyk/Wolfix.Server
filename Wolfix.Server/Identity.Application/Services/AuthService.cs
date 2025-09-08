@@ -29,16 +29,16 @@ internal sealed class AuthService(
         return Result<UserRolesDto>.Success(dto);
     }
 
-    public async Task<Result<string>> GetTokenByRoleAsync(Guid userId, string email, string role)
+    public async Task<Result<string>> GetTokenByRoleAsync(string email, string role)
     {
-        VoidResult checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRole(userId, role);
+        Result<Guid> checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRole(email, role);
 
         if (!checkUserExistsAndHasRoleResult.IsSuccess)
         {
             return Result<string>.Failure(checkUserExistsAndHasRoleResult.ErrorMessage!, checkUserExistsAndHasRoleResult.StatusCode);
         }
 
-        string token = jwtService.GenerateToken(userId, email, role);
+        string token = jwtService.GenerateToken(checkUserExistsAndHasRoleResult.Value, email, role);
         return Result<string>.Success(token);
     }
 

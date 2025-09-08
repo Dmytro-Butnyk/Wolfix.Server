@@ -40,30 +40,30 @@ internal sealed class AuthStore(
         return Result<UserRolesProjection>.Success(userRolesProjection);
     }
 
-    public async Task<VoidResult> CheckUserExistsAndHasRole(Guid userId, string role)
+    public async Task<Result<Guid>> CheckUserExistsAndHasRole(string email, string role)
     {
-        Account? user = await userManager.FindByIdAsync(userId.ToString());
+        Account? user = await userManager.FindByEmailAsync(email);
         
         if (user == null)
         {
-            return VoidResult.Failure($"User with id: {userId} not found", HttpStatusCode.NotFound);
+            return Result<Guid>.Failure($"User with email: {email} not found", HttpStatusCode.NotFound);
         }
         
         bool isRoleExists = await roleManager.RoleExistsAsync(role);
 
         if (!isRoleExists)
         {
-            return VoidResult.Failure("Role does not exist", HttpStatusCode.NotFound);
+            return Result<Guid>.Failure("Role does not exist", HttpStatusCode.NotFound);
         }
         
         bool hasRole = await userManager.IsInRoleAsync(user, role);
 
         if (!hasRole)
         {
-            return VoidResult.Failure("User does not have required role", HttpStatusCode.Forbidden);
+            return Result<Guid>.Failure("User does not have required role", HttpStatusCode.Forbidden);
         }
         
-        return VoidResult.Success();
+        return Result<Guid>.Success(user.Id);
     }
 
     public async Task<Result<Guid>> RegisterAsCustomerAndGetUserIdAsync(string email, string password)

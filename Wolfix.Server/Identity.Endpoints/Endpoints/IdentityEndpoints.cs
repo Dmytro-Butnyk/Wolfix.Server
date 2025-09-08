@@ -56,7 +56,7 @@ internal static class IdentityEndpoints
         [FromBody] TokenDto tokenDto,
         [FromServices] IAuthService authService)
     {
-        Result<string> getTokenResult = await authService.GetTokenByRoleAsync(tokenDto.UserId, tokenDto.Email, tokenDto.Role);
+        Result<string> getTokenResult = await authService.GetTokenByRoleAsync(tokenDto.Email, tokenDto.Role);
 
         if (!getTokenResult.IsSuccess)
         {
