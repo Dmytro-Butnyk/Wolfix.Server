@@ -44,7 +44,7 @@ internal sealed class AuthService(
 
     public async Task<Result<string>> RegisterAsCustomerAsync(string email, string password, CancellationToken ct)
     {
-        Result<Guid> registerResult = await authStore.RegisterAsCustomerAndGetUserIdAsync(email, password);
+        Result<Guid> registerResult = await authStore.RegisterAsCustomerAndGetUserIdAsync(email, password, Roles.Customer);
 
         if (!registerResult.IsSuccess)
         {
@@ -53,7 +53,7 @@ internal sealed class AuthService(
         
         Guid createdUserId = registerResult.Value;
         
-        string token = jwtService.GenerateToken(createdUserId, email, "User");
+        string token = jwtService.GenerateToken(createdUserId, email, Roles.Customer);
 
         VoidResult publishResult = await eventBus.PublishAsync(new CustomerAccountCreated
         {

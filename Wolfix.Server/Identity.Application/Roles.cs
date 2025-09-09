@@ -1,4 +1,4 @@
-namespace Identity.Infrastructure;
+namespace Identity.Application;
 
 public static class Roles
 {

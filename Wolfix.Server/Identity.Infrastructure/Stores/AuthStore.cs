@@ -66,7 +66,7 @@ internal sealed class AuthStore(
         return Result<Guid>.Success(user.Id);
     }
 
-    public async Task<Result<Guid>> RegisterAsCustomerAndGetUserIdAsync(string email, string password)
+    public async Task<Result<Guid>> RegisterAsCustomerAndGetUserIdAsync(string email, string password, string role)
     {
         Account? existingUser = await userManager.FindByEmailAsync(email);
         
@@ -92,7 +92,7 @@ internal sealed class AuthStore(
             return Result<Guid>.Failure("Failed to create user", HttpStatusCode.InternalServerError);
         }
         
-        IdentityResult addRoleResult = await userManager.AddToRoleAsync(user, Roles.Customer);
+        IdentityResult addRoleResult = await userManager.AddToRoleAsync(user, role);
 
         if (!addRoleResult.Succeeded)
         {
