@@ -1,7 +1,7 @@
 using System.Net;
-using System.Text;
 using Identity.Application.Interfaces.Repositories;
 using Identity.Application.Projections;
+using Identity.Infrastructure.Extensions;
 using Identity.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Shared.Domain.Models;
@@ -107,7 +107,7 @@ internal sealed class AuthStore(
         {
             await transaction.RollbackAsync();
             
-            return Result<Guid>.Failure(GetErrors(createResult), HttpStatusCode.InternalServerError);
+            return Result<Guid>.Failure(createResult.GetErrorMessage(), HttpStatusCode.InternalServerError);
         }
         
         IdentityResult addRoleResult = await userManager.AddToRoleAsync(user, role);
@@ -115,23 +115,11 @@ internal sealed class AuthStore(
         if (!addRoleResult.Succeeded)
         {
             await transaction.RollbackAsync();
-            return Result<Guid>.Failure(GetErrors(addRoleResult), HttpStatusCode.InternalServerError);
+            return Result<Guid>.Failure(addRoleResult.GetErrorMessage(), HttpStatusCode.InternalServerError);
         }
         
         await transaction.CommitAsync();
         
         return Result<Guid>.Success(user.Id);
-    }
-
-    private string GetErrors(IdentityResult result)
-    {
-        StringBuilder stringBuilder = new();
-        
-        foreach (var error in result.Errors)
-        {
-            stringBuilder.AppendLine(error.Description);
-        }
-        
-        return stringBuilder.ToString();
     }
 }
