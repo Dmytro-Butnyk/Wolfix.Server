@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text;
 using Identity.Application.Interfaces.Repositories;
 using Identity.Application.Projections;
 using Identity.Infrastructure.Identity;
@@ -105,7 +106,8 @@ internal sealed class AuthStore(
         if (!createResult.Succeeded)
         {
             await transaction.RollbackAsync();
-            return Result<Guid>.Failure("Failed to create user", HttpStatusCode.InternalServerError);
+            
+            return Result<Guid>.Failure(GetErrors(createResult), HttpStatusCode.InternalServerError);
         }
         
         IdentityResult addRoleResult = await userManager.AddToRoleAsync(user, role);
@@ -113,11 +115,23 @@ internal sealed class AuthStore(
         if (!addRoleResult.Succeeded)
         {
             await transaction.RollbackAsync();
-            return Result<Guid>.Failure("Failed to add a role to user", HttpStatusCode.InternalServerError);
+            return Result<Guid>.Failure(GetErrors(addRoleResult), HttpStatusCode.InternalServerError);
         }
         
         await transaction.CommitAsync();
         
         return Result<Guid>.Success(user.Id);
+    }
+
+    private string GetErrors(IdentityResult result)
+    {
+        StringBuilder stringBuilder = new();
+        
+        foreach (var error in result.Errors)
+        {
+            stringBuilder.AppendLine(error.Description);
+        }
+        
+        return stringBuilder.ToString();
     }
 }
