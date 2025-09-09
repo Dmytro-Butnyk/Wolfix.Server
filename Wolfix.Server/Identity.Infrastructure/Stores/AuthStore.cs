@@ -15,19 +15,14 @@ internal sealed class AuthStore(
 {
     public async Task<Result<UserRolesProjection>> LogInAndGetUserRolesAsync(string email, string password)
     {
-        Account? user = await userManager.FindByEmailAsync(email);
+        Result<Account> getUserResult = await GetUser(email, password);
 
-        if (user == null)
+        if (!getUserResult.IsSuccess)
         {
-            return Result<UserRolesProjection>.Failure($"User with email: {email} not found", HttpStatusCode.NotFound);
+            return Result<UserRolesProjection>.Failure(getUserResult.ErrorMessage!, getUserResult.StatusCode);
         }
         
-        bool isPasswordCorrect = await userManager.CheckPasswordAsync(user, password);
-        
-        if (!isPasswordCorrect)
-        {
-            return Result<UserRolesProjection>.Failure("Invalid password");
-        }
+        Account user = getUserResult.Value!;
         
         IList<string> userRoles = await userManager.GetRolesAsync(user);
 
@@ -40,14 +35,16 @@ internal sealed class AuthStore(
         return Result<UserRolesProjection>.Success(userRolesProjection);
     }
 
-    public async Task<Result<Guid>> CheckUserExistsAndHasRole(string email, string role)
+    public async Task<Result<Guid>> CheckUserExistsAndHasRole(string email, string password, string role)
     {
-        Account? user = await userManager.FindByEmailAsync(email);
-        
-        if (user == null)
+        Result<Account> getUserResult = await GetUser(email, password);
+
+        if (!getUserResult.IsSuccess)
         {
-            return Result<Guid>.Failure($"User with email: {email} not found", HttpStatusCode.NotFound);
+            return Result<Guid>.Failure(getUserResult.ErrorMessage!, getUserResult.StatusCode);
         }
+        
+        Account user = getUserResult.Value!;
         
         bool isRoleExists = await roleManager.RoleExistsAsync(role);
 
@@ -64,6 +61,25 @@ internal sealed class AuthStore(
         }
         
         return Result<Guid>.Success(user.Id);
+    }
+
+    private async Task<Result<Account>> GetUser(string email, string password)
+    {
+        Account? user = await userManager.FindByEmailAsync(email);
+
+        if (user == null)
+        {
+            return Result<Account>.Failure($"User with email: {email} not found", HttpStatusCode.NotFound);
+        }
+        
+        bool isPasswordCorrect = await userManager.CheckPasswordAsync(user, password);
+        
+        if (!isPasswordCorrect)
+        {
+            return Result<Account>.Failure("Invalid password");
+        }
+        
+        return Result<Account>.Success(user);
     }
 
     public async Task<Result<Guid>> RegisterAsCustomerAndGetUserIdAsync(string email, string password, string role)

@@ -6,6 +6,6 @@ namespace Identity.Application.Interfaces.Services;
 public interface IAuthService
 {
     Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(string email, string password);
-    Task<Result<string>> GetTokenByRoleAsync(string email, string role);
+    Task<Result<string>> GetTokenByRoleAsync(string email, string password, string role);
     Task<Result<string>> RegisterAsCustomerAsync(string email, string password, CancellationToken ct);
 }

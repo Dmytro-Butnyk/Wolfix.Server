@@ -29,9 +29,9 @@ internal sealed class AuthService(
         return Result<UserRolesDto>.Success(dto);
     }
 
-    public async Task<Result<string>> GetTokenByRoleAsync(string email, string role)
+    public async Task<Result<string>> GetTokenByRoleAsync(string email, string password, string role)
     {
-        Result<Guid> checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRole(email, role);
+        Result<Guid> checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRole(email, password, role);
 
         if (!checkUserExistsAndHasRoleResult.IsSuccess)
         {

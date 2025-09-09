@@ -57,11 +57,11 @@ internal static class IdentityEndpoints
         return TypedResults.Ok(logInResult.Value);
     }
 
-    private static async Task<Results<Ok<string>, NotFound<string>, ForbidHttpResult>> GetTokenByRole(
+    private static async Task<Results<Ok<string>, NotFound<string>, ForbidHttpResult, BadRequest<string>>> GetTokenByRole(
         [FromBody] TokenDto tokenDto,
         [FromServices] IAuthService authService)
     {
-        Result<string> getTokenResult = await authService.GetTokenByRoleAsync(tokenDto.Email, tokenDto.Role);
+        Result<string> getTokenResult = await authService.GetTokenByRoleAsync(tokenDto.Email, tokenDto.Password, tokenDto.Role);
 
         if (!getTokenResult.IsSuccess)
         {
@@ -69,6 +69,7 @@ internal static class IdentityEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(getTokenResult.ErrorMessage),
                 HttpStatusCode.Forbidden => TypedResults.Forbid(),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(getTokenResult.ErrorMessage),
                 _ => throw new Exception("Unknown status code")
             };
         }
