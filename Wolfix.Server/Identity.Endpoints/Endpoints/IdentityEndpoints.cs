@@ -27,9 +27,14 @@ internal static class IdentityEndpoints
 
     private static void MapCustomerEndpoints(RouteGroupBuilder customerGroup)
     {
-        customerGroup.MapPost("roles", LogInAndGetUserRoles);
-        customerGroup.MapPost("token", GetTokenByRole);
-        customerGroup.MapPost("register", RegisterAsCustomer);
+        customerGroup.MapPost("roles", LogInAndGetUserRoles)
+            .WithSummary("Log in and get all roles");
+        
+        customerGroup.MapPost("token", GetTokenByRole)
+            .WithSummary("Get token by specific role");
+        
+        customerGroup.MapPost("register", RegisterAsCustomer)
+            .WithSummary("Register as customer");
     }
     
     private static async Task<Results<Ok<UserRolesDto>, NotFound<string>, BadRequest<string>, InternalServerError<string>>> LogInAndGetUserRoles(

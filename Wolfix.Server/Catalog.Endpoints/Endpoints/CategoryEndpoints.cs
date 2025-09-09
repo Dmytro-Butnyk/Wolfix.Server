@@ -23,8 +23,11 @@ internal static class CategoryEndpoints
 
     private static void MapGetEndpoints(RouteGroupBuilder group)
     {
-        group.MapGet("parent", GetAllParentCategories);
-        group.MapGet("child/{parentId:guid}", GetAllChildCategoriesByParent);
+        group.MapGet("parent", GetAllParentCategories)
+            .WithSummary("Get all parent categories");
+        
+        group.MapGet("child/{parentId:guid}", GetAllChildCategoriesByParent)
+            .WithSummary("Get all child categories by parent");
     }
 
     private static async Task<Ok<IReadOnlyCollection<CategoryShortDto>>> GetAllParentCategories(

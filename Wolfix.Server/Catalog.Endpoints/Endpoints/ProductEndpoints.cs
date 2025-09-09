@@ -28,14 +28,20 @@ internal static class ProductEndpoints
 
     private static void MapProductEndpoints(RouteGroupBuilder group)
     {
-        group.MapGet("category/{childCategoryId:guid}/page/{page:int}", GetAllByCategoryForPage);
-        group.MapGet("with-discount/page/{page:int}", GetWithDiscountForPage);
-        group.MapGet("recommended", GetRecommendedForPage);
-        group.MapGet("random", GetRandom);
+        group.MapGet("category/{childCategoryId:guid}/page/{page:int}", GetAllByCategoryForPage)
+            .WithSummary("Get all products by specific category for page with pagination");
+        
+        group.MapGet("with-discount/page/{page:int}", GetWithDiscountForPage)
+            .WithSummary("Get all products with discount for page with pagination");
+        
+        group.MapGet("recommended", GetRecommendedForPage)
+            .WithSummary("Get recommended products by visitedCategories list for page with pagination");
+        
+        group.MapGet("random", GetRandom)
+            .WithSummary("Get random products");
     }
     
     #region ADD PRODUCT ENDPOINTS HERE
-
     private static async Task<VoidResult> AddProduct(
         
         )
@@ -49,9 +55,11 @@ internal static class ProductEndpoints
 
     private static void MapReviewEndpoints(RouteGroupBuilder group)
     {
-        group.MapGet("", GetReviews);
+        group.MapGet("", GetReviews)
+            .WithSummary("Get all reviews by specific product");
         //todo: протестить
-        group.MapPost("", AddReview);
+        group.MapPost("", AddReview)
+            .WithSummary("Add review");
     }
 
     private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, BadRequest<string>, NotFound<string>>> GetAllByCategoryForPage(

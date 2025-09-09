@@ -29,14 +29,20 @@ internal static class CustomerEndpoints
     
     private static void MapFavoriteItemsEndpoints(RouteGroupBuilder group)
     {
-        group.MapGet("{customerId:guid}", GetFavoriteProducts);
-        group.MapPost("", AddProductToFavorite);
+        group.MapGet("{customerId:guid}", GetFavoriteProducts)
+            .WithSummary("Get all favorite products by specific customer");
+        
+        group.MapPost("", AddProductToFavorite)
+            .WithSummary("Add product to favorite");
     }
 
     private static void MapCartItemsEndpoints(RouteGroupBuilder group)
     {
-        group.MapGet("{customerId:guid}", GetCartProducts);
-        group.MapPost("", AddProductToCart);
+        group.MapGet("{customerId:guid}", GetCartProducts)
+            .WithSummary("Get all products in cart by specific customer");
+        
+        group.MapPost("", AddProductToCart)
+            .WithSummary("Add product to cart");
     }
     
     //todo: эндпоинт для того чтобы отзыв оставить
