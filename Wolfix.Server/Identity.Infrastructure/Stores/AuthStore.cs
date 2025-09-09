@@ -106,7 +106,6 @@ internal sealed class AuthStore(
         if (!createResult.Succeeded)
         {
             await transaction.RollbackAsync();
-            
             return Result<Guid>.Failure(createResult.GetErrorMessage(), HttpStatusCode.InternalServerError);
         }
         
