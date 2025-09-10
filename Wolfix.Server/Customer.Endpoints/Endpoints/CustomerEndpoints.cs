@@ -52,8 +52,17 @@ internal static class CustomerEndpoints
 
     private static void MapChangeMethods(RouteGroupBuilder group)
     {
-        group.MapPut("full-name", ChangeFullName)
+        group.MapPatch("full-name", ChangeFullName)
             .WithSummary("Change full name");
+
+        group.MapPatch("phone-number", ChangePhoneNumber)
+            .WithSummary("Change phone number");
+        
+        group.MapPatch("address", ChangeAddress)
+            .WithSummary("Change address");
+        
+        group.MapPatch("birth-date", ChangeBirthDate)
+            .WithSummary("Change birth date");
     }
     
     //todo: эндпоинт для того чтобы отзыв оставить
@@ -139,5 +148,68 @@ internal static class CustomerEndpoints
         }
         
         return TypedResults.Ok(changeFullNameResult.Value);
+    }
+
+    private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> ChangePhoneNumber(
+        [FromBody] ChangePhoneNumberDto request,
+        [FromRoute] Guid customerId,
+        [FromServices] ICustomerService customerService,
+        CancellationToken ct)
+    {
+        Result<string> changePhoneNumber = await customerService.ChangePhoneNumber(customerId, request, ct);
+
+        if (!changePhoneNumber.IsSuccess)
+        {
+            return changePhoneNumber.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(changePhoneNumber.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(changePhoneNumber.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+        
+        return TypedResults.Ok(changePhoneNumber.Value);
+    }
+
+    private static async Task<Results<Ok<AddressDto>, NotFound<string>, BadRequest<string>>> ChangeAddress(
+        [FromBody] ChangeAddressDto request,
+        [FromRoute] Guid customerId,
+        [FromServices] ICustomerService customerService,
+        CancellationToken ct)
+    {
+        Result<AddressDto> changeAddressResult = await customerService.ChangeAddress(customerId, request, ct);
+        
+        if (!changeAddressResult.IsSuccess)
+        {
+            return changeAddressResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(changeAddressResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(changeAddressResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+        
+        return TypedResults.Ok(changeAddressResult.Value);
+    }
+
+    private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> ChangeBirthDate(
+        [FromBody] ChangeBirthDateDto request,
+        [FromRoute] Guid customerId,
+        [FromServices] ICustomerService customerService,
+        CancellationToken ct)
+    {
+        Result<string> changeBirthDateResult = await customerService.ChangeBirthDate(customerId, request, ct);
+        
+        if (!changeBirthDateResult.IsSuccess)
+        {
+            return changeBirthDateResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(changeBirthDateResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(changeBirthDateResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+        
+        return TypedResults.Ok(changeBirthDateResult.Value);
     }
 }

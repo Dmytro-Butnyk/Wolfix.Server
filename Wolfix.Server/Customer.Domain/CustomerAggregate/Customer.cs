@@ -10,6 +10,8 @@ public sealed class Customer : BaseEntity
 {
     public string? PhotoUrl { get; private set; }
     
+    //todo: попробовать не указывать маппинг велью обджектов в конфигурации и должно быть лучше
+    //todo: добавить велью обджект (счётчик нарушений + енам статус заблокан или всё ок)
     internal FullName? FullName { get; private set; }
 
     internal PhoneNumber? PhoneNumber { get; private set; }

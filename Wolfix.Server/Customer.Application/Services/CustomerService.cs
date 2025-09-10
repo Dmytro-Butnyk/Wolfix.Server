@@ -131,4 +131,79 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
         
         return Result<FullNameDto>.Success(dto);
     }
+
+    public async Task<Result<string>> ChangePhoneNumber(Guid customerId, ChangePhoneNumberDto request, CancellationToken ct)
+    {
+        var customer = await customerRepository.GetByIdAsync(customerId, ct);
+        
+        if (customer is null)
+        {
+            return Result<string>.Failure(
+                $"Customer with id: {customerId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        VoidResult changePhoneNumberResult = customer.ChangePhoneNumber(request.PhoneNumber);
+
+        if (!changePhoneNumberResult.IsSuccess)
+        {
+            return Result<string>.Failure(changePhoneNumberResult);
+        }
+
+        await customerRepository.SaveChangesAsync(ct);
+        
+        return Result<string>.Success(customer.GetPhoneNumber());
+    }
+
+    public async Task<Result<AddressDto>> ChangeAddress(Guid customerId, ChangeAddressDto request, CancellationToken ct)
+    {
+        var customer = await customerRepository.GetByIdAsync(customerId, ct);
+        
+        if (customer is null)
+        {
+            return Result<AddressDto>.Failure(
+                $"Customer with id: {customerId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        VoidResult changeAddressResult = customer.ChangeAddress(request.City, request.Street,
+            request.HouseNumber, request.ApartmentNumber);
+
+        if (!changeAddressResult.IsSuccess)
+        {
+            return Result<AddressDto>.Failure(changeAddressResult);
+        }
+
+        await customerRepository.SaveChangesAsync(ct);
+        
+        AddressDto dto = new(request.City, request.Street, request.HouseNumber, request.ApartmentNumber);
+        
+        return Result<AddressDto>.Success(dto);
+    }
+
+    public async Task<Result<string>> ChangeBirthDate(Guid customerId, ChangeBirthDateDto request, CancellationToken ct)
+    {
+        var customer = await customerRepository.GetByIdAsync(customerId, ct);
+        
+        if (customer is null)
+        {
+            return Result<string>.Failure(
+                $"Customer with id: {customerId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        VoidResult changeBirthDateResult = customer.ChangeBirthDate(request.BirthDate);
+
+        if (!changeBirthDateResult.IsSuccess)
+        {
+            return Result<string>.Failure(changeBirthDateResult);
+        }
+
+        await customerRepository.SaveChangesAsync(ct);
+        
+        return Result<string>.Success(request.BirthDate.ToString("dd-MM-yyyy"));
+    }
 }
