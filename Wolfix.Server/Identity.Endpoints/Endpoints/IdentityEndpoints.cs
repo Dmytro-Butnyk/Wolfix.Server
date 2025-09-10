@@ -23,6 +23,10 @@ internal static class IdentityEndpoints
 
         var customerGroup = identityGroup.MapGroup("customer");
         MapCustomerEndpoints(customerGroup);
+
+        identityGroup.MapPost("seller/register", RegisterAsSeller)
+            .DisableAntiforgery()
+            .WithSummary("Register as seller");
     }
 
     private static void MapCustomerEndpoints(RouteGroupBuilder customerGroup)
@@ -41,7 +45,7 @@ internal static class IdentityEndpoints
         [FromBody] LogInDto logInDto,
         [FromServices] IAuthService authService)
     {
-        Result<UserRolesDto> logInResult = await authService.LogInAndGetUserRolesAsync(logInDto.Email, logInDto.Password);
+        Result<UserRolesDto> logInResult = await authService.LogInAndGetUserRolesAsync(logInDto);
 
         if (!logInResult.IsSuccess)
         {
@@ -61,7 +65,7 @@ internal static class IdentityEndpoints
         [FromBody] TokenDto tokenDto,
         [FromServices] IAuthService authService)
     {
-        Result<string> getTokenResult = await authService.GetTokenByRoleAsync(tokenDto.Email, tokenDto.Password, tokenDto.Role);
+        Result<string> getTokenResult = await authService.GetTokenByRoleAsync(tokenDto);
 
         if (!getTokenResult.IsSuccess)
         {
@@ -78,11 +82,11 @@ internal static class IdentityEndpoints
     }
 
     private static async Task<Results<Ok<string>, Conflict<string>, InternalServerError<string>, BadRequest<string>>> RegisterAsCustomer(
-        [FromBody] RegisterDto registerDto,
+        [FromBody] RegisterAsCustomerDto registerAsCustomerDto,
         [FromServices] IAuthService authService,
         CancellationToken ct)
     {
-        Result<string> registerResult = await authService.RegisterAsCustomerAsync(registerDto.Email, registerDto.Password, ct);
+        Result<string> registerResult = await authService.RegisterAsCustomerAsync(registerAsCustomerDto, ct);
 
         if (!registerResult.IsSuccess)
         {
@@ -91,6 +95,29 @@ internal static class IdentityEndpoints
                 HttpStatusCode.Conflict => TypedResults.Conflict(registerResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(registerResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(registerResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+        
+        return TypedResults.Ok(registerResult.Value);
+    }
+
+    private static async Task<Results<Ok<string>, BadRequest<string>, Conflict<string>, InternalServerError<string>>> RegisterAsSeller(
+        [FromForm] RegisterAsSellerDto registerAsSellerDto,
+        [FromServices] IAuthService authService,
+        CancellationToken ct)
+    {
+        Result<string> registerResult = await authService.RegisterAsSellerAsync(registerAsSellerDto, ct);
+
+        if (!registerResult.IsSuccess)
+        {
+            string errorMessage = registerResult.ErrorMessage!;
+
+            return registerResult.StatusCode switch
+            {
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(errorMessage),
+                HttpStatusCode.Conflict => TypedResults.Conflict(errorMessage),
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(errorMessage),
                 _ => throw new Exception("Unknown status code")
             };
         }

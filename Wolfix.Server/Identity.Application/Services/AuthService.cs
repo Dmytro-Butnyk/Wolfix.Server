@@ -1,4 +1,5 @@
 using System.Net;
+using Identity.Application.Dto.Requests;
 using Identity.Application.Dto.Responses;
 using Identity.Application.Interfaces;
 using Identity.Application.Interfaces.Repositories;
@@ -16,9 +17,9 @@ internal sealed class AuthService(
     IJwtService jwtService,
     IEventBus eventBus) : IAuthService
 {
-    public async Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(string email, string password)
+    public async Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(LogInDto logInDto)
     {
-        Result<UserRolesProjection> getUserRolesResult = await authStore.LogInAndGetUserRolesAsync(email, password);
+        Result<UserRolesProjection> getUserRolesResult = await authStore.LogInAndGetUserRolesAsync(logInDto.Email, logInDto.Password);
 
         if (!getUserRolesResult.IsSuccess)
         {
@@ -29,41 +30,81 @@ internal sealed class AuthService(
         return Result<UserRolesDto>.Success(dto);
     }
 
-    public async Task<Result<string>> GetTokenByRoleAsync(string email, string password, string role)
+    public async Task<Result<string>> GetTokenByRoleAsync(TokenDto dto)
     {
-        Result<Guid> checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRole(email, password, role);
+        Result<Guid> checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRole(dto.Email, dto.Password, dto.Role);
 
         if (!checkUserExistsAndHasRoleResult.IsSuccess)
         {
             return Result<string>.Failure(checkUserExistsAndHasRoleResult.ErrorMessage!, checkUserExistsAndHasRoleResult.StatusCode);
         }
 
-        string token = jwtService.GenerateToken(checkUserExistsAndHasRoleResult.Value, email, role);
+        string token = jwtService.GenerateToken(checkUserExistsAndHasRoleResult.Value, dto.Email, dto.Role);
         return Result<string>.Success(token);
     }
 
-    public async Task<Result<string>> RegisterAsCustomerAsync(string email, string password, CancellationToken ct)
+    public async Task<Result<string>> RegisterAsCustomerAsync(RegisterAsCustomerDto dto, CancellationToken ct)
     {
-        Result<Guid> registerResult = await authStore.RegisterAsCustomerAndGetUserIdAsync(email, password, Roles.Customer);
+        Result<Guid> registerResult = await authStore.RegisterAccountAsync(dto.Email, dto.Password, Roles.Customer);
 
         if (!registerResult.IsSuccess)
         {
             return Result<string>.Failure(registerResult.ErrorMessage!, registerResult.StatusCode);
         }
         
-        Guid createdUserId = registerResult.Value;
+        Guid registeredCustomerId = registerResult.Value;
         
-        string token = jwtService.GenerateToken(createdUserId, email, Roles.Customer);
-
         VoidResult publishResult = await eventBus.PublishAsync(new CustomerAccountCreated
         {
-            AccountId = createdUserId
+            AccountId = registeredCustomerId
         }, ct);
 
         if (!publishResult.IsSuccess)
         {
             return Result<string>.Failure(publishResult.ErrorMessage!, publishResult.StatusCode);
         }
+        
+        string token = jwtService.GenerateToken(registeredCustomerId, dto.Email, Roles.Customer);
+        
+        return Result<string>.Success(token);
+    }
+
+    public async Task<Result<string>> RegisterAsSellerAsync(RegisterAsSellerDto dto, CancellationToken ct)
+    {
+        Result<Guid> registerResult = await authStore.RegisterAccountAsync(dto.Email, dto.Password, Roles.Seller);
+
+        if (!registerResult.IsSuccess)
+        {
+            return Result<string>.Failure(registerResult.ErrorMessage!, registerResult.StatusCode);
+        }
+        
+        Guid registeredSellerId = registerResult.Value;
+
+        VoidResult publishResult = await eventBus.PublishAsync(new SellerAccountCreated
+        {
+            AccountId = registeredSellerId,
+            Email = dto.Email,
+            Password = dto.Password,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            MiddleName = dto.MiddleName,
+            PhoneNumber = dto.PhoneNumber,
+            City = dto.City,
+            Street = dto.Street,
+            HouseNumber = dto.HouseNumber,
+            ApartmentNumber = dto.ApartmentNumber,
+            BirthDate = dto.BirthDate,
+            Document = dto.Document
+        }, ct);
+
+        if (!publishResult.IsSuccess)
+        {
+            return Result<string>.Failure(publishResult.ErrorMessage!, publishResult.StatusCode);
+        }
+        
+        //todo: событие чтобы отправлять документ к админу на рассмотрение
+        
+        string token = jwtService.GenerateToken(registeredSellerId, dto.Email, Roles.Seller);
         
         return Result<string>.Success(token);
     }

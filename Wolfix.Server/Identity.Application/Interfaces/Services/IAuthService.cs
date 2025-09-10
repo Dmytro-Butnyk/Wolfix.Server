@@ -1,3 +1,4 @@
+using Identity.Application.Dto.Requests;
 using Identity.Application.Dto.Responses;
 using Shared.Domain.Models;
 
@@ -5,7 +6,11 @@ namespace Identity.Application.Interfaces.Services;
 
 public interface IAuthService
 {
-    Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(string email, string password);
-    Task<Result<string>> GetTokenByRoleAsync(string email, string password, string role);
-    Task<Result<string>> RegisterAsCustomerAsync(string email, string password, CancellationToken ct);
+    Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(LogInDto logInDto);
+    
+    Task<Result<string>> GetTokenByRoleAsync(TokenDto dto);
+    
+    Task<Result<string>> RegisterAsCustomerAsync(RegisterAsCustomerDto dto, CancellationToken ct);
+    
+    Task<Result<string>> RegisterAsSellerAsync(RegisterAsSellerDto dto, CancellationToken ct);
 }

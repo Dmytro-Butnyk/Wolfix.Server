@@ -83,7 +83,7 @@ internal sealed class AuthStore(
         return Result<Account>.Success(user);
     }
 
-    public async Task<Result<Guid>> RegisterAsCustomerAndGetUserIdAsync(string email, string password, string role)
+    public async Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role)
     {
         Account? existingUser = await userManager.FindByEmailAsync(email);
         
@@ -98,7 +98,6 @@ internal sealed class AuthStore(
             UserName = email
         };
 
-        //todo: разобраться с транзакцией
         await using var transaction = await context.Database.BeginTransactionAsync();
 
         IdentityResult createResult = await userManager.CreateAsync(user, password);

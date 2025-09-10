@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Seller.Domain.Enums;
 using Seller.Domain.SellerAggregate.Entities;
 using Shared.Domain.ValueObjects;
 using Shared.Infrastructure.ValueGenerators;
@@ -19,8 +20,6 @@ internal sealed class SellerEntityConfiguration : IEntityTypeConfiguration<Domai
 
     private void ConfigureBasicProperties(EntityTypeBuilder<Domain.SellerAggregate.Seller> builder)
     {
-        const string nullMarker = "_____NULL_____";
-        
         builder.Property(s => s.Id)
             .HasValueGenerator<GuidV7ValueGenerator>()
             .ValueGeneratedOnAdd();
@@ -29,32 +28,36 @@ internal sealed class SellerEntityConfiguration : IEntityTypeConfiguration<Domai
             .IsRequired(false);
         
         builder.Property(s => s.FullName)
-            .IsRequired(false)
+            .IsRequired()
             .HasConversion<string>(
-                fullName => fullName == null ? nullMarker : fullName.ToString(),
-                fullNameString => fullNameString == nullMarker ? null : (FullName)fullNameString
+                fullName => fullName.ToString(),
+                fullNameString => (FullName)fullNameString
             );
         
         builder.Property(s => s.PhoneNumber)
-            .IsRequired(false)
+            .IsRequired()
             .HasConversion<string>(
-                phoneNumber => phoneNumber == null ? nullMarker : phoneNumber.Value,
-                phoneNumberString => phoneNumberString == nullMarker ? null : (PhoneNumber)phoneNumberString
+                phoneNumber => phoneNumber.Value,
+                phoneNumberString => (PhoneNumber)phoneNumberString
             );
 
         builder.Property(s => s.Address)
-            .IsRequired(false)
+            .IsRequired()
             .HasConversion<string>(
-                address => address == null ? nullMarker : address.ToString(),
-                addressString => addressString == nullMarker ? null : (Address)addressString
+                address => address.ToString(),
+                addressString => (Address)addressString
             );
 
         builder.Property(s => s.BirthDate)
-            .IsRequired(false)
+            .IsRequired()
             .HasConversion<string>(
-                birthDate => birthDate == null ? nullMarker : birthDate.ToString(),
-                birthDateString => birthDateString == nullMarker ? null : (BirthDate)birthDateString
+                birthDate => birthDate.ToString(),
+                birthDateString => (BirthDate)birthDateString
             );
+
+        builder.Property(s => s.Status)
+            .IsRequired()
+            .HasConversion<string>();
         
         builder.Property(s => s.AccountId)
             .IsRequired();

@@ -1,4 +1,5 @@
 using System.Net;
+using Seller.Domain.Enums;
 using Seller.Domain.SellerAggregate.Entities;
 using Shared.Domain.Entities;
 using Shared.Domain.Models;
@@ -10,13 +11,15 @@ public sealed class Seller : BaseEntity
 {
     public string? PhotoUrl { get; private set; }
     
-    internal FullName? FullName { get; private set; }
+    internal FullName FullName { get; private set; }
 
-    internal PhoneNumber? PhoneNumber { get; private set; }
+    internal PhoneNumber PhoneNumber { get; private set; }
     
-    internal Address? Address { get; private set; }
+    internal Address Address { get; private set; }
     
-    internal BirthDate? BirthDate { get; private set; }
+    internal BirthDate BirthDate { get; private set; }
+
+    public SellerStatus Status { get; private set; } = SellerStatus.Pending;
     
     public Guid AccountId { get; private set; }
 
@@ -28,56 +31,93 @@ public sealed class Seller : BaseEntity
     
     private Seller() { }
     
-    private Seller(Guid accountId)
+    private Seller(Guid accountId, FullName fullName, PhoneNumber phoneNumber,
+        Address address, BirthDate birthDate)
     {
         AccountId = accountId;
+        FullName = fullName;
+        PhoneNumber = phoneNumber;
+        Address = address;
+        BirthDate = birthDate;
     }
     
-    public static Result<Seller> Create(Guid accountId)
+    public static Result<Seller> Create(Guid accountId, string firstName, string lastName, string middleName,
+        string phoneNumber, string city, string street, uint houseNumber, uint? apartmentNumber, DateOnly birthDate)
     {
         if (accountId == Guid.Empty)
         {
             return Result<Seller>.Failure($"{nameof(accountId)} cannot be empty");
         }
+        
+        Result<FullName> createFullNameResult = FullName.Create(firstName, lastName, middleName);
 
-        Seller seller = new(accountId);
+        if (!createFullNameResult.IsSuccess)
+        {
+            return Result<Seller>.Failure(createFullNameResult.ErrorMessage!, createFullNameResult.StatusCode);
+        }
+        FullName newFullName = createFullNameResult.Value!;
+        
+        Result<PhoneNumber> createPhoneNumberResult = PhoneNumber.Create(phoneNumber);
+
+        if (!createPhoneNumberResult.IsSuccess)
+        {
+            return Result<Seller>.Failure(createPhoneNumberResult.ErrorMessage!, createPhoneNumberResult.StatusCode);
+        }
+        PhoneNumber newPhoneNumber = createPhoneNumberResult.Value!;
+        
+        Result<Address> createAddressResult = Address.Create(city, street, houseNumber, apartmentNumber);
+        
+        if (!createAddressResult.IsSuccess)
+        {
+            return Result<Seller>.Failure(createAddressResult.ErrorMessage!, createAddressResult.StatusCode);
+        }
+        Address newAddress = createAddressResult.Value!;
+        
+        Result<BirthDate> createBirthDateResult = BirthDate.Create(birthDate);
+
+        if (!createBirthDateResult.IsSuccess)
+        {
+            return Result<Seller>.Failure(createBirthDateResult.ErrorMessage!, createBirthDateResult.StatusCode);
+        }
+        BirthDate newBirthDate = createBirthDateResult.Value!;
+
+        Seller seller = new(accountId, newFullName, newPhoneNumber, newAddress, newBirthDate);
         return Result<Seller>.Success(seller);
     }
     
     #region Getters
-    private const string DefaultStringValue = "Не зазначено";
     public string GetFullName()
-        => FullName == null ? DefaultStringValue : FullName.ToString();
+        => FullName.ToString();
     
     public string GetFirstName()
-        => FullName == null ? DefaultStringValue : FullName.FirstName;
+        => FullName.FirstName;
 
     public string GetLastName()
-        => FullName == null ? DefaultStringValue : FullName.LastName;
+        => FullName.LastName;
 
     public string GetMiddleName()
-        => FullName == null ? DefaultStringValue : FullName.MiddleName;
+        => FullName.MiddleName;
 
     public string GetPhoneNumber()
-        => PhoneNumber == null ? DefaultStringValue : PhoneNumber.Value;
+        => PhoneNumber.Value;
 
     public string GetAddress()
-        => Address == null ? DefaultStringValue : Address.ToString();
+        => Address.ToString();
     
     public string GetCity()
-        => Address == null ? DefaultStringValue : Address.City;
+        => Address.City;
 
     public string GetStreet()
-        => Address == null ? DefaultStringValue : Address.Street;
+        => Address.Street;
 
     public uint? GetHouseNumber()
-        => Address?.HouseNumber;
+        => Address.HouseNumber;
     
     public uint? GetApartmentNumber()
-        => Address?.ApartmentNumber;
+        => Address.ApartmentNumber;
     
     public DateOnly? GetBirthDate()
-        => BirthDate?.Value;
+        => BirthDate.Value;
     #endregion
     
     #region Setters

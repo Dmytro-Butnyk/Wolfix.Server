@@ -2,6 +2,7 @@ using Catalog.Endpoints.Endpoints;
 using Catalog.Endpoints.Extensions;
 using DotNetEnv;
 using Identity.Endpoints.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using Wolfix.API.ExceptionHandlers;
 using Wolfix.API.Extensions;
 

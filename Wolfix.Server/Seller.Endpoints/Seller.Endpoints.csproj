@@ -11,7 +11,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Seller.Application\Seller.Application.csproj" />
+      <ProjectReference Include="..\Seller.Infrastructure\Seller.Infrastructure.csproj" />
       <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Endpoints\" />
     </ItemGroup>
 
 </Project>

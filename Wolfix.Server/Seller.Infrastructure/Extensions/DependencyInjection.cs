@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Seller.Domain.Interfaces;
+using Seller.Infrastructure.Repositories;
 
 namespace Seller.Infrastructure.Extensions;
 
@@ -15,7 +17,7 @@ public static class DependencyInjection
 
     public static IServiceCollection AddSellerRepositories(this IServiceCollection services)
     {
-        //todo: add repositories
+        services.AddScoped<ISellerRepository, SellerRepository>();
 
         return services;
     }

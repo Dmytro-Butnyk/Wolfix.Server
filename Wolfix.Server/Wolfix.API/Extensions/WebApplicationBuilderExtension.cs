@@ -3,6 +3,7 @@ using Customer.Endpoints.Extensions;
 using Identity.Endpoints.Extensions;
 using Media.Api;
 using Microsoft.AspNetCore.ResponseCompression;
+using Seller.Endpoints.Extensions;
 using Shared.Application.Extensions;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
@@ -19,7 +20,8 @@ public static class WebApplicationBuilderExtension
             .AddCatalogModule(connectionString)
             .AddIdentityModule(connectionString)
             .AddCustomerModule(connectionString)
-            .AddMediaModule(connectionString);
+            .AddMediaModule(connectionString)
+            .AddSellerModule(connectionString);
         
         return builder;
     }
@@ -54,6 +56,13 @@ public static class WebApplicationBuilderExtension
     {
         builder.Services.AddCustomerModule(connectionString);
         
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddSellerModule(this WebApplicationBuilder builder, string connectionString)
+    {
+        builder.Services.AddSellerModule(connectionString);
+
         return builder;
     }
 
