@@ -2,8 +2,8 @@ using Catalog.Endpoints.Endpoints;
 using Catalog.Endpoints.Extensions;
 using DotNetEnv;
 using Identity.Endpoints.Extensions;
-using Wolfix.Host.ExceptionHandlers;
-using Wolfix.Host.Extensions;
+using Wolfix.API.ExceptionHandlers;
+using Wolfix.API.Extensions;
 
 if (File.Exists(".env"))
 {
@@ -12,6 +12,8 @@ if (File.Exists(".env"))
 }
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.AddServiceDefaults();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication();
@@ -36,6 +38,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 WebApplication app = builder.Build();
+
+app.MapDefaultEndpoints();
 
 app.UseStaticFiles();
 

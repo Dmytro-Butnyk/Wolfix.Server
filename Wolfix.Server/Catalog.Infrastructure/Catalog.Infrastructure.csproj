@@ -18,6 +18,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
       <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
+      <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Wolfix.Host.ExceptionHandlers;
+namespace Wolfix.API.ExceptionHandlers;
 
 public sealed class ExceptionHandler(IProblemDetailsService problemDetailsService) : IExceptionHandler
 {

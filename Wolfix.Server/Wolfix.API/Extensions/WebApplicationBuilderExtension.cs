@@ -7,14 +7,13 @@ using Shared.Application.Extensions;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 
-namespace Wolfix.Host.Extensions;
+namespace Wolfix.API.Extensions;
 
 public static class WebApplicationBuilderExtension
 {
-    
     public static WebApplicationBuilder AddAllModules(this WebApplicationBuilder builder)
     {
-        string connectionString = EnvironmentExtension.GetEnvironmentVariableOrThrow("DB_CONNECTION_STRING");
+        string connectionString = builder.Configuration.GetConnectionString("DB")!;
 
         builder
             .AddCatalogModule(connectionString)

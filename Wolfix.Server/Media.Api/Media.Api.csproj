@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Media.Application\Media.Application.csproj" />
       <ProjectReference Include="..\Media.Infrastructure\Media.Infrastructure.csproj" />
+      <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
     </ItemGroup>
 
 </Project>

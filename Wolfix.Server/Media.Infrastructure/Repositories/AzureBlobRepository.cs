@@ -1,5 +1,6 @@
 using Azure.Storage.Blobs;
 using Media.Domain.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace Media.Infrastructure.Repositories;
 
@@ -7,11 +8,11 @@ internal sealed class AzureBlobRepository : IAzureBlobRepository
 {
     private readonly BlobServiceClient _blobServiceClient;
 
-    public AzureBlobRepository()
+    public AzureBlobRepository(IConfiguration configuration)
     {
-        string? connectionString = Environment.GetEnvironmentVariable("BLOB_STORAGE_CONNECTION_STRING");
+        string connectionString = configuration.GetConnectionString("BLOB")!;
         
-        _blobServiceClient = new BlobServiceClient(connectionString!);
+        _blobServiceClient = new BlobServiceClient(connectionString);
     }
     
     public async Task<string> AddFileAndGetUrlAsync(string containerName, string fileName, Stream fileStream, CancellationToken ct)

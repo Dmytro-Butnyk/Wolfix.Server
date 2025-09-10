@@ -1,6 +1,6 @@
 using DotNetEnv;
 
-namespace Wolfix.Host.Extensions;
+namespace Wolfix.API.Extensions;
 
 public static class EnvironmentExtension
 {
