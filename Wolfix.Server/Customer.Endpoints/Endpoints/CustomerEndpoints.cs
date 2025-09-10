@@ -1,4 +1,6 @@
+using System.Net;
 using Customer.Application.Dto.CartItem;
+using Customer.Application.Dto.Customer;
 using Customer.Application.Dto.FavoriteItem;
 using Customer.Application.Dto.Product;
 using Customer.Application.Interfaces;
@@ -13,7 +15,7 @@ namespace Customer.Endpoints.Endpoints;
 
 internal static class CustomerEndpoints
 {
-    private const string Route = "api/customer";
+    private const string Route = "api/customers";
 
     public static void MapCustomerEndpoints(this IEndpointRouteBuilder app)
     {
@@ -25,6 +27,9 @@ internal static class CustomerEndpoints
         
         var cartItemsGroup = customerGroup.MapGroup("cart-items");
         MapCartItemsEndpoints(cartItemsGroup);
+        
+        var changeMethodsGroup = customerGroup.MapGroup("{customerId:guid}");
+        MapChangeMethods(changeMethodsGroup);
     }
     
     private static void MapFavoriteItemsEndpoints(RouteGroupBuilder group)
@@ -43,6 +48,12 @@ internal static class CustomerEndpoints
         
         group.MapPost("", AddProductToCart)
             .WithSummary("Add product to cart");
+    }
+
+    private static void MapChangeMethods(RouteGroupBuilder group)
+    {
+        group.MapPut("full-name", ChangeFullName)
+            .WithSummary("Change full name");
     }
     
     //todo: эндпоинт для того чтобы отзыв оставить
@@ -107,5 +118,26 @@ internal static class CustomerEndpoints
         }
         
         return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<Ok<FullNameDto>, NotFound<string>, BadRequest<string>>> ChangeFullName(
+        [FromBody] ChangeFullNameDto request,
+        [FromRoute] Guid customerId,
+        [FromServices] ICustomerService customerService,
+        CancellationToken ct)
+    {
+        Result<FullNameDto> changeFullNameResult = await customerService.ChangeFullName(customerId, request, ct);
+        
+        if (!changeFullNameResult.IsSuccess)
+        {
+            return changeFullNameResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(changeFullNameResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(changeFullNameResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+        
+        return TypedResults.Ok(changeFullNameResult.Value);
     }
 }

@@ -1,5 +1,6 @@
 using Customer.Application.Dto;
 using Customer.Application.Dto.CartItem;
+using Customer.Application.Dto.Customer;
 using Customer.Application.Dto.FavoriteItem;
 using Customer.Application.Dto.Product;
 using Shared.Domain.Models;
@@ -15,4 +16,6 @@ public interface ICustomerService
     Task<Result<IReadOnlyCollection<FavoriteItemDto>>> GetFavoriteItemsAsync(Guid customerId, CancellationToken ct);
     
     Task<Result<CustomerCartItemsDto>> GetCartItemsAsync(Guid customerId, CancellationToken ct);
+    
+    Task<Result<FullNameDto>> ChangeFullName(Guid customerId, ChangeFullNameDto request, CancellationToken ct);
 }

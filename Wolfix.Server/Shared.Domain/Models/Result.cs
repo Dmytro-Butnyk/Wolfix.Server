@@ -28,6 +28,12 @@ public sealed class Result<TValue>
 
     public static Result<TValue> Failure(string errorMessage, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
         => new(errorMessage, statusCode);
+    
+    public static Result<TValue> Failure(Result<TValue> result)
+        => new(result.ErrorMessage!, result.StatusCode);
+    
+    public static Result<TValue> Failure(VoidResult result)
+        => new(result.ErrorMessage!, result.StatusCode);
 
     public TResult Map<TResult>(Func<TValue, TResult> onSuccess, Func<string, TResult> onFailure)
     {
