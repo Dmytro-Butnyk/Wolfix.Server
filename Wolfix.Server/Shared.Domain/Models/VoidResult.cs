@@ -19,6 +19,12 @@ public sealed class VoidResult
 
     public static VoidResult Failure(string errorMessage, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
         => new(errorMessage, statusCode);
+    
+    public static VoidResult Failure(VoidResult result)
+        => new(result.ErrorMessage!, result.StatusCode);
+    
+    public static VoidResult Failure<TValue>(Result<TValue> result)
+        => new(result.ErrorMessage!, result.StatusCode);
 
     public TResult Map<TResult>(Func<TResult> onSuccess, Func<string, TResult> onFailure)
         => IsSuccess ? onSuccess() : onFailure(ErrorMessage!);
