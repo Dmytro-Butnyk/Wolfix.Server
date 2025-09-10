@@ -6,7 +6,7 @@ using Identity.Infrastructure.Helpers;
 using Identity.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 
-namespace Wolfix.Host.Extensions;
+namespace Wolfix.API.Extensions;
 
 public static class WebApplicationExtension
 {

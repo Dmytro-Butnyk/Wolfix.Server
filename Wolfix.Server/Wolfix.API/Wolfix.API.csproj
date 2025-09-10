@@ -17,6 +17,7 @@
       <ProjectReference Include="..\Media.Api\Media.Api.csproj" />
       <ProjectReference Include="..\Customer.Endpoints\Customer.Endpoints.csproj" />
       <ProjectReference Include="..\Identity.Endpoints\Identity.Endpoints.csproj" />
+      <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
     </ItemGroup>
 
     <ItemGroup>
