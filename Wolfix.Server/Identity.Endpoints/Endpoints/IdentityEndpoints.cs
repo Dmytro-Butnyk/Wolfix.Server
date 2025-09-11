@@ -187,6 +187,11 @@ internal static class IdentityEndpoints
             [FromServices] IAuthService authService,
             CancellationToken ct)
     {
+        if (request.CurrentPassword == request.NewPassword)
+        {
+            return TypedResults.BadRequest("New password must be different from current password");
+        }
+        
         VoidResult changePasswordResult = await authService.ChangePasswordAsync(accountId, request, ct);
 
         if (!changePasswordResult.IsSuccess)
