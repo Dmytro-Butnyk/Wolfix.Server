@@ -45,7 +45,9 @@ internal sealed class ProductAttribute : BaseEntity
     } 
     
     public static explicit operator ProductAttributeInfo(ProductAttribute productAttribute)
-        => new(productAttribute.Key);
+        => new(
+            productAttribute.Id,
+            productAttribute.Key);
 }
 
-public record ProductAttributeInfo(string Key);
+public record ProductAttributeInfo(Guid Id, string Key);

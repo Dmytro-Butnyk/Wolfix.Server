@@ -5,12 +5,15 @@ using Shared.Domain.Interfaces;
 
 namespace Shared.Infrastructure.Repositories;
 
+//TODO: REMOVE SAVE CHANGES
+
 public class BaseRepository<TContext, TEntity>(TContext context)
     : IBaseRepository<TEntity>
     where TEntity : BaseEntity
     where TContext : DbContext
 {
     private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
+    public TContext Context => context;
 
     public async Task<bool> IsExistAsync(Guid id, CancellationToken cancellationToken)
     {
