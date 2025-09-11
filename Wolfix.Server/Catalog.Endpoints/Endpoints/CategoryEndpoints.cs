@@ -38,6 +38,8 @@ internal static class CategoryEndpoints
     {
         group.MapPost("", AddParent)
             .WithSummary("Add parent category");
+        
+        //todo: ендпоинт для добавления чайлд категории
     }
 
     private static async Task<Ok<IReadOnlyCollection<CategoryShortDto>>> GetAllParentCategories(
