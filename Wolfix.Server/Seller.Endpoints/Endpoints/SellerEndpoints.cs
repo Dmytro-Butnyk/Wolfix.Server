@@ -21,6 +21,8 @@ internal static class SellerEndpoints
         
         var changeGroup = sellerGroup.MapGroup("{sellerId:guid}");
         MapChangeEndpoints(changeGroup);
+        
+        //todo: ендпоинт для смены фото
     }
     
     private static void MapChangeEndpoints(RouteGroupBuilder group)

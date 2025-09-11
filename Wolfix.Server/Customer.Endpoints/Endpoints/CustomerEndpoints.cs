@@ -30,6 +30,8 @@ internal static class CustomerEndpoints
         
         var changeMethodsGroup = customerGroup.MapGroup("{customerId:guid}");
         MapChangeMethods(changeMethodsGroup);
+        
+        //todo: ендпоинт для смены фото
     }
     
     private static void MapFavoriteItemsEndpoints(RouteGroupBuilder group)

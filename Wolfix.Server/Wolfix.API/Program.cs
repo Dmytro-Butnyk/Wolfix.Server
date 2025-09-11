@@ -22,7 +22,7 @@ builder.Services.AddAuthentication();
 
 //todo: перенести EventBus в Shared.Application???
 //todo: написать юнит тесты в каждом модуле и сделать CI/CD
-//todo: написать автодобавление важных записей в бд при старте сервера(только если уже не добавлены)
+//todo: написать отдельный проект для заполнения базы
 
 builder
     .AddAppCache()
