@@ -12,4 +12,6 @@ public interface IAuthStore
     Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role, CancellationToken ct);
     
     Task<VoidResult> ChangeEmailAsync(Guid accountId, string email, string token, CancellationToken ct);
+    
+    Task<VoidResult> ChangePasswordAsync(Guid accountId, string currentPassword, string newPassword, CancellationToken ct);
 }

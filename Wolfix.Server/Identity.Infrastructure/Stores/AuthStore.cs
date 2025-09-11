@@ -152,4 +152,28 @@ internal sealed class AuthStore(
         
         return VoidResult.Success();
     }
+
+    public async Task<VoidResult> ChangePasswordAsync(Guid accountId, string currentPassword, string newPassword, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        
+        Account? account = await userManager.FindByIdAsync(accountId.ToString());
+        
+        if (account is null)
+        {
+            return VoidResult.Failure(
+                "Account not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        IdentityResult changePasswordResult = await userManager.ChangePasswordAsync(account, currentPassword, newPassword);
+
+        if (!changePasswordResult.Succeeded)
+        {
+            return VoidResult.Failure(changePasswordResult.GetErrorMessage());
+        }
+        
+        return VoidResult.Success();
+    }
 }

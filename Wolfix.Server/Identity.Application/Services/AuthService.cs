@@ -120,4 +120,17 @@ internal sealed class AuthService(
         
         return Result<string>.Success(request.Email);
     }
+
+    public async Task<VoidResult> ChangePasswordAsync(Guid accountId, ChangePasswordDto request, CancellationToken ct)
+    {
+        VoidResult changePasswordResult = await authStore.ChangePasswordAsync(accountId, request.CurrentPassword,
+            request.NewPassword, ct);
+        
+        if (!changePasswordResult.IsSuccess)
+        {
+            return VoidResult.Failure(changePasswordResult);
+        }
+        
+        return VoidResult.Success();
+    }
 }

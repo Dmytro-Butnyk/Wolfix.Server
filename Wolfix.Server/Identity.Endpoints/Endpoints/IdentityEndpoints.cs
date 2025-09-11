@@ -50,8 +50,8 @@ internal static class IdentityEndpoints
         group.MapPatch("email", ChangeEmail)
             .WithSummary("Change email");
         
-        // group.MapPatch("password", )
-        //     .WithSummary("Change password");
+        group.MapPatch("password", ChangePassword)
+            .WithSummary("Change password");
     }
     
     private static async Task<Results<Ok<UserRolesDto>, NotFound<string>, BadRequest<string>, InternalServerError<string>>> LogInAndGetUserRoles(
@@ -168,7 +168,7 @@ internal static class IdentityEndpoints
         
         return TypedResults.Ok(changeEmailResult.Value);
     }
-
+    
     private static string? GetToken(HttpContext context)
     {
         string? authHeader = context.Request.Headers.Authorization;
@@ -179,5 +179,26 @@ internal static class IdentityEndpoints
         }
 
         return authHeader["Bearer ".Length..];
+    }
+
+    private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>>> ChangePassword(
+            [FromBody] ChangePasswordDto request,
+            [FromRoute] Guid accountId,
+            [FromServices] IAuthService authService,
+            CancellationToken ct)
+    {
+        VoidResult changePasswordResult = await authService.ChangePasswordAsync(accountId, request, ct);
+
+        if (!changePasswordResult.IsSuccess)
+        {
+            return changePasswordResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(changePasswordResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(changePasswordResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+        
+        return TypedResults.NoContent();
     }
 }

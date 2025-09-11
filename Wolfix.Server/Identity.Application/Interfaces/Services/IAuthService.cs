@@ -15,4 +15,6 @@ public interface IAuthService
     Task<Result<string>> RegisterAsSellerAsync(RegisterAsSellerDto dto, CancellationToken ct);
     
     Task<Result<string>> ChangeEmailAsync(Guid accountId, ChangeEmailDto request, string token, CancellationToken ct);
+    
+    Task<VoidResult> ChangePasswordAsync(Guid accountId, ChangePasswordDto request, CancellationToken ct);
 }
