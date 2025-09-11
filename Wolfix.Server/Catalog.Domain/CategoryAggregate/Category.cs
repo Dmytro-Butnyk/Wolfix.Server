@@ -164,6 +164,21 @@ public sealed class Category : BaseEntity
         );
     }
 
+    public VoidResult AddProductVariants(params IReadOnlyCollection<string> keys)
+    {
+        foreach (string key in keys)
+        {
+            VoidResult addResult = AddProductVariant(key);
+            
+            if (!addResult.IsSuccess)
+            {
+                return VoidResult.Failure(addResult);
+            }
+        }
+        
+        return VoidResult.Success();
+    }
+
     public VoidResult RemoveProductVariant(Guid productVariantId)
     {
         ProductVariant? existingProductVariant = _productVariants.FirstOrDefault(pv => pv.Id == productVariantId);
@@ -235,6 +250,21 @@ public sealed class Category : BaseEntity
             },
             onFailure: errorMessage => VoidResult.Failure(errorMessage, createProductAttributeResult.StatusCode)
         );
+    }
+
+    public VoidResult AddProductAttributes(params IReadOnlyCollection<string> keys)
+    {
+        foreach (string key in keys)
+        {
+            VoidResult addResult = AddProductAttribute(key);
+            
+            if (!addResult.IsSuccess)
+            {
+                return VoidResult.Failure(addResult);
+            }
+        }
+        
+        return VoidResult.Success();
     }
 
     public VoidResult RemoveProductAttribute(Guid productAttributeId)

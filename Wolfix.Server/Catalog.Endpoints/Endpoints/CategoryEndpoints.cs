@@ -1,4 +1,7 @@
+using System.Net;
 using Catalog.Application.Dto.Category;
+using Catalog.Application.Dto.Category.Requests;
+using Catalog.Application.Dto.Category.Responses;
 using Catalog.Application.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -19,6 +22,7 @@ internal static class CategoryEndpoints
             .WithTags("Categories");
         
         MapGetEndpoints(categoryGroup);
+        MapManageEndpoints(categoryGroup);
     }
 
     private static void MapGetEndpoints(RouteGroupBuilder group)
@@ -28,6 +32,12 @@ internal static class CategoryEndpoints
         
         group.MapGet("child/{parentId:guid}", GetAllChildCategoriesByParent)
             .WithSummary("Get all child categories by parent");
+    }
+
+    private static void MapManageEndpoints(RouteGroupBuilder group)
+    {
+        group.MapPost("", AddParent)
+            .WithSummary("Add parent category");
     }
 
     private static async Task<Ok<IReadOnlyCollection<CategoryShortDto>>> GetAllParentCategories(
@@ -53,5 +63,25 @@ internal static class CategoryEndpoints
         }
         
         return TypedResults.Ok(getChildCategoriesResult.Value);
+    }
+
+    private static async Task<Results<NoContent, Conflict<string>, BadRequest<string>>> AddParent(
+        [FromBody] AddParentCategoryDto request,
+        [FromServices] ICategoryService categoryService,
+        CancellationToken ct)
+    {
+        VoidResult addParentCategoryResult = await categoryService.AddParentAsync(request, ct);
+
+        if (!addParentCategoryResult.IsSuccess)
+        {
+            return addParentCategoryResult.StatusCode switch
+            {
+                HttpStatusCode.Conflict => TypedResults.Conflict(addParentCategoryResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(addParentCategoryResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+        
+        return TypedResults.NoContent();
     }
 }

@@ -1,7 +1,10 @@
 using System.Net;
 using Catalog.Application.Dto.Category;
+using Catalog.Application.Dto.Category.Requests;
+using Catalog.Application.Dto.Category.Responses;
 using Catalog.Application.Interfaces;
 using Catalog.Application.Mapping.Category;
+using Catalog.Domain.CategoryAggregate;
 using Catalog.Domain.Interfaces;
 using Catalog.Domain.Projections.Category;
 using Shared.Application.Interfaces;
@@ -55,5 +58,45 @@ internal sealed class CategoryService(
         }, ct, TimeSpan.FromMinutes(20));
         
         return Result<IReadOnlyCollection<CategoryShortDto>>.Success(childCategoriesDto);
+    }
+
+    public async Task<VoidResult> AddParentAsync(AddParentCategoryDto request, CancellationToken ct)
+    {
+        if (await categoryRepository.IsExistAsync(request.Name, ct))
+        {
+            return VoidResult.Failure(
+                $"Category with name: {request.Name} already exists",
+                HttpStatusCode.Conflict
+            );
+        }
+        
+        Result<Category> createCategoryResult = Category.Create(request.Name, request.Description);
+
+        if (!createCategoryResult.IsSuccess)
+        {
+            return VoidResult.Failure(createCategoryResult);
+        }
+        
+        Category category = createCategoryResult.Value!;
+
+        VoidResult addProductAttributesResult = category.AddProductAttributes(request.AttributeKeys);
+
+        if (!addProductAttributesResult.IsSuccess)
+        {
+            return VoidResult.Failure(addProductAttributesResult);
+        }
+        
+        VoidResult addProductVariantsResult = category.AddProductVariants(request.VariantKeys);
+
+        if (!addProductVariantsResult.IsSuccess)
+        {
+            return VoidResult.Failure(addProductVariantsResult);
+        }
+
+        //todo: поменять метод AddAsync в дженерик репозитории и везде где я его использовал раньше после него дописать SaveChangesAsync
+        //todo: а потом прям тутттт вызвать его
+        await categoryRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
     }
 }
