@@ -3,6 +3,7 @@ using Identity.Application.Dto;
 using Identity.Application.Dto.Requests;
 using Identity.Application.Dto.Responses;
 using Identity.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -27,6 +28,9 @@ internal static class IdentityEndpoints
         identityGroup.MapPost("seller/register", RegisterAsSeller)
             .DisableAntiforgery()
             .WithSummary("Register as seller");
+        
+        var changeGroup = identityGroup.MapGroup("{accountId:guid}");
+        MapChangeEndpoints(changeGroup);
     }
 
     private static void MapCustomerEndpoints(RouteGroupBuilder customerGroup)
@@ -40,12 +44,22 @@ internal static class IdentityEndpoints
         customerGroup.MapPost("register", RegisterAsCustomer)
             .WithSummary("Register as customer");
     }
+
+    private static void MapChangeEndpoints(RouteGroupBuilder group)
+    {
+        group.MapPatch("email", ChangeEmail)
+            .WithSummary("Change email");
+        
+        // group.MapPatch("password", )
+        //     .WithSummary("Change password");
+    }
     
     private static async Task<Results<Ok<UserRolesDto>, NotFound<string>, BadRequest<string>, InternalServerError<string>>> LogInAndGetUserRoles(
         [FromBody] LogInDto logInDto,
-        [FromServices] IAuthService authService)
+        [FromServices] IAuthService authService,
+        CancellationToken ct)
     {
-        Result<UserRolesDto> logInResult = await authService.LogInAndGetUserRolesAsync(logInDto);
+        Result<UserRolesDto> logInResult = await authService.LogInAndGetUserRolesAsync(logInDto, ct);
 
         if (!logInResult.IsSuccess)
         {
@@ -63,9 +77,10 @@ internal static class IdentityEndpoints
 
     private static async Task<Results<Ok<string>, NotFound<string>, ForbidHttpResult, BadRequest<string>>> GetTokenByRole(
         [FromBody] TokenDto tokenDto,
-        [FromServices] IAuthService authService)
+        [FromServices] IAuthService authService,
+        CancellationToken ct)
     {
-        Result<string> getTokenResult = await authService.GetTokenByRoleAsync(tokenDto);
+        Result<string> getTokenResult = await authService.GetTokenByRoleAsync(tokenDto, ct);
 
         if (!getTokenResult.IsSuccess)
         {
@@ -123,5 +138,46 @@ internal static class IdentityEndpoints
         }
         
         return TypedResults.Ok(registerResult.Value);
+    }
+
+    private static async Task<Results<Ok<string>, UnauthorizedHttpResult, NotFound<string>, BadRequest<string>>> ChangeEmail(
+        [FromBody] ChangeEmailDto request,
+        [FromRoute] Guid accountId,
+        [FromServices] IAuthService authService,
+        HttpContext context,
+        CancellationToken ct)
+    {
+        string? token = GetToken(context);
+
+        if (token is null)
+        {
+            return TypedResults.Unauthorized();
+        }
+        
+        Result<string> changeEmailResult = await authService.ChangeEmailAsync(accountId, request, token, ct);
+
+        if (!changeEmailResult.IsSuccess)
+        {
+            return changeEmailResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(changeEmailResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(changeEmailResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+        
+        return TypedResults.Ok(changeEmailResult.Value);
+    }
+
+    private static string? GetToken(HttpContext context)
+    {
+        string? authHeader = context.Request.Headers.Authorization;
+
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
+        {
+            return null;
+        }
+
+        return authHeader["Bearer ".Length..];
     }
 }

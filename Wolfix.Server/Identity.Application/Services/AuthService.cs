@@ -17,9 +17,9 @@ internal sealed class AuthService(
     IJwtService jwtService,
     IEventBus eventBus) : IAuthService
 {
-    public async Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(LogInDto logInDto)
+    public async Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(LogInDto logInDto, CancellationToken ct)
     {
-        Result<UserRolesProjection> getUserRolesResult = await authStore.LogInAndGetUserRolesAsync(logInDto.Email, logInDto.Password);
+        Result<UserRolesProjection> getUserRolesResult = await authStore.LogInAndGetUserRolesAsync(logInDto.Email, logInDto.Password, ct);
 
         if (!getUserRolesResult.IsSuccess)
         {
@@ -30,9 +30,9 @@ internal sealed class AuthService(
         return Result<UserRolesDto>.Success(dto);
     }
 
-    public async Task<Result<string>> GetTokenByRoleAsync(TokenDto dto)
+    public async Task<Result<string>> GetTokenByRoleAsync(TokenDto dto, CancellationToken ct)
     {
-        Result<Guid> checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRole(dto.Email, dto.Password, dto.Role);
+        Result<Guid> checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRole(dto.Email, dto.Password, dto.Role, ct);
 
         if (!checkUserExistsAndHasRoleResult.IsSuccess)
         {
@@ -45,7 +45,7 @@ internal sealed class AuthService(
 
     public async Task<Result<string>> RegisterAsCustomerAsync(RegisterAsCustomerDto dto, CancellationToken ct)
     {
-        Result<Guid> registerResult = await authStore.RegisterAccountAsync(dto.Email, dto.Password, Roles.Customer);
+        Result<Guid> registerResult = await authStore.RegisterAccountAsync(dto.Email, dto.Password, Roles.Customer, ct);
 
         if (!registerResult.IsSuccess)
         {
@@ -71,7 +71,7 @@ internal sealed class AuthService(
 
     public async Task<Result<string>> RegisterAsSellerAsync(RegisterAsSellerDto dto, CancellationToken ct)
     {
-        Result<Guid> registerResult = await authStore.RegisterAccountAsync(dto.Email, dto.Password, Roles.Seller);
+        Result<Guid> registerResult = await authStore.RegisterAccountAsync(dto.Email, dto.Password, Roles.Seller, ct);
 
         if (!registerResult.IsSuccess)
         {
@@ -99,7 +99,7 @@ internal sealed class AuthService(
 
         if (!publishResult.IsSuccess)
         {
-            return Result<string>.Failure(publishResult.ErrorMessage!, publishResult.StatusCode);
+            return Result<string>.Failure(publishResult);
         }
         
         //todo: событие чтобы отправлять документ к админу на рассмотрение
@@ -107,5 +107,17 @@ internal sealed class AuthService(
         string token = jwtService.GenerateToken(registeredSellerId, dto.Email, Roles.Seller);
         
         return Result<string>.Success(token);
+    }
+
+    public async Task<Result<string>> ChangeEmailAsync(Guid accountId, ChangeEmailDto request, string token, CancellationToken ct)
+    {
+        VoidResult changeEmailResult = await authStore.ChangeEmailAsync(accountId, request.Email, token, ct);
+        
+        if (!changeEmailResult.IsSuccess)
+        {
+            return Result<string>.Failure(changeEmailResult);
+        }
+        
+        return Result<string>.Success(request.Email);
     }
 }

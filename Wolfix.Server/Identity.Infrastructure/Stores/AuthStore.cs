@@ -14,9 +14,11 @@ internal sealed class AuthStore(
     UserManager<Account> userManager,
     RoleManager<Role> roleManager) : IAuthStore
 {
-    public async Task<Result<UserRolesProjection>> LogInAndGetUserRolesAsync(string email, string password)
+    public async Task<Result<UserRolesProjection>> LogInAndGetUserRolesAsync(string email, string password, CancellationToken ct)
     {
-        Result<Account> getUserResult = await GetUser(email, password);
+        ct.ThrowIfCancellationRequested();
+
+        Result<Account> getUserResult = await GetUser(email, password, ct);
 
         if (!getUserResult.IsSuccess)
         {
@@ -36,9 +38,11 @@ internal sealed class AuthStore(
         return Result<UserRolesProjection>.Success(userRolesProjection);
     }
 
-    public async Task<Result<Guid>> CheckUserExistsAndHasRole(string email, string password, string role)
+    public async Task<Result<Guid>> CheckUserExistsAndHasRole(string email, string password, string role, CancellationToken ct)
     {
-        Result<Account> getUserResult = await GetUser(email, password);
+        ct.ThrowIfCancellationRequested();
+
+        Result<Account> getUserResult = await GetUser(email, password, ct);
 
         if (!getUserResult.IsSuccess)
         {
@@ -64,8 +68,10 @@ internal sealed class AuthStore(
         return Result<Guid>.Success(user.Id);
     }
 
-    private async Task<Result<Account>> GetUser(string email, string password)
+    private async Task<Result<Account>> GetUser(string email, string password, CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
+
         Account? user = await userManager.FindByEmailAsync(email);
 
         if (user == null)
@@ -83,8 +89,10 @@ internal sealed class AuthStore(
         return Result<Account>.Success(user);
     }
 
-    public async Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role)
+    public async Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role, CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
+
         Account? existingUser = await userManager.FindByEmailAsync(email);
         
         if (existingUser != null)
@@ -98,13 +106,13 @@ internal sealed class AuthStore(
             UserName = email
         };
 
-        await using var transaction = await context.Database.BeginTransactionAsync();
+        await using var transaction = await context.Database.BeginTransactionAsync(ct);
 
         IdentityResult createResult = await userManager.CreateAsync(user, password);
         
         if (!createResult.Succeeded)
         {
-            await transaction.RollbackAsync();
+            await transaction.RollbackAsync(ct);
             return Result<Guid>.Failure(createResult.GetErrorMessage(), HttpStatusCode.InternalServerError);
         }
         
@@ -112,12 +120,36 @@ internal sealed class AuthStore(
 
         if (!addRoleResult.Succeeded)
         {
-            await transaction.RollbackAsync();
+            await transaction.RollbackAsync(ct);
             return Result<Guid>.Failure(addRoleResult.GetErrorMessage(), HttpStatusCode.InternalServerError);
         }
         
-        await transaction.CommitAsync();
+        await transaction.CommitAsync(ct);
         
         return Result<Guid>.Success(user.Id);
+    }
+
+    public async Task<VoidResult> ChangeEmailAsync(Guid accountId, string email, string token, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        
+        Account? account = await userManager.FindByIdAsync(accountId.ToString());
+        
+        if (account is null)
+        {
+            return VoidResult.Failure(
+                "Account not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        IdentityResult changeEmailResult = await userManager.ChangeEmailAsync(account, email, token);
+
+        if (!changeEmailResult.Succeeded)
+        {
+            return VoidResult.Failure(changeEmailResult.GetErrorMessage());
+        }
+        
+        return VoidResult.Success();
     }
 }

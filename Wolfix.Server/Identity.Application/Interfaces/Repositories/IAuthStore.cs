@@ -5,9 +5,11 @@ namespace Identity.Application.Interfaces.Repositories;
 
 public interface IAuthStore
 {
-    Task<Result<UserRolesProjection>> LogInAndGetUserRolesAsync(string email, string password);
+    Task<Result<UserRolesProjection>> LogInAndGetUserRolesAsync(string email, string password, CancellationToken ct);
     
-    Task<Result<Guid>> CheckUserExistsAndHasRole(string email, string password, string role);
+    Task<Result<Guid>> CheckUserExistsAndHasRole(string email, string password, string role, CancellationToken ct);
     
-    Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role);
+    Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role, CancellationToken ct);
+    
+    Task<VoidResult> ChangeEmailAsync(Guid accountId, string email, string token, CancellationToken ct);
 }

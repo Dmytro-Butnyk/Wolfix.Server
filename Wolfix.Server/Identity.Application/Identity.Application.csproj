@@ -19,8 +19,4 @@
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.13.1" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Dto\Requests\Shared\" />
-    </ItemGroup>
-
 </Project>
