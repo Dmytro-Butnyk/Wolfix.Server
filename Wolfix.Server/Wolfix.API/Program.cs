@@ -5,6 +5,7 @@ using Identity.Endpoints.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Wolfix.API.ExceptionHandlers;
 using Wolfix.API.Extensions;
+using Wolfix.ServiceDefaults;
 
 if (File.Exists(".env"))
 {

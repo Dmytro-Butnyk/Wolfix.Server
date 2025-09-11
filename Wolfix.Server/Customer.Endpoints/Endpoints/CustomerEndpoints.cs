@@ -1,6 +1,5 @@
 using System.Net;
 using Customer.Application.Dto.CartItem;
-using Customer.Application.Dto.Customer;
 using Customer.Application.Dto.FavoriteItem;
 using Customer.Application.Dto.Product;
 using Customer.Application.Interfaces;
@@ -9,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Shared.Application.Dto;
 using Shared.Domain.Models;
 
 namespace Customer.Endpoints.Endpoints;
@@ -135,7 +135,7 @@ internal static class CustomerEndpoints
         [FromServices] ICustomerService customerService,
         CancellationToken ct)
     {
-        Result<FullNameDto> changeFullNameResult = await customerService.ChangeFullName(customerId, request, ct);
+        Result<FullNameDto> changeFullNameResult = await customerService.ChangeFullNameAsync(customerId, request, ct);
         
         if (!changeFullNameResult.IsSuccess)
         {
@@ -156,7 +156,7 @@ internal static class CustomerEndpoints
         [FromServices] ICustomerService customerService,
         CancellationToken ct)
     {
-        Result<string> changePhoneNumber = await customerService.ChangePhoneNumber(customerId, request, ct);
+        Result<string> changePhoneNumber = await customerService.ChangePhoneNumberAsync(customerId, request, ct);
 
         if (!changePhoneNumber.IsSuccess)
         {
@@ -177,7 +177,7 @@ internal static class CustomerEndpoints
         [FromServices] ICustomerService customerService,
         CancellationToken ct)
     {
-        Result<AddressDto> changeAddressResult = await customerService.ChangeAddress(customerId, request, ct);
+        Result<AddressDto> changeAddressResult = await customerService.ChangeAddressAsync(customerId, request, ct);
         
         if (!changeAddressResult.IsSuccess)
         {
@@ -198,7 +198,7 @@ internal static class CustomerEndpoints
         [FromServices] ICustomerService customerService,
         CancellationToken ct)
     {
-        Result<string> changeBirthDateResult = await customerService.ChangeBirthDate(customerId, request, ct);
+        Result<string> changeBirthDateResult = await customerService.ChangeBirthDateAsync(customerId, request, ct);
         
         if (!changeBirthDateResult.IsSuccess)
         {

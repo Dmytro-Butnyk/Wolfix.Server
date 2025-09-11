@@ -5,6 +5,7 @@ using Identity.Infrastructure;
 using Identity.Infrastructure.Helpers;
 using Identity.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
+using Seller.Endpoints.Extensions;
 
 namespace Wolfix.API.Extensions;
 
@@ -15,6 +16,7 @@ public static class WebApplicationExtension
         app.MapCatalogApi();
         app.MapIdentityApi();
         app.MapCustomerApi();
+        app.MapSellerApi();
     }
 
     public static async Task EnsureAllRolesExist(this WebApplication app)

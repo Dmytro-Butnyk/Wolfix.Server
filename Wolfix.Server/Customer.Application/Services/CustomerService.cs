@@ -1,7 +1,6 @@
 using System.Net;
 using Customer.Application.Dto;
 using Customer.Application.Dto.CartItem;
-using Customer.Application.Dto.Customer;
 using Customer.Application.Dto.FavoriteItem;
 using Customer.Application.Dto.Product;
 using Customer.Application.Interfaces;
@@ -10,6 +9,7 @@ using Customer.Application.Mapping.FavoriteItem;
 using Customer.Domain.Interfaces;
 using Customer.Domain.Projections;
 using Customer.IntegrationEvents;
+using Shared.Application.Dto;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents.Interfaces;
 
@@ -106,7 +106,8 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
         return Result<CustomerCartItemsDto>.Success(customerCartItemsDto);
     }
 
-    public async Task<Result<FullNameDto>> ChangeFullName(Guid customerId, ChangeFullNameDto request, CancellationToken ct)
+    public async Task<Result<FullNameDto>> ChangeFullNameAsync(Guid customerId, ChangeFullNameDto request,
+        CancellationToken ct)
     {
         var customer = await customerRepository.GetByIdAsync(customerId, ct);
 
@@ -132,7 +133,8 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
         return Result<FullNameDto>.Success(dto);
     }
 
-    public async Task<Result<string>> ChangePhoneNumber(Guid customerId, ChangePhoneNumberDto request, CancellationToken ct)
+    public async Task<Result<string>> ChangePhoneNumberAsync(Guid customerId, ChangePhoneNumberDto request,
+        CancellationToken ct)
     {
         var customer = await customerRepository.GetByIdAsync(customerId, ct);
         
@@ -156,7 +158,8 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
         return Result<string>.Success(customer.GetPhoneNumber());
     }
 
-    public async Task<Result<AddressDto>> ChangeAddress(Guid customerId, ChangeAddressDto request, CancellationToken ct)
+    public async Task<Result<AddressDto>> ChangeAddressAsync(Guid customerId, ChangeAddressDto request,
+        CancellationToken ct)
     {
         var customer = await customerRepository.GetByIdAsync(customerId, ct);
         
@@ -183,7 +186,8 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
         return Result<AddressDto>.Success(dto);
     }
 
-    public async Task<Result<string>> ChangeBirthDate(Guid customerId, ChangeBirthDateDto request, CancellationToken ct)
+    public async Task<Result<string>> ChangeBirthDateAsync(Guid customerId, ChangeBirthDateDto request,
+        CancellationToken ct)
     {
         var customer = await customerRepository.GetByIdAsync(customerId, ct);
         
