@@ -6,13 +6,12 @@ namespace Catalog.Domain.Interfaces.DomainServices;
 
 public interface IProductDomainService
 {
-    Task<VoidResult> AddProductAsync(
+    Task<Result<Guid>> AddProductAsync(
         string title,
         string description,
         decimal price,
         ProductStatus status,
         Guid categoryId,
-        AddMediaValueObject media,
         IReadOnlyCollection<AddAttributeValueObject> attributes,
         CancellationToken ct);
 }

@@ -6,11 +6,11 @@ using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.EventHandlers;
 
-public sealed class BlobResourcesForProductAddedEventHandler(
+public sealed class BlobResourceForProductAddedEventHandler(
     IProductRepository productRepository
-) : IIntegrationEventHandler<BlobResourcesForProductAdded>
+) : IIntegrationEventHandler<BlobResourceForProductAdded>
 {
-    public async Task<VoidResult> HandleAsync(BlobResourcesForProductAdded @event, CancellationToken ct)
+    public async Task<VoidResult> HandleAsync(BlobResourceForProductAdded @event, CancellationToken ct)
     {
         Product? product = await productRepository.GetByIdAsync(@event.ProductId, ct);
 

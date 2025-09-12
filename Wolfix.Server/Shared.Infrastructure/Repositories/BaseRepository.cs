@@ -49,23 +49,34 @@ public class BaseRepository<TContext, TEntity>(TContext context)
         await context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<TEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<TEntity?> GetByIdAsync(
+        Guid id,
+        CancellationToken cancellationToken,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        
-        TEntity? entity = await _dbSet.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-        return entity;
+
+        IQueryable<TEntity> query = _dbSet;
+
+        if (include is not null)
+            query = include(query);
+
+        return await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
-    public async Task<TEntity?> GetByIdAsNoTrackingAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<TEntity?> GetByIdAsNoTrackingAsync(
+        Guid id,
+        CancellationToken cancellationToken,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        
-        TEntity? entity = await _dbSet
-            .AsNoTracking()
-            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
-        
-        return entity;
+
+        IQueryable<TEntity> query = _dbSet.AsNoTracking();
+
+        if (include is not null)
+            query = include(query);
+
+        return await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
     public async Task ExecuteDeleteAsync(CancellationToken cancellationToken)

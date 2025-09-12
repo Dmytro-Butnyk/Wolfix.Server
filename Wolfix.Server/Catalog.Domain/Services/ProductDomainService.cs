@@ -14,21 +14,20 @@ public sealed class ProductDomainService(
     IProductRepository productRepository,
     ICategoryRepository categoryRepository) : IProductDomainService
 {
-    public async Task<VoidResult> AddProductAsync(
+    public async Task<Result<Guid>> AddProductAsync(
         string title,
         string description,
         decimal price,
         ProductStatus status,
         Guid categoryId,
-        AddMediaValueObject media,
         IReadOnlyCollection<AddAttributeValueObject> attributes,
         CancellationToken ct)
     {
-        Category? category = await categoryRepository.GetByIdAsync(categoryId, ct);
+        Category? category = await categoryRepository.GetByIdAsNoTrackingAsync(categoryId, ct);
 
         if (category is null)
         {
-            return VoidResult.Failure("Category not found", HttpStatusCode.NotFound);
+            return Result<Guid>.Failure("Category not found", HttpStatusCode.NotFound);
         }
 
         Result<Product> newProduct = Product.Create(
@@ -41,23 +40,25 @@ public sealed class ProductDomainService(
 
         if (!newProduct.IsSuccess)
         {
-            return VoidResult.Failure(newProduct.ErrorMessage!, newProduct.StatusCode);
+            return Result<Guid>.Failure(newProduct.ErrorMessage!, newProduct.StatusCode);
         }
 
         await productRepository.AddAsync(newProduct.Value!, ct);
-
+        
+        //todo: придумать как обрабатывать ошибку, если случиться проблема с одним из атрибутов
         VoidResult addProductAttributesResult =
-            await AddProductAttributes(newProduct.Value!, attributes, ct);
+            await AddProductAttributesAsync(newProduct.Value!, attributes, ct);
 
-
-        return VoidResult.Success();
+        return Result<Guid>.Success(newProduct.Value!.Id);
     }
 
-    private async Task<VoidResult> AddProductAttributes(Product newProduct,
+    private async Task<VoidResult> AddProductAttributesAsync(Product newProduct,
         IReadOnlyCollection<AddAttributeValueObject> addAttributesDtos,
         CancellationToken ct)
     {
-        Category? category = await categoryRepository.GetByIdAsync(newProduct.CategoryId, ct);
+        Category? category = await categoryRepository
+            .GetByIdWithProductAttributesAsNoTrackingAsync(
+                newProduct.CategoryId, ct);
 
         if (category is null)
         {

@@ -16,6 +16,7 @@ using Catalog.Domain.Projections.Product;
 using Catalog.Domain.Projections.Product.Review;
 using Catalog.Domain.ValueObjects.AddProduct;
 using Catalog.IntegrationEvents;
+using Catalog.IntegrationEvents.Dto;
 using Shared.Application.Dto;
 using Shared.Domain.Enums;
 using Shared.Domain.Models;
@@ -44,7 +45,7 @@ internal sealed class ProductService(
 
         BlobResourceType blobResourceType;
 
-        if (Enum.TryParse(addProductDto.Media.ContentType, out BlobResourceType resourceType))
+        if (Enum.TryParse(addProductDto.ContentType, out BlobResourceType resourceType))
         {
             blobResourceType = resourceType;
         }
@@ -52,31 +53,39 @@ internal sealed class ProductService(
         {
             return VoidResult.Failure("Invalid blob resource type");
         }
-        
-        Stream stream = addProductDto.Media.Filestream.OpenReadStream();
 
-        AddMediaValueObject media = new AddMediaValueObject(blobResourceType, stream);
+        Stream stream = addProductDto.Filestream.OpenReadStream();
 
         IReadOnlyCollection<AddAttributeValueObject> attributes = addProductDto.Attributes
             .Select(attr => new AddAttributeValueObject(attr.Id, attr.Value))
             .ToList();
 
-        VoidResult result = await productDomainService.AddProductAsync(
+        Result<Guid> result = await productDomainService.AddProductAsync(
             addProductDto.Title,
             addProductDto.Description,
             addProductDto.Price,
             productStatus,
             addProductDto.CategoryId,
-            media,
             attributes,
             ct
         );
-        
+
         if (!result.IsSuccess)
         {
-            return VoidResult.Failure(result.ErrorMessage!, result.StatusCode);;
+            return VoidResult.Failure(result.ErrorMessage!, result.StatusCode);
         }
-        
+
+        VoidResult eventResult = await eventBus.PublishAsync(
+            new ProductMediaAdded(
+                result.Value,
+                new MediaEventDto(blobResourceType, stream, true)),
+            ct);
+
+        if (!eventResult.IsSuccess)
+        {
+            return VoidResult.Failure(eventResult.ErrorMessage!, eventResult.StatusCode);
+        }
+
         return VoidResult.Success();
     }
 

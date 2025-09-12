@@ -27,7 +27,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IIntegrationEventHandler<CheckProductExistsForAddingToFavorite>, CheckProductExistsForAddingToFavoriteEventHandler>();
         services.AddScoped<IIntegrationEventHandler<CheckProductExistsForAddingToCart>, CheckProductExistsForAddingToCartEventHandler>();
-        services.AddScoped<IIntegrationEventHandler<BlobResourcesForProductAdded>, BlobResourcesForProductAddedEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<BlobResourceForProductAdded>, BlobResourceForProductAddedEventHandler>();
         
         return services;
     }

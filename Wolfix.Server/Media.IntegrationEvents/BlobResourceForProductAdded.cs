@@ -3,7 +3,7 @@ using Shared.IntegrationEvents.Interfaces;
 
 namespace Media.IntegrationEvents;
 
-public record BlobResourcesForProductAdded(
+public record BlobResourceForProductAdded(
     Guid ProductId,
     BlobResourceAddedDto BlobResource
 ) : IIntegrationEvent;

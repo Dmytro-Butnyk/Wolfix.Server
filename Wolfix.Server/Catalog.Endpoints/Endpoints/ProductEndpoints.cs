@@ -31,6 +31,7 @@ internal static class ProductEndpoints
     private static void MapProductEndpoints(RouteGroupBuilder group)
     {
         group.MapPost("", AddProduct)
+            .DisableAntiforgery()
             .WithSummary("Add product");
         
         group.MapGet("category/{childCategoryId:guid}/page/{page:int}", GetAllByCategoryForPage)

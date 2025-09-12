@@ -1,6 +1,8 @@
-﻿namespace Catalog.IntegrationEvents.Dto;
+﻿using Shared.Domain.Enums;
+
+namespace Catalog.IntegrationEvents.Dto;
 
 public sealed record MediaEventDto(
-    string ContentType,
+    BlobResourceType ContentType,
     Stream Filestream,
     bool IsMain);
