@@ -92,9 +92,9 @@ internal sealed class CategoryService(
         {
             return VoidResult.Failure(addProductVariantsResult);
         }
+        
+        await categoryRepository.AddAsync(category, ct);
 
-        //todo: поменять метод AddAsync в дженерик репозитории и везде где я его использовал раньше после него дописать SaveChangesAsync
-        //todo: а потом прям тутттт вызвать его
         await categoryRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();
