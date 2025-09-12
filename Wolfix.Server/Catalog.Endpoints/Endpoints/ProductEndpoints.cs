@@ -125,6 +125,7 @@ internal static class ProductEndpoints
         return TypedResults.Ok(getRecommendedProductsResult.Value);
     }
 
+    //todo: что-то не так тут
     private static async Task<Ok<IReadOnlyCollection<ProductShortDto>>> GetRandom(
         [FromServices] IProductService productService,
         CancellationToken ct,
