@@ -14,12 +14,10 @@ public sealed class BlobResourceService(
     IBlobResourceRepository blobResourceRepository,
     IAzureBlobRepository azureBlobRepository) : IBlobResourceService
 {
-    public async Task<Result<BlobResourceShortDto>> AddBlobResourceAsync(string contentType, Stream fileStream, CancellationToken ct)
+    public async Task<Result<BlobResourceShortDto>> AddBlobResourceAsync(BlobResourceType contentType, Stream fileStream, CancellationToken ct)
     {
-
-        BlobResourceType blobResourceType = Enum.Parse<BlobResourceType>(contentType);
         Result<BlobResource> blobResource = BlobResource
-            .Create(blobResourceType);
+            .Create(contentType);
 
         if (!blobResource.IsSuccess)
         {
@@ -27,13 +25,18 @@ public sealed class BlobResourceService(
         }
 
         string url = await azureBlobRepository.AddFileAndGetUrlAsync(
-            blobResourceType == BlobResourceType.Photo
+            contentType == BlobResourceType.Photo
                 ? containerNames.CurrentValue.Photos
                 : containerNames.CurrentValue.Videos,
             blobResource.Value!.Name,fileStream,
             ct);
         
-        blobResource.Value.ChangeUrl(url);
+        VoidResult changeUrlResult = blobResource.Value.ChangeUrl(url);
+
+        if (!changeUrlResult.IsSuccess)
+        {
+            return Result<BlobResourceShortDto>.Failure(changeUrlResult.ErrorMessage!, changeUrlResult.StatusCode);       
+        }
         
         await blobResourceRepository.AddAsync(blobResource.Value, ct);
         

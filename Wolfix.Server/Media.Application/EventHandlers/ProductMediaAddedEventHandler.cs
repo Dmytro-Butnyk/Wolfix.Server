@@ -22,14 +22,14 @@ public sealed class ProductMediaAddedEventHandler(
 
         if (!result.IsSuccess)
         {
-            return VoidResult.Failure("Media file could not be processed");
+            return VoidResult.Failure(result.ErrorMessage!, result.StatusCode);
         }
 
         BlobResourceAddedDto blobResourceAddedDto =
             new(result.Value.Id, result.Value.ContentType, result.Value.Url, @event.Media.IsMain);
 
         VoidResult publishResult = await eventBus
-            .PublishAsync(new BlobResourcesForProductAdded(@event.ProductId, blobResourceAddedDto), ct);
+            .PublishAsync(new BlobResourceForProductAdded(@event.ProductId, blobResourceAddedDto), ct);
 
         if (!publishResult.IsSuccess)
         {

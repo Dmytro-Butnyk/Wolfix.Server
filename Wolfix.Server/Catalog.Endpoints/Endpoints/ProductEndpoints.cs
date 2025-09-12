@@ -1,4 +1,6 @@
+using System.Net;
 using Catalog.Application.Dto.Product;
+using Catalog.Application.Dto.Product.AdditionDtos;
 using Catalog.Application.Dto.Product.Review;
 using Catalog.Application.Interfaces;
 using Microsoft.AspNetCore.Builder;
@@ -19,7 +21,7 @@ internal static class ProductEndpoints
     {
         var productGroup = app.MapGroup(Route)
             .WithTags("Products");
-        
+
         MapProductEndpoints(productGroup);
 
         var reviewGroup = productGroup.MapGroup("{productId:guid}/reviews");
@@ -28,30 +30,42 @@ internal static class ProductEndpoints
 
     private static void MapProductEndpoints(RouteGroupBuilder group)
     {
+        group.MapPost("", AddProduct)
+            .DisableAntiforgery()
+            .WithSummary("Add product");
+        
         group.MapGet("category/{childCategoryId:guid}/page/{page:int}", GetAllByCategoryForPage)
             .WithSummary("Get all products by specific category for page with pagination");
-        
+
         group.MapGet("with-discount/page/{page:int}", GetWithDiscountForPage)
             .WithSummary("Get all products with discount for page with pagination");
-        
+
         group.MapGet("recommended", GetRecommendedForPage)
             .WithSummary("Get recommended products by visitedCategories list for page with pagination");
-        
+
         group.MapGet("random", GetRandom)
             .WithSummary("Get random products");
     }
-    
-    #region ADD PRODUCT ENDPOINTS HERE
-    private static async Task<VoidResult> AddProduct(
-        
-        )
+
+    private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> AddProduct(
+        [FromForm] AddProductDto addProductDto,
+        [FromServices] IProductService productService,
+        CancellationToken ct)
     {
-        
-        
-        return VoidResult.Success();
+        VoidResult addProductResult = await productService.AddProductAsync(addProductDto, ct);
+
+        if (!addProductResult.IsSuccess)
+        {
+            return addProductResult.StatusCode switch
+            {
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(addProductResult.ErrorMessage),
+                HttpStatusCode.NotFound => TypedResults.NotFound(addProductResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+
+        return TypedResults.NoContent();
     }
-    
-    #endregion
 
     private static void MapReviewEndpoints(RouteGroupBuilder group)
     {
@@ -62,18 +76,20 @@ internal static class ProductEndpoints
             .WithSummary("Add review");
     }
 
-    private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, BadRequest<string>, NotFound<string>>> GetAllByCategoryForPage(
-        [FromRoute] Guid childCategoryId,
-        [FromRoute] int page,
-        [FromServices] IProductService productService,
-        CancellationToken ct,
-        [FromQuery] int pageSize = 20)
+    //TODO: ПРОВЕРИТЬ СТАТУС КОДЫ
+    private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, BadRequest<string>, NotFound<string>>>
+        GetAllByCategoryForPage(
+            [FromRoute] Guid childCategoryId,
+            [FromRoute] int page,
+            [FromServices] IProductService productService,
+            CancellationToken ct,
+            [FromQuery] int pageSize = 20)
     {
         if (page < 1)
         {
             return TypedResults.BadRequest("Page must be greater than 0");
         }
-        
+
         Result<PaginationDto<ProductShortDto>> getProductsByCategoryResult =
             await productService.GetForPageByCategoryIdAsync(childCategoryId, page, pageSize, ct);
 
@@ -81,7 +97,7 @@ internal static class ProductEndpoints
         {
             return TypedResults.NotFound(getProductsByCategoryResult.ErrorMessage);
         }
-        
+
         return TypedResults.Ok(getProductsByCategoryResult.Value);
     }
 
@@ -98,7 +114,7 @@ internal static class ProductEndpoints
 
         Result<PaginationDto<ProductShortDto>> getProductsWithDiscountResult =
             await productService.GetForPageWithDiscountAsync(page, pageSize, ct);
-        
+
         return TypedResults.Ok(getProductsWithDiscountResult.Value);
     }
 
@@ -113,7 +129,7 @@ internal static class ProductEndpoints
         {
             return TypedResults.BadRequest("Visited categories must be not empty");
         }
-        
+
         Result<IReadOnlyCollection<ProductShortDto>> getRecommendedProductsResult =
             await productService.GetRecommendedForPageAsync(pageSize, visitedCategoriesIds.ToList(), ct);
 
@@ -121,7 +137,7 @@ internal static class ProductEndpoints
         {
             return TypedResults.NotFound(getRecommendedProductsResult.ErrorMessage);
         }
-        
+
         return TypedResults.Ok(getRecommendedProductsResult.Value);
     }
 
@@ -133,7 +149,7 @@ internal static class ProductEndpoints
     {
         Result<IReadOnlyCollection<ProductShortDto>> getRandomProductsResult =
             await productService.GetRandomProductsAsync(pageSize, ct);
-        
+
         return TypedResults.Ok(getRandomProductsResult.Value);
     }
 
@@ -146,12 +162,12 @@ internal static class ProductEndpoints
     {
         Result<CursorPaginationDto<ProductReviewDto>> getProductReviewsResult =
             await productService.GetReviewsAsync(productId, pageSize, lastId, ct);
-        
+
         if (!getProductReviewsResult.IsSuccess)
         {
             return TypedResults.NotFound(getProductReviewsResult.ErrorMessage);
         }
-        
+
         return TypedResults.Ok(getProductReviewsResult.Value);
     }
 
@@ -162,12 +178,12 @@ internal static class ProductEndpoints
         CancellationToken ct)
     {
         VoidResult addReviewResult = await productService.AddReviewAsync(productId, addProductReviewDto, ct);
-        
+
         if (!addReviewResult.IsSuccess)
         {
             return TypedResults.NotFound(addReviewResult.ErrorMessage);
         }
-        
+
         return TypedResults.NoContent();
     }
 }

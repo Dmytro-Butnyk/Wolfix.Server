@@ -1,6 +1,8 @@
 using Catalog.Application.EventHandlers;
 using Catalog.Application.Interfaces;
 using Catalog.Application.Services;
+using Catalog.Domain.Interfaces.DomainServices;
+using Catalog.Domain.Services;
 using Customer.IntegrationEvents;
 using Media.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +18,7 @@ public static class DependencyInjection
     {
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IProductDomainService, ProductDomainService>();
 
         return services;
     }
@@ -24,8 +27,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IIntegrationEventHandler<CheckProductExistsForAddingToFavorite>, CheckProductExistsForAddingToFavoriteEventHandler>();
         services.AddScoped<IIntegrationEventHandler<CheckProductExistsForAddingToCart>, CheckProductExistsForAddingToCartEventHandler>();
-        services.AddScoped<IIntegrationEventHandler<BlobResourcesForProductAdded>, BlobResourcesForProductAddedEventHandler>();
-        
+        services.AddScoped<IIntegrationEventHandler<BlobResourceForProductAdded>, BlobResourceForProductAddedEventHandler>();
         
         return services;
     }

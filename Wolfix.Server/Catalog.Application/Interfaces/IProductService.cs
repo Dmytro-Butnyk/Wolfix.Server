@@ -1,4 +1,5 @@
 using Catalog.Application.Dto.Product;
+using Catalog.Application.Dto.Product.AdditionDtos;
 using Catalog.Application.Dto.Product.Review;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
@@ -7,6 +8,7 @@ namespace Catalog.Application.Interfaces;
 
 public interface IProductService
 {
+    Task<VoidResult> AddProductAsync(AddProductDto addProductDto, CancellationToken ct);
     Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRandomProductsAsync(int pageSize, CancellationToken ct);
     
     Task<Result<PaginationDto<ProductShortDto>>> GetForPageByCategoryIdAsync(Guid childCategoryId,

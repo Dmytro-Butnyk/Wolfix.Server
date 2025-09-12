@@ -1,4 +1,5 @@
 ﻿using Media.Application.Dto;
+using Shared.Domain.Enums;
 using Shared.Domain.Models;
 
 namespace Media.Application.Interfaces;
@@ -6,7 +7,7 @@ namespace Media.Application.Interfaces;
 public interface IBlobResourceService
 {
     Task<Result<BlobResourceShortDto>> AddBlobResourceAsync(
-        string contentType,
+        BlobResourceType contentType,
         Stream fileStream,
         CancellationToken ct);
     

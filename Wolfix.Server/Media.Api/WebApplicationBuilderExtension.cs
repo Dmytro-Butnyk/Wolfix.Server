@@ -15,6 +15,8 @@ public static class WebApplicationBuilderExtension
         services.AddAzureBlobRepository();
 
         services.AddMediaOptions(configuration);
+        services.AddMediaServices();
+        services.AddMediaEventHandlers();
         
         return services;
     }

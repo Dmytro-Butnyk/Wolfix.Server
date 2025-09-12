@@ -55,4 +55,12 @@ internal sealed class CategoryRepository(CatalogContext context) :
         
         return childCategories;
     }
+
+    public async Task<Category?> GetByIdWithProductAttributesAsNoTrackingAsync(Guid id, CancellationToken ct)
+    {
+        return await _categories
+            .AsNoTracking()
+            .Include("_productAttributes")
+            .FirstOrDefaultAsync(category => category.Id == id, ct);
+    }
 }
