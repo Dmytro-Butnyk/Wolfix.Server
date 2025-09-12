@@ -2,6 +2,7 @@ using System.Net;
 
 namespace Shared.Domain.Models;
 
+//todo: добавить DebuggerDisplay
 public sealed class VoidResult
 {
     public bool IsSuccess => ErrorMessage == null;
@@ -20,6 +21,7 @@ public sealed class VoidResult
     public static VoidResult Failure(string errorMessage, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
         => new(errorMessage, statusCode);
     
+    //todo: добавить проверки
     public static VoidResult Failure(VoidResult result)
         => new(result.ErrorMessage!, result.StatusCode);
     
