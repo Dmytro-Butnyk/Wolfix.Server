@@ -2,6 +2,7 @@ using System.Net;
 
 namespace Shared.Domain.Models;
 
+//todo: добавить DebuggerDisplay
 public sealed class Result<TValue>
 {
     public TValue? Value { get; }
@@ -29,6 +30,7 @@ public sealed class Result<TValue>
     public static Result<TValue> Failure(string errorMessage, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
         => new(errorMessage, statusCode);
     
+    //todo: добавить проверки
     public static Result<TValue> Failure(Result<TValue> result)
         => new(result.ErrorMessage!, result.StatusCode);
     
