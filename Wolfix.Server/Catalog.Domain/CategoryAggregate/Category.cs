@@ -65,6 +65,11 @@ public sealed class Category : BaseEntity
 
     public VoidResult ChangeName(string name)
     {
+        if (Name == name)
+        {
+            return VoidResult.Failure($"{nameof(name)} the same as the current one");
+        }
+        
         if (IsTextInvalid(name, out string errorMessage))
         {
             return VoidResult.Failure(errorMessage);
@@ -76,6 +81,11 @@ public sealed class Category : BaseEntity
     
     public VoidResult ChangeDescription(string? description)
     {
+        if (Description == description)
+        {
+            return VoidResult.Failure($"{nameof(description)} the same as the current one");
+        }
+        
         if (description is " " or "")
         {
             return VoidResult.Failure($"{nameof(description)} cannot be empty or white space");

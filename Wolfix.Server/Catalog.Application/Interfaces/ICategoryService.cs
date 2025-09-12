@@ -15,4 +15,6 @@ public interface ICategoryService
     Task<VoidResult> AddParentAsync(AddParentCategoryDto request, CancellationToken ct);
     
     Task<VoidResult> AddChildAsync(AddChildCategoryDto request, Guid parentId, CancellationToken ct);
+    
+    Task<Result<ParentCategoryDto>> ChangeParentAsync(ChangeParentCategoryDto request, Guid categoryId, CancellationToken ct);
 }

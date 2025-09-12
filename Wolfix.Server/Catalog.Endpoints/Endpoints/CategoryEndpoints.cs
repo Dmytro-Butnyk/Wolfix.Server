@@ -30,8 +30,13 @@ internal static class CategoryEndpoints
         group.MapGet("parent", GetAllParentCategories)
             .WithSummary("Get all parent categories");
         
+        group.MapPatch("{categoryId:guid}", ChangeParent)
+            .WithSummary("Change parent category");
+        
         group.MapGet("child/{parentId:guid}", GetAllChildCategoriesByParent)
             .WithSummary("Get all child categories by parent");
+        
+        //todo: change child category
     }
 
     private static void MapManageEndpoints(RouteGroupBuilder group)
@@ -88,7 +93,29 @@ internal static class CategoryEndpoints
         return TypedResults.NoContent();
     }
 
-    private static async Task<Results<NoContent, Conflict<string>, BadRequest<string>>> AddChild(
+    private static async Task<Results<Ok<ParentCategoryDto>, NotFound<string>, Conflict<string>, BadRequest<string>>> ChangeParent(
+        [FromBody] ChangeParentCategoryDto request,
+        [FromRoute] Guid categoryId,
+        [FromServices] ICategoryService categoryService,
+        CancellationToken ct)
+    {
+        Result<ParentCategoryDto> changeParentCategoryResult = await categoryService.ChangeParentAsync(request, categoryId, ct);
+
+        if (!changeParentCategoryResult.IsSuccess)
+        {
+            return changeParentCategoryResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(changeParentCategoryResult.ErrorMessage),
+                HttpStatusCode.Conflict => TypedResults.Conflict(changeParentCategoryResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(changeParentCategoryResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+
+        return TypedResults.Ok(changeParentCategoryResult.Value);
+    }
+
+    private static async Task<Results<NoContent, NotFound<string>, Conflict<string>, BadRequest<string>>> AddChild(
         [FromBody] AddChildCategoryDto request,
         [FromRoute] Guid parentId,
         [FromServices] ICategoryService categoryService,
@@ -100,6 +127,7 @@ internal static class CategoryEndpoints
         {
             return addChildCategoryResult.StatusCode switch
             {
+                HttpStatusCode.NotFound => TypedResults.NotFound(addChildCategoryResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(addChildCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addChildCategoryResult.ErrorMessage),
                 _ => throw new Exception("Unknown status code")

@@ -49,14 +49,19 @@ public class BaseRepository<TContext, TEntity>(TContext context)
     public async Task<TEntity?> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken,
-        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
+        params string[]? includeProperties)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         IQueryable<TEntity> query = _dbSet;
 
-        if (include is not null)
-            query = include(query);
+        if (includeProperties is not null)
+        {
+            foreach (string includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
+        }
 
         return await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
@@ -64,14 +69,19 @@ public class BaseRepository<TContext, TEntity>(TContext context)
     public async Task<TEntity?> GetByIdAsNoTrackingAsync(
         Guid id,
         CancellationToken cancellationToken,
-        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
+        params string[]? includeProperties)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         IQueryable<TEntity> query = _dbSet.AsNoTracking();
 
-        if (include is not null)
-            query = include(query);
+        if (includeProperties is not null)
+        {
+            foreach (string includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
+        }
 
         return await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }

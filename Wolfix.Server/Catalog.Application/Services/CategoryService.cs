@@ -87,13 +87,21 @@ internal sealed class CategoryService(
 
     public async Task<VoidResult> AddChildAsync(AddChildCategoryDto request, Guid parentId, CancellationToken ct)
     {
-        Category? parentCategory = await categoryRepository.GetByIdAsync(parentId, ct);
+        Category? parentCategory = await categoryRepository.GetByIdAsync(parentId, ct, "Parent");
 
         if (parentCategory is null)
         {
             return VoidResult.Failure(
                 $"Parent category with id: {parentId} not found",
                 HttpStatusCode.NotFound
+            );
+        }
+
+        if (parentCategory.Parent != null)
+        {
+            return VoidResult.Failure(
+                $"Parent category with id: {parentId} already has a parent",
+                HttpStatusCode.Conflict
             );
         }
         
@@ -133,4 +141,71 @@ internal sealed class CategoryService(
         
         return VoidResult.Success();
     }
+
+    public async Task<Result<ParentCategoryDto>> ChangeParentAsync(ChangeParentCategoryDto request, Guid categoryId, CancellationToken ct)
+    {
+        Category? parentCategory = await categoryRepository.GetByIdAsync(categoryId, ct, "Parent");
+        
+        if (parentCategory is null)
+        {
+            return Result<ParentCategoryDto>.Failure(
+                $"Category with id: {categoryId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        if (parentCategory.Parent != null)
+        {
+            return Result<ParentCategoryDto>.Failure(
+                $"Category with id: {categoryId} is not a parent category",
+                HttpStatusCode.Conflict
+            );
+        }
+        
+        if (await categoryRepository.IsExistAsync(request.Name, ct))
+        {
+            return Result<ParentCategoryDto>.Failure(
+                $"Category with name: {request.Name} already exists",
+                HttpStatusCode.Conflict
+            );
+        }
+        
+        bool isNothingChanged = true;
+
+        if (IsNotTheSame(parentCategory.Name, request.Name))
+        {
+            VoidResult changeCategoryName = parentCategory.ChangeName(request.Name);
+
+            if (!changeCategoryName.IsSuccess)
+            {
+                return Result<ParentCategoryDto>.Failure(changeCategoryName);
+            }
+            isNothingChanged = false;
+        }
+        
+        if ((parentCategory.Description == null && request.Description != null)
+            || IsNotTheSame(parentCategory.Description, request.Description))
+        {
+            VoidResult changeCategoryDescription = parentCategory.ChangeDescription(request.Description);
+
+            if (!changeCategoryDescription.IsSuccess)
+            {
+                return Result<ParentCategoryDto>.Failure(changeCategoryDescription);
+            }
+            isNothingChanged = false;
+        }
+
+        if (isNothingChanged)
+        {
+            return Result<ParentCategoryDto>.Failure("The same data provided");
+        }
+        
+        await categoryRepository.SaveChangesAsync(ct);
+        
+        ParentCategoryDto dto = new(request.Name, request.Description);
+        return Result<ParentCategoryDto>.Success(dto);
+    }
+    
+    private bool IsNotTheSame(string current, string newOne)
+        => !current.Equals(newOne, StringComparison.OrdinalIgnoreCase);
 }

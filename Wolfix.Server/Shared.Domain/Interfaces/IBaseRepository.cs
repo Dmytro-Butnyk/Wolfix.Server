@@ -14,10 +14,10 @@ public interface IBaseRepository<TEntity> where TEntity : BaseEntity
     Task<TEntity?> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken,
-        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null);
+        params string[]? includeProperties);
     Task<TEntity?> GetByIdAsNoTrackingAsync(Guid id,
         CancellationToken cancellationToken,
-        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null);
+        params string[]? includeProperties);
     
     Task ExecuteDeleteAsync(CancellationToken cancellationToken);
     Task ExecuteDeleteAsync(Expression<Func<TEntity,bool>> condition, CancellationToken cancellationToken);
