@@ -97,10 +97,10 @@ internal sealed class CategoryService(
             );
         }
 
-        if (parentCategory.Parent != null)
+        if (!parentCategory.IsParent)
         {
             return VoidResult.Failure(
-                $"Parent category with id: {parentId} already has a parent",
+                $"Category with id: {parentId} already has a parent",
                 HttpStatusCode.Conflict
             );
         }
@@ -154,7 +154,7 @@ internal sealed class CategoryService(
             );
         }
         
-        if (parentCategory.Parent != null)
+        if (!parentCategory.IsParent)
         {
             return Result<ParentCategoryDto>.Failure(
                 $"Category with id: {categoryId} is not a parent category",
@@ -172,28 +172,23 @@ internal sealed class CategoryService(
         
         bool isNothingChanged = true;
 
-        if (IsNotTheSame(parentCategory.Name, request.Name))
-        {
-            VoidResult changeCategoryName = parentCategory.ChangeName(request.Name);
+        VoidResult changeCategoryName = parentCategory.ChangeName(request.Name);
 
-            if (!changeCategoryName.IsSuccess)
-            {
-                return Result<ParentCategoryDto>.Failure(changeCategoryName);
-            }
-            isNothingChanged = false;
+        if (!changeCategoryName.IsSuccess) 
+        {
+            return Result<ParentCategoryDto>.Failure(changeCategoryName);
         }
         
-        if ((parentCategory.Description == null && request.Description != null)
-            || IsNotTheSame(parentCategory.Description, request.Description))
-        {
-            VoidResult changeCategoryDescription = parentCategory.ChangeDescription(request.Description);
+        isNothingChanged = false;
+        
+        VoidResult changeCategoryDescription = parentCategory.ChangeDescription(request.Description);
 
-            if (!changeCategoryDescription.IsSuccess)
-            {
-                return Result<ParentCategoryDto>.Failure(changeCategoryDescription);
-            }
-            isNothingChanged = false;
+        if (!changeCategoryDescription.IsSuccess)
+        {
+            return Result<ParentCategoryDto>.Failure(changeCategoryDescription);
         }
+            
+        isNothingChanged = false;
 
         if (isNothingChanged)
         {
@@ -205,7 +200,285 @@ internal sealed class CategoryService(
         ParentCategoryDto dto = new(request.Name, request.Description);
         return Result<ParentCategoryDto>.Success(dto);
     }
-    
-    private bool IsNotTheSame(string current, string newOne)
-        => !current.Equals(newOne, StringComparison.OrdinalIgnoreCase);
+
+    public async Task<Result<ChildCategoryDto>> ChangeChildAsync(ChangeChildCategoryDto request, Guid childCategoryId, CancellationToken ct)
+    {
+        Category? childCategory = await categoryRepository.GetByIdAsync(childCategoryId, ct, "Parent");
+        
+        if (childCategory is null)
+        {
+            return Result<ChildCategoryDto>.Failure(
+                $"Child category with id: {childCategoryId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        if (!childCategory.IsChild)
+        {
+            return Result<ChildCategoryDto>.Failure(
+                $"Category with id: {childCategoryId} is not a child category",
+                HttpStatusCode.Conflict
+            );
+        }
+        
+        if (await categoryRepository.IsExistAsync(request.Name, ct))
+        {
+            return Result<ChildCategoryDto>.Failure(
+                $"Child category with name: {request.Name} already exists",
+                HttpStatusCode.Conflict
+            );
+        }
+        
+        bool isNothingChanged = true;
+
+        VoidResult changeCategoryName = childCategory.ChangeName(request.Name);
+            
+        if (!changeCategoryName.IsSuccess)
+        {
+            return Result<ChildCategoryDto>.Failure(changeCategoryName);
+        }
+        
+        isNothingChanged = false;
+        
+        VoidResult changeCategoryDescription = childCategory.ChangeDescription(request.Description);
+
+        if (!changeCategoryDescription.IsSuccess)
+        {
+            return Result<ChildCategoryDto>.Failure(changeCategoryDescription);
+        }
+        
+        isNothingChanged = false;
+
+        if (isNothingChanged)
+        {
+            return Result<ChildCategoryDto>.Failure("The same data provided");
+        }
+
+        await categoryRepository.SaveChangesAsync(ct);
+
+        ChildCategoryDto dto = new(request.Name, request.Description);
+        return Result<ChildCategoryDto>.Success(dto);
+    }
+
+    public async Task<VoidResult> AddAttributeAsync(AddCategoryAttributeDto request, Guid childCategoryId, CancellationToken ct)
+    {
+        Category? childCategory = await categoryRepository.GetByIdAsync(childCategoryId, ct, 
+            "Parent", "_productAttributes");
+        
+        if (childCategory is null)
+        {
+            return VoidResult.Failure(
+                $"Child category with id: {childCategoryId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        if (!childCategory.IsChild)
+        {
+            return VoidResult.Failure(
+                $"Category with id: {childCategoryId} is not a child category",
+                HttpStatusCode.Conflict
+            );
+        }
+        
+        VoidResult addAttributeResult = childCategory.AddProductAttribute(request.Key);
+
+        if (!addAttributeResult.IsSuccess)
+        {
+            return VoidResult.Failure(addAttributeResult);
+        }
+        
+        await categoryRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> AddVariantAsync(AddCategoryVariantDto request, Guid childCategoryId, CancellationToken ct)
+    {
+        Category? childCategory = await categoryRepository.GetByIdAsync(childCategoryId, ct, 
+            "Parent", "_productVariants");
+        
+        if (childCategory is null)
+        {
+            return VoidResult.Failure(
+                $"Child category with id: {childCategoryId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        if (!childCategory.IsChild)
+        {
+            return VoidResult.Failure(
+                $"Category with id: {childCategoryId} is not a child category",
+                HttpStatusCode.Conflict
+            );
+        }
+        
+        VoidResult addVariantResult = childCategory.AddProductVariant(request.Key);
+        
+        if (!addVariantResult.IsSuccess)
+        {
+            return VoidResult.Failure(addVariantResult);
+        }
+        
+        await categoryRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<Result<CategoryAttributeDto>> ChangeAttributeAsync(ChangeCategoryAttributeDto request, Guid childCategoryId,
+        Guid attributeId, CancellationToken ct)
+    {
+        Category? childCategory = await categoryRepository.GetByIdAsync(childCategoryId, ct, 
+            "Parent", "_productAttributes");;
+        
+        if (childCategory is null)
+        {
+            return Result<CategoryAttributeDto>.Failure(
+                $"Child category with id: {childCategoryId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        if (!childCategory.IsChild)
+        {
+            return Result<CategoryAttributeDto>.Failure(
+                $"Category with id: {childCategoryId} is not a child category",
+                HttpStatusCode.Conflict
+            );
+        }
+        
+        VoidResult changeAttributeResult = childCategory.ChangeProductAttributeKey(attributeId, request.Key);
+
+        if (!changeAttributeResult.IsSuccess)
+        {
+            return Result<CategoryAttributeDto>.Failure(changeAttributeResult);
+        }
+        
+        await categoryRepository.SaveChangesAsync(ct);
+        
+        CategoryAttributeDto dto = new(request.Key);
+        return Result<CategoryAttributeDto>.Success(dto);
+    }
+
+    public async Task<Result<CategoryVariantDto>> ChangeVariantAsync(ChangeCategoryVariantDto request, Guid childCategoryId,
+        Guid variantId, CancellationToken ct)
+    {
+        Category? childCategory = await categoryRepository.GetByIdAsync(childCategoryId, ct, 
+            "Parent", "_productAttributes");;
+        
+        if (childCategory is null)
+        {
+            return Result<CategoryVariantDto>.Failure(
+                $"Child category with id: {childCategoryId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        if (!childCategory.IsChild)
+        {
+            return Result<CategoryVariantDto>.Failure(
+                $"Category with id: {childCategoryId} is not a child category",
+                HttpStatusCode.Conflict
+            );
+        }
+        
+        VoidResult changeVariantResult = childCategory.ChangeProductVariantKey(variantId, request.Key);
+        
+        if (!changeVariantResult.IsSuccess)
+        {
+            return Result<CategoryVariantDto>.Failure(changeVariantResult);
+        }
+        
+        await categoryRepository.SaveChangesAsync(ct);
+        
+        CategoryVariantDto dto = new(request.Key);
+        return Result<CategoryVariantDto>.Success(dto);
+    }
+
+    public async Task<VoidResult> DeleteCategoryAsync(Guid categoryId, CancellationToken ct)
+    {
+        Category? category = await categoryRepository.GetByIdAsync(categoryId, ct);
+
+        if (category is null)
+        {
+            return VoidResult.Failure(
+                $"Category with id: {categoryId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        //todo: удалять все продукты с этой категорией????
+        
+        categoryRepository.Delete(category, ct);
+        await categoryRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();   
+    }
+
+    public async Task<VoidResult> DeleteAttributeAsync(Guid childCategoryId, Guid attributeId, CancellationToken ct)
+    {
+        Category? childCategory = await categoryRepository.GetByIdAsync(childCategoryId, ct,
+            "Parent", "_productAttributes");
+        
+        if (childCategory is null)
+        {
+            return VoidResult.Failure(
+                $"Category with id: {childCategoryId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        if (!childCategory.IsChild)
+        {
+            return VoidResult.Failure(
+                $"Category with id: {childCategoryId} is not a child category",
+                HttpStatusCode.Conflict
+            );
+        }
+
+        VoidResult deleteAttributeResult = childCategory.RemoveProductAttribute(attributeId);
+
+        if (!deleteAttributeResult.IsSuccess)
+        {
+            return VoidResult.Failure(deleteAttributeResult);
+        }
+        
+        await categoryRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> DeleteVariantAsync(Guid childCategoryId, Guid variantId, CancellationToken ct)
+    {
+        Category? childCategory = await categoryRepository.GetByIdAsync(childCategoryId, ct,
+            "Parent", "_productVariants");
+        
+        if (childCategory is null)
+        {
+            return VoidResult.Failure(
+                $"Category with id: {childCategoryId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        if (!childCategory.IsChild)
+        {
+            return VoidResult.Failure(
+                $"Category with id: {childCategoryId} is not a child category",
+                HttpStatusCode.Conflict
+            );
+        }
+
+        VoidResult deleteVariantResult = childCategory.RemoveProductVariant(variantId);
+        
+        if (!deleteVariantResult.IsSuccess)
+        {
+            return VoidResult.Failure(deleteVariantResult);
+        }
+        
+        await categoryRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
 }

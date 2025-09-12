@@ -37,7 +37,9 @@ internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Cat
         builder.Property(c => c.Name).IsRequired();
         builder.Property(c => c.Description).IsRequired(false);
         builder.Property(c => c.ProductsCount).IsRequired();
-    
+
+        builder.Ignore(c => c.IsParent);
+        builder.Ignore(c => c.IsChild);
         builder.Ignore(c => c.ProductIds);
         builder.Ignore(c => c.ProductVariants);
         builder.Ignore(c => c.ProductAttributes);

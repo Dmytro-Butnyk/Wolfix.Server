@@ -8,8 +8,8 @@ public interface IBaseRepository<TEntity> where TEntity : BaseEntity
     Task<bool> IsExistAsync(Guid id, CancellationToken cancellationToken);
     
     Task AddAsync(TEntity entity,  CancellationToken cancellationToken);
-    void UpdateAsync(TEntity entity, Action updateAction, CancellationToken cancellationToken);
-    void DeleteAsync(TEntity entity,  CancellationToken cancellationToken);
+    void Update(TEntity entity, Action updateAction, CancellationToken cancellationToken);
+    void Delete(TEntity entity, CancellationToken cancellationToken);
     //TODO: add include parameter
     Task<TEntity?> GetByIdAsync(
         Guid id,

@@ -13,6 +13,10 @@ public sealed class Category : BaseEntity
     
     public string? Description { get; private set; }
     
+    public bool IsParent => Parent == null;
+    
+    public bool IsChild => Parent != null;
+    
     private readonly List<Guid> _productIds = [];
     public IReadOnlyCollection<Guid> ProductIds => _productIds.AsReadOnly();
     

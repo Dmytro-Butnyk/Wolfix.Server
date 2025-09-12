@@ -31,7 +31,7 @@ public class BaseRepository<TContext, TEntity>(TContext context)
         await _dbSet.AddAsync(entity, cancellationToken);
     } 
     
-    public void UpdateAsync(TEntity entity, Action actionUpdate, CancellationToken cancellationToken)
+    public void Update(TEntity entity, Action actionUpdate, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         
@@ -39,7 +39,7 @@ public class BaseRepository<TContext, TEntity>(TContext context)
         actionUpdate.Invoke();
     } 
     
-    public void DeleteAsync(TEntity entity, CancellationToken cancellationToken)
+    public void Delete(TEntity entity, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         
