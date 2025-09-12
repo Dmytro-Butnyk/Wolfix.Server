@@ -40,6 +40,8 @@ public sealed class BlobResourceService(
         
         await blobResourceRepository.AddAsync(blobResource.Value, ct);
         
+        await blobResourceRepository.SaveChangesAsync(ct);
+        
         BlobResourceShortDto blobResourceShortDto = new()
         {
             Id = blobResource.Value.Id,
@@ -67,7 +69,9 @@ public sealed class BlobResourceService(
         
         await azureBlobRepository.DeleteFileAsync(containerName, fileName, ct);
         
-        await blobResourceRepository.DeleteAsync(blobResource, ct);
+        blobResourceRepository.DeleteAsync(blobResource, ct);
+        
+        await blobResourceRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();
     }

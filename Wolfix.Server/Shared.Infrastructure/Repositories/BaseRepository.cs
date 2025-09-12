@@ -28,25 +28,22 @@ public class BaseRepository<TContext, TEntity>(TContext context)
     {
         cancellationToken.ThrowIfCancellationRequested();
         
-        _dbSet.Add(entity);
-        await context.SaveChangesAsync(cancellationToken);
+        await _dbSet.AddAsync(entity, cancellationToken);
     } 
     
-    public async Task UpdateAsync(TEntity entity, Action actionUpdate, CancellationToken cancellationToken)
+    public void UpdateAsync(TEntity entity, Action actionUpdate, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         
         _dbSet.Update(entity);
         actionUpdate.Invoke();
-        await context.SaveChangesAsync(cancellationToken);
     } 
     
-    public async Task DeleteAsync(TEntity entity, CancellationToken cancellationToken)
+    public void DeleteAsync(TEntity entity, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         
         _dbSet.Remove(entity);
-        await context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<TEntity?> GetByIdAsync(

@@ -45,6 +45,8 @@ public sealed class ProductDomainService(
 
         await productRepository.AddAsync(newProduct.Value!, ct);
         
+        await productRepository.SaveChangesAsync(ct);
+        
         //todo: придумать как обрабатывать ошибку, если случиться проблема с одним из атрибутов
         VoidResult addProductAttributesResult =
             await AddProductAttributesAsync(newProduct.Value!, attributes, ct);

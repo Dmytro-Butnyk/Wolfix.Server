@@ -20,6 +20,8 @@ internal sealed class CustomerAccountCreatedEventHandler(ICustomerRepository cus
 
         await customerRepository.AddAsync(createCustomerResult.Value!, ct);
         
+        await customerRepository.SaveChangesAsync(ct);
+        
         return VoidResult.Success();
     }
 }

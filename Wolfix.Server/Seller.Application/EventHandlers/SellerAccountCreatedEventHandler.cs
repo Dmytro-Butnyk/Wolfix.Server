@@ -21,6 +21,8 @@ public sealed class SellerAccountCreatedEventHandler(ISellerRepository sellerRep
         
         await sellerRepository.AddAsync(createSellerResult.Value!, ct);
         
+        await sellerRepository.SaveChangesAsync(ct);
+        
         return VoidResult.Success();
     }
 }
