@@ -1,10 +1,16 @@
+using System.Diagnostics;
 using System.Net;
 
 namespace Shared.Domain.Models;
 
-//todo: добавить DebuggerDisplay
+[DebuggerDisplay("{DebuggerDisplay,nq}")]
 public sealed class VoidResult
 {
+    private string DebuggerDisplay =>
+        IsSuccess
+        ? "Success"
+        : $"Failure: {ErrorMessage} StatusCode: {StatusCode}";
+    
     public bool IsSuccess => ErrorMessage == null;
     public string? ErrorMessage { get; }
     public HttpStatusCode StatusCode { get; }
@@ -21,12 +27,17 @@ public sealed class VoidResult
     public static VoidResult Failure(string errorMessage, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
         => new(errorMessage, statusCode);
     
-    //todo: добавить проверки
     public static VoidResult Failure(VoidResult result)
-        => new(result.ErrorMessage!, result.StatusCode);
-    
+    {
+        if (result.IsSuccess) throw new ArgumentException("Result is success", nameof(result));
+        return new VoidResult(result.ErrorMessage!, result.StatusCode);
+    }
+
     public static VoidResult Failure<TValue>(Result<TValue> result)
-        => new(result.ErrorMessage!, result.StatusCode);
+    {
+        if (result.IsSuccess) throw new ArgumentException("Result is success", nameof(result));
+        return new VoidResult(result.ErrorMessage!, result.StatusCode);
+    }
 
     public TResult Map<TResult>(Func<TResult> onSuccess, Func<string, TResult> onFailure)
         => IsSuccess ? onSuccess() : onFailure(ErrorMessage!);
