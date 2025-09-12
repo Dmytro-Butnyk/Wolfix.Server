@@ -39,7 +39,8 @@ internal static class CategoryEndpoints
         group.MapPost("", AddParent)
             .WithSummary("Add parent category");
         
-        //todo: ендпоинт для добавления чайлд категории
+        group.MapPost("{parentId:guid}", AddChild)
+            .WithSummary("Add child category");
     }
 
     private static async Task<Ok<IReadOnlyCollection<CategoryShortDto>>> GetAllParentCategories(
@@ -80,6 +81,27 @@ internal static class CategoryEndpoints
             {
                 HttpStatusCode.Conflict => TypedResults.Conflict(addParentCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addParentCategoryResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+        
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, Conflict<string>, BadRequest<string>>> AddChild(
+        [FromBody] AddChildCategoryDto request,
+        [FromRoute] Guid parentId,
+        [FromServices] ICategoryService categoryService,
+        CancellationToken ct)
+    {
+        VoidResult addChildCategoryResult = await categoryService.AddChildAsync(request, parentId, ct);
+
+        if (!addChildCategoryResult.IsSuccess)
+        {
+            return addChildCategoryResult.StatusCode switch
+            {
+                HttpStatusCode.Conflict => TypedResults.Conflict(addChildCategoryResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(addChildCategoryResult.ErrorMessage),
                 _ => throw new Exception("Unknown status code")
             };
         }

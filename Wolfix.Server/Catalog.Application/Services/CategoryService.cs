@@ -79,22 +79,56 @@ internal sealed class CategoryService(
         
         Category category = createCategoryResult.Value!;
 
-        VoidResult addProductAttributesResult = category.AddProductAttributes(request.AttributeKeys);
+        await categoryRepository.AddAsync(category, ct);
+        await categoryRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
 
-        if (!addProductAttributesResult.IsSuccess)
+    public async Task<VoidResult> AddChildAsync(AddChildCategoryDto request, Guid parentId, CancellationToken ct)
+    {
+        Category? parentCategory = await categoryRepository.GetByIdAsync(parentId, ct);
+
+        if (parentCategory is null)
         {
-            return VoidResult.Failure(addProductAttributesResult);
+            return VoidResult.Failure(
+                $"Parent category with id: {parentId} not found",
+                HttpStatusCode.NotFound
+            );
         }
         
-        VoidResult addProductVariantsResult = category.AddProductVariants(request.VariantKeys);
-
-        if (!addProductVariantsResult.IsSuccess)
+        if (await categoryRepository.IsExistAsync(request.Name, ct))
         {
-            return VoidResult.Failure(addProductVariantsResult);
+            return VoidResult.Failure(
+                $"Category with name: {request.Name} already exists",
+                HttpStatusCode.Conflict
+            );
+        }
+        
+        Result<Category> createCategoryResult = Category.Create(request.Name, request.Description, parentCategory);
+
+        if (!createCategoryResult.IsSuccess)
+        {
+            return VoidResult.Failure(createCategoryResult);
+        }
+        
+        Category category = createCategoryResult.Value!;
+
+        VoidResult addAttributesResult = category.AddProductAttributes(request.AttributeKeys);
+
+        if (!addAttributesResult.IsSuccess)
+        {
+            return VoidResult.Failure(addAttributesResult);
+        }
+        
+        VoidResult addVariantsResult = category.AddProductVariants(request.VariantKeys);
+
+        if (!addVariantsResult.IsSuccess)
+        {
+            return VoidResult.Failure(addVariantsResult);
         }
         
         await categoryRepository.AddAsync(category, ct);
-
         await categoryRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();
