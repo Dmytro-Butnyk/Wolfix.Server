@@ -42,10 +42,10 @@ public static class WebApplicationBuilderExtension
 
     private static WebApplicationBuilder AddIdentityModule(this WebApplicationBuilder builder, string connectionString)
     {
-        string tokenIssuer = EnvironmentExtension.GetEnvironmentVariableOrThrow("TOKEN_ISSUER");
-        string tokenAudience = EnvironmentExtension.GetEnvironmentVariableOrThrow("TOKEN_AUDIENCE");
-        string tokenKey = EnvironmentExtension.GetEnvironmentVariableOrThrow("TOKEN_KEY");
-        string tokenLifetime = EnvironmentExtension.GetEnvironmentVariableOrThrow("TOKEN_LIFETIME");
+        string tokenIssuer = builder.Configuration.GetOrThrow("TOKEN_ISSUER");
+        string tokenAudience = builder.Configuration.GetOrThrow("TOKEN_AUDIENCE");
+        string tokenKey = builder.Configuration.GetOrThrow("TOKEN_KEY");
+        string tokenLifetime = builder.Configuration.GetOrThrow("TOKEN_LIFETIME");
         
         builder.Services.AddIdentityModule(connectionString, tokenIssuer, tokenAudience, tokenKey, tokenLifetime);
         
