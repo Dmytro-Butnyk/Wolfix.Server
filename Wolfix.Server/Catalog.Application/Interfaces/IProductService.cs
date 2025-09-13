@@ -10,6 +10,7 @@ public interface IProductService
 {
     Task<VoidResult> AddProductAsync(AddProductDto addProductDto, CancellationToken ct);
     Task<VoidResult> ChangeProductMainPhotoAsync(Guid productId, Guid newMainPhotoId, CancellationToken ct);
+    Task<VoidResult> DeleteProductMediaAsync(Guid productId, Guid mediaId, CancellationToken ct);
     Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRandomProductsAsync(int pageSize, CancellationToken ct);
     
     Task<Result<PaginationDto<ProductShortDto>>> GetForPageByCategoryIdAsync(Guid childCategoryId,

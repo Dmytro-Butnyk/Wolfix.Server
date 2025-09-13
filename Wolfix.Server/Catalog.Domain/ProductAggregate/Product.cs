@@ -274,7 +274,6 @@ public sealed class Product : BaseEntity
         
         return Result<string>.Success(productMedia.MediaUrl);
     }
-    //todo: найти проблему при изменении mainPhoto
     public VoidResult ChangeMainPhoto(Guid productMediaId)
     {
         ProductMedia? newMainPhoto = _productMedias
@@ -336,18 +335,25 @@ public sealed class Product : BaseEntity
         );
     }
 
-    public VoidResult RemoveProductMedia(Guid mediaId)
+    public Result<Guid> RemoveProductMedia(Guid mediaId)
     {
         ProductMedia? productMedia = _productMedias.FirstOrDefault(p => p.Id == mediaId);
 
         if (productMedia == null)
         {
-            return VoidResult.Failure($"{nameof(productMedia)} is null. Nothing to remove.");
+            return Result<Guid>.Failure($"{nameof(productMedia)} is null. Nothing to remove.", HttpStatusCode.NotFound);
         }
+        
+        if (productMedia.IsMain)
+        {
+            return Result<Guid>.Failure($"{nameof(productMedia)} is main. Can not remove.");
+        }
+        
+        Guid productMediaId = productMedia.MediaId;
         
         _productMedias.Remove(productMedia);
         
-        return VoidResult.Success();
+        return Result<Guid>.Success(productMediaId);
     }
     
     public void RemoveAllProductMedias()

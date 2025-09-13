@@ -36,6 +36,8 @@ internal static class ProductEndpoints
 
         group.MapPatch("product/{productId:guid}/new-main-photo/{newMainPhotoId:guid}", ChangeProductMainPhoto);
         
+        group.MapDelete("product/{productId:guid}/media/{mediaId:guid}", DeleteProductMedia);
+        
         group.MapGet("category/{childCategoryId:guid}/page/{page:int}", GetAllByCategoryForPage)
             .WithSummary("Get all products by specific category for page with pagination");
 
@@ -97,6 +99,27 @@ internal static class ProductEndpoints
             };
         }
 
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> DeleteProductMedia(
+        [FromRoute] Guid productId,
+        [FromRoute] Guid mediaId,
+        [FromServices] IProductService productService,
+        CancellationToken ct)
+    {
+        VoidResult deleteProductMediaResult = await productService.DeleteProductMediaAsync(productId, mediaId, ct);
+        
+        if (!deleteProductMediaResult.IsSuccess)
+        {
+            return deleteProductMediaResult.StatusCode switch
+            {
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(deleteProductMediaResult.ErrorMessage),
+                HttpStatusCode.NotFound => TypedResults.NotFound(deleteProductMediaResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+        
         return TypedResults.NoContent();
     }
 

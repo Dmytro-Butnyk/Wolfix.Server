@@ -91,7 +91,7 @@ internal sealed class ProductService(
 
     public async Task<VoidResult> ChangeProductMainPhotoAsync(Guid productId, Guid newMainPhotoId, CancellationToken ct)
     {
-        Product? product = await productRepository.GetByIdAsync(productId, ct);
+        Product? product = await productRepository.GetByIdAsync(productId, ct, "_productMedias");
 
         if (product is null)
         {
@@ -115,6 +115,38 @@ internal sealed class ProductService(
         return VoidResult.Success();
     }
 
+    public async Task<VoidResult> DeleteProductMediaAsync(Guid productId, Guid mediaId, CancellationToken ct)
+    {
+        Product? product = await productRepository.GetByIdAsync(productId, ct, "_productMedias");
+
+        if (product is null)
+        {
+            return VoidResult.Failure(
+                $"Product with id: {productId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        Result<Guid> deleteProductMediaResult = product.RemoveProductMedia(mediaId);
+
+        if (!deleteProductMediaResult.IsSuccess)
+        {
+            return VoidResult.Failure(deleteProductMediaResult);
+        }
+        
+        await productRepository.SaveChangesAsync(ct);
+        
+        VoidResult eventResult = await eventBus.PublishAsync(
+            new ProductMediaDeleted(deleteProductMediaResult.Value), ct);
+
+        if (!eventResult.IsSuccess)
+        {
+            return VoidResult.Failure(eventResult);
+        }
+        
+        return VoidResult.Success();
+    }
+    
     public async Task<Result<PaginationDto<ProductShortDto>>> GetForPageByCategoryIdAsync(Guid childCategoryId,
         int page, int pageSize, CancellationToken ct)
     {

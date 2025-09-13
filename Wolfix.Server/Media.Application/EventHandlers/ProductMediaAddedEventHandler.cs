@@ -1,8 +1,6 @@
 ﻿using Catalog.IntegrationEvents;
 using Media.Application.Dto;
 using Media.Application.Interfaces;
-using Media.Domain.BlobAggregate;
-using Media.Domain.Interfaces;
 using Media.IntegrationEvents;
 using Media.IntegrationEvents.Dto;
 using Shared.Domain.Models;
@@ -26,7 +24,7 @@ public sealed class ProductMediaAddedEventHandler(
         }
 
         BlobResourceAddedDto blobResourceAddedDto =
-            new(result.Value.Id, result.Value.ContentType, result.Value.Url, @event.Media.IsMain);
+            new(result.Value!.Id, result.Value.ContentType, result.Value.Url, @event.Media.IsMain);
 
         VoidResult publishResult = await eventBus
             .PublishAsync(new BlobResourceForProductAdded(@event.ProductId, blobResourceAddedDto), ct);
