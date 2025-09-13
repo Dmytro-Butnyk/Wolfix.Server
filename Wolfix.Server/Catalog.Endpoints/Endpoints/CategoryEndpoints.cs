@@ -54,18 +54,12 @@ internal static class CategoryEndpoints
         group.MapPost("child/{childCategoryId:guid}/attributes", AddAttribute)
             .WithSummary("Add attribute to child category");
         
-        group.MapPatch("child/{childCategoryId:guid}/attributes/{attributeId:guid}", ChangeAttribute)
-            .WithSummary("Change attribute of child category");
-        
         group.MapDelete("child/{childCategoryId:guid}/attributes/{attributeId:guid}", DeleteAttribute)
             .WithSummary("Delete attribute of child category");
 
         group.MapPost("child/{childCategoryId:guid}/variants", AddVariant)
             .WithSummary("Add variant to child category");
 
-        group.MapPatch("child/{childCategoryId:guid}/variants/{variantId:guid}", ChangeVariant)
-            .WithSummary("Change variant of child category");
-        
         group.MapDelete("child/{childCategoryId:guid}/variants/{variantId:guid}", DeleteVariant)
             .WithSummary("Delete variant of child category");
     }
@@ -218,30 +212,6 @@ internal static class CategoryEndpoints
         return TypedResults.NoContent();
     }
 
-    private static async Task<Results<Ok<CategoryAttributeDto>, NotFound<string>, Conflict<string>, BadRequest<string>>> ChangeAttribute(
-        [FromBody] ChangeCategoryAttributeDto request,
-        [FromRoute] Guid childCategoryId,
-        [FromRoute] Guid attributeId,
-        [FromServices] ICategoryService categoryService,
-        CancellationToken ct)
-    {
-        Result<CategoryAttributeDto> changeCategoryAttributeResult = await categoryService.ChangeAttributeAsync(request, childCategoryId,
-            attributeId, ct);
-
-        if (!changeCategoryAttributeResult.IsSuccess)
-        {
-            return changeCategoryAttributeResult.StatusCode switch
-            {
-                HttpStatusCode.NotFound => TypedResults.NotFound(changeCategoryAttributeResult.ErrorMessage),
-                HttpStatusCode.Conflict => TypedResults.Conflict(changeCategoryAttributeResult.ErrorMessage),
-                HttpStatusCode.BadRequest => TypedResults.BadRequest(changeCategoryAttributeResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
-            };
-        }
-        
-        return TypedResults.Ok(changeCategoryAttributeResult.Value);
-    }
-
     private static async Task<Results<NoContent, NotFound<string>>> DeleteAttribute(
         [FromRoute] Guid childCategoryId,
         [FromRoute] Guid attributeId,
@@ -278,30 +248,6 @@ internal static class CategoryEndpoints
         }
         
         return TypedResults.NoContent();
-    }
-
-    private static async Task<Results<Ok<CategoryVariantDto>, NotFound<string>, Conflict<string>, BadRequest<string>>> ChangeVariant(
-        [FromBody] ChangeCategoryVariantDto request,
-        [FromRoute] Guid childCategoryId,
-        [FromRoute] Guid variantId,
-        [FromServices] ICategoryService categoryService,
-        CancellationToken ct)
-    {
-        Result<CategoryVariantDto> changeCategoryVariantResult = await categoryService.ChangeVariantAsync(request, childCategoryId,
-            variantId, ct);
-
-        if (!changeCategoryVariantResult.IsSuccess)
-        {
-            return changeCategoryVariantResult.StatusCode switch
-            {
-                HttpStatusCode.NotFound => TypedResults.NotFound(changeCategoryVariantResult.ErrorMessage),
-                HttpStatusCode.Conflict => TypedResults.Conflict(changeCategoryVariantResult.ErrorMessage),
-                HttpStatusCode.BadRequest => TypedResults.BadRequest(changeCategoryVariantResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
-            };
-        }
-        
-        return TypedResults.Ok(changeCategoryVariantResult.Value);
     }
 
     private static async Task<Results<NoContent, NotFound<string>>> DeleteVariant(
