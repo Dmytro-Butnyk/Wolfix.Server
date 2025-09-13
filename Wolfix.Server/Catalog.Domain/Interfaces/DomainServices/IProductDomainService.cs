@@ -14,4 +14,6 @@ public interface IProductDomainService
         Guid categoryId,
         IReadOnlyCollection<AddAttributeValueObject> attributes,
         CancellationToken ct);
+
+    Task<IReadOnlyCollection<Guid>> GetAllMediaIdsByCategoryProducts(Guid categoryId, CancellationToken ct);
 }

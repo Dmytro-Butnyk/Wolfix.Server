@@ -195,4 +195,16 @@ internal sealed class ProductRepository(CatalogContext context)
                 review.CreatedAt))
             .ToListAsync(ct);
     }
+
+    public async Task<IReadOnlyCollection<Guid>> GetAllMediaIdsByCategoryProductsAsync(Guid categoryId,
+        CancellationToken ct)
+    {
+        return await _products
+            .AsNoTracking()
+            .Where(product => product.CategoryId == categoryId)
+            .Include("_productMedias")
+            .SelectMany(product => EF.Property<List<ProductMedia>>(product, "_productMedias"))
+            .Select(media => media.MediaId)
+            .ToListAsync(ct);
+    }
 }

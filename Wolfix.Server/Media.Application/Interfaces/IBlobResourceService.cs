@@ -12,4 +12,6 @@ public interface IBlobResourceService
         CancellationToken ct);
     
     Task<VoidResult> DeleteBlobResourceAsync(Guid id, CancellationToken ct);
+    
+    Task ExecuteDeleteBlobResourceAsync(IReadOnlyCollection<Guid> mediaIds, CancellationToken ct);
 }

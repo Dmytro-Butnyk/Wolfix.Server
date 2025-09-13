@@ -34,6 +34,7 @@ public static class DependencyInjection
     public static IServiceCollection AddMediaEventHandlers(this IServiceCollection services)
     {
         services.AddScoped<IIntegrationEventHandler<ProductMediaAdded>, ProductMediaAddedEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<CategoryAndProductsDeleted>, CategoryAndProductsDeletedEventHandler>();
         
         return services;
     }

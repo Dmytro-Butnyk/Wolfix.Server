@@ -54,6 +54,11 @@ public sealed class ProductDomainService(
         return Result<Guid>.Success(newProduct.Value!.Id);
     }
 
+    public async Task<IReadOnlyCollection<Guid>> GetAllMediaIdsByCategoryProducts(Guid categoryId, CancellationToken ct)
+    {
+        return await productRepository.GetAllMediaIdsByCategoryProductsAsync(categoryId, ct);
+    }
+
     private async Task<VoidResult> AddProductAttributesAsync(Product newProduct,
         IReadOnlyCollection<AddAttributeValueObject> addAttributesDtos,
         CancellationToken ct)

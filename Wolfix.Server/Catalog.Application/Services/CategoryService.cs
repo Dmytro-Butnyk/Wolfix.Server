@@ -6,14 +6,19 @@ using Catalog.Application.Interfaces;
 using Catalog.Application.Mapping.Category;
 using Catalog.Domain.CategoryAggregate;
 using Catalog.Domain.Interfaces;
+using Catalog.Domain.Interfaces.DomainServices;
 using Catalog.Domain.Projections.Category;
+using Catalog.IntegrationEvents;
 using Shared.Application.Interfaces;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.Services;
 
 internal sealed class CategoryService(
     ICategoryRepository categoryRepository,
+    IProductDomainService productDomainService,
+    IEventBus eventBus,
     IAppCache appCache
     ) : ICategoryService
 {
@@ -407,9 +412,18 @@ internal sealed class CategoryService(
                 HttpStatusCode.NotFound
             );
         }
-        
-        //todo: удалять все продукты с этой категорией????
-        
+
+        IReadOnlyCollection<Guid> allMediaIdsOfCategoryProducts =
+            await productDomainService.GetAllMediaIdsByCategoryProducts(categoryId, ct);
+
+        if (allMediaIdsOfCategoryProducts.Count > 0)
+        {
+            await eventBus.PublishAsync(new CategoryAndProductsDeleted
+            {
+                MediaIds = allMediaIdsOfCategoryProducts
+            }, ct);
+        }
+
         categoryRepository.Delete(category, ct);
         await categoryRepository.SaveChangesAsync(ct);
         

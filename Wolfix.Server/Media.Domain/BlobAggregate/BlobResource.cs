@@ -7,12 +7,10 @@ namespace Media.Domain.BlobAggregate;
 public sealed class BlobResource : BaseEntity
 {
     public string Name { get; private set; }
-    public string Url { get; private set; } = String.Empty;
+    public string Url { get; private set; } = string.Empty;
     public BlobResourceType Type { get; private set; }
 
-    private BlobResource()
-    {
-    }
+    private BlobResource() { }
 
     private BlobResource(string name, BlobResourceType type)
     {

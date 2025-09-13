@@ -249,7 +249,7 @@ internal static class CategoryEndpoints
         CancellationToken ct)
     {
         VoidResult deleteAttributeResult = await categoryService.DeleteAttributeAsync(childCategoryId, attributeId, ct);
-        
+        //todo: значение тоже удалиться должно везде
         if (!deleteAttributeResult.IsSuccess)
         {
             return TypedResults.NotFound(deleteAttributeResult.ErrorMessage);
@@ -311,7 +311,7 @@ internal static class CategoryEndpoints
         CancellationToken ct)
     {
         VoidResult deleteVariantResult = await categoryService.DeleteVariantAsync(childCategoryId, variantId, ct);
-
+        //todo: значение тоже удалиться должно везде
         if (!deleteVariantResult.IsSuccess)
         {
             return TypedResults.NotFound(deleteVariantResult.ErrorMessage);
