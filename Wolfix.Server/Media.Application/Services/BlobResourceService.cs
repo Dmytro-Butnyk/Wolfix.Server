@@ -69,7 +69,7 @@ public sealed class BlobResourceService(
         
         await azureBlobRepository.DeleteFileAsync(containerName, fileName, ct);
         
-        blobResourceRepository.DeleteAsync(blobResource, ct);
+        blobResourceRepository.Delete(blobResource, ct);
         
         await blobResourceRepository.SaveChangesAsync(ct);
         

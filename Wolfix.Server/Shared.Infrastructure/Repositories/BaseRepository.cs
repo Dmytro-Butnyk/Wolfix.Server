@@ -31,7 +31,7 @@ public class BaseRepository<TContext, TEntity>(TContext context)
         await _dbSet.AddAsync(entity, cancellationToken);
     } 
     
-    public void UpdateAsync(TEntity entity, Action actionUpdate, CancellationToken cancellationToken)
+    public void Update(TEntity entity, Action actionUpdate, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         
@@ -39,7 +39,7 @@ public class BaseRepository<TContext, TEntity>(TContext context)
         actionUpdate.Invoke();
     } 
     
-    public void DeleteAsync(TEntity entity, CancellationToken cancellationToken)
+    public void Delete(TEntity entity, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         
@@ -49,14 +49,19 @@ public class BaseRepository<TContext, TEntity>(TContext context)
     public async Task<TEntity?> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken,
-        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
+        params string[]? includeProperties)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         IQueryable<TEntity> query = _dbSet;
 
-        if (include is not null)
-            query = include(query);
+        if (includeProperties is not null)
+        {
+            foreach (string includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
+        }
 
         return await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
@@ -64,14 +69,19 @@ public class BaseRepository<TContext, TEntity>(TContext context)
     public async Task<TEntity?> GetByIdAsNoTrackingAsync(
         Guid id,
         CancellationToken cancellationToken,
-        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
+        params string[]? includeProperties)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         IQueryable<TEntity> query = _dbSet.AsNoTracking();
 
-        if (include is not null)
-            query = include(query);
+        if (includeProperties is not null)
+        {
+            foreach (string includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
+        }
 
         return await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
