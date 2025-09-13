@@ -48,6 +48,11 @@ internal sealed class ProductMedia : BaseEntity
         return Result<ProductMedia>.Success(productMedia, HttpStatusCode.Created);
     }
     
+    public void SetIsMain(bool isMain)
+    {
+        IsMain = isMain;
+    }
+    
     public static explicit operator ProductMediaInfo(ProductMedia productMedia)
     {
         return new ProductMediaInfo(

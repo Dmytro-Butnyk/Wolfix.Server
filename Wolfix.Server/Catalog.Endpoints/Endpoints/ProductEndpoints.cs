@@ -33,6 +33,8 @@ internal static class ProductEndpoints
         group.MapPost("", AddProduct)
             .DisableAntiforgery()
             .WithSummary("Add product");
+
+        group.MapPatch("product/{productId:guid}/new-main-photo/{newMainPhotoId:guid}", ChangeProductMainPhoto);
         
         group.MapGet("category/{childCategoryId:guid}/page/{page:int}", GetAllByCategoryForPage)
             .WithSummary("Get all products by specific category for page with pagination");
@@ -47,6 +49,15 @@ internal static class ProductEndpoints
             .WithSummary("Get random products");
     }
 
+    private static void MapReviewEndpoints(RouteGroupBuilder group)
+    {
+        group.MapGet("", GetReviews)
+            .WithSummary("Get all reviews by specific product");
+        //todo: протестить
+        group.MapPost("", AddReview)
+            .WithSummary("Add review");
+    }
+    
     private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> AddProduct(
         [FromForm] AddProductDto addProductDto,
         [FromServices] IProductService productService,
@@ -66,14 +77,27 @@ internal static class ProductEndpoints
 
         return TypedResults.NoContent();
     }
-
-    private static void MapReviewEndpoints(RouteGroupBuilder group)
+    
+    private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> ChangeProductMainPhoto(
+        [FromRoute] Guid productId,
+        [FromRoute] Guid newMainPhotoId,
+        [FromServices] IProductService productService,
+        CancellationToken ct)
     {
-        group.MapGet("", GetReviews)
-            .WithSummary("Get all reviews by specific product");
-        //todo: протестить
-        group.MapPost("", AddReview)
-            .WithSummary("Add review");
+        VoidResult changeMainPhotoResult =
+            await productService.ChangeProductMainPhotoAsync(productId, newMainPhotoId, ct);
+
+        if (!changeMainPhotoResult.IsSuccess)
+        {
+            return changeMainPhotoResult.StatusCode switch
+            {
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(changeMainPhotoResult.ErrorMessage),
+                HttpStatusCode.NotFound => TypedResults.NotFound(changeMainPhotoResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+
+        return TypedResults.NoContent();
     }
 
     //TODO: ПРОВЕРИТЬ СТАТУС КОДЫ

@@ -89,6 +89,32 @@ internal sealed class ProductService(
         return VoidResult.Success();
     }
 
+    public async Task<VoidResult> ChangeProductMainPhotoAsync(Guid productId, Guid newMainPhotoId, CancellationToken ct)
+    {
+        Product? product = await productRepository.GetByIdAsync(productId, ct);
+
+        if (product is null)
+        {
+            return VoidResult.Failure(
+                $"Product with id: {productId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        VoidResult changeProductMainPhotoResult = product.ChangeMainPhoto(newMainPhotoId);
+        
+        if(!changeProductMainPhotoResult.IsSuccess)
+        {
+            return VoidResult.Failure(
+                changeProductMainPhotoResult.ErrorMessage!,
+                changeProductMainPhotoResult.StatusCode);
+        }
+        
+        await productRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
     public async Task<Result<PaginationDto<ProductShortDto>>> GetForPageByCategoryIdAsync(Guid childCategoryId,
         int page, int pageSize, CancellationToken ct)
     {

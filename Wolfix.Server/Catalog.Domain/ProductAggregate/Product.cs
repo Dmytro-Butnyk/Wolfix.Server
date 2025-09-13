@@ -274,6 +274,38 @@ public sealed class Product : BaseEntity
         
         return Result<string>.Success(productMedia.MediaUrl);
     }
+    //todo: найти проблему при изменении mainPhoto
+    public VoidResult ChangeMainPhoto(Guid productMediaId)
+    {
+        ProductMedia? newMainPhoto = _productMedias
+            .FirstOrDefault(p => p.Id == productMediaId);
+
+        if (newMainPhoto is null)
+        {
+            return VoidResult.Failure(
+                $"{nameof(newMainPhoto)} is null. Nothing to change.", 
+                HttpStatusCode.NotFound
+            );
+        }
+
+        ProductMedia? currentMainPhoto = _productMedias
+            .FirstOrDefault(p => p.IsMain);
+
+        if (currentMainPhoto?.Id == newMainPhoto.Id)
+        {
+            return VoidResult.Success();
+        }
+
+        if (currentMainPhoto is not null)
+        {
+            currentMainPhoto.SetIsMain(false);
+        }
+
+        newMainPhoto.SetIsMain(true);
+
+        return VoidResult.Success();
+    }
+
     #endregion
     
     #region productMedias
