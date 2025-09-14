@@ -8,27 +8,22 @@ internal sealed class ProductAttributeValue : BaseEntity
 {
     public Product Product { get; private set; }
     public string Key { get; private set; }
-    public string Value { get; private set; }
+    public string? Value { get; private set; }
     
     private ProductAttributeValue() { }
 
-    private ProductAttributeValue(Product product, string key, string value)
+    private ProductAttributeValue(Product product, string key, string? value)
     {
         Product = product;
         Key = key;
         Value = value;
     }
 
-    internal static Result<ProductAttributeValue> Create(Product product, string key, string value)
+    internal static Result<ProductAttributeValue> Create(Product product, string key, string? value)
     {
         if (IsTextInvalid(key, out var keyErrorMessage))
         {
             return Result<ProductAttributeValue>.Failure(keyErrorMessage);
-        }
-
-        if (IsTextInvalid(value, out var valueErrorMessage))
-        {
-            return Result<ProductAttributeValue>.Failure(valueErrorMessage);
         }
 
         var productsAttributes = new ProductAttributeValue(product, key, value);

@@ -14,6 +14,7 @@ public sealed class Result<TValue>
     public TValue? Value { get; }
     public string? ErrorMessage { get; }
     public bool IsSuccess => ErrorMessage == null;
+    public bool IsFailure => !IsSuccess;
     public HttpStatusCode StatusCode { get; }
 
     private Result(TValue value, HttpStatusCode statusCode)

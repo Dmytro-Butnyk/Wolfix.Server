@@ -16,4 +16,8 @@ public interface IProductDomainService
         CancellationToken ct);
 
     Task<IReadOnlyCollection<Guid>> GetAllMediaIdsByCategoryProducts(Guid categoryId, CancellationToken ct);
+    
+    Task<VoidResult> AddAttributeToProductsAsync(Guid childCategoryId, string key, CancellationToken ct);
+    
+    Task<VoidResult> AddVariantToProductsAsync(Guid childCategoryId, string key, CancellationToken ct);
 }

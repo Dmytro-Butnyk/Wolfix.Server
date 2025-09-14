@@ -12,6 +12,7 @@ public sealed class VoidResult
         : $"Failure: {ErrorMessage} StatusCode: {StatusCode}";
     
     public bool IsSuccess => ErrorMessage == null;
+    public bool IsFailure => !IsSuccess;
     public string? ErrorMessage { get; }
     public HttpStatusCode StatusCode { get; }
 

@@ -293,7 +293,17 @@ internal sealed class CategoryService(
             return VoidResult.Failure(addAttributeResult);
         }
         
+        VoidResult addAttributeToProductsResult = await productDomainService.AddAttributeToProductsAsync(childCategoryId, request.Key, ct);
+
+        if (!addAttributeToProductsResult.IsSuccess)
+        {
+            return VoidResult.Failure(addAttributeToProductsResult);
+        }
+        
+        //todo: сохранять до домейн сервиса или после
         await categoryRepository.SaveChangesAsync(ct);
+        
+        //todo: кидать уведомление продавцу о том что нужно добавить значение для аттрибута
         
         return VoidResult.Success();
     }
@@ -326,7 +336,17 @@ internal sealed class CategoryService(
             return VoidResult.Failure(addVariantResult);
         }
         
+        VoidResult addVariantToProductsResult = await productDomainService.AddVariantToProductsAsync(childCategoryId, request.Key, ct);
+
+        if (addVariantToProductsResult.IsFailure)
+        {
+            return VoidResult.Failure(addVariantToProductsResult);
+        }
+        
+        //todo: сохранять до домейн сервиса или после
         await categoryRepository.SaveChangesAsync(ct);
+        
+        //todo: кидать уведомление продавцу о том что нужно добавить значение для варианта
         
         return VoidResult.Success();
     }

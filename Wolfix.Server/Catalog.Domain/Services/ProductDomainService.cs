@@ -53,12 +53,7 @@ public sealed class ProductDomainService(
 
         return Result<Guid>.Success(newProduct.Value!.Id);
     }
-
-    public async Task<IReadOnlyCollection<Guid>> GetAllMediaIdsByCategoryProducts(Guid categoryId, CancellationToken ct)
-    {
-        return await productRepository.GetAllMediaIdsByCategoryProductsAsync(categoryId, ct);
-    }
-
+    
     private async Task<VoidResult> AddProductAttributesAsync(Product newProduct,
         IReadOnlyCollection<AddAttributeValueObject> addAttributesDtos,
         CancellationToken ct)
@@ -98,6 +93,55 @@ public sealed class ProductDomainService(
             return VoidResult.Failure("Error during one or many attributes creation");
         }
 
+        return VoidResult.Success();
+    }
+
+    public async Task<IReadOnlyCollection<Guid>> GetAllMediaIdsByCategoryProducts(Guid categoryId, CancellationToken ct)
+    {
+        return await productRepository.GetAllMediaIdsByCategoryProductsAsync(categoryId, ct);
+    }
+
+    public async Task<VoidResult> AddAttributeToProductsAsync(Guid childCategoryId, string key, CancellationToken ct)
+    {
+        IReadOnlyCollection<Product> productsByCategory = await productRepository.GetAllByCategoryAsync(childCategoryId, ct);
+        
+        if (productsByCategory.Count == 0)
+        {
+            return VoidResult.Success();
+        }
+        
+        foreach (var product in productsByCategory)
+        {
+            VoidResult addAttributeToProductResult = product.AddProductAttributeValue(key, string.Empty);
+            
+            if (!addAttributeToProductResult.IsSuccess)
+            {
+                return VoidResult.Failure(addAttributeToProductResult);
+            }
+        }
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> AddVariantToProductsAsync(Guid childCategoryId, string key, CancellationToken ct)
+    {
+        IReadOnlyCollection<Product> productsByCategory = await productRepository.GetAllByCategoryAsync(childCategoryId, ct);
+
+        if (productsByCategory.Count == 0)
+        {
+            return VoidResult.Success();
+        }
+        
+        foreach (var product in productsByCategory)
+        {
+            VoidResult addVariantToProductsResult = product.AddProductVariantValue(key, string.Empty);
+
+            if (!addVariantToProductsResult.IsSuccess)
+            {
+                return VoidResult.Failure(addVariantToProductsResult);
+            }
+        }
+        
         return VoidResult.Success();
     }
 }

@@ -1,5 +1,4 @@
 using System.Net;
-using Catalog.Application.Dto.Category;
 using Catalog.Application.Dto.Category.Requests;
 using Catalog.Application.Dto.Category.Responses;
 using Catalog.Application.Interfaces;
