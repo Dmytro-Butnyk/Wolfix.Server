@@ -530,17 +530,16 @@ public sealed class Product : BaseEntity
         );
     }
 
-    public VoidResult RemoveProductAttributeValue(Guid productAttributeId)
+    public void RemoveProductAttributeValue(Guid productAttributeId)
     {
         ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.CategoryAttributeId == productAttributeId);
         
         if (productAttributeValue == null)
         {
-            return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to remove.", HttpStatusCode.NotFound);
+            return;
         }
         
         _productsAttributeValues.Remove(productAttributeValue);
-        return VoidResult.Success();
     }
     
     public VoidResult RemoveAllProductAttributeValues()
@@ -621,17 +620,16 @@ public sealed class Product : BaseEntity
         );
     }
 
-    public VoidResult RemoveProductVariantValue(Guid productVariantId)
+    public void RemoveProductVariantValue(Guid productVariantId)
     {
         ProductVariantValue? productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.CategoryVariantId == productVariantId);
         
         if (productVariantValue == null)
         {
-            return VoidResult.Failure($"{nameof(productVariantValue)} is null. Nothing to remove.", HttpStatusCode.NotFound);
+            return;
         }
         
         _productVariantValues.Remove(productVariantValue);
-        return VoidResult.Success();
     }
 
     public VoidResult RemoveAllProductVariantValues()

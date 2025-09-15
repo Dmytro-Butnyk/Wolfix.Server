@@ -392,13 +392,6 @@ internal sealed class CategoryService(
             return VoidResult.Failure(deleteAttributeResult);
         }
         
-        VoidResult deleteAttributeInProductsResult = await productDomainService.DeleteAttributeInProductsAsync(childCategoryId, attributeId, ct);
-
-        if (deleteAttributeInProductsResult.IsFailure)
-        {
-            return VoidResult.Failure(deleteAttributeInProductsResult);
-        }
-        
         await categoryRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();
@@ -430,13 +423,6 @@ internal sealed class CategoryService(
         if (!deleteVariantResult.IsSuccess)
         {
             return VoidResult.Failure(deleteVariantResult);
-        }
-        
-        VoidResult deleteVariantInProductsResult = await productDomainService.DeleteVariantInProductsAsync(childCategoryId, variantId, ct);
-
-        if (deleteVariantInProductsResult.IsFailure)
-        {
-            return VoidResult.Failure(deleteVariantInProductsResult);
         }
         
         await categoryRepository.SaveChangesAsync(ct);

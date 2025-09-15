@@ -61,7 +61,8 @@ app.MapAllEndpoints();
 
 app.UseCors("AllowNextClient");
 
-await app.EnsureDatabaseExistAndMigrationsApplied();
+//todo
+// await app.EnsureDatabaseExistAndMigrationsApplied();
 await app.EnsureRolesValid();
 
 app.Run();

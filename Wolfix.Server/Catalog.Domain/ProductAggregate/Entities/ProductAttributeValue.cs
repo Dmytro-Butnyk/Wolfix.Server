@@ -7,6 +7,7 @@ namespace Catalog.Domain.ProductAggregate.Entities;
 internal sealed class ProductAttributeValue : BaseEntity
 {
     public Product Product { get; private set; }
+    public Guid ProductId { get; private set; }
     
     public string Key { get; private set; }
     
@@ -19,6 +20,7 @@ internal sealed class ProductAttributeValue : BaseEntity
     private ProductAttributeValue(Product product, string key, string? value, Guid categoryAttributeId)
     {
         Product = product;
+        ProductId = product.Id;
         Key = key;
         Value = value;
         CategoryAttributeId = categoryAttributeId;

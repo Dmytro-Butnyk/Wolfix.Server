@@ -16,8 +16,4 @@ public interface IProductDomainService
         CancellationToken ct);
 
     Task<IReadOnlyCollection<Guid>> GetAllMediaIdsByCategoryProducts(Guid categoryId, CancellationToken ct);
-    
-    Task<VoidResult> DeleteAttributeInProductsAsync(Guid childCategoryId, Guid attributeId, CancellationToken ct);
-    
-    Task<VoidResult> DeleteVariantInProductsAsync(Guid childCategoryId, Guid variantId, CancellationToken ct);
 }

@@ -1,3 +1,4 @@
+using Catalog.Domain.CategoryAggregate.Entities;
 using Catalog.Domain.ProductAggregate.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -14,6 +15,8 @@ internal sealed class ProductAttributeValueEntityConfiguration : IEntityTypeConf
         ConfigureBasicProperties(builder);
         
         ConfigureProductRelation(builder);
+        
+        ConfigureProductAttributeRelation(builder);
     }
 
     private void ConfigureBasicProperties(EntityTypeBuilder<ProductAttributeValue> builder)
@@ -31,10 +34,19 @@ internal sealed class ProductAttributeValueEntityConfiguration : IEntityTypeConf
     {
         builder.HasOne(pav => pav.Product)
             .WithMany("_productsAttributeValues")
-            .HasForeignKey("ProductId")
+            .HasForeignKey(pav => pav.ProductId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
         builder.Navigation("Product")
             .UsePropertyAccessMode(PropertyAccessMode.Property);
+    }
+
+    private void ConfigureProductAttributeRelation(EntityTypeBuilder<ProductAttributeValue> builder)
+    {
+        builder.HasOne<ProductAttribute>()
+            .WithMany()
+            .HasForeignKey(pav => pav.CategoryAttributeId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

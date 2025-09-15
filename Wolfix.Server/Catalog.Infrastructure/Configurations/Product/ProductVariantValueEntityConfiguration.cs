@@ -1,3 +1,4 @@
+using Catalog.Domain.CategoryAggregate.Entities;
 using Catalog.Domain.ProductAggregate.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -14,6 +15,8 @@ internal sealed class ProductVariantValueEntityConfiguration : IEntityTypeConfig
         ConfigureBasicProperties(builder);
         
         ConfigureProductRelation(builder);
+        
+        ConfigureProductVariantRelation(builder);
     }
 
     private void ConfigureBasicProperties(EntityTypeBuilder<ProductVariantValue> builder)
@@ -24,17 +27,25 @@ internal sealed class ProductVariantValueEntityConfiguration : IEntityTypeConfig
         
         builder.Property(pvv => pvv.Key).IsRequired();
         builder.Property(pvv => pvv.Value).IsRequired(false);
-        builder.Property(pvv => pvv.CategoryVariantId).IsRequired();
     }
 
     private void ConfigureProductRelation(EntityTypeBuilder<ProductVariantValue> builder)
     {
         builder.HasOne(pvv => pvv.Product)
             .WithMany("_productVariantValues")
-            .HasForeignKey("ProductId")
+            .HasForeignKey(pvv => pvv.ProductId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
         builder.Navigation("Product")
             .UsePropertyAccessMode(PropertyAccessMode.Property);
+    }
+
+    private void ConfigureProductVariantRelation(EntityTypeBuilder<ProductVariantValue> builder)
+    {
+        builder.HasOne<ProductVariant>()
+            .WithMany()
+            .HasForeignKey(pvv => pvv.CategoryVariantId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
