@@ -10,27 +10,22 @@ internal sealed class ProductVariantValue : BaseEntity
     
     public string Key { get; private set; }
     
-    public string Value { get; private set; }
+    public string? Value { get; private set; }
     
     private ProductVariantValue() { }
 
-    private ProductVariantValue(Product product, string key, string value)
+    private ProductVariantValue(Product product, string key, string? value)
     {
         Product = product;
         Key = key;
         Value = value;
     }
 
-    internal static Result<ProductVariantValue> Create(Product product, string key, string value)
+    internal static Result<ProductVariantValue> Create(Product product, string key, string? value)
     {
         if (IsTextInvalid(key, out var keyErrorMessage))
         {
             return Result<ProductVariantValue>.Failure(keyErrorMessage);
-        }
-        
-        if (IsTextInvalid(value, out var valueErrorMessage))
-        {
-            return Result<ProductVariantValue>.Failure(valueErrorMessage);
         }
 
         var productVariant = new ProductVariantValue(product, key, value);

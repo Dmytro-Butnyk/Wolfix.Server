@@ -3,6 +3,7 @@ using Media.Application.Interfaces;
 using Media.Application.Options;
 using Media.Domain.BlobAggregate;
 using Media.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Shared.Domain.Enums;
 using Shared.Domain.Models;
@@ -12,8 +13,11 @@ namespace Media.Application.Services;
 public sealed class BlobResourceService(
     IOptionsMonitor<AzureBlobContainersNames> containerNames,
     IBlobResourceRepository blobResourceRepository,
-    IAzureBlobRepository azureBlobRepository) : IBlobResourceService
+    IAzureBlobRepository azureBlobRepository,
+    ILogger<BlobResourceService> logger) : IBlobResourceService
 {
+    //todo: тут вынести в прайват каррент велью
+    
     public async Task<Result<BlobResourceShortDto>> AddBlobResourceAsync(BlobResourceType contentType, Stream fileStream, CancellationToken ct)
     {
         Result<BlobResource> blobResource = BlobResource
@@ -74,5 +78,55 @@ public sealed class BlobResourceService(
         await blobResourceRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();
+    }
+
+    public async Task ExecuteDeleteBlobResourceAsync(IReadOnlyCollection<Guid> mediaIds, CancellationToken ct)
+    {
+        IReadOnlyCollection<BlobResource> medias = await blobResourceRepository.GetAllForDeleteAsync(mediaIds, ct);
+
+        if (medias.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var blobResource in medias)
+        {
+            string containerName = blobResource.Type switch
+            {
+                BlobResourceType.Photo => containerNames.CurrentValue.Photos,
+                BlobResourceType.Video => containerNames.CurrentValue.Videos,
+                //todo: добавить для документов
+                _ => throw new Exception($"Unknown blob resource type: {blobResource.Type}")
+            };
+            
+            await TryDeleteBlobFromAzureAsync(containerName, blobResource.Name, ct);
+        }
+        
+        await blobResourceRepository.ExecuteDeleteAsync(media => medias.Contains(media), ct);
+    }
+
+    private async Task TryDeleteBlobFromAzureAsync(string containerName, string fileName, CancellationToken ct)
+    {
+        const uint retryCount = 3;
+        uint currentRetryCount = 0;
+
+        while (currentRetryCount < retryCount)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            try
+            {
+                await azureBlobRepository.DeleteFileAsync(containerName, fileName, ct);
+                return;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error while deleting blob from Azure");
+            }
+            finally
+            {
+                ++currentRetryCount;
+            }
+        }
     }
 }

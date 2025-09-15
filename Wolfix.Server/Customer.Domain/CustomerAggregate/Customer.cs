@@ -1,5 +1,6 @@
 using System.Net;
 using Customer.Domain.CustomerAggregate.Entities;
+using Customer.Domain.CustomerAggregate.ValueObjects;
 using Shared.Domain.Entities;
 using Shared.Domain.Models;
 using Shared.Domain.ValueObjects;
@@ -10,8 +11,6 @@ public sealed class Customer : BaseEntity
 {
     public string? PhotoUrl { get; private set; }
     
-    //todo: попробовать не указывать маппинг велью обджектов в конфигурации и должно быть лучше
-    //todo: добавить велью обджект (счётчик нарушений + енам статус заблокан или всё ок)
     internal FullName? FullName { get; private set; }
 
     internal PhoneNumber? PhoneNumber { get; private set; }
@@ -21,6 +20,8 @@ public sealed class Customer : BaseEntity
     internal BirthDate? BirthDate { get; private set; }
 
     public decimal BonusesAmount { get; private set; }
+    
+    internal ViolationStatus ViolationStatus { get; private set; }
     
     public Guid AccountId { get; private set; }
 
@@ -40,9 +41,10 @@ public sealed class Customer : BaseEntity
 
     private Customer() { }
 
-    private Customer(Guid accountId)
+    private Customer(Guid accountId, ViolationStatus violationStatus)
     {
         AccountId = accountId;
+        ViolationStatus = violationStatus;
     }
 
     public static Result<Customer> Create(Guid accountId)
@@ -52,7 +54,7 @@ public sealed class Customer : BaseEntity
             return Result<Customer>.Failure($"{nameof(accountId)} cannot be empty");
         }
 
-        Customer customer = new(accountId);
+        Customer customer = new(accountId, ViolationStatus.Create().Value!);
         return Result<Customer>.Success(customer);
     }
     
@@ -164,6 +166,21 @@ public sealed class Customer : BaseEntity
         }
         
         BonusesAmount = bonusesAmount;
+        return VoidResult.Success();
+    }
+    #endregion
+    
+    #region violationStatus
+    public VoidResult AddViolation()
+    {
+        Result<ViolationStatus> addViolationResult = ViolationStatus.AddViolation();
+
+        if (addViolationResult.IsFailure)
+        {
+            return VoidResult.Failure(addViolationResult);
+        }
+        
+        ViolationStatus = addViolationResult.Value!;
         return VoidResult.Success();
     }
     #endregion

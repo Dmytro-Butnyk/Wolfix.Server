@@ -23,7 +23,7 @@ internal sealed class ProductAttributeValueEntityConfiguration : IEntityTypeConf
             .ValueGeneratedOnAdd();
         
         builder.Property(pav => pav.Key).IsRequired();
-        builder.Property(pav => pav.Value).IsRequired();
+        builder.Property(pav => pav.Value).IsRequired(false);
     }
     
     private void ConfigureProductRelation(EntityTypeBuilder<ProductAttributeValue> builder)

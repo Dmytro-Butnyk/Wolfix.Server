@@ -30,12 +30,20 @@ internal sealed class CustomerEntityConfiguration : IEntityTypeConfiguration<Dom
         builder.Property(c => c.PhotoUrl)
             .IsRequired(false);
         
-        builder.Property(c => c.FullName)
-            .IsRequired(false)
-            .HasConversion<string>(
-                fullName => fullName == null ? nullMarker : fullName.ToString(),
-                fullNameString => fullNameString == nullMarker ? null : (FullName)fullNameString
-            );
+        builder.OwnsOne(c => c.FullName, fullName =>
+        {
+            fullName.Property(fn => fn.FirstName)
+                .HasColumnName("FirstName")
+                .IsRequired();
+
+            fullName.Property(fn => fn.LastName)
+                .HasColumnName("LastName")
+                .IsRequired();
+
+            fullName.Property(fn => fn.MiddleName)
+                .HasColumnName("MiddleName")
+                .IsRequired();
+        });
         
         builder.Property(c => c.PhoneNumber)
             .IsRequired(false)
@@ -44,12 +52,24 @@ internal sealed class CustomerEntityConfiguration : IEntityTypeConfiguration<Dom
                 phoneNumberString => phoneNumberString == nullMarker ? null : (PhoneNumber)phoneNumberString
             );
 
-        builder.Property(c => c.Address)
-            .IsRequired(false)
-            .HasConversion<string>(
-                address => address == null ? nullMarker : address.ToString(),
-                addressString => addressString == nullMarker ? null : (Address)addressString
-            );
+        builder.OwnsOne(c => c.Address, address =>
+        {
+            address.Property(a => a.City)
+                .HasColumnName("City")
+                .IsRequired();
+
+            address.Property(a => a.Street)
+                .HasColumnName("Street")
+                .IsRequired();
+
+            address.Property(a => a.HouseNumber)
+                .HasColumnName("HouseNumber")
+                .IsRequired();
+
+            address.Property(a => a.ApartmentNumber)
+                .HasColumnName("ApartmentNumber")
+                .IsRequired(false);
+        });
 
         builder.Property(c => c.BirthDate)
             .IsRequired(false)
@@ -61,6 +81,19 @@ internal sealed class CustomerEntityConfiguration : IEntityTypeConfiguration<Dom
         builder.Property(c => c.BonusesAmount)
             .IsRequired()
             .HasDefaultValue(0);
+
+        builder.OwnsOne(c => c.ViolationStatus, vs =>
+        {
+            vs.Property(v => v.ViolationsCount)
+                .HasColumnName("ViolationsCount")
+                .IsRequired()
+                .HasDefaultValue(0);
+
+            vs.Property(v => v.Status)
+                .HasColumnName("AccountStatus")
+                .IsRequired()
+                .HasConversion<string>();
+        });
 
         builder.Property(c => c.AccountId)
             .IsRequired();

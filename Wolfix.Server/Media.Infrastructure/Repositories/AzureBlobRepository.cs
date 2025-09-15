@@ -10,7 +10,8 @@ internal sealed class AzureBlobRepository : IAzureBlobRepository
 
     public AzureBlobRepository(IConfiguration configuration)
     {
-        string connectionString = configuration.GetConnectionString("BLOB")!;
+        string connectionString = configuration.GetConnectionString("BLOB")
+                                  ?? throw new Exception("Configuration key BLOB not found");
         
         _blobServiceClient = new BlobServiceClient(connectionString);
     }

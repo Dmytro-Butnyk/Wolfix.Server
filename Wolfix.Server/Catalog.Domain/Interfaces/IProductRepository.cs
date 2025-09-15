@@ -26,4 +26,8 @@ public interface IProductRepository
     
     Task<IReadOnlyCollection<ProductReviewProjection>> GetProductReviewsAsync(Guid productId, int pageSize, CancellationToken ct);
     Task<IReadOnlyCollection<ProductReviewProjection>> GetNextProductReviewsAsync(Guid productId, int pageSize, Guid lastId, CancellationToken ct);
+    
+    Task<IReadOnlyCollection<Guid>> GetAllMediaIdsByCategoryProductsAsync(Guid categoryId, CancellationToken ct);
+    
+    Task<IReadOnlyCollection<Product>> GetAllByCategoryAsync(Guid childCategoryId, CancellationToken ct);
 }

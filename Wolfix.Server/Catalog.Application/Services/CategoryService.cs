@@ -6,14 +6,19 @@ using Catalog.Application.Interfaces;
 using Catalog.Application.Mapping.Category;
 using Catalog.Domain.CategoryAggregate;
 using Catalog.Domain.Interfaces;
+using Catalog.Domain.Interfaces.DomainServices;
 using Catalog.Domain.Projections.Category;
+using Catalog.IntegrationEvents;
 using Shared.Application.Interfaces;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.Services;
 
 internal sealed class CategoryService(
     ICategoryRepository categoryRepository,
+    IProductDomainService productDomainService,
+    IEventBus eventBus,
     IAppCache appCache
     ) : ICategoryService
 {
@@ -288,7 +293,17 @@ internal sealed class CategoryService(
             return VoidResult.Failure(addAttributeResult);
         }
         
+        VoidResult addAttributeToProductsResult = await productDomainService.AddAttributeToProductsAsync(childCategoryId, request.Key, ct);
+
+        if (!addAttributeToProductsResult.IsSuccess)
+        {
+            return VoidResult.Failure(addAttributeToProductsResult);
+        }
+        
+        //todo: сохранять до домейн сервиса или после
         await categoryRepository.SaveChangesAsync(ct);
+        
+        //todo: кидать уведомление продавцу о том что нужно добавить значение для аттрибута
         
         return VoidResult.Success();
     }
@@ -321,79 +336,19 @@ internal sealed class CategoryService(
             return VoidResult.Failure(addVariantResult);
         }
         
+        VoidResult addVariantToProductsResult = await productDomainService.AddVariantToProductsAsync(childCategoryId, request.Key, ct);
+
+        if (addVariantToProductsResult.IsFailure)
+        {
+            return VoidResult.Failure(addVariantToProductsResult);
+        }
+        
+        //todo: сохранять до домейн сервиса или после
         await categoryRepository.SaveChangesAsync(ct);
+        
+        //todo: кидать уведомление продавцу о том что нужно добавить значение для варианта
         
         return VoidResult.Success();
-    }
-
-    public async Task<Result<CategoryAttributeDto>> ChangeAttributeAsync(ChangeCategoryAttributeDto request, Guid childCategoryId,
-        Guid attributeId, CancellationToken ct)
-    {
-        Category? childCategory = await categoryRepository.GetByIdAsync(childCategoryId, ct, 
-            "Parent", "_productAttributes");;
-        
-        if (childCategory is null)
-        {
-            return Result<CategoryAttributeDto>.Failure(
-                $"Child category with id: {childCategoryId} not found",
-                HttpStatusCode.NotFound
-            );
-        }
-        
-        if (!childCategory.IsChild)
-        {
-            return Result<CategoryAttributeDto>.Failure(
-                $"Category with id: {childCategoryId} is not a child category",
-                HttpStatusCode.Conflict
-            );
-        }
-        
-        VoidResult changeAttributeResult = childCategory.ChangeProductAttributeKey(attributeId, request.Key);
-
-        if (!changeAttributeResult.IsSuccess)
-        {
-            return Result<CategoryAttributeDto>.Failure(changeAttributeResult);
-        }
-        
-        await categoryRepository.SaveChangesAsync(ct);
-        
-        CategoryAttributeDto dto = new(request.Key);
-        return Result<CategoryAttributeDto>.Success(dto);
-    }
-
-    public async Task<Result<CategoryVariantDto>> ChangeVariantAsync(ChangeCategoryVariantDto request, Guid childCategoryId,
-        Guid variantId, CancellationToken ct)
-    {
-        Category? childCategory = await categoryRepository.GetByIdAsync(childCategoryId, ct, 
-            "Parent", "_productAttributes");;
-        
-        if (childCategory is null)
-        {
-            return Result<CategoryVariantDto>.Failure(
-                $"Child category with id: {childCategoryId} not found",
-                HttpStatusCode.NotFound
-            );
-        }
-        
-        if (!childCategory.IsChild)
-        {
-            return Result<CategoryVariantDto>.Failure(
-                $"Category with id: {childCategoryId} is not a child category",
-                HttpStatusCode.Conflict
-            );
-        }
-        
-        VoidResult changeVariantResult = childCategory.ChangeProductVariantKey(variantId, request.Key);
-        
-        if (!changeVariantResult.IsSuccess)
-        {
-            return Result<CategoryVariantDto>.Failure(changeVariantResult);
-        }
-        
-        await categoryRepository.SaveChangesAsync(ct);
-        
-        CategoryVariantDto dto = new(request.Key);
-        return Result<CategoryVariantDto>.Success(dto);
     }
 
     public async Task<VoidResult> DeleteCategoryAsync(Guid categoryId, CancellationToken ct)
@@ -407,9 +362,18 @@ internal sealed class CategoryService(
                 HttpStatusCode.NotFound
             );
         }
-        
-        //todo: удалять все продукты с этой категорией????
-        
+
+        IReadOnlyCollection<Guid> allMediaIdsOfCategoryProducts =
+            await productDomainService.GetAllMediaIdsByCategoryProducts(categoryId, ct);
+
+        if (allMediaIdsOfCategoryProducts.Count > 0)
+        {
+            await eventBus.PublishAsync(new CategoryAndProductsDeleted
+            {
+                MediaIds = allMediaIdsOfCategoryProducts
+            }, ct);
+        }
+
         categoryRepository.Delete(category, ct);
         await categoryRepository.SaveChangesAsync(ct);
         
@@ -444,6 +408,13 @@ internal sealed class CategoryService(
             return VoidResult.Failure(deleteAttributeResult);
         }
         
+        VoidResult deleteAttributeInProductsResult = await productDomainService.DeleteAttributeInProductsAsync(childCategoryId, attributeId, ct);
+
+        if (deleteAttributeInProductsResult.IsFailure)
+        {
+            return VoidResult.Failure(deleteAttributeInProductsResult);
+        }
+        
         await categoryRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();
@@ -475,6 +446,13 @@ internal sealed class CategoryService(
         if (!deleteVariantResult.IsSuccess)
         {
             return VoidResult.Failure(deleteVariantResult);
+        }
+        
+        VoidResult deleteVariantInProductsResult = await productDomainService.DeleteVariantInProductsAsync(childCategoryId, variantId, ct);
+
+        if (deleteVariantInProductsResult.IsFailure)
+        {
+            return VoidResult.Failure(deleteVariantInProductsResult);
         }
         
         await categoryRepository.SaveChangesAsync(ct);

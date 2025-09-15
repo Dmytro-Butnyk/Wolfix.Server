@@ -12,6 +12,7 @@ public sealed class VoidResult
         : $"Failure: {ErrorMessage} StatusCode: {StatusCode}";
     
     public bool IsSuccess => ErrorMessage == null;
+    public bool IsFailure => !IsSuccess;
     public string? ErrorMessage { get; }
     public HttpStatusCode StatusCode { get; }
 
@@ -27,16 +28,16 @@ public sealed class VoidResult
     public static VoidResult Failure(string errorMessage, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
         => new(errorMessage, statusCode);
     
-    public static VoidResult Failure(VoidResult result)
+    public static VoidResult Failure(VoidResult failedResult)
     {
-        if (result.IsSuccess) throw new ArgumentException("Result is success", nameof(result));
-        return new VoidResult(result.ErrorMessage!, result.StatusCode);
+        if (failedResult.IsSuccess) throw new ArgumentException("Result is success", nameof(failedResult));
+        return new VoidResult(failedResult.ErrorMessage!, failedResult.StatusCode);
     }
 
-    public static VoidResult Failure<TValue>(Result<TValue> result)
+    public static VoidResult Failure<TValue>(Result<TValue> failedResult)
     {
-        if (result.IsSuccess) throw new ArgumentException("Result is success", nameof(result));
-        return new VoidResult(result.ErrorMessage!, result.StatusCode);
+        if (failedResult.IsSuccess) throw new ArgumentException("Result is success", nameof(failedResult));
+        return new VoidResult(failedResult.ErrorMessage!, failedResult.StatusCode);
     }
 
     public TResult Map<TResult>(Func<TResult> onSuccess, Func<string, TResult> onFailure)
