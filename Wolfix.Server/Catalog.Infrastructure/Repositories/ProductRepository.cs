@@ -207,12 +207,4 @@ internal sealed class ProductRepository(CatalogContext context)
             .Select(media => media.MediaId)
             .ToListAsync(ct);
     }
-
-    public async Task<IReadOnlyCollection<Product>> GetAllByCategoryAsync(Guid childCategoryId, CancellationToken ct)
-    {
-        return await _products
-            .Where(product => product.CategoryId == childCategoryId)
-            .Include("_productsAttributeValues")
-            .ToListAsync(ct);
-    }
 }
