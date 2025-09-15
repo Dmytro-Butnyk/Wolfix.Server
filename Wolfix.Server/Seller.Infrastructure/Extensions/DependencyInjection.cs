@@ -7,6 +7,13 @@ namespace Seller.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
+    public static async Task EnsureSellerSchemeExistAndMigrateAsync(this IServiceProvider serviceProvider)
+    {
+        var db = serviceProvider.GetRequiredService<SellerContext>();
+        
+        await db.Database.MigrateAsync();
+    }
+    
     public static IServiceCollection AddSellerDbContext(this IServiceCollection services, string connectionString)
     {
         services.AddDbContext<SellerContext>(options =>

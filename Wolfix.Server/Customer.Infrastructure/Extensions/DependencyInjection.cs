@@ -9,6 +9,13 @@ namespace Customer.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
+    public static async Task EnsureCustomerSchemeExistAndMigrateAsync(this IServiceProvider serviceProvider)
+    {
+        var db = serviceProvider.GetRequiredService<CustomerContext>();
+        
+        await db.Database.MigrateAsync();
+    }
+    
     public static IServiceCollection AddCustomerDbContext(this IServiceCollection services, string connectionString)
     {
         services.AddDbContext<CustomerContext>(options =>

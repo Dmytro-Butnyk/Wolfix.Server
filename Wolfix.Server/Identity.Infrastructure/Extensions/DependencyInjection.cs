@@ -9,6 +9,13 @@ namespace Identity.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
+    public static async Task EnsureIdentitySchemeExistAndMigrateAsync(this IServiceProvider serviceProvider)
+    {
+        var db = serviceProvider.GetRequiredService<IdentityContext>();
+        
+        await db.Database.MigrateAsync();
+    }
+    
     public static IServiceCollection AddIdentityDbContext(this IServiceCollection services, string connectionString)
     {
         services.AddDbContext<IdentityContext>(options =>

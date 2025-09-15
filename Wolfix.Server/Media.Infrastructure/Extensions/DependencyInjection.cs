@@ -10,6 +10,13 @@ namespace Media.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
+    public static async Task EnsureMediaSchemeExistAndMigrateAsync(this IServiceProvider serviceProvider)
+    {
+        var db = serviceProvider.GetRequiredService<MediaContext>();
+        
+        await db.Database.MigrateAsync();
+    }
+    
     public static IServiceCollection AddMediaDbContext(this IServiceCollection services, string connectionString)
     {
         services.AddDbContext<MediaContext>(options => 

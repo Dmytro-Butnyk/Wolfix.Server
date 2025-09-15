@@ -11,6 +11,13 @@ namespace Catalog.Infrastructure.Extensions;
 
 public static class DependencyInjection
 {
+    public static async Task EnsureCatalogSchemeExistAndMigrateAsync(this IServiceProvider serviceProvider)
+    {
+        var db = serviceProvider.GetRequiredService<CatalogContext>();
+        
+        await db.Database.MigrateAsync();
+    }
+    
     public static IServiceCollection AddCatalogDbContext(this IServiceCollection services, string connectionString)
     {
         services.AddDbContext<CatalogContext>(options => 
