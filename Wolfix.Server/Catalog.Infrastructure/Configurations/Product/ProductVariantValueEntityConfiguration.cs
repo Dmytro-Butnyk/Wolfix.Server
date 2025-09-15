@@ -24,6 +24,7 @@ internal sealed class ProductVariantValueEntityConfiguration : IEntityTypeConfig
         
         builder.Property(pvv => pvv.Key).IsRequired();
         builder.Property(pvv => pvv.Value).IsRequired(false);
+        builder.Property(pvv => pvv.CategoryVariantId).IsRequired();
     }
 
     private void ConfigureProductRelation(EntityTypeBuilder<ProductVariantValue> builder)

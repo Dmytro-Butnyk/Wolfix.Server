@@ -12,23 +12,31 @@ internal sealed class ProductVariantValue : BaseEntity
     
     public string? Value { get; private set; }
     
+    public Guid CategoryVariantId { get; private set; }
+    
     private ProductVariantValue() { }
 
-    private ProductVariantValue(Product product, string key, string? value)
+    private ProductVariantValue(Product product, string key, string? value, Guid categoryVariantId)
     {
         Product = product;
         Key = key;
         Value = value;
+        CategoryVariantId = categoryVariantId;
     }
 
-    internal static Result<ProductVariantValue> Create(Product product, string key, string? value)
+    internal static Result<ProductVariantValue> Create(Product product, string key, string? value, Guid categoryVariantId)
     {
         if (IsTextInvalid(key, out var keyErrorMessage))
         {
             return Result<ProductVariantValue>.Failure(keyErrorMessage);
         }
 
-        var productVariant = new ProductVariantValue(product, key, value);
+        if (Guid.Empty == categoryVariantId)
+        {
+            return Result<ProductVariantValue>.Failure($"{nameof(categoryVariantId)} is required");
+        }
+
+        var productVariant = new ProductVariantValue(product, key, value, categoryVariantId);
         return Result<ProductVariantValue>.Success(productVariant, HttpStatusCode.Created);
     }
 

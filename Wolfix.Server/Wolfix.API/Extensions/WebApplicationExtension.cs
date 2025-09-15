@@ -36,7 +36,7 @@ public static class WebApplicationExtension
         await services.EnsureSellerSchemeExistAndMigrateAsync();
     }
 
-    public static async Task EnsureAllRolesValid(this WebApplication app)
+    public static async Task EnsureRolesValid(this WebApplication app)
     {
         await using var scope = app.Services.CreateAsyncScope();
         var services = scope.ServiceProvider;

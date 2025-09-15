@@ -24,6 +24,7 @@ internal sealed class ProductAttributeValueEntityConfiguration : IEntityTypeConf
         
         builder.Property(pav => pav.Key).IsRequired();
         builder.Property(pav => pav.Value).IsRequired(false);
+        builder.Property(pav => pav.CategoryAttributeId).IsRequired();
     }
     
     private void ConfigureProductRelation(EntityTypeBuilder<ProductAttributeValue> builder)

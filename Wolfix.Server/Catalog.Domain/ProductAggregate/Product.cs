@@ -508,7 +508,7 @@ public sealed class Product : BaseEntity
     #endregion
 
     #region productAttributeValues
-    public VoidResult AddProductAttributeValue(string key, string value)
+    public VoidResult AddProductAttributeValue(string key, string value, Guid productAttributeId)
     {
         ProductAttributeValue? existingProductAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Value == value);
 
@@ -517,7 +517,8 @@ public sealed class Product : BaseEntity
             return VoidResult.Failure($"{nameof(existingProductAttributeValue)} already exists", HttpStatusCode.Conflict);
         }
         
-        Result<ProductAttributeValue> createProductAttributeValueResult = ProductAttributeValue.Create(this, key, value);
+        Result<ProductAttributeValue> createProductAttributeValueResult =
+            ProductAttributeValue.Create(this, key, value, productAttributeId);
 
         return createProductAttributeValueResult.Map(
             onSuccess: productAttributeValue =>
@@ -529,9 +530,9 @@ public sealed class Product : BaseEntity
         );
     }
 
-    public VoidResult RemoveProductAttributeValue(Guid productAttributeValueId)
+    public VoidResult RemoveProductAttributeValue(Guid productAttributeId)
     {
-        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.CategoryAttributeId == productAttributeId);
         
         if (productAttributeValue == null)
         {
@@ -599,7 +600,7 @@ public sealed class Product : BaseEntity
     
     //todo
     #region productVariantValues
-    public VoidResult AddProductVariantValue(string key, string value)
+    public VoidResult AddProductVariantValue(string key, string value, Guid productVariantId)
     {
         ProductVariantValue? existingProductVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Value == value);
 
@@ -608,7 +609,7 @@ public sealed class Product : BaseEntity
             return VoidResult.Failure($"{nameof(existingProductVariantValue)} already exists", HttpStatusCode.Conflict);
         }
         
-        Result<ProductVariantValue> createProductVariantValueResult = ProductVariantValue.Create(this, key, value);
+        Result<ProductVariantValue> createProductVariantValueResult = ProductVariantValue.Create(this, key, value, productVariantId);
 
         return createProductVariantValueResult.Map(
             onSuccess: productVariantValue =>
@@ -620,9 +621,9 @@ public sealed class Product : BaseEntity
         );
     }
 
-    public VoidResult RemoveProductVariantValue(Guid productVariantValueId)
+    public VoidResult RemoveProductVariantValue(Guid productVariantId)
     {
-        ProductVariantValue? productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.Id == productVariantValueId);
+        ProductVariantValue? productVariantValue = _productVariantValues.FirstOrDefault(pvv => pvv.CategoryVariantId == productVariantId);
         
         if (productVariantValue == null)
         {

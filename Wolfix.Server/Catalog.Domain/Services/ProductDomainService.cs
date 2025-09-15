@@ -74,7 +74,7 @@ public sealed class ProductDomainService(
 
         foreach (AddAttributeValueObject addAttributesDto in addAttributesDtos)
         {
-            ProductAttributeInfo? attributeInfo = attributes.FirstOrDefault(a => a.Id == addAttributesDto.Id);
+            ProductAttributeInfo? attributeInfo = attributes.FirstOrDefault(a => a.Id == addAttributesDto.ProductAttributeId);
 
             if (attributeInfo is null)
             {
@@ -84,7 +84,7 @@ public sealed class ProductDomainService(
 
             string key = attributeInfo.Key;
 
-            VoidResult addAttributeResult = newProduct.AddProductAttributeValue(key, addAttributesDto.Value);
+            VoidResult addAttributeResult = newProduct.AddProductAttributeValue(key, addAttributesDto.Value, addAttributesDto.ProductAttributeId);
 
             if (addAttributeResult.IsFailure)
             {
@@ -105,50 +105,6 @@ public sealed class ProductDomainService(
     public async Task<IReadOnlyCollection<Guid>> GetAllMediaIdsByCategoryProducts(Guid categoryId, CancellationToken ct)
     {
         return await productRepository.GetAllMediaIdsByCategoryProductsAsync(categoryId, ct);
-    }
-
-    public async Task<VoidResult> AddAttributeToProductsAsync(Guid childCategoryId, string key, CancellationToken ct)
-    {
-        IReadOnlyCollection<Product> productsByCategory = await productRepository.GetAllByCategoryAsync(childCategoryId, ct);
-        
-        if (productsByCategory.Count == 0)
-        {
-            return VoidResult.Success();
-        }
-        
-        foreach (var product in productsByCategory)
-        {
-            VoidResult addAttributeToProductResult = product.AddProductAttributeValue(key, string.Empty);
-            
-            if (!addAttributeToProductResult.IsSuccess)
-            {
-                return VoidResult.Failure(addAttributeToProductResult);
-            }
-        }
-        
-        return VoidResult.Success();
-    }
-
-    public async Task<VoidResult> AddVariantToProductsAsync(Guid childCategoryId, string key, CancellationToken ct)
-    {
-        IReadOnlyCollection<Product> productsByCategory = await productRepository.GetAllByCategoryAsync(childCategoryId, ct);
-
-        if (productsByCategory.Count == 0)
-        {
-            return VoidResult.Success();
-        }
-        
-        foreach (var product in productsByCategory)
-        {
-            VoidResult addVariantResult = product.AddProductVariantValue(key, string.Empty);
-
-            if (addVariantResult.IsFailure)
-            {
-                return VoidResult.Failure(addVariantResult);
-            }
-        }
-        
-        return VoidResult.Success();
     }
 
     public async Task<VoidResult> DeleteAttributeInProductsAsync(Guid childCategoryId, Guid attributeId, CancellationToken ct)

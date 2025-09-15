@@ -7,26 +7,36 @@ namespace Catalog.Domain.ProductAggregate.Entities;
 internal sealed class ProductAttributeValue : BaseEntity
 {
     public Product Product { get; private set; }
+    
     public string Key { get; private set; }
+    
     public string? Value { get; private set; }
+    
+    public Guid CategoryAttributeId { get; private set; }
     
     private ProductAttributeValue() { }
 
-    private ProductAttributeValue(Product product, string key, string? value)
+    private ProductAttributeValue(Product product, string key, string? value, Guid categoryAttributeId)
     {
         Product = product;
         Key = key;
         Value = value;
+        CategoryAttributeId = categoryAttributeId;
     }
 
-    internal static Result<ProductAttributeValue> Create(Product product, string key, string? value)
+    internal static Result<ProductAttributeValue> Create(Product product, string key, string? value, Guid categoryAttributeId)
     {
         if (IsTextInvalid(key, out var keyErrorMessage))
         {
             return Result<ProductAttributeValue>.Failure(keyErrorMessage);
         }
 
-        var productsAttributes = new ProductAttributeValue(product, key, value);
+        if (Guid.Empty == categoryAttributeId)
+        {
+            return Result<ProductAttributeValue>.Failure($"{nameof(categoryAttributeId)} is required");
+        }
+
+        var productsAttributes = new ProductAttributeValue(product, key, value, categoryAttributeId);
         return Result<ProductAttributeValue>.Success(productsAttributes, HttpStatusCode.Created);
     }
 

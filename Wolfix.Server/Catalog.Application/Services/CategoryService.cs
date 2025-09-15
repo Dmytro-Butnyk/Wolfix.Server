@@ -288,19 +288,11 @@ internal sealed class CategoryService(
         
         VoidResult addAttributeResult = childCategory.AddProductAttribute(request.Key);
 
-        if (!addAttributeResult.IsSuccess)
+        if (addAttributeResult.IsFailure)
         {
             return VoidResult.Failure(addAttributeResult);
         }
         
-        VoidResult addAttributeToProductsResult = await productDomainService.AddAttributeToProductsAsync(childCategoryId, request.Key, ct);
-
-        if (!addAttributeToProductsResult.IsSuccess)
-        {
-            return VoidResult.Failure(addAttributeToProductsResult);
-        }
-        
-        //todo: сохранять до домейн сервиса или после
         await categoryRepository.SaveChangesAsync(ct);
         
         //todo: кидать уведомление продавцу о том что нужно добавить значение для аттрибута
@@ -331,19 +323,11 @@ internal sealed class CategoryService(
         
         VoidResult addVariantResult = childCategory.AddProductVariant(request.Key);
         
-        if (!addVariantResult.IsSuccess)
+        if (addVariantResult.IsFailure)
         {
             return VoidResult.Failure(addVariantResult);
         }
         
-        VoidResult addVariantToProductsResult = await productDomainService.AddVariantToProductsAsync(childCategoryId, request.Key, ct);
-
-        if (addVariantToProductsResult.IsFailure)
-        {
-            return VoidResult.Failure(addVariantToProductsResult);
-        }
-        
-        //todo: сохранять до домейн сервиса или после
         await categoryRepository.SaveChangesAsync(ct);
         
         //todo: кидать уведомление продавцу о том что нужно добавить значение для варианта
