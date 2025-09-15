@@ -286,6 +286,13 @@ public sealed class Product : BaseEntity
                 HttpStatusCode.NotFound
             );
         }
+        
+        if (newMainPhoto.MediaType == BlobResourceType.Video)
+        {
+            return VoidResult.Failure(
+                $"{nameof(newMainPhoto)} is video. Can not be main photo."
+            );
+        }
 
         ProductMedia? currentMainPhoto = _productMedias
             .FirstOrDefault(p => p.IsMain);
@@ -313,6 +320,22 @@ public sealed class Product : BaseEntity
         BlobResourceType mediaType,
         string mediaUrl, bool isMain)
     {
+        if (!_productMedias.Any(pm => pm.IsMain))
+        {
+            isMain = true;
+
+            if (mediaType == BlobResourceType.Video)
+            {
+                return VoidResult.Failure(
+                    $"{nameof(mediaType)} is video. Can not be main photo."
+                );
+            }
+        }
+        else if (isMain)
+        {
+            isMain = false;
+        }
+        
         if (IsGuidInvalid(mediaId, out string mediaIdErrorMessage))
         {
             return VoidResult.Failure(mediaIdErrorMessage);

@@ -54,7 +54,12 @@ internal sealed class ProductService(
             return VoidResult.Failure("Invalid blob resource type");
         }
 
-        Stream stream = addProductDto.Filestream.OpenReadStream();
+        if (addProductDto.Media is null)
+        {
+            return VoidResult.Failure("Media is null");       
+        }
+        
+        Stream stream = addProductDto.Media.OpenReadStream();
 
         IReadOnlyCollection<AddAttributeValueObject> attributes = addProductDto.Attributes
             .Select(attr => new AddAttributeValueObject(attr.Id, attr.Value))
@@ -78,7 +83,7 @@ internal sealed class ProductService(
         VoidResult eventResult = await eventBus.PublishAsync(
             new ProductMediaAdded(
                 result.Value,
-                new MediaEventDto(blobResourceType, stream, true)),
+                new MediaEventDto(blobResourceType, stream, false)),
             ct);
 
         if (!eventResult.IsSuccess)
@@ -111,6 +116,60 @@ internal sealed class ProductService(
         }
         
         await productRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> AddProductMediaAsync(AddMediaDto addMediaDto, CancellationToken ct)
+    {
+        BlobResourceType blobResourceType;
+
+        if (Enum.TryParse(addMediaDto.ContentType, out BlobResourceType resourceType))
+        {
+            blobResourceType = resourceType;
+        }
+        else
+        {
+            return VoidResult.Failure("Invalid blob resource type");
+        }
+        
+        Product? product = await productRepository.GetByIdAsync(
+            addMediaDto.ProductId,
+            ct,
+            "_productMedias");
+
+        if (product is null)
+        {
+            return VoidResult.Failure(
+                $"Product with id: {addMediaDto.ProductId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        int mediaCount = product.ProductMedias.Count;
+
+        if (mediaCount >= 10)
+        {
+            return VoidResult.Failure("Product can not have more than 10 media");
+        }
+        
+        if (addMediaDto.Media is null)
+        {
+            return VoidResult.Failure("Media is null");       
+        }
+        
+        Stream stream = addMediaDto.Media.OpenReadStream();
+        
+        VoidResult eventResult = await eventBus.PublishAsync(
+            new ProductMediaAdded(
+                addMediaDto.ProductId,
+                new MediaEventDto(blobResourceType, stream, true)),
+            ct);
+
+        if (!eventResult.IsSuccess)
+        {
+            return VoidResult.Failure(eventResult.ErrorMessage!, eventResult.StatusCode);
+        }
         
         return VoidResult.Success();
     }

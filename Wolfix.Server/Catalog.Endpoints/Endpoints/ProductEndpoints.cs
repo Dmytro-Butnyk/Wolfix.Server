@@ -34,10 +34,16 @@ internal static class ProductEndpoints
             .DisableAntiforgery()
             .WithSummary("Add product");
 
-        group.MapPatch("product/{productId:guid}/new-main-photo/{newMainPhotoId:guid}", ChangeProductMainPhoto);
-        
-        group.MapDelete("product/{productId:guid}/media/{mediaId:guid}", DeleteProductMedia);
-        
+        group.MapPatch("product/{productId:guid}/new-main-photo/{newMainPhotoId:guid}", ChangeProductMainPhoto)
+            .WithSummary("Change product main photo");
+
+        group.MapPatch("add-product-media", AddProductMedia)
+            .DisableAntiforgery()
+            .WithSummary("Add product media");
+
+        group.MapDelete("product/{productId:guid}/media/{mediaId:guid}", DeleteProductMedia)
+            .WithSummary("Delete product media");
+
         group.MapGet("category/{childCategoryId:guid}/page/{page:int}", GetAllByCategoryForPage)
             .WithSummary("Get all products by specific category for page with pagination");
 
@@ -59,7 +65,7 @@ internal static class ProductEndpoints
         group.MapPost("", AddReview)
             .WithSummary("Add review");
     }
-    
+
     private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> AddProduct(
         [FromForm] AddProductDto addProductDto,
         [FromServices] IProductService productService,
@@ -79,7 +85,7 @@ internal static class ProductEndpoints
 
         return TypedResults.NoContent();
     }
-    
+
     private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> ChangeProductMainPhoto(
         [FromRoute] Guid productId,
         [FromRoute] Guid newMainPhotoId,
@@ -102,6 +108,27 @@ internal static class ProductEndpoints
         return TypedResults.NoContent();
     }
 
+    private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> AddProductMedia(
+        [FromForm] AddMediaDto addMediaDto,
+        [FromServices] IProductService productService,
+        CancellationToken ct
+    )
+    {
+        VoidResult addProductMediaResult = await productService.AddProductMediaAsync(addMediaDto, ct);
+        
+        if (!addProductMediaResult.IsSuccess)
+        {
+            return addProductMediaResult.StatusCode switch
+            {
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(addProductMediaResult.ErrorMessage),
+                HttpStatusCode.NotFound => TypedResults.NotFound(addProductMediaResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+        
+        return TypedResults.NoContent();
+    }
+
     private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> DeleteProductMedia(
         [FromRoute] Guid productId,
         [FromRoute] Guid mediaId,
@@ -109,7 +136,7 @@ internal static class ProductEndpoints
         CancellationToken ct)
     {
         VoidResult deleteProductMediaResult = await productService.DeleteProductMediaAsync(productId, mediaId, ct);
-        
+
         if (!deleteProductMediaResult.IsSuccess)
         {
             return deleteProductMediaResult.StatusCode switch
@@ -119,7 +146,7 @@ internal static class ProductEndpoints
                 _ => throw new Exception("Unknown status code")
             };
         }
-        
+
         return TypedResults.NoContent();
     }
 

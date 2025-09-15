@@ -1,6 +1,7 @@
 using Catalog.Application.Dto.Product;
 using Catalog.Application.Dto.Product.AdditionDtos;
 using Catalog.Application.Dto.Product.Review;
+using Catalog.Domain.ProductAggregate.Enums;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
 
@@ -10,6 +11,7 @@ public interface IProductService
 {
     Task<VoidResult> AddProductAsync(AddProductDto addProductDto, CancellationToken ct);
     Task<VoidResult> ChangeProductMainPhotoAsync(Guid productId, Guid newMainPhotoId, CancellationToken ct);
+    Task<VoidResult> AddProductMediaAsync(AddMediaDto addMediaDto, CancellationToken ct);
     Task<VoidResult> DeleteProductMediaAsync(Guid productId, Guid mediaId, CancellationToken ct);
     Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRandomProductsAsync(int pageSize, CancellationToken ct);
     
