@@ -1,5 +1,6 @@
 ﻿using Catalog.Domain.ProductAggregate.Enums;
 using Catalog.Domain.ValueObjects.AddProduct;
+using Catalog.Domain.ValueObjects.FullProductDto;
 using Shared.Domain.Models;
 
 namespace Catalog.Domain.Interfaces.DomainServices;
@@ -24,4 +25,5 @@ public interface IProductDomainService
     Task<VoidResult> DeleteAttributeInProductsAsync(Guid childCategoryId, Guid attributeId, CancellationToken ct);
     
     Task<VoidResult> DeleteVariantInProductsAsync(Guid childCategoryId, Guid variantId, CancellationToken ct);
+    Task<Result<IReadOnlyCollection<ProductCategoriesValueObject>>> GetCategoriesLineForProduct(Guid categoryId, CancellationToken ct); 
 }

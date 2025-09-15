@@ -6,6 +6,7 @@ using Catalog.Domain.Interfaces.DomainServices;
 using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.ProductAggregate.Enums;
 using Catalog.Domain.ValueObjects.AddProduct;
+using Catalog.Domain.ValueObjects.FullProductDto;
 using Shared.Domain.Models;
 
 namespace Catalog.Domain.Services;
@@ -58,6 +59,8 @@ public sealed class ProductDomainService(
         IReadOnlyCollection<AddAttributeValueObject> addAttributesDtos,
         CancellationToken ct)
     {
+        //todo: убрать метод GetByIdWithProductAttributesAsNoTrackingAsync так как есть возможность добавлять инклуды как аргументы
+        
         Category? category = await categoryRepository.GetByIdWithProductAttributesAsNoTrackingAsync(newProduct.CategoryId, ct);
 
         if (category is null)
@@ -203,5 +206,41 @@ public sealed class ProductDomainService(
         }
         
         return VoidResult.Success();
+    }
+    
+    public async Task<Result<IReadOnlyCollection<ProductCategoriesValueObject>>> GetCategoriesLineForProduct(Guid categoryId, CancellationToken ct)
+    {
+        Category? category = await categoryRepository.GetByIdAsNoTrackingAsync(categoryId, ct);
+
+        if (category is null)
+        {
+            return Result<IReadOnlyCollection<ProductCategoriesValueObject>>
+                .Failure("Category not found", HttpStatusCode.NotFound);
+        }
+
+        if (!category.IsChild)
+        {
+            return Result<IReadOnlyCollection<ProductCategoriesValueObject>>
+                .Failure("Category is not a child category");
+        }
+
+        IReadOnlyCollection<ProductCategoriesValueObject> categoriesValueObjects =
+        [
+            new()
+            {
+                CategoryId = category.Id,
+                CategoryName = category.Name,
+                Order = 2
+            },
+            new()
+            {
+                CategoryId = category.Parent.Id,
+                CategoryName = category.Parent.Name,
+                Order = 1         
+            }
+        ];
+
+        return Result<IReadOnlyCollection<ProductCategoriesValueObject>>
+            .Success(categoriesValueObjects);
     }
 }
