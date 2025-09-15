@@ -24,12 +24,6 @@ public interface ICategoryService
     
     Task<VoidResult> AddVariantAsync(AddCategoryVariantDto request, Guid childCategoryId, CancellationToken ct);
     
-    Task<Result<CategoryAttributeDto>> ChangeAttributeAsync(ChangeCategoryAttributeDto request, Guid childCategoryId,
-        Guid attributeId, CancellationToken ct);
-
-    Task<Result<CategoryVariantDto>> ChangeVariantAsync(ChangeCategoryVariantDto request, Guid childCategoryId,
-        Guid variantId, CancellationToken ct);
-
     Task<VoidResult> DeleteCategoryAsync(Guid categoryId, CancellationToken ct);
     
     Task<VoidResult> DeleteAttributeAsync(Guid childCategoryId, Guid attributeId, CancellationToken ct);

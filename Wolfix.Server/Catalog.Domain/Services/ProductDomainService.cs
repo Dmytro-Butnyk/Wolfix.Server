@@ -58,13 +58,14 @@ public sealed class ProductDomainService(
         IReadOnlyCollection<AddAttributeValueObject> addAttributesDtos,
         CancellationToken ct)
     {
-        Category? category = await categoryRepository
-            .GetByIdWithProductAttributesAsNoTrackingAsync(
-                newProduct.CategoryId, ct);
+        Category? category = await categoryRepository.GetByIdWithProductAttributesAsNoTrackingAsync(newProduct.CategoryId, ct);
 
         if (category is null)
         {
-            return VoidResult.Failure("Category not found", HttpStatusCode.NotFound);
+            return VoidResult.Failure(
+                $"Category with id: {newProduct.CategoryId} not found",
+                HttpStatusCode.NotFound
+            );
         }
 
         IReadOnlyCollection<ProductAttributeInfo> attributes = category.ProductAttributes;
@@ -83,7 +84,12 @@ public sealed class ProductDomainService(
 
             string key = attributeInfo.Key;
 
-            newProduct.AddProductAttributeValue(key, addAttributesDto.Value);
+            VoidResult addAttributeResult = newProduct.AddProductAttributeValue(key, addAttributesDto.Value);
+
+            if (addAttributeResult.IsFailure)
+            {
+                isAllSuccess = false;
+            }
         }
 
         await productRepository.SaveChangesAsync(ct);
@@ -134,11 +140,65 @@ public sealed class ProductDomainService(
         
         foreach (var product in productsByCategory)
         {
-            VoidResult addVariantToProductsResult = product.AddProductVariantValue(key, string.Empty);
+            VoidResult addVariantResult = product.AddProductVariantValue(key, string.Empty);
 
-            if (!addVariantToProductsResult.IsSuccess)
+            if (addVariantResult.IsFailure)
             {
-                return VoidResult.Failure(addVariantToProductsResult);
+                return VoidResult.Failure(addVariantResult);
+            }
+        }
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> DeleteAttributeInProductsAsync(Guid childCategoryId, Guid attributeId, CancellationToken ct)
+    {
+        IReadOnlyCollection<Product> productsByCategory = await productRepository.GetAllByCategoryAsync(childCategoryId, ct);
+
+        if (productsByCategory.Count == 0)
+        {
+            return VoidResult.Success();
+        }
+        
+        foreach (var product in productsByCategory)
+        {
+            //todo: в метод продукта принимается айди аттрибутВелью а в метод сервиса приходит айди обычного аттрибута,
+            // добавить в ProductAttributeValue и ProductVariantValue айди ключей без прямой привязки к ним,
+            // и переделать методы RemoveProductAttributeValue и RemoveProductVariantValue,
+            // и желательно вообще сущности переназвать, чтобы у категории был CategoryAttribute и CategoryVariant,
+            // а у продукта ProductAttribute и ProductVariant
+            VoidResult deleteAttributeResult = product.RemoveProductAttributeValue(attributeId);
+
+            if (deleteAttributeResult.IsFailure)
+            {
+                return VoidResult.Failure(deleteAttributeResult);
+            }
+        }
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> DeleteVariantInProductsAsync(Guid childCategoryId, Guid variantId, CancellationToken ct)
+    {
+        IReadOnlyCollection<Product> productsByCategory = await productRepository.GetAllByCategoryAsync(childCategoryId, ct);
+
+        if (productsByCategory.Count == 0)
+        {
+            return VoidResult.Success();
+        }
+        
+        foreach (var product in productsByCategory)
+        {
+            //todo: в метод продукта принимается айди аттрибутВелью а в метод сервиса приходит айди обычного аттрибута,
+            // добавить в ProductAttributeValue и ProductVariantValue айди ключей без прямой привязки к ним,
+            // и переделать методы RemoveProductAttributeValue и RemoveProductVariantValue,
+            // и желательно вообще сущности переназвать, чтобы у категории был CategoryAttribute и CategoryVariant,
+            // а у продукта ProductAttribute и ProductVariant
+            VoidResult deleteVariantResult = product.RemoveProductVariantValue(variantId);
+
+            if (deleteVariantResult.IsFailure)
+            {
+                return VoidResult.Failure(deleteVariantResult);
             }
         }
         
