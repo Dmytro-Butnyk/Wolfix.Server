@@ -12,7 +12,8 @@ public sealed class BlobResourceForProductAddedEventHandler(
 {
     public async Task<VoidResult> HandleAsync(BlobResourceForProductAdded @event, CancellationToken ct)
     {
-        Product? product = await productRepository.GetByIdAsync(@event.ProductId, ct);
+        Product? product = await productRepository
+            .GetByIdAsync(@event.ProductId, ct, "_productMedias");
 
         if (product is null)
         {

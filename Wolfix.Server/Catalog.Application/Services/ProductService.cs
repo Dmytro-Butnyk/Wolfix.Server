@@ -213,7 +213,7 @@ internal sealed class ProductService(
     public async Task<Result<ProductFullDto>> GetProductFullInfoAsync(Guid productId, CancellationToken ct)
     {
         Product? product = await productRepository.GetByIdAsync(productId, ct,
-            "_productMedias", "_productAttributeValues");
+            "_productMedias", "_productAttributeValues", "_productVariantValues");
 
         if (product is null)
         {
@@ -223,19 +223,28 @@ internal sealed class ProductService(
             );
         }
 
-        IReadOnlyCollection<ProductMediasDto> productMediasDto = product.ProductMedias.Select(pmi =>
-            new ProductMediasDto()
+        IReadOnlyCollection<ProductMediaDto> productMediasDto = product.ProductMedias.Select(pmi =>
+            new ProductMediaDto()
             {
                 Url = pmi.MediaUrl,
-                ContentType = pmi.MediaType.ToString()
+                ContentType = pmi.MediaType.ToString(),
+                IsMain = pmi.IsMain
             }
         ).ToList();
 
-        IReadOnlyCollection<ProductAttributeDto> productAttributeDto = product.ProductAttributeValues.Select(pav =>
+        IReadOnlyCollection<ProductAttributeDto> productAttributesDto = product.ProductAttributeValues.Select(pav =>
             new ProductAttributeDto()
             {
                 Key = pav.Key,
                 Value = pav.Value,
+            }
+        ).ToList();
+        
+        IReadOnlyCollection<ProductVariantDto> productVariantsDto = product.ProductVariantValues.Select(pvv =>
+            new ProductVariantDto()
+            {
+                Key = pvv.Key,
+                Value = pvv.Value,
             }
         ).ToList();
 
@@ -247,8 +256,8 @@ internal sealed class ProductService(
             return Result<ProductFullDto>.Failure(categoriesLineResult);
         }
 
-        IReadOnlyCollection<ProductCategoriesDto> categoriesLine =
-            categoriesLineResult.Value!.Select(c => new ProductCategoriesDto()
+        IReadOnlyCollection<ProductCategoryDto> categoriesLine =
+            categoriesLineResult.Value!.Select(c => new ProductCategoryDto()
                 {
                     CategoryId = c.CategoryId,
                     CategoryName = c.CategoryName,
@@ -268,7 +277,8 @@ internal sealed class ProductService(
             AverageRating = product.AverageRating,
             Categories = categoriesLine,
             Medias = productMediasDto,
-            Attributes = productAttributeDto
+            Attributes = productAttributesDto,
+            Variants = productVariantsDto
         };
 
         return Result<ProductFullDto>.Success(productFullDto);
