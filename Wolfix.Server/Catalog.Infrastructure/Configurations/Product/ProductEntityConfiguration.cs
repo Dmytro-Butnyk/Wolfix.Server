@@ -43,7 +43,7 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
         builder.Property(p => p.Status).IsRequired().HasConversion<string>();
         
         builder.Ignore(r => r.Reviews);
-        builder.Ignore(r => r.ProductsAttributeValues);
+        builder.Ignore(r => r.ProductAttributeValues);
         builder.Ignore(r => r.ProductVariantValues);
         builder.Ignore(r => r.ProductMedias);
         builder.Ignore(r => r.MainPhotoUrl);
@@ -93,12 +93,12 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
 
     private void ConfigureProductAttributeValuesRelation(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
     {
-        builder.HasMany<ProductAttributeValue>("_productsAttributeValues")
+        builder.HasMany<ProductAttributeValue>("_productAttributeValues")
             .WithOne(pav => pav.Product)
             .HasForeignKey("ProductId")
             .OnDelete(DeleteBehavior.Cascade)
             .IsRequired(false);
-        builder.Navigation("_productsAttributeValues")
+        builder.Navigation("_productAttributeValues")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 

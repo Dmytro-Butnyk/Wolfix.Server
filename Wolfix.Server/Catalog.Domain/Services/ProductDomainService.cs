@@ -112,7 +112,7 @@ public sealed class ProductDomainService(
     
     public async Task<Result<IReadOnlyCollection<ProductCategoriesValueObject>>> GetCategoriesLineForProduct(Guid categoryId, CancellationToken ct)
     {
-        Category? category = await categoryRepository.GetByIdAsNoTrackingAsync(categoryId, ct);
+        Category? category = await categoryRepository.GetByIdAsNoTrackingAsync(categoryId, ct, "Parent");
 
         if (category is null)
         {

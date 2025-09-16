@@ -33,7 +33,7 @@ internal sealed class ProductAttributeValueEntityConfiguration : IEntityTypeConf
     private void ConfigureProductRelation(EntityTypeBuilder<ProductAttributeValue> builder)
     {
         builder.HasOne(pav => pav.Product)
-            .WithMany("_productsAttributeValues")
+            .WithMany("_productAttributeValues")
             .HasForeignKey(pav => pav.ProductId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);

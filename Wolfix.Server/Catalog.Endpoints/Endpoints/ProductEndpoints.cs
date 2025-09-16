@@ -1,6 +1,7 @@
 using System.Net;
 using Catalog.Application.Dto.Product;
 using Catalog.Application.Dto.Product.AdditionDtos;
+using Catalog.Application.Dto.Product.FullDto;
 using Catalog.Application.Dto.Product.Review;
 using Catalog.Application.Interfaces;
 using Microsoft.AspNetCore.Builder;
@@ -43,6 +44,9 @@ internal static class ProductEndpoints
 
         group.MapDelete("product/{productId:guid}/media/{mediaId:guid}", DeleteProductMedia)
             .WithSummary("Delete product media");
+        
+        group.MapGet("product/{productId:guid}", GetProductFullInfo)
+            .WithSummary("Get product full info");
 
         group.MapGet("category/{childCategoryId:guid}/page/{page:int}", GetAllByCategoryForPage)
             .WithSummary("Get all products by specific category for page with pagination");
@@ -148,6 +152,27 @@ internal static class ProductEndpoints
         }
 
         return TypedResults.NoContent();
+    }
+    
+    private static async Task<Results<Ok<ProductFullDto>, BadRequest<string>, NotFound<string>>> GetProductFullInfo(
+        [FromRoute] Guid productId,
+        [FromServices] IProductService productService,
+        CancellationToken ct)
+    {
+        Result<ProductFullDto> getProductFullInfoResult =
+            await productService.GetProductFullInfoAsync(productId, ct);
+
+        if (!getProductFullInfoResult.IsSuccess)
+        {
+            return getProductFullInfoResult.StatusCode switch
+            {
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(getProductFullInfoResult.ErrorMessage),
+                HttpStatusCode.NotFound => TypedResults.NotFound(getProductFullInfoResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
+        }
+
+        return TypedResults.Ok(getProductFullInfoResult.Value);
     }
 
     //TODO: ПРОВЕРИТЬ СТАТУС КОДЫ

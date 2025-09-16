@@ -329,7 +329,7 @@ namespace Catalog.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("Catalog.Domain.ProductAggregate.Product", "Product")
-                        .WithMany("_productsAttributeValues")
+                        .WithMany("_productAttributeValues")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -399,7 +399,7 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.Navigation("_productVariantValues");
 
-                    b.Navigation("_productsAttributeValues");
+                    b.Navigation("_productAttributeValues");
 
                     b.Navigation("_reviews");
                 });

@@ -64,8 +64,8 @@ public sealed class Product : BaseEntity
         .ToList()
         .AsReadOnly();
 
-    private readonly List<ProductAttributeValue> _productsAttributeValues = [];
-    public IReadOnlyCollection<ProductAttributeValueInfo> ProductsAttributeValues => _productsAttributeValues
+    private readonly List<ProductAttributeValue> _productAttributeValues = [];
+    public IReadOnlyCollection<ProductAttributeValueInfo> ProductAttributeValues => _productAttributeValues
         .Select(pav => (ProductAttributeValueInfo)pav)
         .ToList()
         .AsReadOnly();
@@ -496,7 +496,7 @@ public sealed class Product : BaseEntity
     #region productAttributeValue
     public Result<ProductAttributeValueInfo> GetProductAttributeValue(Guid productAttributeValueId)
     {
-        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        ProductAttributeValue? productAttributeValue = _productAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
 
         if (productAttributeValue == null)
         {
@@ -510,7 +510,7 @@ public sealed class Product : BaseEntity
     #region productAttributeValues
     public VoidResult AddProductAttributeValue(string key, string value, Guid productAttributeId)
     {
-        ProductAttributeValue? existingProductAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Value == value);
+        ProductAttributeValue? existingProductAttributeValue = _productAttributeValues.FirstOrDefault(pav => pav.Value == value);
 
         if (existingProductAttributeValue != null)
         {
@@ -523,7 +523,7 @@ public sealed class Product : BaseEntity
         return createProductAttributeValueResult.Map(
             onSuccess: productAttributeValue =>
             {
-                _productsAttributeValues.Add(productAttributeValue);
+                _productAttributeValues.Add(productAttributeValue);
                 return VoidResult.Success();
             },
             onFailure: errorMessage => VoidResult.Failure(errorMessage, createProductAttributeValueResult.StatusCode)
@@ -532,25 +532,25 @@ public sealed class Product : BaseEntity
 
     public void RemoveProductAttributeValue(Guid productAttributeId)
     {
-        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.CategoryAttributeId == productAttributeId);
+        ProductAttributeValue? productAttributeValue = _productAttributeValues.FirstOrDefault(pav => pav.CategoryAttributeId == productAttributeId);
         
         if (productAttributeValue == null)
         {
             return;
         }
         
-        _productsAttributeValues.Remove(productAttributeValue);
+        _productAttributeValues.Remove(productAttributeValue);
     }
     
     public VoidResult RemoveAllProductAttributeValues()
     {
-        _productsAttributeValues.Clear();
+        _productAttributeValues.Clear();
         return VoidResult.Success();
     }
 
     public VoidResult ChangeProductAttributeKey(Guid productAttributeValueId, string key)
     {
-        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        ProductAttributeValue? productAttributeValue = _productAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
         
         if (productAttributeValue == null)
         {
@@ -567,7 +567,7 @@ public sealed class Product : BaseEntity
 
     public VoidResult ChangeProductAttributeValue(Guid productAttributeValueId, string value)
     {
-        ProductAttributeValue? productAttributeValue = _productsAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        ProductAttributeValue? productAttributeValue = _productAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
         
         if (productAttributeValue == null)
         {

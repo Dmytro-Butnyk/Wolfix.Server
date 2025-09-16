@@ -315,7 +315,7 @@ namespace Catalog.Infrastructure.Migrations
             modelBuilder.Entity("Catalog.Domain.ProductAggregate.Entities.ProductAttributeValue", b =>
                 {
                     b.HasOne("Catalog.Domain.ProductAggregate.Product", "Product")
-                        .WithMany("_productsAttributeValues")
+                        .WithMany("_productAttributeValues")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade);
 
@@ -379,7 +379,7 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.Navigation("_productVariantValues");
 
-                    b.Navigation("_productsAttributeValues");
+                    b.Navigation("_productAttributeValues");
 
                     b.Navigation("_reviews");
                 });

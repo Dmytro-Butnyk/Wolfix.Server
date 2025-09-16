@@ -210,7 +210,7 @@ internal sealed class ProductService(
         return VoidResult.Success();
     }
 
-    public async Task<Result<ProductFullDto>> GetProductFullInfo(Guid productId, CancellationToken ct)
+    public async Task<Result<ProductFullDto>> GetProductFullInfoAsync(Guid productId, CancellationToken ct)
     {
         Product? product = await productRepository.GetByIdAsync(productId, ct,
             "_productMedias", "_productAttributeValues");
@@ -231,7 +231,7 @@ internal sealed class ProductService(
             }
         ).ToList();
 
-        IReadOnlyCollection<ProductAttributeDto> productAttributeDto = product.ProductsAttributeValues.Select(pav =>
+        IReadOnlyCollection<ProductAttributeDto> productAttributeDto = product.ProductAttributeValues.Select(pav =>
             new ProductAttributeDto()
             {
                 Key = pav.Key,

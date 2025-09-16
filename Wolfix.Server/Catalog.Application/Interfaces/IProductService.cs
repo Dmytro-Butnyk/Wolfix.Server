@@ -14,7 +14,7 @@ public interface IProductService
     Task<VoidResult> ChangeProductMainPhotoAsync(Guid productId, Guid newMainPhotoId, CancellationToken ct);
     Task<VoidResult> AddProductMediaAsync(AddMediaDto addMediaDto, CancellationToken ct);
     Task<VoidResult> DeleteProductMediaAsync(Guid productId, Guid mediaId, CancellationToken ct);
-    Task<Result<ProductFullDto>> GetProductFullInfo(Guid productId, CancellationToken ct);
+    Task<Result<ProductFullDto>> GetProductFullInfoAsync(Guid productId, CancellationToken ct);
     Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRandomProductsAsync(int pageSize, CancellationToken ct);
     
     Task<Result<PaginationDto<ProductShortDto>>> GetForPageByCategoryIdAsync(Guid childCategoryId,
