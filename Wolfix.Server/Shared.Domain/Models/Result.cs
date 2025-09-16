@@ -37,7 +37,7 @@ public sealed class Result<TValue>
     public static Result<TValue> Failure(string errorMessage, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
         => new(errorMessage, statusCode);
     
-    public static Result<TValue> Failure(Result<TValue> result)
+    public static Result<TValue> Failure<TResult>(Result<TResult> result)
     {
         if (result.IsSuccess) throw new ArgumentException("Result is success", nameof(result));
         return new Result<TValue>(result.ErrorMessage!, result.StatusCode);
