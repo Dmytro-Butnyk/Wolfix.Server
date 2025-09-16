@@ -109,4 +109,40 @@ public sealed class ProductDomainService(
     {
         return await productRepository.GetAllMediaIdsByCategoryProductsAsync(categoryId, ct);
     }
+    
+    public async Task<Result<IReadOnlyCollection<ProductCategoriesValueObject>>> GetCategoriesLineForProduct(Guid categoryId, CancellationToken ct)
+    {
+        Category? category = await categoryRepository.GetByIdAsNoTrackingAsync(categoryId, ct);
+
+        if (category is null)
+        {
+            return Result<IReadOnlyCollection<ProductCategoriesValueObject>>
+                .Failure("Category not found", HttpStatusCode.NotFound);
+        }
+
+        if (!category.IsChild)
+        {
+            return Result<IReadOnlyCollection<ProductCategoriesValueObject>>
+                .Failure("Category is not a child category");
+        }
+
+        IReadOnlyCollection<ProductCategoriesValueObject> categoriesValueObjects =
+        [
+            new()
+            {
+                CategoryId = category.Id,
+                CategoryName = category.Name,
+                Order = 2
+            },
+            new()
+            {
+                CategoryId = category.Parent.Id,
+                CategoryName = category.Parent.Name,
+                Order = 1         
+            }
+        ];
+
+        return Result<IReadOnlyCollection<ProductCategoriesValueObject>>
+            .Success(categoriesValueObjects);
+    }
 }
