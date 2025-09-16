@@ -212,7 +212,7 @@ internal sealed class ProductService(
 
     public async Task<Result<ProductFullDto>> GetProductFullInfoAsync(Guid productId, CancellationToken ct)
     {
-        Product? product = await productRepository.GetByIdAsync(productId, ct,
+        Product? product = await productRepository.GetByIdAsNoTrackingAsync(productId, ct,
             "_productMedias", "_productAttributeValues", "_productVariantValues");
 
         if (product is null)
