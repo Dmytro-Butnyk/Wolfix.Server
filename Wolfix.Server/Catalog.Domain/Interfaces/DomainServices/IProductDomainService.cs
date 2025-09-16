@@ -1,5 +1,6 @@
 ﻿using Catalog.Domain.ProductAggregate.Enums;
 using Catalog.Domain.ValueObjects.AddProduct;
+using Catalog.Domain.ValueObjects.FullProductDto;
 using Shared.Domain.Models;
 
 namespace Catalog.Domain.Interfaces.DomainServices;

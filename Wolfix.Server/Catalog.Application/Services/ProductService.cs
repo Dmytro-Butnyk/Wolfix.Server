@@ -2,6 +2,7 @@ using System.Net;
 using System.Reflection.Metadata;
 using Catalog.Application.Dto.Product;
 using Catalog.Application.Dto.Product.AdditionDtos;
+using Catalog.Application.Dto.Product.FullDto;
 using Catalog.Application.Dto.Product.Review;
 using Catalog.Application.Interfaces;
 using Catalog.Application.Mapping.Product;
@@ -15,6 +16,7 @@ using Catalog.Domain.ProductAggregate.Enums;
 using Catalog.Domain.Projections.Product;
 using Catalog.Domain.Projections.Product.Review;
 using Catalog.Domain.ValueObjects.AddProduct;
+using Catalog.Domain.ValueObjects.FullProductDto;
 using Catalog.IntegrationEvents;
 using Catalog.IntegrationEvents.Dto;
 using Shared.Application.Dto;
@@ -56,14 +58,16 @@ internal sealed class ProductService(
 
         if (addProductDto.Media is null)
         {
-            return VoidResult.Failure("Media is null");       
+            return VoidResult.Failure("Media is null");
         }
-        
+
         Stream stream = addProductDto.Media.OpenReadStream();
 
         IReadOnlyCollection<AddAttributeValueObject> attributes = addProductDto.Attributes
             .Select(attr => new AddAttributeValueObject(attr.Id, attr.Value))
             .ToList();
+
+        //todo: исправить логику доменного сервися (сейчас продукт создается внутри него, что не очень хорошо)
 
         Result<Guid> result = await productDomainService.AddProductAsync(
             addProductDto.Title,
@@ -105,18 +109,18 @@ internal sealed class ProductService(
                 HttpStatusCode.NotFound
             );
         }
-        
+
         VoidResult changeProductMainPhotoResult = product.ChangeMainPhoto(newMainPhotoId);
-        
-        if(!changeProductMainPhotoResult.IsSuccess)
+
+        if (!changeProductMainPhotoResult.IsSuccess)
         {
             return VoidResult.Failure(
                 changeProductMainPhotoResult.ErrorMessage!,
                 changeProductMainPhotoResult.StatusCode);
         }
-        
+
         await productRepository.SaveChangesAsync(ct);
-        
+
         return VoidResult.Success();
     }
 
@@ -132,7 +136,7 @@ internal sealed class ProductService(
         {
             return VoidResult.Failure("Invalid blob resource type");
         }
-        
+
         Product? product = await productRepository.GetByIdAsync(
             addMediaDto.ProductId,
             ct,
@@ -145,21 +149,21 @@ internal sealed class ProductService(
                 HttpStatusCode.NotFound
             );
         }
-        
+
         int mediaCount = product.ProductMedias.Count;
 
         if (mediaCount >= 10)
         {
             return VoidResult.Failure("Product can not have more than 10 media");
         }
-        
+
         if (addMediaDto.Media is null)
         {
-            return VoidResult.Failure("Media is null");       
+            return VoidResult.Failure("Media is null");
         }
-        
+
         Stream stream = addMediaDto.Media.OpenReadStream();
-        
+
         VoidResult eventResult = await eventBus.PublishAsync(
             new ProductMediaAdded(
                 addMediaDto.ProductId,
@@ -170,7 +174,7 @@ internal sealed class ProductService(
         {
             return VoidResult.Failure(eventResult.ErrorMessage!, eventResult.StatusCode);
         }
-        
+
         return VoidResult.Success();
     }
 
@@ -185,16 +189,16 @@ internal sealed class ProductService(
                 HttpStatusCode.NotFound
             );
         }
-        
+
         Result<Guid> deleteProductMediaResult = product.RemoveProductMedia(mediaId);
 
         if (!deleteProductMediaResult.IsSuccess)
         {
             return VoidResult.Failure(deleteProductMediaResult);
         }
-        
+
         await productRepository.SaveChangesAsync(ct);
-        
+
         VoidResult eventResult = await eventBus.PublishAsync(
             new ProductMediaDeleted(deleteProductMediaResult.Value), ct);
 
@@ -202,10 +206,74 @@ internal sealed class ProductService(
         {
             return VoidResult.Failure(eventResult);
         }
-        
+
         return VoidResult.Success();
     }
-    
+
+    public async Task<Result<ProductFullDto>> GetProductFullInfo(Guid productId, CancellationToken ct)
+    {
+        Product? product = await productRepository.GetByIdAsync(productId, ct,
+            "_productMedias", "_productAttributeValues");
+
+        if (product is null)
+        {
+            return Result<ProductFullDto>.Failure(
+                $"Product with id: {productId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        IReadOnlyCollection<ProductMediasDto> productMediasDto = product.ProductMedias.Select(pmi =>
+            new ProductMediasDto()
+            {
+                Url = pmi.MediaUrl,
+                ContentType = pmi.MediaType.ToString()
+            }
+        ).ToList();
+
+        IReadOnlyCollection<ProductAttributeDto> productAttributeDto = product.ProductsAttributeValues.Select(pav =>
+            new ProductAttributeDto()
+            {
+                Key = pav.Key,
+                Value = pav.Value,
+            }
+        ).ToList();
+
+        Result<IReadOnlyCollection<ProductCategoriesValueObject>> categoriesLineResult =
+            await productDomainService.GetCategoriesLineForProduct(product.CategoryId, ct);
+
+        if (categoriesLineResult.IsFailure)
+        {
+            return Result<ProductFullDto>.Failure(categoriesLineResult);
+        }
+
+        IReadOnlyCollection<ProductCategoriesDto> categoriesLine =
+            categoriesLineResult.Value!.Select(c => new ProductCategoriesDto()
+                {
+                    CategoryId = c.CategoryId,
+                    CategoryName = c.CategoryName,
+                    Order = c.Order
+                }
+            ).ToList();
+
+        ProductFullDto productFullDto = new()
+        {
+            Id = product.Id,
+            Title = product.Title,
+            Description = product.Description,
+            Price = product.Price,
+            FinalPrice = product.FinalPrice,
+            Status = product.Status.ToString(),
+            Bonuses = product.Bonuses,
+            AverageRating = product.AverageRating,
+            Categories = categoriesLine,
+            Medias = productMediasDto,
+            Attributes = productAttributeDto
+        };
+
+        return Result<ProductFullDto>.Success(productFullDto);
+    }
+
     public async Task<Result<PaginationDto<ProductShortDto>>> GetForPageByCategoryIdAsync(Guid childCategoryId,
         int page, int pageSize, CancellationToken ct)
     {

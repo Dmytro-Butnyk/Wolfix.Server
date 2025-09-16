@@ -6,6 +6,7 @@ using Catalog.Domain.Interfaces.DomainServices;
 using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.ProductAggregate.Enums;
 using Catalog.Domain.ValueObjects.AddProduct;
+using Catalog.Domain.ValueObjects.FullProductDto;
 using Shared.Domain.Models;
 
 namespace Catalog.Domain.Services;
@@ -58,6 +59,8 @@ public sealed class ProductDomainService(
         IReadOnlyCollection<AddAttributeValueObject> addAttributesDtos,
         CancellationToken ct)
     {
+        //todo: убрать метод GetByIdWithProductAttributesAsNoTrackingAsync так как есть возможность добавлять инклуды как аргументы
+        
         Category? category = await categoryRepository.GetByIdWithProductAttributesAsNoTrackingAsync(newProduct.CategoryId, ct);
 
         if (category is null)
