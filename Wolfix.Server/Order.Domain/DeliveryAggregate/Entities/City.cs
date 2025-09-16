@@ -1,4 +1,5 @@
 using Shared.Domain.Entities;
+using Shared.Domain.Models;
 
 namespace Order.Domain.DeliveryAggregate.Entities;
 
@@ -17,6 +18,28 @@ internal sealed class City : BaseEntity
         .Select(postMachine => (PostMachineInfo)postMachine)
         .ToList()
         .AsReadOnly();
+    
+    private City() { }
+
+    private City(string name)
+    {
+        Name = name;
+    }
+
+    public static Result<City> Create(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return Result<City>.Failure($"{nameof(name)} cannot be null or empty");
+        }
+        
+        if (name.Length > 100)
+        {
+            return Result<City>.Failure($"{nameof(name)} cannot be longer than 100 characters");
+        }
+
+        return Result<City>.Success(new(name));
+    }
     
     public static explicit operator CityInfo(City city)
         => new(city.Id, city.Name);
