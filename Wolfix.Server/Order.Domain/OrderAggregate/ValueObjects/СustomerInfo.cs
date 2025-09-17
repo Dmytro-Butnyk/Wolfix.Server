@@ -3,7 +3,7 @@ using Shared.Domain.ValueObjects;
 
 namespace Order.Domain.OrderAggregate.ValueObjects;
 
-internal sealed class CustomerInfo
+public sealed class CustomerInfo
 {
     public FullName FullName { get; }
     

@@ -8,17 +8,17 @@ namespace Order.Domain.OrderAggregate;
 
 public sealed class Order : BaseEntity
 {
-    internal CustomerInfo CustomerInfo { get; private set; }
+    public CustomerInfo CustomerInfo { get; private set; }
     
     public Guid CustomerId { get; private set; }
     
-    internal RecipientInfo RecipientInfo { get; private set; }
+    public RecipientInfo RecipientInfo { get; private set; }
     
     public OrderPaymentOption PaymentOption { get; private set; }
     
     public OrderPaymentStatus PaymentStatus { get; private set; }
     
-    internal DeliveryInfo DeliveryInfo { get; private set; }
+    public DeliveryInfo DeliveryInfo { get; private set; }
     
     public string DeliveryMethodName { get; private set; }
     
@@ -27,6 +27,8 @@ public sealed class Order : BaseEntity
     public decimal UsedBonusesAmount { get; private set; }
 
     public decimal Price { get; private set; }
+    
+    public string? PaymentIntentId { get; private set; } = string.Empty;
     
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
     
@@ -126,6 +128,23 @@ public sealed class Order : BaseEntity
             deliveryMethodName, deliveryInfo, withBonuses, usedBonusesAmount, price));
     }
 
+    public VoidResult AddPaymentIntentId(string paymentIntentId)
+    {
+        if (string.IsNullOrWhiteSpace(paymentIntentId))
+        {
+            return VoidResult.Failure($"{nameof(paymentIntentId)} cannot be null or empty");
+        }
+
+        if (PaymentStatus == OrderPaymentStatus.Paid)
+        {
+            return VoidResult.Failure($"{nameof(paymentIntentId)} cannot be added when order is not pending");
+        }
+        
+        PaymentIntentId = paymentIntentId;
+        return VoidResult.Success();
+    }
+
+    #region orderItems
     public VoidResult AddOrderItem(Guid productId, string photoUrl, string title, uint quantity, decimal price)
     {
         if (_orderItems.Any(oi => oi.ProductId == productId))
@@ -143,4 +162,5 @@ public sealed class Order : BaseEntity
         _orderItems.Add(createOrderItemResult.Value!);
         return VoidResult.Success();
     }
+    #endregion
 }

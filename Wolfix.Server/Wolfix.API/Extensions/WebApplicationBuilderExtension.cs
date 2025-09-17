@@ -3,6 +3,7 @@ using Customer.Endpoints.Extensions;
 using Identity.Endpoints.Extensions;
 using Media.Api;
 using Microsoft.AspNetCore.ResponseCompression;
+using Order.Endpoints.Extensions;
 using Seller.Endpoints.Extensions;
 using Shared.Application.Extensions;
 using Shared.IntegrationEvents;
@@ -21,7 +22,8 @@ public static class WebApplicationBuilderExtension
             .AddIdentityModule(connectionString)
             .AddCustomerModule(connectionString)
             .AddMediaModule(connectionString)
-            .AddSellerModule(connectionString);
+            .AddSellerModule(connectionString)
+            .AddOrderModule(connectionString);
         
         return builder;
     }
@@ -63,6 +65,17 @@ public static class WebApplicationBuilderExtension
     {
         builder.Services.AddSellerModule(connectionString);
 
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddOrderModule(this WebApplicationBuilder builder, string connectionString)
+    {
+        string publishableKey = builder.Configuration.GetOrThrow("STRIPE_PUBLISHABLE_KEY");
+        string secretKey = builder.Configuration.GetOrThrow("STRIPE_SECRET_KEY");
+        string webhookKey = builder.Configuration.GetOrThrow("STRIPE_WEBHOOK_KEY");
+        
+        builder.Services.AddOrderModule(connectionString, publishableKey, secretKey, webhookKey);
+        
         return builder;
     }
 

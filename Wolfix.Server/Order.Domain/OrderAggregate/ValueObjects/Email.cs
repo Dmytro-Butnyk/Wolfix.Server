@@ -3,7 +3,7 @@ using Shared.Domain.Models;
 
 namespace Order.Domain.OrderAggregate.ValueObjects;
 
-internal sealed class Email
+public sealed class Email
 {
     private static readonly Regex Regex = new(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.Compiled);
     

@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Order.Application.Contracts;
 using Order.Domain.Interfaces.Order;
 using Order.Infrastructure.Options;
 using Order.Infrastructure.Repositories;
+using Order.Infrastructure.Services;
 using Shared.Domain.Interfaces;
 using Shared.Infrastructure.Repositories;
 
@@ -42,6 +44,13 @@ public static class DependencyInjection
             options.SecretKey = secretKey;
             options.WebhookKey = webhookKey;
         });
+
+        return services;
+    }
+
+    public static IServiceCollection AddOrderInfrastructureServices(this IServiceCollection services)
+    {
+        services.AddScoped<IPaymentService, StripePaymentService>();
 
         return services;
     }

@@ -125,6 +125,9 @@ internal sealed class OrderEntityConfiguration : IEntityTypeConfiguration<OrderA
 
         builder.Property(order => order.Price)
             .IsRequired();
+        
+        builder.Property(order => order.PaymentIntentId)
+            .IsRequired(false);
 
         builder.Property(order => order.CreatedAt)
             .IsRequired();

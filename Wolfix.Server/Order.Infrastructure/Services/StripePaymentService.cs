@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Order.Application.Contracts;
+using Order.Application.Models;
 using Order.Infrastructure.Options;
 using Shared.Domain.Models;
 using Stripe;
@@ -10,7 +11,7 @@ public sealed class StripePaymentService(IOptions<StripeOptions> stripeOptions) 
 {
     private readonly StripeClient _stripeClient = new(stripeOptions.Value.SecretKey);
     
-    public async Task<Result<string>> PayAsync(decimal amount, string currency, string customerEmail, CancellationToken ct)
+    public async Task<Result<StripePaymentResponse>> PayAsync(decimal amount, string currency, string customerEmail, CancellationToken ct)
     {
         try
         {
@@ -25,11 +26,15 @@ public sealed class StripePaymentService(IOptions<StripeOptions> stripeOptions) 
             PaymentIntentService service = new(_stripeClient);
             PaymentIntent intent = await service.CreateAsync(options, cancellationToken: ct);
 
-            return Result<string>.Success(intent.Id);
+            return Result<StripePaymentResponse>.Success(new StripePaymentResponse
+            {
+                PaymentIntentId = intent.Id,
+                ClientSecret = intent.ClientSecret
+            });
         }
         catch (StripeException ex)
         {
-            return Result<string>.Failure($"Stripe error: {ex.Message}");
+            return Result<StripePaymentResponse>.Failure($"Stripe error: {ex.Message}");
         }
     }
 }

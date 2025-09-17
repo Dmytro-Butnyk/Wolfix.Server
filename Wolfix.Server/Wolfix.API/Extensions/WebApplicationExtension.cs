@@ -9,6 +9,8 @@ using Identity.Infrastructure.Helpers;
 using Identity.Infrastructure.Identity;
 using Media.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Identity;
+using Order.Endpoints.Extensions;
+using Order.Infrastructure.Extensions;
 using Seller.Endpoints.Extensions;
 using Seller.Infrastructure.Extensions;
 
@@ -22,6 +24,7 @@ public static class WebApplicationExtension
         app.MapIdentityApi();
         app.MapCustomerApi();
         app.MapSellerApi();
+        app.MapOrderApi();
     }
 
     public static async Task EnsureDatabaseExistAndMigrationsApplied(this WebApplication app)
@@ -34,6 +37,7 @@ public static class WebApplicationExtension
         await services.EnsureIdentitySchemeExistAndMigrateAsync();
         await services.EnsureMediaSchemeExistAndMigrateAsync();
         await services.EnsureSellerSchemeExistAndMigrateAsync();
+        await services.EnsureOrderSchemeExistAndMigrateAsync();
     }
 
     public static async Task EnsureRolesValid(this WebApplication app)

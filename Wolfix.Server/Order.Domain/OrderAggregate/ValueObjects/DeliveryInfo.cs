@@ -3,7 +3,7 @@ using Shared.Domain.Models;
 
 namespace Order.Domain.OrderAggregate.ValueObjects;
 
-internal sealed class DeliveryInfo
+public sealed class DeliveryInfo
 {
     public uint? Number { get; }
     
