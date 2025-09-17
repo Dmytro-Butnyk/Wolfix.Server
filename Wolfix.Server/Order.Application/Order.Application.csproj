@@ -7,11 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Projections\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Shared.Domain\Shared.Domain.csproj" />
+      <ProjectReference Include="..\Order.Domain\Order.Domain.csproj" />
+      <ProjectReference Include="..\Shared.Application\Shared.Application.csproj" />
     </ItemGroup>
 
 </Project>
