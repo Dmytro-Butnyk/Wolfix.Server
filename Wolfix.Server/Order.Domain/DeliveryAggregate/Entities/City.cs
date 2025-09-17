@@ -19,14 +19,19 @@ internal sealed class City : BaseEntity
         .ToList()
         .AsReadOnly();
     
+    public DeliveryMethod DeliveryMethod { get; private set; }
+    public Guid DeliveryMethodId { get; private set; }
+    
     private City() { }
 
-    private City(string name)
+    private City(string name, DeliveryMethod deliveryMethod)
     {
         Name = name;
+        DeliveryMethod = deliveryMethod;
+        DeliveryMethodId = deliveryMethod.Id;
     }
 
-    public static Result<City> Create(string name)
+    public static Result<City> Create(string name, DeliveryMethod deliveryMethod)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -38,7 +43,7 @@ internal sealed class City : BaseEntity
             return Result<City>.Failure($"{nameof(name)} cannot be longer than 100 characters");
         }
 
-        return Result<City>.Success(new(name));
+        return Result<City>.Success(new(name, deliveryMethod));
     }
     
     public static explicit operator CityInfo(City city)

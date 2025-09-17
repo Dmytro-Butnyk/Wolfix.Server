@@ -8,6 +8,8 @@ internal sealed class RecipientInfo
     public FullName FullName { get; }
     
     public PhoneNumber PhoneNumber { get; }
+    
+    private RecipientInfo() { }
 
     private RecipientInfo(FullName fullName, PhoneNumber phoneNumber)
     {

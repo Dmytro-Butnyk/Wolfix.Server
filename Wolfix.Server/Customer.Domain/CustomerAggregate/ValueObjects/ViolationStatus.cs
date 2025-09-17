@@ -7,9 +7,9 @@ internal sealed class ViolationStatus
 {
     private const uint MaxViolationsCount = 3;
     
-    public uint ViolationsCount { get; private set; }
+    public uint ViolationsCount { get; }
 
-    public AccountStatus Status { get; private set; }
+    public AccountStatus Status { get; }
 
     private ViolationStatus(uint violationsCount, AccountStatus status)
     {

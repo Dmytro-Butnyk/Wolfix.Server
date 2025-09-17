@@ -11,8 +11,8 @@ internal sealed class CustomerInfo
     
     public Email Email { get; }
     
-    public decimal BonusesAmount { get; }
-
+    private CustomerInfo() { }
+    
     private CustomerInfo(FullName fullName, PhoneNumber phoneNumber, Email email)
     {
         FullName = fullName;

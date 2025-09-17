@@ -13,21 +13,17 @@ internal sealed class DeliveryInfo
     
     public uint HouseNumber { get; }
     
-    public string? Note { get; }
-    
     public DeliveryOption Option { get; }
 
-    private DeliveryInfo(string city, string street, uint houseNumber, uint? number, string? note, DeliveryOption option)
+    private DeliveryInfo(string city, string street, uint houseNumber, uint? number, DeliveryOption option)
     {
         Number = number;
         City = city;
         Street = street;
         HouseNumber = houseNumber;
-        Note = note;
     }
 
-    public static Result<DeliveryInfo> Create(string city, string street, uint houseNumber, uint? number,
-        string? note, DeliveryOption option)
+    public static Result<DeliveryInfo> Create(string city, string street, uint houseNumber, uint? number, DeliveryOption option)
     {
         if (string.IsNullOrWhiteSpace(city))
         {
@@ -46,17 +42,7 @@ internal sealed class DeliveryInfo
 
         if (option == DeliveryOption.Courier)
         {
-            return Result<DeliveryInfo>.Success(new(city, street, houseNumber, null, null, option));
-        }
-        
-        if (option == DeliveryOption.Department)
-        {
-            if (number == null)
-            {
-                return Result<DeliveryInfo>.Failure($"{nameof(number)} cannot be null");
-            }
-            
-            return Result<DeliveryInfo>.Success(new(city, street, houseNumber, number, null, option));
+            return Result<DeliveryInfo>.Success(new(city, street, houseNumber, null, option));
         }
 
         if (number == null)
@@ -64,6 +50,6 @@ internal sealed class DeliveryInfo
             return Result<DeliveryInfo>.Failure($"{nameof(number)} cannot be null");
         }
         
-        return Result<DeliveryInfo>.Success(new(city, street, houseNumber, number, note, option));
+        return Result<DeliveryInfo>.Success(new(city, street, houseNumber, number, option));
     }
 }

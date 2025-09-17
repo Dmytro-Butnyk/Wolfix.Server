@@ -18,7 +18,6 @@ public sealed class CustomerContext : DbContext, IContextWithConfigurations
         
         modelBuilder.HasDefaultSchema("customer");
         ApplyConfigurations(modelBuilder);
-        
     }
 
     public void ApplyConfigurations(ModelBuilder modelBuilder)

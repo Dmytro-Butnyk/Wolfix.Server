@@ -4,11 +4,11 @@ namespace Shared.Domain.ValueObjects;
 
 public sealed class FullName
 {
-    public string FirstName { get; private set; }
+    public string FirstName { get; }
     
-    public string LastName { get; private set; }
+    public string LastName { get; }
     
-    public string MiddleName { get; private set; }
+    public string MiddleName { get; }
 
     private FullName(string firstName, string lastName, string middleName)
     {

@@ -18,17 +18,9 @@ public sealed class Order : BaseEntity
     
     public OrderPaymentStatus PaymentStatus { get; private set; }
     
-    public Guid DeliveryMethodId { get; private set; }
-    
-    public string DeliveryMethodName { get; private set; }
-    
     internal DeliveryInfo DeliveryInfo { get; private set; }
     
-    private readonly List<OrderItem> _orderItems = [];
-    public IReadOnlyCollection<OrderItemInfo> OrderItems => _orderItems
-        .Select(oi => (OrderItemInfo)oi)
-        .ToList()
-        .AsReadOnly();
+    public string DeliveryMethodName { get; private set; }
     
     public bool WithBonuses { get; private set; }
     
@@ -36,10 +28,18 @@ public sealed class Order : BaseEntity
 
     public decimal Price { get; private set; }
     
+    public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+    
+    private readonly List<OrderItem> _orderItems = [];
+    public IReadOnlyCollection<OrderItemInfo> OrderItems => _orderItems
+        .Select(oi => (OrderItemInfo)oi)
+        .ToList()
+        .AsReadOnly();
+    
     private Order() { }
 
     private Order(CustomerInfo customerInfo, Guid customerId, RecipientInfo recipientInfo,
-        OrderPaymentOption paymentOption, OrderPaymentStatus paymentStatus, Guid deliveryMethodId,
+        OrderPaymentOption paymentOption, OrderPaymentStatus paymentStatus,
         string deliveryMethodName, DeliveryInfo deliveryInfo, bool withBonuses,
         decimal usedBonusesAmount, decimal price)
     {
@@ -48,7 +48,6 @@ public sealed class Order : BaseEntity
         RecipientInfo = recipientInfo;
         PaymentOption = paymentOption;
         PaymentStatus = paymentStatus;
-        DeliveryMethodId = deliveryMethodId;
         DeliveryMethodName = deliveryMethodName;
         DeliveryInfo = deliveryInfo;
         WithBonuses = withBonuses;
@@ -59,9 +58,9 @@ public sealed class Order : BaseEntity
     public static Result<Order> Create(string customerFirstName, string customerLastName, string customerMiddleName,
         string customerPhoneNumber, string customerEmail, Guid customerId, string recipientFirstName, string recipientLastName,
         string recipientMiddleName, string recipientPhoneNumber, OrderPaymentOption paymentOption, OrderPaymentStatus paymentStatus,
-        Guid deliveryMethodId, string deliveryMethodName, uint? deliveryInfoNumber, string deliveryInfoCity,
-        string deliveryInfoStreet, uint deliveryInfoHouseNumber, string? deliveryInfoNote, DeliveryOption deliveryOption, bool withBonuses,
-        decimal usedBonusesAmount, decimal price)
+        string deliveryMethodName, uint? deliveryInfoNumber, string deliveryInfoCity, string deliveryInfoStreet,
+        uint deliveryInfoHouseNumber, DeliveryOption deliveryOption,
+        bool withBonuses, decimal usedBonusesAmount, decimal price)
     {
         if (paymentOption == OrderPaymentOption.WhileReceiving && paymentStatus == OrderPaymentStatus.Paid)
         {
@@ -93,18 +92,13 @@ public sealed class Order : BaseEntity
         
         var recipientInfo = createRecipientInfoResult.Value!;
 
-        if (Guid.Empty == deliveryMethodId)
-        {
-            return Result<Order>.Failure($"{nameof(deliveryMethodId)} cannot be empty");
-        }
-
         if (string.IsNullOrWhiteSpace(deliveryMethodName))
         {
             return Result<Order>.Failure($"{nameof(deliveryMethodName)} cannot be null or empty");
         }
 
-        Result<DeliveryInfo> createDeliveryInfo = ValueObjects.DeliveryInfo.Create(deliveryInfoCity, deliveryInfoStreet,
-            deliveryInfoHouseNumber, deliveryInfoNumber, deliveryInfoNote, deliveryOption);
+        Result<DeliveryInfo> createDeliveryInfo = DeliveryInfo.Create(deliveryInfoCity, deliveryInfoStreet,
+            deliveryInfoHouseNumber, deliveryInfoNumber, deliveryOption);
         
         if (createDeliveryInfo.IsFailure)
         {
@@ -129,6 +123,24 @@ public sealed class Order : BaseEntity
         }
 
         return Result<Order>.Success(new(customerInfo, customerId, recipientInfo, paymentOption, paymentStatus,
-            deliveryMethodId, deliveryMethodName, deliveryInfo, withBonuses, usedBonusesAmount, price));
+            deliveryMethodName, deliveryInfo, withBonuses, usedBonusesAmount, price));
+    }
+
+    public VoidResult AddOrderItem(Guid productId, string photoUrl, string title, uint quantity, decimal price)
+    {
+        if (_orderItems.Any(oi => oi.ProductId == productId))
+        {
+            return VoidResult.Failure($"Order item with product id: {productId} already exist");
+        }
+
+        Result<OrderItem> createOrderItemResult = OrderItem.Create(productId, photoUrl, title, quantity, price, this);
+
+        if (createOrderItemResult.IsFailure)
+        {
+            return VoidResult.Failure(createOrderItemResult);
+        }
+        
+        _orderItems.Add(createOrderItemResult.Value!);
+        return VoidResult.Success();
     }
 }

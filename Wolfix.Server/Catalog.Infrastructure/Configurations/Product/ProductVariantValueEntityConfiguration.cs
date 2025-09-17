@@ -36,7 +36,7 @@ internal sealed class ProductVariantValueEntityConfiguration : IEntityTypeConfig
             .HasForeignKey(pvv => pvv.ProductId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
-        builder.Navigation("Product")
+        builder.Navigation(pvv => pvv.Product)
             .UsePropertyAccessMode(PropertyAccessMode.Property);
     }
 
