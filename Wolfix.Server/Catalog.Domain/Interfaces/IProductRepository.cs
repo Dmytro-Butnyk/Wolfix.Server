@@ -9,6 +9,8 @@ namespace Catalog.Domain.Interfaces;
 public interface IProductRepository
     : IBaseRepository<Product>, IPaginationRepository<ProductShortProjection>
 {
+    Task<int> GetTotalCountByIdsAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct);
+    
     Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdForPageAsync(Guid childCategoryId,
         int page, int pageSize, CancellationToken ct);
     

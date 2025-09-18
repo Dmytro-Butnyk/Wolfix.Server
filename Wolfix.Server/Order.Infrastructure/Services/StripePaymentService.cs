@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.Extensions.Options;
 using Order.Application.Contracts;
 using Order.Application.Models;
@@ -34,7 +35,10 @@ public sealed class StripePaymentService(IOptions<StripeOptions> stripeOptions) 
         }
         catch (StripeException ex)
         {
-            return Result<StripePaymentResponse>.Failure($"Stripe error: {ex.Message}");
+            return Result<StripePaymentResponse>.Failure(
+                $"Stripe error: {ex.Message}",
+                HttpStatusCode.InternalServerError
+            );
         }
     }
 }

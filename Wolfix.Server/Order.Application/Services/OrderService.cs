@@ -80,7 +80,12 @@ internal sealed class OrderService(
         
         StripePaymentResponse paymentResponse = payResult.Value!;
 
-        order.AddPaymentIntentId(paymentResponse.PaymentIntentId);
+        VoidResult addPaymentIntentIdResult = order.AddPaymentIntentId(paymentResponse.PaymentIntentId);
+
+        if (addPaymentIntentIdResult.IsFailure)
+        {
+            return Result<string>.Failure(addPaymentIntentIdResult);
+        }
         
         await orderRepository.AddAsync(order, ct);
         await orderRepository.SaveChangesAsync(ct);

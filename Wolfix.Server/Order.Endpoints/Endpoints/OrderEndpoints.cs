@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -22,7 +23,7 @@ internal static class OrderEndpoints
             .WithSummary("Creates an order and returns client secret for payment");
     }
 
-    private static async Task<Results<Ok<string>, BadRequest<string>, NotFound<string>>> PlaceOrder(
+    private static async Task<Results<Ok<string>, BadRequest<string>, NotFound<string>, InternalServerError<string>>> PlaceOrder(
         [FromBody] PlaceOrderDto request,
         [FromServices] IOrderService orderService,
         CancellationToken ct)
@@ -31,8 +32,13 @@ internal static class OrderEndpoints
 
         if (placeOrderResult.IsFailure)
         {
-            //todo: все статус коды обрабатывать
-            return TypedResults.BadRequest(placeOrderResult.ErrorMessage);
+            return placeOrderResult.StatusCode switch
+            {
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(placeOrderResult.ErrorMessage),
+                HttpStatusCode.NotFound => TypedResults.NotFound(placeOrderResult.ErrorMessage),
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(placeOrderResult.ErrorMessage),
+                _ => throw new Exception("Unknown status code")
+            };
         }
         
         return TypedResults.Ok(placeOrderResult.Value!);

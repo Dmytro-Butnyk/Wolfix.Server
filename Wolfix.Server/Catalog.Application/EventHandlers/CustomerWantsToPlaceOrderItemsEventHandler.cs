@@ -1,3 +1,4 @@
+using System.Net;
 using Catalog.Domain.Interfaces;
 using Order.IntegrationEvents;
 using Shared.Domain.Models;
@@ -10,6 +11,18 @@ internal sealed class CustomerWantsToPlaceOrderItemsEventHandler(IProductReposit
 {
     public async Task<VoidResult> HandleAsync(CustomerWantsToPlaceOrderItems @event, CancellationToken ct)
     {
-        throw new Exception();
+        int existingCount = await productRepository.GetTotalCountByIdsAsync(@event.ProductIds, ct);
+        
+        bool allExist = existingCount == @event.ProductIds.Count;
+
+        if (!allExist)
+        {
+            return VoidResult.Failure(
+                "Not all products exist for placing order",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        return VoidResult.Success();
     }
 }

@@ -35,6 +35,16 @@ internal sealed class ProductRepository(CatalogContext context)
         return new List<ProductShortProjection>();
     }
 
+    public async Task<int> GetTotalCountByIdsAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        
+        return await _products
+            .AsNoTracking()
+            .Where(product => ids.Contains(product.Id))
+            .CountAsync(ct);   
+    }
+
     public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdForPageAsync(Guid childCategoryId,
         int page,
         int pageSize, CancellationToken ct)
