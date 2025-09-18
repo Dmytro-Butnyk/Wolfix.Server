@@ -77,7 +77,7 @@ internal static class OrderEndpoints
     {
         VoidResult markOrderPaidResult = await orderService.MarkOrderPaidAsync(orderId, ct);
         
-        if (!markOrderPaidResult.IsSuccess)
+        if (markOrderPaidResult.IsFailure)
         {
             return TypedResults.BadRequest(markOrderPaidResult.ErrorMessage);
         }
