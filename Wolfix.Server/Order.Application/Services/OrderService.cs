@@ -3,6 +3,7 @@ using Order.Application.Dto.Order.Requests;
 using Order.Application.Interfaces;
 using Order.Application.Models;
 using Order.Domain.Interfaces.Order;
+using Order.Domain.OrderAggregate.Enums;
 using Order.IntegrationEvents;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents.Interfaces;
@@ -17,7 +18,7 @@ internal sealed class OrderService(
 {
     public async Task<Result<string>> PlaceOrderWithPaymentAsync(PlaceOrderDto request, CancellationToken ct)
     {
-        Result<OrderAggregate> createOrderResult = await CreateOrderAsync(request, ct);
+        Result<OrderAggregate> createOrderResult = await CreateOrderAsync(request, true, ct);
         
         if (createOrderResult.IsFailure)
         {
@@ -55,7 +56,7 @@ internal sealed class OrderService(
 
     public async Task<VoidResult> PlaceOrderAsync(PlaceOrderDto request, CancellationToken ct)
     {
-        Result<OrderAggregate> createOrderResult = await CreateOrderAsync(request, ct);
+        Result<OrderAggregate> createOrderResult = await CreateOrderAsync(request, false, ct);
         
         if (createOrderResult.IsFailure)
         {
@@ -68,7 +69,7 @@ internal sealed class OrderService(
         return VoidResult.Success();
     }
 
-    private async Task<Result<OrderAggregate>> CreateOrderAsync(PlaceOrderDto request, CancellationToken ct)
+    private async Task<Result<OrderAggregate>> CreateOrderAsync(PlaceOrderDto request, bool payNow, CancellationToken ct)
     {
         VoidResult checkCustomerExistResult = await eventBus.PublishAsync(new CustomerWantsToPlaceOrder
         {
@@ -81,11 +82,17 @@ internal sealed class OrderService(
         }
         
         var orderData = request.Order;
+
+        (OrderPaymentOption paymentOption, OrderPaymentStatus paymentStatus) = payNow switch
+        {
+            true => (OrderPaymentOption.Card, OrderPaymentStatus.Pending),
+            false => (OrderPaymentOption.WhileReceiving, OrderPaymentStatus.Unpaid)
+        };
         
         Result<OrderAggregate> createOrderResult = OrderAggregate.Create(orderData.CustomerFirstName, orderData.CustomerLastName,
             orderData.CustomerMiddleName, orderData.CustomerPhoneNumber, orderData.CustomerEmail, orderData.CustomerId,
             orderData.RecipientFirstName, orderData.RecipientLastName, orderData.RecipientMiddleName, orderData.RecipientPhoneNumber,
-            orderData.PaymentOption, orderData.PaymentStatus, orderData.DeliveryMethodName, orderData.DeliveryInfoNumber,
+            paymentOption, paymentStatus, orderData.DeliveryMethodName, orderData.DeliveryInfoNumber,
             orderData.DeliveryInfoCity, orderData.DeliveryInfoStreet, orderData.DeliveryInfoHouseNumber, orderData.DeliveryOption,
             orderData.WithBonuses, orderData.UsedBonusesAmount, orderData.Price);
 
