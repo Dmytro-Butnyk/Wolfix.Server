@@ -5,6 +5,7 @@ using Customer.Application.Services;
 using Customer.IntegrationEvents;
 using Identity.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
+using Order.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 
 namespace Customer.Application.Extensions;
@@ -24,6 +25,7 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<ProductExistsForAddingToFavorite>, ProductExistsForAddingToFavoriteEventHandler>();
         services.AddScoped<IIntegrationEventHandler<ProductExistsForAddingToCart>, ProductExistsForAddingToCartEventHandler>();
         services.AddScoped<IIntegrationEventHandler<CheckCustomerExistsForAddingReview>, CheckCustomerExistsForAddingReviewEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<CustomerWantsToPlaceOrder>, CustomerWantsToPlaceOrderEventHandler>();
 
         return services;
     }

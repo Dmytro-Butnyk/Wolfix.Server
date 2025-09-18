@@ -3,7 +3,7 @@ using Shared.Domain.Models;
 
 namespace Order.Application.Contracts;
 
-public interface IPaymentService
+public interface IPaymentService<TResponse>
 {
-    Task<Result<StripePaymentResponse>> PayAsync(decimal amount, string currency, string customerEmail, CancellationToken ct);
+    Task<Result<TResponse>> PayAsync(decimal amount, string currency, string customerEmail, CancellationToken ct);
 }

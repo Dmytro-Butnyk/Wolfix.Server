@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Order.Application.Contracts;
+using Order.Application.Models;
 using Order.Domain.Interfaces.Order;
 using Order.Infrastructure.Options;
 using Order.Infrastructure.Repositories;
@@ -50,7 +51,7 @@ public static class DependencyInjection
 
     public static IServiceCollection AddOrderInfrastructureServices(this IServiceCollection services)
     {
-        services.AddScoped<IPaymentService, StripePaymentService>();
+        services.AddScoped<IPaymentService<StripePaymentResponse>, StripePaymentService>();
 
         return services;
     }

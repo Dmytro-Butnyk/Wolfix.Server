@@ -22,7 +22,7 @@ internal static class OrderEndpoints
             .WithSummary("Creates an order and returns client secret for payment");
     }
 
-    private static async Task<Results<Ok<string>, BadRequest<string>>> PlaceOrder(
+    private static async Task<Results<Ok<string>, BadRequest<string>, NotFound<string>>> PlaceOrder(
         [FromBody] PlaceOrderDto request,
         [FromServices] IOrderService orderService,
         CancellationToken ct)
@@ -31,6 +31,7 @@ internal static class OrderEndpoints
 
         if (placeOrderResult.IsFailure)
         {
+            //todo: все статус коды обрабатывать
             return TypedResults.BadRequest(placeOrderResult.ErrorMessage);
         }
         

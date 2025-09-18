@@ -6,6 +6,7 @@ using Catalog.Domain.Services;
 using Customer.IntegrationEvents;
 using Media.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
+using Order.IntegrationEvents;
 using Shared.Application.Caching;
 using Shared.Application.Interfaces;
 using Shared.IntegrationEvents.Interfaces;
@@ -28,6 +29,7 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<CheckProductExistsForAddingToFavorite>, CheckProductExistsForAddingToFavoriteEventHandler>();
         services.AddScoped<IIntegrationEventHandler<CheckProductExistsForAddingToCart>, CheckProductExistsForAddingToCartEventHandler>();
         services.AddScoped<IIntegrationEventHandler<BlobResourceForProductAdded>, BlobResourceForProductAddedEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<CustomerWantsToPlaceOrderItems>, CustomerWantsToPlaceOrderItemsEventHandler>();
         
         return services;
     }

@@ -3,16 +3,29 @@ using Order.Application.Dto.Order.Requests;
 using Order.Application.Interfaces;
 using Order.Application.Models;
 using Order.Domain.Interfaces.Order;
+using Order.IntegrationEvents;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents.Interfaces;
 using OrderAggregate = Order.Domain.OrderAggregate.Order;
 
 namespace Order.Application.Services;
 
-internal sealed class OrderService(IOrderRepository orderRepository, IPaymentService paymentService) : IOrderService
+internal sealed class OrderService(
+    IOrderRepository orderRepository,
+    IPaymentService<StripePaymentResponse> paymentService,
+    IEventBus eventBus) : IOrderService
 {
     public async Task<Result<string>> PlaceOrderAsync(PlaceOrderDto request, CancellationToken ct)
     {
-        //todo: проверять есть ли такой пользователь по айди через событие
+        VoidResult checkCustomerExistResult = await eventBus.PublishAsync(new CustomerWantsToPlaceOrder
+        {
+            CustomerId = request.Order.CustomerId
+        }, ct);
+
+        if (checkCustomerExistResult.IsFailure)
+        {
+            return Result<string>.Failure(checkCustomerExistResult);
+        }
         
         var orderData = request.Order;
         
@@ -30,10 +43,20 @@ internal sealed class OrderService(IOrderRepository orderRepository, IPaymentSer
         
         OrderAggregate order = createOrderResult.Value!;
         
+        VoidResult checkProductsExistResult = await eventBus.PublishAsync(new CustomerWantsToPlaceOrderItems
+        {
+            ProductIds = request.OrderItems
+                .Select(orderItem => orderItem.ProductId)
+                .ToList()
+        }, ct);
+
+        if (checkProductsExistResult.IsFailure)
+        {
+            return Result<string>.Failure(checkProductsExistResult);
+        }
+        
         foreach (var orderItem in request.OrderItems)
         {
-            //todo: проверять есть ли такой продукт по продакт айди через событие
-            
             VoidResult addOrderItemResult = order.AddOrderItem(orderItem.ProductId, orderItem.PhotoUrl, orderItem.Title,
                 orderItem.Quantity, orderItem.Price);
 
@@ -43,7 +66,12 @@ internal sealed class OrderService(IOrderRepository orderRepository, IPaymentSer
             }
         }
         
-        Result<StripePaymentResponse> payResult = await paymentService.PayAsync(order.Price, "uah", order.CustomerInfo.Email.Value, ct);
+        Result<StripePaymentResponse> payResult = await paymentService.PayAsync(
+            order.Price,
+            "uah",
+            order.CustomerInfo.Email.Value,
+            ct
+        );
 
         if (payResult.IsFailure)
         {
