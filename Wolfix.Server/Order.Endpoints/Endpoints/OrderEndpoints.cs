@@ -22,7 +22,7 @@ internal static class OrderEndpoints
         orderGroup.MapPost("with-payment", PlaceOrderWithPayment)
             .WithSummary("Creates an order and returns client secret for payment");
 
-        orderGroup.MapPatch("", PlaceOrder)
+        orderGroup.MapPost("", PlaceOrder)
             .WithSummary("Creates an order without payment");
     }
 
