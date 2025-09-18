@@ -15,56 +15,16 @@ internal sealed class OrderService(
     IPaymentService<StripePaymentResponse> paymentService,
     IEventBus eventBus) : IOrderService
 {
-    public async Task<Result<string>> PlaceOrderAsync(PlaceOrderDto request, CancellationToken ct)
+    public async Task<Result<string>> PlaceOrderWithPaymentAsync(PlaceOrderDto request, CancellationToken ct)
     {
-        VoidResult checkCustomerExistResult = await eventBus.PublishAsync(new CustomerWantsToPlaceOrder
-        {
-            CustomerId = request.Order.CustomerId
-        }, ct);
-
-        if (checkCustomerExistResult.IsFailure)
-        {
-            return Result<string>.Failure(checkCustomerExistResult);
-        }
+        Result<OrderAggregate> createOrderResult = await CreateOrderAsync(request, ct);
         
-        var orderData = request.Order;
-        
-        Result<OrderAggregate> createOrderResult = OrderAggregate.Create(orderData.CustomerFirstName, orderData.CustomerLastName,
-            orderData.CustomerMiddleName, orderData.CustomerPhoneNumber, orderData.CustomerEmail, orderData.CustomerId,
-            orderData.RecipientFirstName, orderData.RecipientLastName, orderData.RecipientMiddleName, orderData.RecipientPhoneNumber,
-            orderData.PaymentOption, orderData.PaymentStatus, orderData.DeliveryMethodName, orderData.DeliveryInfoNumber,
-            orderData.DeliveryInfoCity, orderData.DeliveryInfoStreet, orderData.DeliveryInfoHouseNumber, orderData.DeliveryOption,
-            orderData.WithBonuses, orderData.UsedBonusesAmount, orderData.Price);
-
         if (createOrderResult.IsFailure)
         {
             return Result<string>.Failure(createOrderResult);
         }
         
         OrderAggregate order = createOrderResult.Value!;
-        
-        VoidResult checkProductsExistResult = await eventBus.PublishAsync(new CustomerWantsToPlaceOrderItems
-        {
-            ProductIds = request.OrderItems
-                .Select(orderItem => orderItem.ProductId)
-                .ToList()
-        }, ct);
-
-        if (checkProductsExistResult.IsFailure)
-        {
-            return Result<string>.Failure(checkProductsExistResult);
-        }
-        
-        foreach (var orderItem in request.OrderItems)
-        {
-            VoidResult addOrderItemResult = order.AddOrderItem(orderItem.ProductId, orderItem.PhotoUrl, orderItem.Title,
-                orderItem.Quantity, orderItem.Price);
-
-            if (addOrderItemResult.IsFailure)
-            {
-                return Result<string>.Failure(addOrderItemResult);
-            }
-        }
         
         Result<StripePaymentResponse> payResult = await paymentService.PayAsync(
             order.Price,
@@ -91,5 +51,74 @@ internal sealed class OrderService(
         await orderRepository.SaveChangesAsync(ct);
         
         return Result<string>.Success(paymentResponse.ClientSecret);
+    }
+
+    public async Task<VoidResult> PlaceOrderAsync(PlaceOrderDto request, CancellationToken ct)
+    {
+        Result<OrderAggregate> createOrderResult = await CreateOrderAsync(request, ct);
+        
+        if (createOrderResult.IsFailure)
+        {
+            return VoidResult.Failure(createOrderResult);
+        }
+        
+        await orderRepository.AddAsync(createOrderResult.Value!, ct);
+        await orderRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
+    private async Task<Result<OrderAggregate>> CreateOrderAsync(PlaceOrderDto request, CancellationToken ct)
+    {
+        VoidResult checkCustomerExistResult = await eventBus.PublishAsync(new CustomerWantsToPlaceOrder
+        {
+            CustomerId = request.Order.CustomerId
+        }, ct);
+
+        if (checkCustomerExistResult.IsFailure)
+        {
+            return Result<OrderAggregate>.Failure(checkCustomerExistResult);
+        }
+        
+        var orderData = request.Order;
+        
+        Result<OrderAggregate> createOrderResult = OrderAggregate.Create(orderData.CustomerFirstName, orderData.CustomerLastName,
+            orderData.CustomerMiddleName, orderData.CustomerPhoneNumber, orderData.CustomerEmail, orderData.CustomerId,
+            orderData.RecipientFirstName, orderData.RecipientLastName, orderData.RecipientMiddleName, orderData.RecipientPhoneNumber,
+            orderData.PaymentOption, orderData.PaymentStatus, orderData.DeliveryMethodName, orderData.DeliveryInfoNumber,
+            orderData.DeliveryInfoCity, orderData.DeliveryInfoStreet, orderData.DeliveryInfoHouseNumber, orderData.DeliveryOption,
+            orderData.WithBonuses, orderData.UsedBonusesAmount, orderData.Price);
+
+        if (createOrderResult.IsFailure)
+        {
+            return Result<OrderAggregate>.Failure(createOrderResult);
+        }
+        
+        OrderAggregate order = createOrderResult.Value!;
+        
+        VoidResult checkProductsExistResult = await eventBus.PublishAsync(new CustomerWantsToPlaceOrderItems
+        {
+            ProductIds = request.OrderItems
+                .Select(orderItem => orderItem.ProductId)
+                .ToList()
+        }, ct);
+
+        if (checkProductsExistResult.IsFailure)
+        {
+            return Result<OrderAggregate>.Failure(checkProductsExistResult);
+        }
+        
+        foreach (var orderItem in request.OrderItems)
+        {
+            VoidResult addOrderItemResult = order.AddOrderItem(orderItem.ProductId, orderItem.PhotoUrl, orderItem.Title,
+                orderItem.Quantity, orderItem.Price);
+
+            if (addOrderItemResult.IsFailure)
+            {
+                return Result<OrderAggregate>.Failure(addOrderItemResult);
+            }
+        }
+        
+        return Result<OrderAggregate>.Success(order);
     }
 }

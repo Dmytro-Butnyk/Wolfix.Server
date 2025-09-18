@@ -19,16 +19,40 @@ internal static class OrderEndpoints
         var orderGroup = app.MapGroup(Route)
             .WithTags("Order");
         
-        orderGroup.MapPost("", PlaceOrder)
+        orderGroup.MapPost("with-payment", PlaceOrderWithPayment)
             .WithSummary("Creates an order and returns client secret for payment");
+
+        orderGroup.MapPatch("", PlaceOrder)
+            .WithSummary("Creates an order without payment");
     }
 
-    private static async Task<Results<Ok<string>, BadRequest<string>, NotFound<string>, InternalServerError<string>>> PlaceOrder(
+    private static async Task<Results<Ok<string>, BadRequest<string>, NotFound<string>, InternalServerError<string>>> PlaceOrderWithPayment(
         [FromBody] PlaceOrderDto request,
         [FromServices] IOrderService orderService,
         CancellationToken ct)
     {
-        Result<string> placeOrderResult = await orderService.PlaceOrderAsync(request, ct);
+        Result<string> placeOrderWithPaymentResult = await orderService.PlaceOrderWithPaymentAsync(request, ct);
+
+        if (placeOrderWithPaymentResult.IsFailure)
+        {
+            return placeOrderWithPaymentResult.StatusCode switch
+            {
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(placeOrderWithPaymentResult.ErrorMessage),
+                HttpStatusCode.NotFound => TypedResults.NotFound(placeOrderWithPaymentResult.ErrorMessage),
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(placeOrderWithPaymentResult.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(PlaceOrderWithPayment)} -> Unknown status code: {placeOrderWithPaymentResult.StatusCode}")
+            };
+        }
+        
+        return TypedResults.Ok(placeOrderWithPaymentResult.Value!);
+    }
+
+    private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> PlaceOrder(
+        [FromBody] PlaceOrderDto request,
+        [FromServices] IOrderService orderService,
+        CancellationToken ct)
+    {
+        VoidResult placeOrderResult = await orderService.PlaceOrderAsync(request, ct);
 
         if (placeOrderResult.IsFailure)
         {
@@ -36,11 +60,10 @@ internal static class OrderEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(placeOrderResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(placeOrderResult.ErrorMessage),
-                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(placeOrderResult.ErrorMessage),
                 _ => throw new Exception($"Endpoint: {nameof(PlaceOrder)} -> Unknown status code: {placeOrderResult.StatusCode}")
             };
         }
-        
-        return TypedResults.Ok(placeOrderResult.Value!);
+
+        return TypedResults.NoContent();
     }
 }
