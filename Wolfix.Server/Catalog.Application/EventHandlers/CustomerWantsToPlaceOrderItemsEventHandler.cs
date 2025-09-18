@@ -11,6 +11,7 @@ internal sealed class CustomerWantsToPlaceOrderItemsEventHandler(IProductReposit
 {
     public async Task<VoidResult> HandleAsync(CustomerWantsToPlaceOrderItems @event, CancellationToken ct)
     {
+        //todo: так же проверять тут статус товара чтобы был InStock
         int existingCount = await productRepository.GetTotalCountByIdsAsync(@event.ProductIds, ct);
         
         bool allExist = existingCount == @event.ProductIds.Count;
