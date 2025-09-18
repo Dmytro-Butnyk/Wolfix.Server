@@ -144,6 +144,27 @@ public sealed class Order : BaseEntity
         return VoidResult.Success();
     }
 
+    public VoidResult MarkAsPaid()
+    {
+        if (PaymentOption == OrderPaymentOption.WhileReceiving)
+        {
+            return VoidResult.Failure("Order cannot be paid when payment option is while receiving");
+        }
+        
+        if (PaymentStatus != OrderPaymentStatus.Pending)
+        {
+            return VoidResult.Failure("Order must have Pending status for mark as paid");
+        }
+
+        if (PaymentIntentId == null)
+        {
+            return VoidResult.Failure("Payment intent id cannot be null");
+        }
+        
+        PaymentStatus = OrderPaymentStatus.Paid;
+        return VoidResult.Success();
+    }
+
     #region orderItems
     public VoidResult AddOrderItem(Guid productId, string photoUrl, string title, uint quantity, decimal price)
     {

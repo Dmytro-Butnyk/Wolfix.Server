@@ -22,6 +22,9 @@ internal static class OrderEndpoints
         orderGroup.MapPost("with-payment", PlaceOrderWithPayment)
             .WithSummary("Creates an order and returns client secret for payment");
 
+        orderGroup.MapPatch("{orderId:guid}/paid", MarkOrderPaid)
+            .WithSummary("Marks order as paid");
+
         orderGroup.MapPost("", PlaceOrder)
             .WithSummary("Creates an order without payment");
     }
@@ -64,6 +67,21 @@ internal static class OrderEndpoints
             };
         }
 
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, BadRequest<string>>> MarkOrderPaid(
+        [FromRoute] Guid orderId,
+        [FromServices] IOrderService orderService,
+        CancellationToken ct)
+    {
+        VoidResult markOrderPaidResult = await orderService.MarkOrderPaid(orderId, ct);
+        
+        if (!markOrderPaidResult.IsSuccess)
+        {
+            return TypedResults.BadRequest(markOrderPaidResult.ErrorMessage);
+        }
+        
         return TypedResults.NoContent();
     }
 }

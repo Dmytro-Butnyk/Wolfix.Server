@@ -8,4 +8,6 @@ public interface IOrderService
     Task<Result<string>> PlaceOrderWithPaymentAsync(PlaceOrderDto request, CancellationToken ct);
     
     Task<VoidResult> PlaceOrderAsync(PlaceOrderDto request, CancellationToken ct);
+    
+    Task<VoidResult> MarkOrderPaid(Guid orderId, CancellationToken ct);
 }

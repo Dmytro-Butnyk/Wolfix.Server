@@ -1,3 +1,4 @@
+using System.Net;
 using Order.Application.Contracts;
 using Order.Application.Dto.Order.Requests;
 using Order.Application.Interfaces;
@@ -68,7 +69,7 @@ internal sealed class OrderService(
         
         return VoidResult.Success();
     }
-
+    
     private async Task<Result<OrderAggregate>> CreateOrderAsync(PlaceOrderDto request, bool payNow, CancellationToken ct)
     {
         VoidResult checkCustomerExistResult = await eventBus.PublishAsync(new CustomerWantsToPlaceOrder
@@ -127,5 +128,29 @@ internal sealed class OrderService(
         }
         
         return Result<OrderAggregate>.Success(order);
+    }
+
+    public async Task<VoidResult> MarkOrderPaid(Guid orderId, CancellationToken ct)
+    {
+        OrderAggregate? order = await orderRepository.GetByIdAsync(orderId, ct);
+
+        if (order is null)
+        {
+            return VoidResult.Failure(
+                $"Order with id: {orderId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        VoidResult markOrderPaidResult = order.MarkAsPaid();
+
+        if (markOrderPaidResult.IsFailure)
+        {
+            return VoidResult.Failure(markOrderPaidResult);
+        }
+        
+        await orderRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
     }
 }
