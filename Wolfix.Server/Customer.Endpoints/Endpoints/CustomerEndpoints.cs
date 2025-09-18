@@ -145,7 +145,7 @@ internal static class CustomerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeFullNameResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeFullNameResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(ChangeFullName)} -> Unknown status code: {changeFullNameResult.StatusCode}")
             };
         }
         
@@ -158,19 +158,19 @@ internal static class CustomerEndpoints
         [FromServices] ICustomerService customerService,
         CancellationToken ct)
     {
-        Result<string> changePhoneNumber = await customerService.ChangePhoneNumberAsync(customerId, request, ct);
+        Result<string> changePhoneNumberResult = await customerService.ChangePhoneNumberAsync(customerId, request, ct);
 
-        if (!changePhoneNumber.IsSuccess)
+        if (!changePhoneNumberResult.IsSuccess)
         {
-            return changePhoneNumber.StatusCode switch
+            return changePhoneNumberResult.StatusCode switch
             {
-                HttpStatusCode.NotFound => TypedResults.NotFound(changePhoneNumber.ErrorMessage),
-                HttpStatusCode.BadRequest => TypedResults.BadRequest(changePhoneNumber.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                HttpStatusCode.NotFound => TypedResults.NotFound(changePhoneNumberResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(changePhoneNumberResult.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(ChangePhoneNumber)} -> Unknown status code: {changePhoneNumberResult.StatusCode}")
             };
         }
         
-        return TypedResults.Ok(changePhoneNumber.Value);
+        return TypedResults.Ok(changePhoneNumberResult.Value);
     }
 
     private static async Task<Results<Ok<AddressDto>, NotFound<string>, BadRequest<string>>> ChangeAddress(
@@ -187,7 +187,7 @@ internal static class CustomerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeAddressResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeAddressResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(ChangeAddress)} -> Unknown status code: {changeAddressResult.StatusCode}")
             };
         }
         
@@ -208,7 +208,7 @@ internal static class CustomerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeBirthDateResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeBirthDateResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(ChangeBirthDate)} -> Unknown status code: {changeBirthDateResult.StatusCode}")
             };
         }
         

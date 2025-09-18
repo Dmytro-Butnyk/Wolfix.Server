@@ -68,7 +68,7 @@ internal static class IdentityEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(logInResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(logInResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(logInResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(LogInAndGetUserRoles)} -> Unknown status code: {logInResult.StatusCode}")
             };
         }
         
@@ -89,7 +89,7 @@ internal static class IdentityEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(getTokenResult.ErrorMessage),
                 HttpStatusCode.Forbidden => TypedResults.Forbid(),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getTokenResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(GetTokenByRole)} -> Unknown status code: {getTokenResult.StatusCode}")
             };
         }
         
@@ -110,7 +110,7 @@ internal static class IdentityEndpoints
                 HttpStatusCode.Conflict => TypedResults.Conflict(registerResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(registerResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(registerResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(RegisterAsCustomer)} -> Unknown status code: {registerResult.StatusCode}")
             };
         }
         
@@ -133,7 +133,7 @@ internal static class IdentityEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(errorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(errorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(errorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(RegisterAsSeller)} -> Unknown status code: {registerResult.StatusCode}")
             };
         }
         
@@ -162,7 +162,7 @@ internal static class IdentityEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeEmailResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeEmailResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(ChangeEmail)} -> Unknown status code: {changeEmailResult.StatusCode}")
             };
         }
         
@@ -200,7 +200,7 @@ internal static class IdentityEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changePasswordResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changePasswordResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(ChangePassword)} -> Unknown status code: {changePasswordResult.StatusCode}")
             };
         }
         

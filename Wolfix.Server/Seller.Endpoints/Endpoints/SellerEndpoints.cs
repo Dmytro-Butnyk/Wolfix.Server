@@ -54,7 +54,7 @@ internal static class SellerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeFullNameResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeFullNameResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(ChangeFullName)} -> Unknown status code: {changeFullNameResult.StatusCode}")
             };
         }
         
@@ -75,7 +75,7 @@ internal static class SellerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changePhoneNumberResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changePhoneNumberResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(ChangePhoneNumber)} -> Unknown status code: {changePhoneNumberResult.StatusCode}")
             };
         }
         
@@ -96,7 +96,7 @@ internal static class SellerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeAddressResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeAddressResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(ChangeAddress)} -> Unknown status code: {changeAddressResult.StatusCode}")
             };
         }
         
@@ -117,7 +117,7 @@ internal static class SellerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeBirthDateResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeBirthDateResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(ChangeBirthDate)} -> Unknown status code: {changeBirthDateResult.StatusCode}")
             };
         }
         

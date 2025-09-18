@@ -37,7 +37,7 @@ internal static class OrderEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(placeOrderResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(placeOrderResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(placeOrderResult.ErrorMessage),
-                _ => throw new Exception("Unknown status code")
+                _ => throw new Exception($"Endpoint: {nameof(PlaceOrder)} -> Unknown status code: {placeOrderResult.StatusCode}")
             };
         }
         
