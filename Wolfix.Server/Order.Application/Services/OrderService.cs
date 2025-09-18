@@ -130,7 +130,7 @@ internal sealed class OrderService(
         return Result<OrderAggregate>.Success(order);
     }
 
-    public async Task<VoidResult> MarkOrderPaid(Guid orderId, CancellationToken ct)
+    public async Task<VoidResult> MarkOrderPaidAsync(Guid orderId, CancellationToken ct)
     {
         OrderAggregate? order = await orderRepository.GetByIdAsync(orderId, ct);
 

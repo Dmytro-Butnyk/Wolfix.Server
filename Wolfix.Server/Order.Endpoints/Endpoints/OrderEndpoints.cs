@@ -75,7 +75,7 @@ internal static class OrderEndpoints
         [FromServices] IOrderService orderService,
         CancellationToken ct)
     {
-        VoidResult markOrderPaidResult = await orderService.MarkOrderPaid(orderId, ct);
+        VoidResult markOrderPaidResult = await orderService.MarkOrderPaidAsync(orderId, ct);
         
         if (!markOrderPaidResult.IsSuccess)
         {
