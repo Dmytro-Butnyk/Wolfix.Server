@@ -1,10 +1,12 @@
 using System.Net;
 using Customer.Application.Dto;
 using Customer.Application.Dto.CartItem;
+using Customer.Application.Dto.Customer;
 using Customer.Application.Dto.FavoriteItem;
 using Customer.Application.Dto.Product;
 using Customer.Application.Interfaces;
 using Customer.Application.Mapping.CartItem;
+using Customer.Application.Mapping.Customer;
 using Customer.Application.Mapping.FavoriteItem;
 using Customer.Domain.Interfaces;
 using Customer.Domain.Projections;
@@ -209,5 +211,20 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
         await customerRepository.SaveChangesAsync(ct);
         
         return Result<string>.Success(request.BirthDate.ToString("dd-MM-yyyy"));
+    }
+
+    public async Task<Result<CustomerDto>> GetProfileInfoAsync(Guid customerId, CancellationToken ct)
+    {
+        CustomerProjection? customer = await customerRepository.GetProfileInfoAsync(customerId, ct);
+
+        if (customer is null)
+        {
+            return Result<CustomerDto>.Failure(
+                $"Customer with id: {customerId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        return Result<CustomerDto>.Success(customer.ToDto());
     }
 }

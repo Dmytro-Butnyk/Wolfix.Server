@@ -1,3 +1,4 @@
+using Seller.Application.Dto;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
 
@@ -12,4 +13,6 @@ public interface ISellerService
     Task<Result<AddressDto>> ChangeAddressAsync(Guid sellerId, ChangeAddressDto request, CancellationToken ct);
     
     Task<Result<string>> ChangeBirthDateAsync(Guid sellerId, ChangeBirthDateDto request, CancellationToken ct);
+    
+    Task<Result<SellerDto>> GetProfileInfoAsync(Guid sellerId, CancellationToken ct);
 }

@@ -7,8 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Folder Include="Properties\" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\Shared.Domain\Shared.Domain.csproj" />
-      <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
     </ItemGroup>
 
 </Project>

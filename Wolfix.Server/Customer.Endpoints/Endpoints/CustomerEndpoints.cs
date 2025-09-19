@@ -1,5 +1,6 @@
 using System.Net;
 using Customer.Application.Dto.CartItem;
+using Customer.Application.Dto.Customer;
 using Customer.Application.Dto.FavoriteItem;
 using Customer.Application.Dto.Product;
 using Customer.Application.Interfaces;
@@ -21,6 +22,9 @@ internal static class CustomerEndpoints
     {
         var customerGroup = app.MapGroup(Route)
             .WithTags("Customer");
+        
+        customerGroup.MapGet("{customerId:guid}", GetProfileInfo)
+            .WithSummary("Get profile info");
         
         var favoriteItemsGroup = customerGroup.MapGroup("favorites");
         MapFavoriteItemsEndpoints(favoriteItemsGroup);
@@ -68,6 +72,21 @@ internal static class CustomerEndpoints
     }
     
     //todo: эндпоинт для того чтобы отзыв оставить
+
+    private static async Task<Results<Ok<CustomerDto>, NotFound<string>>> GetProfileInfo(
+        [FromRoute] Guid customerId,
+        [FromServices] ICustomerService customerService,
+        CancellationToken ct)
+    {
+        Result<CustomerDto> getProfileInfoResult = await customerService.GetProfileInfoAsync(customerId, ct);
+
+        if (getProfileInfoResult.IsFailure)
+        {
+            return TypedResults.NotFound(getProfileInfoResult.ErrorMessage);
+        }
+        
+        return TypedResults.Ok(getProfileInfoResult.Value);
+    }
     
     private static async Task<Results<Ok<IReadOnlyCollection<FavoriteItemDto>>, NotFound<string>>> GetFavoriteProducts(
         [FromRoute] Guid customerId,
