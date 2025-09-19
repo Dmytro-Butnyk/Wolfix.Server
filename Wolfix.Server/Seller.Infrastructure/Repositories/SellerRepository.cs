@@ -5,7 +5,7 @@ using Shared.Infrastructure.Repositories;
 
 namespace Seller.Infrastructure.Repositories;
 
-public sealed class SellerRepository(SellerContext context)
+internal sealed class SellerRepository(SellerContext context)
     : BaseRepository<SellerContext, Domain.SellerAggregate.Seller>(context), ISellerRepository
 {
     private readonly DbSet<Domain.SellerAggregate.Seller> _sellers = context.Set<Domain.SellerAggregate.Seller>();

@@ -12,6 +12,7 @@ public static class DependencyInjection
     public static IServiceCollection AddSellerApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<ISellerService, SellerService>();
+        services.AddScoped<ISellerApplicationService, SellerApplicationService>();
         
         return services;
     }

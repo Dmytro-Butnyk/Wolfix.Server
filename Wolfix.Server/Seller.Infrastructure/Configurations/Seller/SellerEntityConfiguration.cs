@@ -1,11 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Seller.Domain.Enums;
 using Seller.Domain.SellerAggregate.Entities;
 using Shared.Domain.ValueObjects;
 using Shared.Infrastructure.ValueGenerators;
 
-namespace Seller.Infrastructure.Configurations;
+namespace Seller.Infrastructure.Configurations.Seller;
 
 internal sealed class SellerEntityConfiguration : IEntityTypeConfiguration<Domain.SellerAggregate.Seller>
 {

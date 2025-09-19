@@ -8,6 +8,7 @@ public static class WebApplicationExtension
     public static WebApplication MapSellerApi(this WebApplication app)
     {
         app.MapSellerEndpoints();
+        app.MapSellerApplicationEndpoints();
         
         return app;
     }
