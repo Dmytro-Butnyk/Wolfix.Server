@@ -84,7 +84,7 @@ internal sealed class ProductService(
             return VoidResult.Failure(result.ErrorMessage!, result.StatusCode);
         }
 
-        VoidResult eventResult = await eventBus.PublishAsync(
+        VoidResult eventResult = await eventBus.PublishWithoutResultAsync(
             new ProductMediaAdded(
                 result.Value,
                 new MediaEventDto(blobResourceType, stream, false)),
@@ -164,7 +164,7 @@ internal sealed class ProductService(
 
         Stream stream = addMediaDto.Media.OpenReadStream();
 
-        VoidResult eventResult = await eventBus.PublishAsync(
+        VoidResult eventResult = await eventBus.PublishWithoutResultAsync(
             new ProductMediaAdded(
                 addMediaDto.ProductId,
                 new MediaEventDto(blobResourceType, stream, true)),
@@ -199,7 +199,7 @@ internal sealed class ProductService(
 
         await productRepository.SaveChangesAsync(ct);
 
-        VoidResult eventResult = await eventBus.PublishAsync(
+        VoidResult eventResult = await eventBus.PublishWithoutResultAsync(
             new ProductMediaDeleted(deleteProductMediaResult.Value), ct);
 
         if (!eventResult.IsSuccess)
@@ -412,7 +412,7 @@ internal sealed class ProductService(
             );
         }
 
-        VoidResult result = await eventBus.PublishAsync(new CheckCustomerExistsForAddingReview
+        VoidResult result = await eventBus.PublishWithoutResultAsync(new CheckCustomerExistsForAddingReview
         {
             CustomerId = addProductReviewDto.CustomerId
         }, ct);

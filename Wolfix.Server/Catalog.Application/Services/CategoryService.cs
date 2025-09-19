@@ -352,7 +352,7 @@ internal sealed class CategoryService(
 
         if (allMediaIdsOfCategoryProducts.Count > 0)
         {
-            await eventBus.PublishAsync(new CategoryAndProductsDeleted
+            await eventBus.PublishWithoutResultAsync(new CategoryAndProductsDeleted
             {
                 MediaIds = allMediaIdsOfCategoryProducts
             }, ct);

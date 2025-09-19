@@ -27,7 +27,7 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
             );
         }
 
-        VoidResult result = await eventBus.PublishAsync(new CheckProductExistsForAddingToFavorite
+        VoidResult result = await eventBus.PublishWithoutResultAsync(new CheckProductExistsForAddingToFavorite
         {
             ProductId = request.ProductId,
             CustomerId = request.CustomerId
@@ -46,7 +46,7 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
             );
         }
         
-        VoidResult result = await eventBus.PublishAsync(new CheckProductExistsForAddingToCart
+        VoidResult result = await eventBus.PublishWithoutResultAsync(new CheckProductExistsForAddingToCart
         {
             ProductId = request.ProductId,
             CustomerId = request.CustomerId

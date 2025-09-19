@@ -6,9 +6,9 @@ namespace Shared.IntegrationEvents;
 
 public sealed class EventBus(IServiceScopeFactory serviceProvider) : IEventBus
 {
-    public async Task<VoidResult> PublishAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IIntegrationEvent
+    public async Task<VoidResult> PublishWithoutResultAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IIntegrationEvent
     {
-        using var scope = serviceProvider.CreateScope();
+        await using var scope = serviceProvider.CreateAsyncScope();
         
         var handlers = scope.ServiceProvider
             .GetServices<IIntegrationEventHandler<TEvent>>()
@@ -30,7 +30,7 @@ public sealed class EventBus(IServiceScopeFactory serviceProvider) : IEventBus
     public async Task<VoidResult> PublishForParallelAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IIntegrationEvent
     {
         //todo
-        using var scope = serviceProvider.CreateScope();
+        await using var scope = serviceProvider.CreateAsyncScope();
         
         var handlers = scope.ServiceProvider
             .GetServices<IIntegrationEventHandler<TEvent>>()
@@ -47,5 +47,16 @@ public sealed class EventBus(IServiceScopeFactory serviceProvider) : IEventBus
         }
         
         return VoidResult.Success();
+    }
+
+    public async Task<Result<TResult>> PublishWithSingleResultAsync<TEvent, TResult>(TEvent @event,
+        CancellationToken ct) where TEvent : IIntegrationEvent
+    {
+        await using var scope = serviceProvider.CreateAsyncScope();
+
+        var handler = scope.ServiceProvider
+            .GetRequiredService<IIntegrationEventHandler<TEvent, TResult>>();
+
+        return await handler.HandleAsync(@event, ct);
     }
 }

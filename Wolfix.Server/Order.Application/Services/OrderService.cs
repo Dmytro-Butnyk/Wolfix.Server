@@ -72,7 +72,7 @@ internal sealed class OrderService(
     
     private async Task<Result<OrderAggregate>> CreateOrderAsync(PlaceOrderDto request, bool payNow, CancellationToken ct)
     {
-        VoidResult checkCustomerExistResult = await eventBus.PublishAsync(new CustomerWantsToPlaceOrder
+        VoidResult checkCustomerExistResult = await eventBus.PublishWithoutResultAsync(new CustomerWantsToPlaceOrder
         {
             CustomerId = request.Order.CustomerId
         }, ct);
@@ -104,7 +104,7 @@ internal sealed class OrderService(
         
         OrderAggregate order = createOrderResult.Value!;
         
-        VoidResult checkProductsExistResult = await eventBus.PublishAsync(new CustomerWantsToPlaceOrderItems
+        VoidResult checkProductsExistResult = await eventBus.PublishWithoutResultAsync(new CustomerWantsToPlaceOrderItems
         {
             ProductIds = request.OrderItems
                 .Select(orderItem => orderItem.ProductId)

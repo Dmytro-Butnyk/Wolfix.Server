@@ -37,16 +37,16 @@ public sealed class Result<TValue>
     public static Result<TValue> Failure(string errorMessage, HttpStatusCode statusCode = HttpStatusCode.BadRequest)
         => new(errorMessage, statusCode);
     
-    public static Result<TValue> Failure<TResult>(Result<TResult> result)
+    public static Result<TValue> Failure<TResult>(Result<TResult> failedResult)
     {
-        if (result.IsSuccess) throw new ArgumentException("Result is success", nameof(result));
-        return new Result<TValue>(result.ErrorMessage!, result.StatusCode);
+        if (failedResult.IsSuccess) throw new ArgumentException("Result is success", nameof(failedResult));
+        return new Result<TValue>(failedResult.ErrorMessage!, failedResult.StatusCode);
     }
 
-    public static Result<TValue> Failure(VoidResult result)
+    public static Result<TValue> Failure(VoidResult failedResult)
     {
-        if (result.IsSuccess) throw new ArgumentException("Result is success", nameof(result));
-        return new Result<TValue>(result.ErrorMessage!, result.StatusCode);
+        if (failedResult.IsSuccess) throw new ArgumentException("Result is success", nameof(failedResult));
+        return new Result<TValue>(failedResult.ErrorMessage!, failedResult.StatusCode);
     }
 
     public TResult Map<TResult>(Func<TValue, TResult> onSuccess, Func<string, TResult> onFailure)

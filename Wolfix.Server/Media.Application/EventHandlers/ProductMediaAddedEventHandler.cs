@@ -27,7 +27,7 @@ public sealed class ProductMediaAddedEventHandler(
             new(result.Value!.Id, result.Value.ContentType, result.Value.Url, @event.Media.IsMain);
 
         VoidResult publishResult = await eventBus
-            .PublishAsync(new BlobResourceForProductAdded(@event.ProductId, blobResourceAddedDto), ct);
+            .PublishWithoutResultAsync(new BlobResourceForProductAdded(@event.ProductId, blobResourceAddedDto), ct);
 
         if (!publishResult.IsSuccess)
         {

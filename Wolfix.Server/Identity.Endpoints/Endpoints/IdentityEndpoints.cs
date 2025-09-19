@@ -21,6 +21,12 @@ internal static class IdentityEndpoints
     {
         var identityGroup = app.MapGroup(Route)
             .WithTags("Identity");
+        
+        identityGroup.MapPost("roles", LogInAndGetUserRoles)
+            .WithSummary("Log in and get all roles");
+        
+        identityGroup.MapPost("token", GetTokenByRole)
+            .WithSummary("Get token by specific role");
 
         var customerGroup = identityGroup.MapGroup("customer");
         MapCustomerEndpoints(customerGroup);
@@ -35,12 +41,6 @@ internal static class IdentityEndpoints
 
     private static void MapCustomerEndpoints(RouteGroupBuilder customerGroup)
     {
-        customerGroup.MapPost("roles", LogInAndGetUserRoles)
-            .WithSummary("Log in and get all roles");
-        
-        customerGroup.MapPost("token", GetTokenByRole)
-            .WithSummary("Get token by specific role");
-        
         customerGroup.MapPost("register", RegisterAsCustomer)
             .WithSummary("Register as customer");
     }

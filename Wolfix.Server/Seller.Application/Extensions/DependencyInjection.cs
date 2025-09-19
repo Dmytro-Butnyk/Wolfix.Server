@@ -18,7 +18,8 @@ public static class DependencyInjection
 
     public static IServiceCollection AddSellerEventHandlers(this IServiceCollection services)
     {
-        services.AddScoped<IIntegrationEventHandler<SellerAccountCreated>, SellerAccountCreatedEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<SellerAccountCreated, Guid>, SellerAccountCreatedEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<GetSellerProfileId, Guid>, GetSellerProfileIdEventHandler>();
 
         return services;
     }

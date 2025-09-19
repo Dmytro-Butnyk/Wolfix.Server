@@ -45,4 +45,13 @@ public sealed class CustomerRepository(CustomerContext context)
                 fi.PriceWithDiscount))
             .ToListAsync(ct);
     }
+
+    public async Task<Guid?> GetIdByAccountIdAsync(Guid accountId, CancellationToken ct)
+    {
+        return await _customers
+            .AsNoTracking()
+            .Where(customer => customer.AccountId == accountId)
+            .Select(customer => customer.Id)
+            .FirstOrDefaultAsync(ct);
+    }
 }

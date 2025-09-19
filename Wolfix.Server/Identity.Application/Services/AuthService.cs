@@ -34,37 +34,80 @@ internal sealed class AuthService(
     {
         Result<Guid> checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRole(dto.Email, dto.Password, dto.Role, ct);
 
-        if (!checkUserExistsAndHasRoleResult.IsSuccess)
+        if (checkUserExistsAndHasRoleResult.IsFailure)
         {
-            return Result<string>.Failure(checkUserExistsAndHasRoleResult.ErrorMessage!, checkUserExistsAndHasRoleResult.StatusCode);
+            return Result<string>.Failure(checkUserExistsAndHasRoleResult);
         }
 
-        string token = jwtService.GenerateToken(checkUserExistsAndHasRoleResult.Value, dto.Email, dto.Role);
+        Guid accountId = checkUserExistsAndHasRoleResult.Value;
+
+        Result<Guid> getProfileIdResult = await GetProfileId(accountId, dto.Role, ct);
+
+        if (getProfileIdResult.IsFailure)
+        {
+            return Result<string>.Failure(getProfileIdResult);
+        }
+        
+        Guid profileId = getProfileIdResult.Value;
+
+        string token = jwtService.GenerateToken(accountId, profileId, dto.Email, dto.Role);
         return Result<string>.Success(token);
+    }
+
+    private async Task<Result<Guid>> GetProfileId(Guid accountId, string role, CancellationToken ct)
+    {
+        if (role == "Customer")
+        {
+            var @event = new GetCustomerProfileId
+            {
+                AccountId = accountId
+            };
+            
+            return await eventBus
+                .PublishWithSingleResultAsync<GetCustomerProfileId, Guid>(@event, ct);
+        }
+        if (role == "Seller")
+        {
+            var @event = new GetSellerProfileId
+            {
+                AccountId = accountId
+            };
+            
+            return await eventBus
+                .PublishWithSingleResultAsync<GetSellerProfileId, Guid>(@event, ct);
+        }
+        //todo: остаток ролей дописать когда готово будет
+        
+        return Result<Guid>.Failure($"Role {role} not found");
     }
 
     public async Task<Result<string>> RegisterAsCustomerAsync(RegisterAsCustomerDto dto, CancellationToken ct)
     {
         Result<Guid> registerResult = await authStore.RegisterAccountAsync(dto.Email, dto.Password, Roles.Customer, ct);
 
-        if (!registerResult.IsSuccess)
+        if (registerResult.IsFailure)
         {
-            return Result<string>.Failure(registerResult.ErrorMessage!, registerResult.StatusCode);
+            return Result<string>.Failure(registerResult);
         }
         
         Guid registeredCustomerId = registerResult.Value;
-        
-        VoidResult publishResult = await eventBus.PublishAsync(new CustomerAccountCreated
+
+        var @event = new CustomerAccountCreated
         {
             AccountId = registeredCustomerId
-        }, ct);
+        };
+        
+        Result<Guid> createCustomerAndGetIdResult = await eventBus
+            .PublishWithSingleResultAsync<CustomerAccountCreated, Guid>(@event, ct);
 
-        if (!publishResult.IsSuccess)
+        if (createCustomerAndGetIdResult.IsFailure)
         {
-            return Result<string>.Failure(publishResult.ErrorMessage!, publishResult.StatusCode);
+            return Result<string>.Failure(createCustomerAndGetIdResult);
         }
         
-        string token = jwtService.GenerateToken(registeredCustomerId, dto.Email, Roles.Customer);
+        Guid customerId = createCustomerAndGetIdResult.Value;
+        
+        string token = jwtService.GenerateToken(registeredCustomerId, customerId, dto.Email, Roles.Customer);
         
         return Result<string>.Success(token);
     }
@@ -80,7 +123,7 @@ internal sealed class AuthService(
         
         Guid registeredSellerId = registerResult.Value;
 
-        VoidResult publishResult = await eventBus.PublishAsync(new SellerAccountCreated
+        var @event = new SellerAccountCreated
         {
             AccountId = registeredSellerId,
             Email = dto.Email,
@@ -95,16 +138,21 @@ internal sealed class AuthService(
             ApartmentNumber = dto.ApartmentNumber,
             BirthDate = dto.BirthDate,
             Document = dto.Document
-        }, ct);
+        };
 
-        if (!publishResult.IsSuccess)
+        Result<Guid> createSellerAndGetIdResult = await eventBus
+            .PublishWithSingleResultAsync<SellerAccountCreated, Guid>(@event, ct);
+
+        if (createSellerAndGetIdResult.IsFailure)
         {
-            return Result<string>.Failure(publishResult);
+            return Result<string>.Failure(createSellerAndGetIdResult);
         }
+        
+        Guid sellerId = createSellerAndGetIdResult.Value;
         
         //todo: событие чтобы отправлять документ к админу на рассмотрение
         
-        string token = jwtService.GenerateToken(registeredSellerId, dto.Email, Roles.Seller);
+        string token = jwtService.GenerateToken(registeredSellerId, sellerId, dto.Email, Roles.Seller);
         
         return Result<string>.Success(token);
     }

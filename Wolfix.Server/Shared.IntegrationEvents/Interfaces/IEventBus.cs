@@ -4,7 +4,9 @@ namespace Shared.IntegrationEvents.Interfaces;
 
 public interface IEventBus
 {
-    Task<VoidResult> PublishAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IIntegrationEvent;
+    Task<VoidResult> PublishWithoutResultAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IIntegrationEvent;
     
     Task<VoidResult> PublishForParallelAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IIntegrationEvent;
+
+    Task<Result<TResult>> PublishWithSingleResultAsync<TEvent, TResult>(TEvent @event, CancellationToken ct) where TEvent : IIntegrationEvent;
 }

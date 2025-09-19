@@ -1,27 +1,31 @@
 using Customer.Domain.Interfaces;
+using Customer.IntegrationEvents;
 using Identity.IntegrationEvents;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents.Interfaces;
+using CustomerAggregate = Customer.Domain.CustomerAggregate.Customer;
 
 namespace Customer.Application.EventHandlers;
 
 internal sealed class CustomerAccountCreatedEventHandler(ICustomerRepository customerRepository)
-    : IIntegrationEventHandler<CustomerAccountCreated>
+    : IIntegrationEventHandler<CustomerAccountCreated, Guid>
 {
-    public async Task<VoidResult> HandleAsync(CustomerAccountCreated @event, CancellationToken ct)
+    public async Task<Result<Guid>> HandleAsync(CustomerAccountCreated @event, CancellationToken ct)
     {
-        Result<Customer.Domain.CustomerAggregate.Customer> createCustomerResult =
-            Domain.CustomerAggregate.Customer.Create(@event.AccountId);
+        Result<CustomerAggregate> createCustomerResult =
+            CustomerAggregate.Create(@event.AccountId);
         
-        if (!createCustomerResult.IsSuccess)
+        if (createCustomerResult.IsFailure)
         {
-            return VoidResult.Failure(createCustomerResult.ErrorMessage!, createCustomerResult.StatusCode);
+            return Result<Guid>.Failure(createCustomerResult);
         }
+        
+        CustomerAggregate customer = createCustomerResult.Value!;
 
-        await customerRepository.AddAsync(createCustomerResult.Value!, ct);
+        await customerRepository.AddAsync(customer, ct);
         
         await customerRepository.SaveChangesAsync(ct);
         
-        return VoidResult.Success();
+        return Result<Guid>.Success(customer.Id);
     }
 }

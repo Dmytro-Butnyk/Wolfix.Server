@@ -2,5 +2,5 @@ namespace Identity.Application.Interfaces.Services;
 
 public interface IJwtService
 {
-    public string GenerateToken(Guid userId, string email, string role);
+    public string GenerateToken(Guid accountId, Guid profileId, string email, string role);
 }

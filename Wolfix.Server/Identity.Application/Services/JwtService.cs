@@ -11,9 +11,9 @@ internal sealed class JwtService(IOptions<JwtOptions> jwtOptions) : IJwtService
 {
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
     
-    public string GenerateToken(Guid userId, string email, string role)
+    public string GenerateToken(Guid accountId, Guid profileId, string email, string role)
     {
-        ClaimsIdentity identity = GetIdentity(userId, email, role);
+        ClaimsIdentity identity = GetIdentity(accountId, profileId, email, role);
         
         var timeNow = DateTime.UtcNow;
 
@@ -29,13 +29,14 @@ internal sealed class JwtService(IOptions<JwtOptions> jwtOptions) : IJwtService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private ClaimsIdentity GetIdentity(Guid userId, string email, string role)
+    private ClaimsIdentity GetIdentity(Guid accountId, Guid profileId, string email, string role)
     {
         List<Claim> claims =
         [
-            new(JwtRegisteredClaimNames.Sub, userId.ToString()),
+            new(JwtRegisteredClaimNames.Sub, accountId.ToString()),
             new(JwtRegisteredClaimNames.Email, email),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new("profile_id", profileId.ToString()),
             new(ClaimsIdentity.DefaultRoleClaimType, role)
         ];
         

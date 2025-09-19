@@ -5,29 +5,29 @@ namespace Identity.IntegrationEvents;
 
 public sealed record SellerAccountCreated : IIntegrationEvent
 {
-    public Guid AccountId { get; init; }
+    public required Guid AccountId { get; init; }
     
-    public string Email { get; init; }
+    public required string Email { get; init; }
     
-    public string Password { get; init; }
+    public required string Password { get; init; }
     
-    public string FirstName { get; init; }
+    public required string FirstName { get; init; }
     
-    public string LastName { get; init; }
+    public required string LastName { get; init; }
     
-    public string MiddleName { get; init; }
+    public required string MiddleName { get; init; }
     
-    public string PhoneNumber { get; init; }
+    public required string PhoneNumber { get; init; }
     
-    public string City { get; init; }
+    public required string City { get; init; }
     
-    public string Street { get; init; }
+    public required string Street { get; init; }
     
-    public uint HouseNumber { get; init; }
+    public required uint HouseNumber { get; init; }
     
-    public uint? ApartmentNumber { get; init; }
+    public required uint? ApartmentNumber { get; init; }
     
-    public DateOnly BirthDate { get; init; }
+    public required DateOnly BirthDate { get; init; }
     
-    public IFormFile Document { get; init; }
+    public required IFormFile Document { get; init; }
 }

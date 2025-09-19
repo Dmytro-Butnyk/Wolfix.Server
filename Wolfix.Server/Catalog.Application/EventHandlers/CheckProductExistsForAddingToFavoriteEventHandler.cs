@@ -22,7 +22,7 @@ internal sealed class CheckProductExistsForAddingToFavoriteEventHandler(IProduct
             );
         }
 
-        VoidResult result = await eventBus.PublishAsync(new ProductExistsForAddingToFavorite
+        VoidResult result = await eventBus.PublishWithoutResultAsync(new ProductExistsForAddingToFavorite
         {
             CustomerId = @event.CustomerId,
             Title = product.Title,

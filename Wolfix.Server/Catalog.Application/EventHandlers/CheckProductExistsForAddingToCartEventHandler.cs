@@ -22,7 +22,7 @@ public sealed class CheckProductExistsForAddingToCartEventHandler(IProductReposi
             );
         }
 
-        VoidResult result = await eventBus.PublishAsync(new ProductExistsForAddingToCart
+        VoidResult result = await eventBus.PublishWithoutResultAsync(new ProductExistsForAddingToCart
         {
             CustomerId = @event.CustomerId,
             PriceWithDiscount = product.FinalPrice,
