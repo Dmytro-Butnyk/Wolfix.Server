@@ -30,4 +30,10 @@ public interface IProductRepository
     Task<IReadOnlyCollection<ProductReviewProjection>> GetNextProductReviewsAsync(Guid productId, int pageSize, Guid lastId, CancellationToken ct);
     
     Task<IReadOnlyCollection<Guid>> GetAllMediaIdsByCategoryProductsAsync(Guid categoryId, CancellationToken ct);
+    
+    Task<IReadOnlyCollection<ProductShortProjection>> GetBySearchQueryAsync(string searchQuery, int pageSize,
+        CancellationToken ct);
+    
+    Task<IReadOnlyCollection<ProductShortProjection>> GetBySearchQueryAndCategoryAsync(Guid categoryId, string searchQuery, int pageSize,
+        CancellationToken ct);
 }

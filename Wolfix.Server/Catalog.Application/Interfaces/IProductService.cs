@@ -30,4 +30,10 @@ public interface IProductService
         CancellationToken ct);
 
     Task<VoidResult> AddReviewAsync(Guid productId, AddProductReview addProductReviewDto, CancellationToken ct);
+    
+    Task<Result<IReadOnlyCollection<ProductShortDto>>> GetBySearchQueryAsync(string searchQuery, int pageSize,
+        CancellationToken ct);
+    
+    Task<Result<IReadOnlyCollection<ProductShortDto>>> GetBySearchQueryAndCategoryAsync(Guid categoryId, string searchQuery, int pageSize,
+        CancellationToken ct);
 }

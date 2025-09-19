@@ -145,4 +145,16 @@ public sealed class ProductDomainService(
         return Result<IReadOnlyCollection<ProductCategoriesValueObject>>
             .Success(categoriesValueObjects);
     }
+
+    public async Task<VoidResult> IsCategoryExistAsync(Guid categoryId, CancellationToken ct)
+    {
+        Category? category = await categoryRepository.GetByIdAsNoTrackingAsync(categoryId, ct);
+        
+        if (category is null)
+        {
+            return VoidResult.Failure($"Category with id:{categoryId} not found", HttpStatusCode.NotFound);
+        }
+        
+        return VoidResult.Success();
+    }
 }

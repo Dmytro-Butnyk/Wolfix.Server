@@ -20,4 +20,6 @@ public interface IProductDomainService
 
     Task<Result<IReadOnlyCollection<ProductCategoriesValueObject>>> GetCategoriesLineForProduct(Guid categoryId,
         CancellationToken ct);
+    
+    Task<VoidResult> IsCategoryExistAsync(Guid categoryId, CancellationToken ct);
 }

@@ -7,6 +7,8 @@ using Catalog.Domain.Projections.Product.Review;
 using Microsoft.EntityFrameworkCore;
 using Shared.Domain.Models;
 using Shared.Infrastructure.Repositories;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+
 
 namespace Catalog.Infrastructure.Repositories;
 
@@ -14,7 +16,7 @@ internal sealed class ProductRepository(CatalogContext context)
     : BaseRepository<CatalogContext, Product>(context), IProductRepository
 {
     private readonly DbSet<Product> _products = context.Products;
-    
+
     public async Task<int> GetTotalCountAsync(CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
@@ -30,7 +32,7 @@ internal sealed class ProductRepository(CatalogContext context)
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        
+
         //todo
         return new List<ProductShortProjection>();
     }
@@ -38,11 +40,11 @@ internal sealed class ProductRepository(CatalogContext context)
     public async Task<int> GetTotalCountByIdsAsync(IReadOnlyCollection<Guid> ids, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        
+
         return await _products
             .AsNoTracking()
             .Where(product => ids.Contains(product.Id))
-            .CountAsync(ct);   
+            .CountAsync(ct);
     }
 
     public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllByCategoryIdForPageAsync(Guid childCategoryId,
@@ -50,7 +52,7 @@ internal sealed class ProductRepository(CatalogContext context)
         int pageSize, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        
+
         List<ProductShortProjection> productsByCategory = await _products
             .Include(p => p.Discount)
             .AsNoTracking()
@@ -69,7 +71,7 @@ internal sealed class ProductRepository(CatalogContext context)
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        
+
         List<ProductShortProjection> productsWithDiscount = await _products
             .Include(p => p.Discount)
             .AsNoTracking()
@@ -84,7 +86,8 @@ internal sealed class ProductRepository(CatalogContext context)
         return productsWithDiscount;
     }
 
-    public async Task<IReadOnlyCollection<ProductShortProjection>> GetRecommendedByCategoryIdAsync(Guid categoryId, int productsByCategorySize, 
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetRecommendedByCategoryIdAsync(Guid categoryId,
+        int productsByCategorySize,
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
@@ -95,33 +98,39 @@ internal sealed class ProductRepository(CatalogContext context)
             .Where(product => product.CategoryId == categoryId)
             .OrderBy(_ => EF.Functions.Random())
             .Take(productsByCategorySize)
-            .Select(product => new ProductShortProjection(product.Id, product.Title, product.AverageRating,
-                product.Price, product.FinalPrice, product.Bonuses, product.MainPhotoUrl))
+            .Select(product => new ProductShortProjection(
+                product.Id,
+                product.Title,
+                product.AverageRating,
+                product.Price,
+                product.FinalPrice,
+                product.Bonuses,
+                product.MainPhotoUrl))
             .ToListAsync(ct);
     }
 
     public async Task<int> GetTotalCountWithDiscountAsync(CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        
+
         int totalCount = await _products
             .Include(p => p.Discount)
             .AsNoTracking()
             .Where(product => product.Discount != null && product.Discount.Status == DiscountStatus.Active)
             .CountAsync(ct);
-        
+
         return totalCount;
     }
 
     public async Task<int> GetTotalCountByCategoryAsync(Guid categoryId, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        
+
         int totalCount = await _products
             .AsNoTracking()
             .Where(product => product.CategoryId == categoryId)
             .CountAsync(ct);
-        
+
         return totalCount;
     }
 
@@ -146,7 +155,7 @@ internal sealed class ProductRepository(CatalogContext context)
             .Skip(randomSkip)
             .Take(takeFromEnd)
             .Select(p => new ProductShortProjection(p.Id, p.Title, p.AverageRating, p.Price,
-                    p.FinalPrice, p.Bonuses, p.MainPhotoUrl))
+                p.FinalPrice, p.Bonuses, p.MainPhotoUrl))
             .ToListAsync(ct);
 
         if (takeFromEnd < pageSize)
@@ -167,7 +176,8 @@ internal sealed class ProductRepository(CatalogContext context)
         return products;
     }
 
-    public async Task<IReadOnlyCollection<ProductReviewProjection>> GetProductReviewsAsync(Guid productId, int pageSize, CancellationToken ct)
+    public async Task<IReadOnlyCollection<ProductReviewProjection>> GetProductReviewsAsync(Guid productId, int pageSize,
+        CancellationToken ct)
     {
         return await _products
             .AsNoTracking()
@@ -186,7 +196,8 @@ internal sealed class ProductRepository(CatalogContext context)
             .ToListAsync(ct);
     }
 
-    public async Task<IReadOnlyCollection<ProductReviewProjection>> GetNextProductReviewsAsync(Guid productId, int pageSize, Guid lastId, CancellationToken ct)
+    public async Task<IReadOnlyCollection<ProductReviewProjection>> GetNextProductReviewsAsync(Guid productId,
+        int pageSize, Guid lastId, CancellationToken ct)
     {
         return await _products
             .AsNoTracking()
@@ -215,6 +226,35 @@ internal sealed class ProductRepository(CatalogContext context)
             .Include("_productMedias")
             .SelectMany(product => EF.Property<List<ProductMedia>>(product, "_productMedias"))
             .Select(media => media.MediaId)
+            .ToListAsync(ct);
+    }
+
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetBySearchQueryAsync(string searchQuery,
+        int pageSize, CancellationToken ct)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetBySearchQueryAndCategoryAsync(
+        Guid categoryId, string searchQuery, int pageSize, CancellationToken ct)
+    {
+        const double threshold = 0.30; // можно варьировать 0.25..0.45
+
+        return await _products
+            .AsNoTracking()
+            .Where(p => p.CategoryId == categoryId &&
+                        // использовать TrigramsSimilarity (возвращает double 0..1)
+                        EF.Functions.TrigramsSimilarity(p.Title, searchQuery) > threshold)
+            .OrderByDescending(p => EF.Functions.TrigramsSimilarity(p.Title, searchQuery))
+            .Take(pageSize)
+            .Select(product => new ProductShortProjection(
+                product.Id,
+                product.Title,
+                product.AverageRating,
+                product.Price,
+                product.FinalPrice,
+                product.Bonuses,
+                product.MainPhotoUrl))
             .ToListAsync(ct);
     }
 }

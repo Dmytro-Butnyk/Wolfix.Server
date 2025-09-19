@@ -276,6 +276,15 @@ namespace Catalog.Infrastructure.Migrations
                 schema: "catalog",
                 table: "Reviews",
                 column: "ProductId");
+            
+            // Подключаем расширение pg_trgm (для similarity и %)
+            migrationBuilder.Sql(@"CREATE EXTENSION IF NOT EXISTS pg_trgm;");
+
+            // Индекс для ускорения поиска по названию продуктов
+            migrationBuilder.Sql(@"
+                CREATE INDEX IF NOT EXISTS idx_products_title_trgm
+                ON ""catalog"".""Products"" USING gin (""Title"" gin_trgm_ops);
+                ");
         }
 
         /// <inheritdoc />
@@ -316,6 +325,9 @@ namespace Catalog.Infrastructure.Migrations
             migrationBuilder.DropTable(
                 name: "Categories",
                 schema: "catalog");
+            
+            migrationBuilder.Sql(@"DROP INDEX IF EXISTS idx_products_title_trgm;");
+            migrationBuilder.Sql(@"DROP EXTENSION IF EXISTS pg_trgm;");
         }
     }
 }
