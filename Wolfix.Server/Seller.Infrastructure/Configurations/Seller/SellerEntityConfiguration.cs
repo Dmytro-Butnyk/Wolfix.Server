@@ -54,10 +54,6 @@ internal sealed class SellerEntityConfiguration : IEntityTypeConfiguration<Domai
                 birthDateString => (BirthDate)birthDateString
             );
 
-        builder.Property(s => s.Status)
-            .IsRequired()
-            .HasConversion<string>();
-        
         builder.Property(s => s.AccountId)
             .IsRequired();
 

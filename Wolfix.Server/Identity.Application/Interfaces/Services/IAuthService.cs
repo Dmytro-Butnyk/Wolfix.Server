@@ -10,9 +10,7 @@ public interface IAuthService
     
     Task<Result<string>> GetTokenByRoleAsync(TokenDto dto, CancellationToken ct);
     
-    Task<Result<string>> RegisterAsCustomerAsync(RegisterAsCustomerDto dto, CancellationToken ct);
-    
-    Task<Result<string>> RegisterAsSellerAsync(RegisterAsSellerDto dto, CancellationToken ct);
+    Task<Result<string>> RegisterAsync(RegisterAsCustomerDto dto, CancellationToken ct);
     
     Task<Result<string>> ChangeEmailAsync(Guid accountId, ChangeEmailDto request, string token, CancellationToken ct);
     

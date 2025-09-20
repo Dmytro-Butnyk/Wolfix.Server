@@ -11,7 +11,7 @@ namespace Seller.Application.Services;
 
 internal sealed class SellerApplicationService(
     ISellerApplicationRepository sellerApplicationRepository,
-    IEventBus eventBus)
+    IEventBus eventBus) 
     : ISellerApplicationService
 {
     public async Task<VoidResult> CreateAsync(Guid accountId, CreateSellerApplicationDto request, CancellationToken ct)

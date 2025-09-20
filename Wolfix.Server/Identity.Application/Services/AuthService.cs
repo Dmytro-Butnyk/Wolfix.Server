@@ -81,7 +81,7 @@ internal sealed class AuthService(
         return Result<Guid>.Failure($"Role {role} not found");
     }
 
-    public async Task<Result<string>> RegisterAsCustomerAsync(RegisterAsCustomerDto dto, CancellationToken ct)
+    public async Task<Result<string>> RegisterAsync(RegisterAsCustomerDto dto, CancellationToken ct)
     {
         Result<Guid> registerResult = await authStore.RegisterAccountAsync(dto.Email, dto.Password, Roles.Customer, ct);
 
@@ -108,51 +108,6 @@ internal sealed class AuthService(
         Guid customerId = createCustomerAndGetIdResult.Value;
         
         string token = jwtService.GenerateToken(registeredCustomerId, customerId, dto.Email, Roles.Customer);
-        
-        return Result<string>.Success(token);
-    }
-
-    public async Task<Result<string>> RegisterAsSellerAsync(RegisterAsSellerDto dto, CancellationToken ct)
-    {
-        Result<Guid> registerResult = await authStore.RegisterAccountAsync(dto.Email, dto.Password, Roles.Seller, ct);
-
-        if (!registerResult.IsSuccess)
-        {
-            return Result<string>.Failure(registerResult.ErrorMessage!, registerResult.StatusCode);
-        }
-        
-        Guid registeredSellerId = registerResult.Value;
-
-        var @event = new SellerAccountCreated
-        {
-            AccountId = registeredSellerId,
-            Email = dto.Email,
-            Password = dto.Password,
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
-            MiddleName = dto.MiddleName,
-            PhoneNumber = dto.PhoneNumber,
-            City = dto.City,
-            Street = dto.Street,
-            HouseNumber = dto.HouseNumber,
-            ApartmentNumber = dto.ApartmentNumber,
-            BirthDate = dto.BirthDate,
-            Document = dto.Document
-        };
-
-        Result<Guid> createSellerAndGetIdResult = await eventBus
-            .PublishWithSingleResultAsync<SellerAccountCreated, Guid>(@event, ct);
-
-        if (createSellerAndGetIdResult.IsFailure)
-        {
-            return Result<string>.Failure(createSellerAndGetIdResult);
-        }
-        
-        Guid sellerId = createSellerAndGetIdResult.Value;
-        
-        //todo: событие чтобы отправлять документ к админу на рассмотрение
-        
-        string token = jwtService.GenerateToken(registeredSellerId, sellerId, dto.Email, Roles.Seller);
         
         return Result<string>.Success(token);
     }

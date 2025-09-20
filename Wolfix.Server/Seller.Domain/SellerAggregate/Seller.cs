@@ -19,8 +19,6 @@ public sealed class Seller : BaseEntity
     
     internal BirthDate BirthDate { get; private set; }
 
-    public SellerStatus Status { get; private set; } = SellerStatus.Pending;
-    
     public Guid AccountId { get; private set; }
 
     private readonly List<SellerCategory> _sellerCategories = [];
@@ -123,11 +121,6 @@ public sealed class Seller : BaseEntity
     #region Setters
     public VoidResult ChangePhoto(string photoUrl)
     {
-        if (Status != SellerStatus.Confirmed)
-        {
-            return VoidResult.Failure("Seller is not confirmed.");
-        }
-        
         if (string.IsNullOrWhiteSpace(photoUrl))
         {
             return VoidResult.Failure($"{nameof(photoUrl)} cannot be empty");
@@ -139,11 +132,6 @@ public sealed class Seller : BaseEntity
     
     public VoidResult ChangeFullName(string firstName, string lastName, string middleName)
     {
-        if (Status != SellerStatus.Confirmed)
-        {
-            return VoidResult.Failure("Seller is not confirmed.");
-        }
-        
         Result<FullName> createFullNameResult = FullName.Create(firstName, lastName, middleName);
         
         if (!createFullNameResult.IsSuccess)
@@ -157,11 +145,6 @@ public sealed class Seller : BaseEntity
     
     public VoidResult ChangePhoneNumber(string phoneNumber)
     {
-        if (Status != SellerStatus.Confirmed)
-        {
-            return VoidResult.Failure("Seller is not confirmed.");
-        }
-        
         Result<PhoneNumber> createPhoneNumberResult = PhoneNumber.Create(phoneNumber);
 
         if (!createPhoneNumberResult.IsSuccess)
@@ -175,11 +158,6 @@ public sealed class Seller : BaseEntity
 
     public VoidResult ChangeAddress(string city, string street, uint houseNumber, uint? apartmentNumber)
     {
-        if (Status != SellerStatus.Confirmed)
-        {
-            return VoidResult.Failure("Seller is not confirmed.");
-        }
-        
         Result<Address> createAddressResult = Address.Create(city, street, houseNumber, apartmentNumber);
         
         if (!createAddressResult.IsSuccess)
@@ -193,11 +171,6 @@ public sealed class Seller : BaseEntity
 
     public VoidResult ChangeBirthDate(DateOnly birthDate)
     {
-        if (Status != SellerStatus.Confirmed)
-        {
-            return VoidResult.Failure("Seller is not confirmed.");
-        }
-        
         Result<BirthDate> createBirthDateResult = BirthDate.Create(birthDate);
         
         if (!createBirthDateResult.IsSuccess)
@@ -230,11 +203,6 @@ public sealed class Seller : BaseEntity
     #region categories
     public VoidResult AddSellerCategory(Guid categoryId, string name)
     {
-        if (Status != SellerStatus.Confirmed)
-        {
-            return VoidResult.Failure("Seller is not confirmed.");
-        }
-        
         if (_sellerCategories.Any(sc => sc.CategoryId == categoryId))
         {
             return VoidResult.Failure($"{nameof(categoryId)} already exists", HttpStatusCode.Conflict);
@@ -254,11 +222,6 @@ public sealed class Seller : BaseEntity
 
     public VoidResult RemoveSellerCategory(Guid sellerCategoryId)
     {
-        if (Status != SellerStatus.Confirmed)
-        {
-            return VoidResult.Failure("Seller is not confirmed.");
-        }
-        
         SellerCategory? sellerCategory = _sellerCategories.FirstOrDefault(sc => sc.Id == sellerCategoryId);
 
         if (sellerCategory == null)
@@ -273,16 +236,9 @@ public sealed class Seller : BaseEntity
         return VoidResult.Success();
     }
     
-    public VoidResult RemoveAllSellerCategories()
+    public void RemoveAllSellerCategories()
     {
-        if (Status != SellerStatus.Confirmed)
-        {
-            return VoidResult.Failure("Seller is not confirmed.");
-        }
-        
         _sellerCategories.Clear();
-        
-        return VoidResult.Success();
     }
     #endregion
 }

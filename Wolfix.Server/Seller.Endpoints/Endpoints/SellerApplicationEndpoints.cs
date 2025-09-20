@@ -37,7 +37,8 @@ internal static class SellerApplicationEndpoints
             return createApplicationResult.StatusCode switch
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(createApplicationResult.ErrorMessage),
-                HttpStatusCode.BadRequest => TypedResults.BadRequest(createApplicationResult.ErrorMessage)
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(createApplicationResult.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(CreateApplication)} -> Unknown status code: {createApplicationResult.StatusCode}")
             };
         }
         
