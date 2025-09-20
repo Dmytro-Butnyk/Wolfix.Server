@@ -1,10 +1,13 @@
 using System.Net;
 using Order.Application.Contracts;
 using Order.Application.Dto.Order.Requests;
+using Order.Application.Dto.Order.Responses;
 using Order.Application.Interfaces;
+using Order.Application.Mapping;
 using Order.Application.Models;
 using Order.Domain.Interfaces.Order;
 using Order.Domain.OrderAggregate.Enums;
+using Order.Domain.Projections;
 using Order.IntegrationEvents;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents.Interfaces;
@@ -152,5 +155,26 @@ internal sealed class OrderService(
         await orderRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();
+    }
+
+    public async Task<Result<IReadOnlyCollection<CustomerOrderDto>>> GetCustomerOrdersAsync(Guid customerId, CancellationToken ct)
+    {
+        VoidResult checkCustomerExistResult = await eventBus.PublishWithoutResultAsync(new CustomerWantsToGetOrders
+        {
+            CustomerId = customerId
+        }, ct);
+
+        if (checkCustomerExistResult.IsFailure)
+        {
+            return Result<IReadOnlyCollection<CustomerOrderDto>>.Failure(checkCustomerExistResult);
+        }
+        
+        IReadOnlyCollection<CustomerOrderProjection> customerOrders = await orderRepository.GetCustomerOrdersAsync(customerId, ct);
+
+        IReadOnlyCollection<CustomerOrderDto> dto = customerOrders
+            .Select(order => order.ToDto())
+            .ToList();
+
+        return Result<IReadOnlyCollection<CustomerOrderDto>>.Success(dto);
     }
 }

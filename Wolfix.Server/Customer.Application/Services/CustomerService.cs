@@ -81,7 +81,7 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
 
     public async Task<Result<CustomerCartItemsDto>> GetCartItemsAsync(Guid customerId, CancellationToken ct)
     {
-        var customer = await customerRepository.GetByIdAsNoTrackingAsync(customerId, ct);
+        var customer = await customerRepository.GetByIdAsNoTrackingAsync(customerId, ct, "_cartItems");
 
         if (customer is null)
         {
@@ -255,7 +255,7 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
 
     public async Task<VoidResult> DeleteCartItemAsync(Guid customerId, Guid cartItemId, CancellationToken ct)
     {
-        CustomerAggregate? customer = await customerRepository.GetByIdAsync(customerId, ct, "_favoriteItems");
+        CustomerAggregate? customer = await customerRepository.GetByIdAsync(customerId, ct, "_cartItems");
 
         if (customer is null)
         {
