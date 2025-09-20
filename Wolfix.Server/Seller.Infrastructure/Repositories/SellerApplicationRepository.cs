@@ -9,4 +9,12 @@ internal sealed class SellerApplicationRepository(SellerContext context)
     : BaseRepository<SellerContext, SellerApplication>(context), ISellerApplicationRepository
 {
     private readonly DbSet<SellerApplication> _sellerApplications = context.Set<SellerApplication>();
+    
+    public async Task<IReadOnlyCollection<SellerApplication>> GetByAccountIdAsNoTrackingAsync(Guid accountId, CancellationToken ct)
+    {
+        return await _sellerApplications
+            .AsNoTracking()
+            .Where(sa => sa.AccountId == accountId)
+            .ToListAsync(ct);
+    }
 }

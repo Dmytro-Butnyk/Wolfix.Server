@@ -3,6 +3,7 @@ using Seller.Application.Dto.SellerApplication;
 using Seller.Application.Interfaces;
 using Seller.Domain.Interfaces;
 using Seller.Domain.SellerApplicationAggregate;
+using Seller.Domain.SellerApplicationAggregate.Enums;
 using Seller.IntegrationEvents;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents.Interfaces;
@@ -24,6 +25,16 @@ internal sealed class SellerApplicationService(
         if (checkAccountExistResult.IsFailure)
         {
             return checkAccountExistResult;
+        }
+        
+        IReadOnlyCollection<SellerApplication> existingSellerApplications = await sellerApplicationRepository.GetByAccountIdAsNoTrackingAsync(accountId, ct);
+        
+        bool customerIsAlreadySeller =
+            existingSellerApplications.Count != 0 && existingSellerApplications.Any(sa => sa.Status == SellerApplicationStatus.Approved);
+
+        if (customerIsAlreadySeller)
+        {
+            return VoidResult.Failure("Customer is already a seller");
         }
 
         var @event = new SellerApplicationCreating

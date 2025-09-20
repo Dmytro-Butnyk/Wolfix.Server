@@ -11,4 +11,8 @@
       <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Projections\SellerApplication\" />
+    </ItemGroup>
+
 </Project>

@@ -1,6 +1,7 @@
 using Seller.Application.Dto;
 using Seller.Application.Dto.Seller;
 using Seller.Domain.Projections;
+using Seller.Domain.Projections.Seller;
 
 namespace Seller.Application.Mapping;
 
