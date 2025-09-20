@@ -1,3 +1,4 @@
+using Admin.Endpoints.Extensions;
 using Catalog.Endpoints.Extensions;
 using Customer.Endpoints.Extensions;
 using Identity.Endpoints.Extensions;
@@ -23,7 +24,8 @@ public static class WebApplicationBuilderExtension
             .AddCustomerModule(connectionString)
             .AddMediaModule(connectionString)
             .AddSellerModule(connectionString)
-            .AddOrderModule(connectionString);
+            .AddOrderModule(connectionString)
+            .AddAdminModule(connectionString);
         
         return builder;
     }
@@ -76,6 +78,13 @@ public static class WebApplicationBuilderExtension
         
         builder.Services.AddOrderModule(connectionString, publishableKey, secretKey, webhookKey);
         
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddAdminModule(this WebApplicationBuilder builder, string connectionString)
+    {
+        builder.Services.AddAdminModule(connectionString);
+
         return builder;
     }
 
