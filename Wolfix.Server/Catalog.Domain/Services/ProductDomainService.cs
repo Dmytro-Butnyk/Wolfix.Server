@@ -157,4 +157,27 @@ public sealed class ProductDomainService(
         
         return VoidResult.Success();
     }
+
+    public async Task<VoidResult> IsCategoryAndAttributesExistAsync(Guid categoryId, List<Guid> attributeIds, CancellationToken ct)
+    {
+        Category? category = await categoryRepository.GetByIdWithProductAttributesAsNoTrackingAsync(categoryId, ct);
+
+        if (category is null)
+        {
+            return VoidResult.Failure($"Category with id:{categoryId} not found", HttpStatusCode.NotFound);
+        }
+        
+        HashSet<Guid> categoryAttributeIds = category.ProductAttributes
+            .Select(a => a.Id)
+            .ToHashSet();
+
+        bool allExist = attributeIds.All(id => categoryAttributeIds.Contains(id));
+
+        if (!allExist)
+        {
+            return VoidResult.Failure("One or more attributes do not belong to this category");
+        }
+        
+        return VoidResult.Success();       
+    }
 }

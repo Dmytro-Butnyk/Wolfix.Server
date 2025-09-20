@@ -5,9 +5,9 @@ using Catalog.Domain.ProductAggregate.Enums;
 using Catalog.Domain.Projections.Product;
 using Catalog.Domain.Projections.Product.Review;
 using Microsoft.EntityFrameworkCore;
-using Shared.Domain.Models;
 using Shared.Infrastructure.Repositories;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
+using LinqKit;
+
 
 
 namespace Catalog.Infrastructure.Repositories;
@@ -275,4 +275,53 @@ internal sealed class ProductRepository(CatalogContext context)
                 product.MainPhotoUrl))
             .ToListAsync(ct);
     }
+
+    public async Task<IReadOnlyCollection<Guid>> GetByAttributesFiltrationAsNoTrackingAsync(
+        IReadOnlyCollection<(Guid AttributeId, string Value)> filters, int pageSize, CancellationToken ct)
+    {
+        var predicate = PredicateBuilder.New<ProductAttributeValue>(false);
+
+        foreach (var f in filters)
+        {
+            var temp = f; // обязательно, чтобы захват переменной корректно
+            predicate = predicate.Or(pa => 
+                EF.Property<Guid>(pa, "CategoryAttributeId") == temp.AttributeId &&
+                EF.Property<string>(pa, "Value") == temp.Value
+            );
+        }
+
+        var query = _products
+            .AsNoTracking()
+            .SelectMany(p => EF.Property<List<ProductAttributeValue>>(p, "_productAttributeValues"))
+            .Where(predicate)
+            .Take(pageSize)
+            .Select(pa => (
+                pa.Product.Id
+            ));
+
+        return await query.Distinct().ToListAsync(ct);
+    }
+
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetShortProductsByIdsAsNoTrackingAsync(
+        IReadOnlyCollection<Guid> ids, CancellationToken ct)
+    {
+        var products = await _products
+            .Include("_productMedias")
+            .AsNoTracking()
+            .Where(p => ids.Contains(p.Id))
+            .Select(p => new ProductShortProjection(
+                p.Id,
+                p.Title,
+                p.AverageRating,
+                p.Price,
+                p.FinalPrice,
+                p.Bonuses,
+                p.MainPhotoUrl
+            ))
+            .ToListAsync(ct);
+
+        return products;
+    }
+    
+    
 }

@@ -1,14 +1,12 @@
 using System.Net;
-using System.Reflection.Metadata;
 using Catalog.Application.Dto.Product;
 using Catalog.Application.Dto.Product.AdditionDtos;
+using Catalog.Application.Dto.Product.AttributesFiltrationDto;
 using Catalog.Application.Dto.Product.FullDto;
 using Catalog.Application.Dto.Product.Review;
 using Catalog.Application.Interfaces;
 using Catalog.Application.Mapping.Product;
 using Catalog.Application.Mapping.Product.Review;
-using Catalog.Domain.CategoryAggregate;
-using Catalog.Domain.CategoryAggregate.Entities;
 using Catalog.Domain.Interfaces;
 using Catalog.Domain.Interfaces.DomainServices;
 using Catalog.Domain.ProductAggregate;
@@ -501,6 +499,35 @@ internal sealed class ProductService(
         IReadOnlyCollection<ProductShortDto> productShortDtos =
             productShortProjections.Select(p => p.ToShortDto()).ToList();
 
+        return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
+    }
+
+    public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetByAttributesFiltrationAsync(AttributesFiltrationDto attributesFiltrationDto, int pageSize,
+        CancellationToken ct)
+    {
+        VoidResult isCategoryAndtributesExist = await productDomainService
+            .IsCategoryAndAttributesExistAsync(attributesFiltrationDto.CategoryId,
+                attributesFiltrationDto.FiltrationAttribute.Select(fa => fa.AttributeId).ToList(), ct);
+        
+        if (isCategoryAndtributesExist.IsFailure)
+        {
+            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(isCategoryAndtributesExist);
+        }
+
+        IReadOnlyCollection<Guid> productIds =
+            await productRepository.GetByAttributesFiltrationAsNoTrackingAsync(
+                attributesFiltrationDto.FiltrationAttribute
+                    .Select(fa => (fa.AttributeId, fa.Value))
+                    .ToList(),
+                pageSize,
+                ct);
+
+        IReadOnlyCollection<ProductShortProjection> productShortProjections =
+            await productRepository.GetShortProductsByIdsAsNoTrackingAsync(productIds, ct);
+        
+        IReadOnlyCollection<ProductShortDto> productShortDtos =
+            productShortProjections.Select(p => p.ToShortDto()).ToList();
+        
         return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
     }
 }

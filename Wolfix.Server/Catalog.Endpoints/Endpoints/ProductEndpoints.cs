@@ -1,6 +1,7 @@
 using System.Net;
 using Catalog.Application.Dto.Product;
 using Catalog.Application.Dto.Product.AdditionDtos;
+using Catalog.Application.Dto.Product.AttributesFiltrationDto;
 using Catalog.Application.Dto.Product.FullDto;
 using Catalog.Application.Dto.Product.Review;
 using Catalog.Application.Interfaces;
@@ -65,6 +66,9 @@ internal static class ProductEndpoints
         
         group.MapGet("search", GetSearch)
             .WithSummary("Get products by search query");
+        
+        group.MapPost("filter-by-attributes", GetProductsByAttributes)
+            .WithSummary("Get products by attributes filtration");
     }
 
     private static void MapReviewEndpoints(RouteGroupBuilder group)
@@ -335,5 +339,28 @@ internal static class ProductEndpoints
         }
 
         return TypedResults.Ok(getProductsBySearchQueryAndCategoryResult.Value);
+    }
+
+    private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>, NotFound<string>>>
+        GetProductsByAttributes(
+            [FromBody] AttributesFiltrationDto attributesFiltrationDto,
+            [FromServices] IProductService productService,
+            CancellationToken ct,
+            [FromQuery] int pageSize = 20)
+    {
+        Result<IReadOnlyCollection<ProductShortDto>> getProductsByAttributes =
+            await productService.GetByAttributesFiltrationAsync(attributesFiltrationDto, pageSize, ct);
+
+        if (!getProductsByAttributes.IsSuccess)
+        {
+            return getProductsByAttributes.StatusCode switch
+            {
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(getProductsByAttributes.ErrorMessage),
+                HttpStatusCode.NotFound => TypedResults.NotFound(getProductsByAttributes.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(ChangeProductMainPhoto)} -> Unknown status code: {getProductsByAttributes.StatusCode}")
+            };
+        }
+
+        return TypedResults.Ok(getProductsByAttributes.Value);
     }
 }

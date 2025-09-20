@@ -79,7 +79,7 @@ internal sealed class ProductAttributeValue : BaseEntity
     #endregion
     
     public static explicit operator ProductAttributeValueInfo(ProductAttributeValue productAttributeValue)
-        => new(productAttributeValue.Id, productAttributeValue.Key, productAttributeValue.Value);
+        => new(productAttributeValue.Id, productAttributeValue.Key, productAttributeValue.Value, productAttributeValue.CategoryAttributeId);
 }
 
-public record ProductAttributeValueInfo(Guid Id, string Key, string Value);
+public record ProductAttributeValueInfo(Guid Id, string Key, string Value, Guid CategoryAttributeId);

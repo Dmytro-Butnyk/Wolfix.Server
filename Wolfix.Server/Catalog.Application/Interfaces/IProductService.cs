@@ -1,5 +1,6 @@
 using Catalog.Application.Dto.Product;
 using Catalog.Application.Dto.Product.AdditionDtos;
+using Catalog.Application.Dto.Product.AttributesFiltrationDto;
 using Catalog.Application.Dto.Product.FullDto;
 using Catalog.Application.Dto.Product.Review;
 using Catalog.Domain.ProductAggregate.Enums;
@@ -36,4 +37,8 @@ public interface IProductService
     
     Task<Result<IReadOnlyCollection<ProductShortDto>>> GetBySearchQueryAndCategoryAsync(Guid categoryId, string searchQuery, int pageSize,
         CancellationToken ct);
+    
+    //todo: add pagination
+    Task<Result<IReadOnlyCollection<ProductShortDto>>> GetByAttributesFiltrationAsync(AttributesFiltrationDto attributesFiltrationDto,
+        int pageSize, CancellationToken ct);
 }

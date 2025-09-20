@@ -22,4 +22,6 @@ public interface IProductDomainService
         CancellationToken ct);
     
     Task<VoidResult> IsCategoryExistAsync(Guid categoryId, CancellationToken ct);
+    
+    Task<VoidResult> IsCategoryAndAttributesExistAsync (Guid categoryId, List<Guid> attributeIds, CancellationToken ct);
 }
