@@ -17,6 +17,7 @@ internal sealed class SellerApplicationService(
 {
     public async Task<VoidResult> CreateAsync(Guid accountId, CreateSellerApplicationDto request, CancellationToken ct)
     {
+        //todo: так же в запросе принимать айди категории и тут проверять через событие существует ли категория
         VoidResult checkAccountExistResult = await eventBus.PublishWithoutResultAsync(new CustomerWantsToBeSeller
         {
             AccountId = accountId
