@@ -17,7 +17,6 @@ internal sealed class SellerApplicationService(
 {
     public async Task<VoidResult> CreateAsync(Guid accountId, CreateSellerApplicationDto request, CancellationToken ct)
     {
-        //todo: так же в запросе принимать айди категории и тут проверять через событие существует ли категория
         VoidResult checkAccountExistResult = await eventBus.PublishWithoutResultAsync(new CustomerWantsToBeSeller
         {
             AccountId = accountId
@@ -27,8 +26,20 @@ internal sealed class SellerApplicationService(
         {
             return checkAccountExistResult;
         }
+
+        VoidResult checkCategoryExistResult = await eventBus.PublishWithoutResultAsync(new CheckCategoryExist
+        {
+            CategoryId = request.CategoryId,
+            Name = request.CategoryName
+        }, ct);
+
+        if (checkCategoryExistResult.IsFailure)
+        {
+            return checkCategoryExistResult;
+        }
         
-        IReadOnlyCollection<SellerApplication> existingSellerApplications = await sellerApplicationRepository.GetByAccountIdAsNoTrackingAsync(accountId, ct);
+        IReadOnlyCollection<SellerApplication> existingSellerApplications =
+            await sellerApplicationRepository.GetByAccountIdAsNoTrackingAsync(accountId, ct);
         
         bool customerIsAlreadySeller =
             existingSellerApplications.Count != 0 && existingSellerApplications.Any(sa => sa.Status == SellerApplicationStatus.Approved);
