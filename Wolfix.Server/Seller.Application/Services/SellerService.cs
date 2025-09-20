@@ -1,5 +1,6 @@
 using System.Net;
 using Seller.Application.Dto;
+using Seller.Application.Dto.Seller;
 using Seller.Application.Interfaces;
 using Seller.Application.Mapping;
 using Seller.Domain.Enums;

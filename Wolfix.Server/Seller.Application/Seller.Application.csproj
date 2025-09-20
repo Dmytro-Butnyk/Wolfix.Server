@@ -8,7 +8,9 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Identity.IntegrationEvents\Identity.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Media.IntegrationEvents\Media.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Seller.Domain\Seller.Domain.csproj" />
+      <ProjectReference Include="..\Seller.IntegrationEvents\Seller.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Shared.Application\Shared.Application.csproj" />
       <ProjectReference Include="..\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
