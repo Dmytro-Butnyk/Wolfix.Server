@@ -20,37 +20,42 @@ public sealed class BlobResourceService(
     
     public async Task<Result<BlobResourceShortDto>> AddBlobResourceAsync(BlobResourceType contentType, Stream fileStream, CancellationToken ct)
     {
-        Result<BlobResource> blobResource = BlobResource
-            .Create(contentType);
+        Result<BlobResource> createBlobResourceResult = BlobResource.Create(contentType);
 
-        if (!blobResource.IsSuccess)
+        if (!createBlobResourceResult.IsSuccess)
         {
-            return Result<BlobResourceShortDto>.Failure("Invalid blob resource data");
+            return Result<BlobResourceShortDto>.Failure(createBlobResourceResult);
         }
 
+        string containerName = contentType switch
+        {
+            BlobResourceType.Photo => containerNames.CurrentValue.Photos,
+            BlobResourceType.Video => containerNames.CurrentValue.Videos,
+            BlobResourceType.Document => containerNames.CurrentValue.Documents,
+            _ => throw new Exception($"Unknown blob resource type: {contentType}")
+        };
+
         string url = await azureBlobRepository.AddFileAndGetUrlAsync(
-            contentType == BlobResourceType.Photo
-                ? containerNames.CurrentValue.Photos
-                : containerNames.CurrentValue.Videos,
-            blobResource.Value!.Name,fileStream,
+            containerName,
+            createBlobResourceResult.Value!.Name,fileStream,
             ct);
         
-        VoidResult changeUrlResult = blobResource.Value.ChangeUrl(url);
+        VoidResult changeUrlResult = createBlobResourceResult.Value.ChangeUrl(url);
 
         if (!changeUrlResult.IsSuccess)
         {
             return Result<BlobResourceShortDto>.Failure(changeUrlResult.ErrorMessage!, changeUrlResult.StatusCode);       
         }
         
-        await blobResourceRepository.AddAsync(blobResource.Value, ct);
+        await blobResourceRepository.AddAsync(createBlobResourceResult.Value, ct);
         
         await blobResourceRepository.SaveChangesAsync(ct);
         
         BlobResourceShortDto blobResourceShortDto = new()
         {
-            Id = blobResource.Value.Id,
-            ContentType = blobResource.Value.Type,
-            Url = blobResource.Value.Url
+            Id = createBlobResourceResult.Value.Id,
+            ContentType = createBlobResourceResult.Value.Type,
+            Url = createBlobResourceResult.Value.Url
         };
         
         return Result<BlobResourceShortDto>.Success(blobResourceShortDto);

@@ -9,6 +9,8 @@ internal sealed class DepartmentEntityConfiguration : IEntityTypeConfiguration<D
 {
     public void Configure(EntityTypeBuilder<Department> builder)
     {
+        builder.ToTable("Departments");
+        
         ConfigureBasicProperties(builder);
         
         ConfigureCityRelation(builder);

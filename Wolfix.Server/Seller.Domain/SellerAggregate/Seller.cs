@@ -19,8 +19,6 @@ public sealed class Seller : BaseEntity
     
     internal BirthDate BirthDate { get; private set; }
 
-    public SellerStatus Status { get; private set; } = SellerStatus.Pending;
-    
     public Guid AccountId { get; private set; }
 
     private readonly List<SellerCategory> _sellerCategories = [];

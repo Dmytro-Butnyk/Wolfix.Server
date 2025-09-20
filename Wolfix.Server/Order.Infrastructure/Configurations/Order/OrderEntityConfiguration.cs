@@ -10,6 +10,8 @@ internal sealed class OrderEntityConfiguration : IEntityTypeConfiguration<OrderA
 {
     public void Configure(EntityTypeBuilder<OrderAggregate> builder)
     {
+        builder.ToTable("Orders");
+        
         ConfigureBasicProperties(builder);
         
         ConfigureOrderItemRelation(builder);

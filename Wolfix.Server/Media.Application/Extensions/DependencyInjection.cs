@@ -4,8 +4,10 @@ using Media.Application.Interfaces;
 using Media.Application.Options;
 using Media.Application.Services;
 using Media.IntegrationEvents;
+using Media.IntegrationEvents.Dto;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Seller.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 
 namespace Media.Application.Extensions;
@@ -36,6 +38,7 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<ProductMediaAdded>, ProductMediaAddedEventHandler>();
         services.AddScoped<IIntegrationEventHandler<ProductMediaDeleted>, ProductMediaDeletedEventHandler>();
         services.AddScoped<IIntegrationEventHandler<CategoryAndProductsDeleted>, CategoryAndProductsDeletedEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<SellerApplicationCreating, CreatedBlobResourceDto>, SellerApplicationCreatingEventHandler>();
         
         return services;
     }

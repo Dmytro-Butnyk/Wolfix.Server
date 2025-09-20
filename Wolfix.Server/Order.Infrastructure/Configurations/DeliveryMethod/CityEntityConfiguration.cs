@@ -10,6 +10,8 @@ internal sealed class CityEntityConfiguration : IEntityTypeConfiguration<City>
 {
     public void Configure(EntityTypeBuilder<City> builder)
     {
+        builder.ToTable("Cities");
+        
         ConfigureBasicProperties(builder);
         
         ConfigureDepartmentRelation(builder);

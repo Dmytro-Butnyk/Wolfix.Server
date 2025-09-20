@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Projections\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Shared.Domain\Shared.Domain.csproj" />
       <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
     </ItemGroup>

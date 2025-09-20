@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Order.Application.Dto.Order.Requests;
+using Order.Application.Dto.Order.Responses;
 using Order.Application.Interfaces;
 using Shared.Domain.Models;
 
@@ -18,6 +19,9 @@ internal static class OrderEndpoints
     {
         var orderGroup = app.MapGroup(Route)
             .WithTags("Order");
+
+        orderGroup.MapGet("{customerId:guid}", GetCustomerOrders)
+            .WithSummary("Get all orders by specific customer");
         
         orderGroup.MapPost("with-payment", PlaceOrderWithPayment)
             .WithSummary("Creates an order and returns client secret for payment");
@@ -27,6 +31,21 @@ internal static class OrderEndpoints
 
         orderGroup.MapPost("", PlaceOrder)
             .WithSummary("Creates an order without payment");
+    }
+
+    private static async Task<Results<Ok<IReadOnlyCollection<CustomerOrderDto>>, NotFound<string>>> GetCustomerOrders(
+        [FromRoute] Guid customerId,
+        [FromServices] IOrderService orderService,
+        CancellationToken ct)
+    {
+        Result<IReadOnlyCollection<CustomerOrderDto>> getCustomerOrders = await orderService.GetCustomerOrdersAsync(customerId, ct);
+
+        if (getCustomerOrders.IsFailure)
+        {
+            return TypedResults.NotFound(getCustomerOrders.ErrorMessage);
+        }
+
+        return TypedResults.Ok(getCustomerOrders.Value!);
     }
 
     private static async Task<Results<Ok<string>, BadRequest<string>, NotFound<string>, InternalServerError<string>>> PlaceOrderWithPayment(

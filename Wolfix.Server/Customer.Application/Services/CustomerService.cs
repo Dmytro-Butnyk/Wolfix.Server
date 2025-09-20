@@ -1,10 +1,12 @@
 using System.Net;
 using Customer.Application.Dto;
 using Customer.Application.Dto.CartItem;
+using Customer.Application.Dto.Customer;
 using Customer.Application.Dto.FavoriteItem;
 using Customer.Application.Dto.Product;
 using Customer.Application.Interfaces;
 using Customer.Application.Mapping.CartItem;
+using Customer.Application.Mapping.Customer;
 using Customer.Application.Mapping.FavoriteItem;
 using Customer.Domain.Interfaces;
 using Customer.Domain.Projections;
@@ -12,6 +14,7 @@ using Customer.IntegrationEvents;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents.Interfaces;
+using CustomerAggregate = Customer.Domain.CustomerAggregate.Customer;
 
 namespace Customer.Application.Services;
 
@@ -78,7 +81,7 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
 
     public async Task<Result<CustomerCartItemsDto>> GetCartItemsAsync(Guid customerId, CancellationToken ct)
     {
-        var customer = await customerRepository.GetByIdAsNoTrackingAsync(customerId, ct);
+        var customer = await customerRepository.GetByIdAsNoTrackingAsync(customerId, ct, "_cartItems");
 
         if (customer is null)
         {
@@ -209,5 +212,68 @@ internal sealed class CustomerService(ICustomerRepository customerRepository, IE
         await customerRepository.SaveChangesAsync(ct);
         
         return Result<string>.Success(request.BirthDate.ToString("dd-MM-yyyy"));
+    }
+
+    public async Task<Result<CustomerDto>> GetProfileInfoAsync(Guid customerId, CancellationToken ct)
+    {
+        CustomerProjection? customer = await customerRepository.GetProfileInfoAsync(customerId, ct);
+
+        if (customer is null)
+        {
+            return Result<CustomerDto>.Failure(
+                $"Customer with id: {customerId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        return Result<CustomerDto>.Success(customer.ToDto());
+    }
+
+    public async Task<VoidResult> DeleteFavoriteItemAsync(Guid customerId, Guid favoriteItemId, CancellationToken ct)
+    {
+        CustomerAggregate? customer = await customerRepository.GetByIdAsync(customerId, ct, "_favoriteItems");
+
+        if (customer is null)
+        {
+            return VoidResult.Failure(
+                $"Customer with id: {customerId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        VoidResult deleteFavoriteResult = customer.RemoveFavoriteItem(favoriteItemId);
+
+        if (deleteFavoriteResult.IsFailure)
+        {
+            return deleteFavoriteResult;
+        }
+        
+        await customerRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> DeleteCartItemAsync(Guid customerId, Guid cartItemId, CancellationToken ct)
+    {
+        CustomerAggregate? customer = await customerRepository.GetByIdAsync(customerId, ct, "_cartItems");
+
+        if (customer is null)
+        {
+            return VoidResult.Failure(
+                $"Customer with id: {customerId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        VoidResult deleteCartItemResult = customer.RemoveCartItem(cartItemId);
+
+        if (deleteCartItemResult.IsFailure)
+        {
+            return deleteCartItemResult;
+        }
+        
+        await customerRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
     }
 }

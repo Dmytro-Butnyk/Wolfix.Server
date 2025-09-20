@@ -1,4 +1,5 @@
 using System.Net;
+using Identity.Application;
 using Identity.Application.Interfaces.Repositories;
 using Identity.Application.Projections;
 using Identity.Infrastructure.Extensions;
@@ -129,6 +130,37 @@ internal sealed class AuthStore(
         return Result<Guid>.Success(user.Id);
     }
 
+    public async Task<VoidResult> AddSellerRoleAsync(Guid accountId, string role, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        
+        Account? account = await userManager.FindByIdAsync(accountId.ToString());
+        
+        if (account is null)
+        {
+            return VoidResult.Failure(
+                $"Account with id: {accountId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        bool customerAlreadyHasSellerRole = await userManager.IsInRoleAsync(account, Roles.Seller);
+
+        if (customerAlreadyHasSellerRole)
+        {
+            return VoidResult.Failure("Customer already has seller role");
+        }
+        
+        IdentityResult addRoleResult = await userManager.AddToRoleAsync(account, role);
+        
+        if (!addRoleResult.Succeeded)
+        {
+            return VoidResult.Failure(addRoleResult.GetErrorMessage(), HttpStatusCode.InternalServerError);
+        }
+        
+        return VoidResult.Success();
+    }
+
     public async Task<VoidResult> ChangeEmailAsync(Guid accountId, string email, string token, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
@@ -162,7 +194,7 @@ internal sealed class AuthStore(
         if (account is null)
         {
             return VoidResult.Failure(
-                "Account not found",
+                $"Account with id: {accountId} not found",
                 HttpStatusCode.NotFound
             );
         }
@@ -172,6 +204,30 @@ internal sealed class AuthStore(
         if (!changePasswordResult.Succeeded)
         {
             return VoidResult.Failure(changePasswordResult.GetErrorMessage());
+        }
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> CheckUserCanBeSeller(Guid accountId, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        Account? account = await userManager.FindByIdAsync(accountId.ToString());
+
+        if (account is null)
+        {
+            return VoidResult.Failure(
+                $"Account with id: {accountId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        bool userHasSellerRole = await userManager.IsInRoleAsync(account, Roles.Seller);
+
+        if (userHasSellerRole)
+        {
+            return VoidResult.Failure("User already has seller role");
         }
         
         return VoidResult.Success();

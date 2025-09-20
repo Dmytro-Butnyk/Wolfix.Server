@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Customer.IntegrationEvents\Customer.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Identity.IntegrationEvents\Identity.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Seller.IntegrationEvents\Seller.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Shared.Application\Shared.Application.csproj" />
       <ProjectReference Include="..\Shared.Domain\Shared.Domain.csproj" />
       <ProjectReference Include="..\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj" />

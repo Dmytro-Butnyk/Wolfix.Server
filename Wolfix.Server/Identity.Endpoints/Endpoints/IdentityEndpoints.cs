@@ -31,17 +31,13 @@ internal static class IdentityEndpoints
         var customerGroup = identityGroup.MapGroup("customer");
         MapCustomerEndpoints(customerGroup);
 
-        identityGroup.MapPost("seller/register", RegisterAsSeller)
-            .DisableAntiforgery()
-            .WithSummary("Register as seller");
-        
-        var changeGroup = identityGroup.MapGroup("{accountId:guid}");
+         var changeGroup = identityGroup.MapGroup("{accountId:guid}");
         MapChangeEndpoints(changeGroup);
     }
 
     private static void MapCustomerEndpoints(RouteGroupBuilder customerGroup)
     {
-        customerGroup.MapPost("register", RegisterAsCustomer)
+        customerGroup.MapPost("register", Register)
             .WithSummary("Register as customer");
     }
 
@@ -96,12 +92,12 @@ internal static class IdentityEndpoints
         return TypedResults.Ok(getTokenResult.Value);
     }
 
-    private static async Task<Results<Ok<string>, Conflict<string>, InternalServerError<string>, BadRequest<string>>> RegisterAsCustomer(
+    private static async Task<Results<Ok<string>, Conflict<string>, InternalServerError<string>, BadRequest<string>>> Register(
         [FromBody] RegisterAsCustomerDto registerAsCustomerDto,
         [FromServices] IAuthService authService,
         CancellationToken ct)
     {
-        Result<string> registerResult = await authService.RegisterAsCustomerAsync(registerAsCustomerDto, ct);
+        Result<string> registerResult = await authService.RegisterAsync(registerAsCustomerDto, ct);
 
         if (!registerResult.IsSuccess)
         {
@@ -110,30 +106,7 @@ internal static class IdentityEndpoints
                 HttpStatusCode.Conflict => TypedResults.Conflict(registerResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(registerResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(registerResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(RegisterAsCustomer)} -> Unknown status code: {registerResult.StatusCode}")
-            };
-        }
-        
-        return TypedResults.Ok(registerResult.Value);
-    }
-
-    private static async Task<Results<Ok<string>, BadRequest<string>, Conflict<string>, InternalServerError<string>>> RegisterAsSeller(
-        [FromForm] RegisterAsSellerDto registerAsSellerDto,
-        [FromServices] IAuthService authService,
-        CancellationToken ct)
-    {
-        Result<string> registerResult = await authService.RegisterAsSellerAsync(registerAsSellerDto, ct);
-
-        if (!registerResult.IsSuccess)
-        {
-            string errorMessage = registerResult.ErrorMessage!;
-
-            return registerResult.StatusCode switch
-            {
-                HttpStatusCode.BadRequest => TypedResults.BadRequest(errorMessage),
-                HttpStatusCode.Conflict => TypedResults.Conflict(errorMessage),
-                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(errorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(RegisterAsSeller)} -> Unknown status code: {registerResult.StatusCode}")
+                _ => throw new Exception($"Endpoint: {nameof(Register)} -> Unknown status code: {registerResult.StatusCode}")
             };
         }
         

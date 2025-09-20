@@ -1,3 +1,5 @@
+using Admin.Endpoints.Extensions;
+using Admin.Infrastructure.Extensions;
 using Catalog.Endpoints.Extensions;
 using Catalog.Infrastructure.Extensions;
 using Customer.Endpoints.Extensions;
@@ -25,6 +27,7 @@ public static class WebApplicationExtension
         app.MapCustomerApi();
         app.MapSellerApi();
         app.MapOrderApi();
+        app.MapAdminApi();
     }
 
     public static async Task EnsureDatabaseExistAndMigrationsApplied(this WebApplication app)
@@ -38,6 +41,7 @@ public static class WebApplicationExtension
         await services.EnsureMediaSchemeExistAndMigrateAsync();
         await services.EnsureSellerSchemeExistAndMigrateAsync();
         await services.EnsureOrderSchemeExistAndMigrateAsync();
+        await services.EnsureAdminSchemeExistAndMigrateAsync();
     }
 
     public static async Task EnsureRolesValid(this WebApplication app)

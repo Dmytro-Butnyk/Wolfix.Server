@@ -18,7 +18,7 @@ namespace Seller.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("seller")
-                .HasAnnotation("ProductVersion", "9.0.8")
+                .HasAnnotation("ProductVersion", "9.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -74,13 +74,41 @@ namespace Seller.Infrastructure.Migrations
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("text");
 
+                    b.HasKey("Id");
+
+                    b.ToTable("Sellers", "seller");
+                });
+
+            modelBuilder.Entity("Seller.Domain.SellerApplicationAggregate.SellerApplication", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BlobResourceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("DocumentUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sellers", "seller");
+                    b.ToTable("SellerApplications", "seller");
                 });
 
             modelBuilder.Entity("Seller.Domain.SellerAggregate.Entities.SellerCategory", b =>
@@ -92,6 +120,131 @@ namespace Seller.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Seller");
+                });
+
+            modelBuilder.Entity("Seller.Domain.SellerApplicationAggregate.SellerApplication", b =>
+                {
+                    b.OwnsOne("Seller.Domain.SellerApplicationAggregate.ValueObjects.SellerProfileData", "SellerProfileData", b1 =>
+                        {
+                            b1.Property<Guid>("SellerApplicationId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("SellerApplicationId");
+
+                            b1.ToTable("SellerApplications", "seller");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SellerApplicationId");
+
+                            b1.OwnsOne("Shared.Domain.ValueObjects.Address", "Address", b2 =>
+                                {
+                                    b2.Property<Guid>("SellerProfileDataSellerApplicationId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<long?>("ApartmentNumber")
+                                        .HasColumnType("bigint")
+                                        .HasColumnName("ApartmentNumber");
+
+                                    b2.Property<string>("City")
+                                        .IsRequired()
+                                        .HasColumnType("text")
+                                        .HasColumnName("City");
+
+                                    b2.Property<long>("HouseNumber")
+                                        .HasColumnType("bigint")
+                                        .HasColumnName("HouseNumber");
+
+                                    b2.Property<string>("Street")
+                                        .IsRequired()
+                                        .HasColumnType("text")
+                                        .HasColumnName("Street");
+
+                                    b2.HasKey("SellerProfileDataSellerApplicationId");
+
+                                    b2.ToTable("SellerApplications", "seller");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("SellerProfileDataSellerApplicationId");
+                                });
+
+                            b1.OwnsOne("Shared.Domain.ValueObjects.BirthDate", "BirthDate", b2 =>
+                                {
+                                    b2.Property<Guid>("SellerProfileDataSellerApplicationId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<DateOnly>("Value")
+                                        .HasColumnType("date")
+                                        .HasColumnName("BirthDate");
+
+                                    b2.HasKey("SellerProfileDataSellerApplicationId");
+
+                                    b2.ToTable("SellerApplications", "seller");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("SellerProfileDataSellerApplicationId");
+                                });
+
+                            b1.OwnsOne("Shared.Domain.ValueObjects.FullName", "FullName", b2 =>
+                                {
+                                    b2.Property<Guid>("SellerProfileDataSellerApplicationId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<string>("FirstName")
+                                        .IsRequired()
+                                        .HasColumnType("text")
+                                        .HasColumnName("FirstName");
+
+                                    b2.Property<string>("LastName")
+                                        .IsRequired()
+                                        .HasColumnType("text")
+                                        .HasColumnName("LastName");
+
+                                    b2.Property<string>("MiddleName")
+                                        .IsRequired()
+                                        .HasColumnType("text")
+                                        .HasColumnName("MiddleName");
+
+                                    b2.HasKey("SellerProfileDataSellerApplicationId");
+
+                                    b2.ToTable("SellerApplications", "seller");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("SellerProfileDataSellerApplicationId");
+                                });
+
+                            b1.OwnsOne("Shared.Domain.ValueObjects.PhoneNumber", "PhoneNumber", b2 =>
+                                {
+                                    b2.Property<Guid>("SellerProfileDataSellerApplicationId")
+                                        .HasColumnType("uuid");
+
+                                    b2.Property<string>("Value")
+                                        .IsRequired()
+                                        .HasColumnType("text")
+                                        .HasColumnName("PhoneNumber");
+
+                                    b2.HasKey("SellerProfileDataSellerApplicationId");
+
+                                    b2.ToTable("SellerApplications", "seller");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("SellerProfileDataSellerApplicationId");
+                                });
+
+                            b1.Navigation("Address")
+                                .IsRequired();
+
+                            b1.Navigation("BirthDate")
+                                .IsRequired();
+
+                            b1.Navigation("FullName")
+                                .IsRequired();
+
+                            b1.Navigation("PhoneNumber")
+                                .IsRequired();
+                        });
+
+                    b.Navigation("SellerProfileData")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Seller.Domain.SellerAggregate.Seller", b =>

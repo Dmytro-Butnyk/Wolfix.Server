@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Seller.Application.Dto;
+using Seller.Application.Dto.Seller;
 using Seller.Application.Interfaces;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
@@ -18,6 +20,9 @@ internal static class SellerEndpoints
     {
         var sellerGroup = app.MapGroup(Route)
             .WithTags("Seller");
+
+        sellerGroup.MapGet("{sellerId:guid}", GetProfileInfo)
+            .WithSummary("Get profile info");
         
         var changeGroup = sellerGroup.MapGroup("{sellerId:guid}");
         MapChangeEndpoints(changeGroup);
@@ -38,6 +43,21 @@ internal static class SellerEndpoints
         
         group.MapPatch("birth-date", ChangeBirthDate)
             .WithSummary("Change birth date");
+    }
+
+    private static async Task<Results<Ok<SellerDto>, NotFound<string>>> GetProfileInfo(
+        [FromRoute] Guid sellerId,
+        [FromServices] ISellerService sellerService,
+        CancellationToken ct)
+    {
+        Result<SellerDto> getProfileInfoResult = await sellerService.GetProfileInfoAsync(sellerId, ct);
+
+        if (getProfileInfoResult.IsFailure)
+        {
+            return TypedResults.NotFound(getProfileInfoResult.ErrorMessage);
+        }
+        
+        return TypedResults.Ok(getProfileInfoResult.Value);
     }
 
     private static async Task<Results<Ok<FullNameDto>, NotFound<string>, BadRequest<string>>> ChangeFullName(

@@ -10,6 +10,8 @@ internal sealed class DeliveryMethodEntityConfiguration : IEntityTypeConfigurati
 {
     public void Configure(EntityTypeBuilder<DeliveryMethodAggregate> builder)
     {
+        builder.ToTable("DeliveryMethods");
+        
         ConfigureBasicProperties(builder);
         
         ConfigureCityRelation(builder);

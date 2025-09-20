@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Admin.Endpoints\Admin.Endpoints.csproj" />
       <ProjectReference Include="..\Catalog.Endpoints\Catalog.Endpoints.csproj" />
       <ProjectReference Include="..\Media.Api\Media.Api.csproj" />
       <ProjectReference Include="..\Customer.Endpoints\Customer.Endpoints.csproj" />

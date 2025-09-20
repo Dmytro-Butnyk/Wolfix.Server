@@ -1,5 +1,10 @@
 using System.Net;
+using Seller.Application.Dto;
+using Seller.Application.Dto.Seller;
 using Seller.Application.Interfaces;
+using Seller.Application.Mapping;
+using Seller.Application.Mapping.Seller;
+using Seller.Domain.Enums;
 using Seller.Domain.Interfaces;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
@@ -107,5 +112,20 @@ internal sealed class SellerService(ISellerRepository sellerRepository) : ISelle
         await sellerRepository.SaveChangesAsync(ct);
         
         return Result<string>.Success(request.BirthDate.ToString("dd-MM-yyyy"));
+    }
+
+    public async Task<Result<SellerDto>> GetProfileInfoAsync(Guid sellerId, CancellationToken ct)
+    {
+        var seller = await sellerRepository.GetProfileInfoAsync(sellerId, ct);
+
+        if (seller is null)
+        {
+            return Result<SellerDto>.Failure(
+                $"Seller with id: {sellerId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        return Result<SellerDto>.Success(seller.ToDto());
     }
 }

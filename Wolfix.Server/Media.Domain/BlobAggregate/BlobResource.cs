@@ -25,11 +25,9 @@ public sealed class BlobResource : BaseEntity
             return Result<BlobResource>.Failure("Invalid blob resource type");
         }
 
-        string name = $"{Guid.NewGuid():N}-{type.ToString().ToLowerInvariant()}";
+        var name = $"{Guid.NewGuid():N}-{type.ToString().ToLowerInvariant()}";
 
-        BlobResource blobResource = new BlobResource(name, type);
-
-        return Result<BlobResource>.Success(blobResource);
+        return Result<BlobResource>.Success(new(name, type));
     }
 
     public VoidResult ChangeName(string name)

@@ -9,6 +9,8 @@ internal sealed class PostMachineEntityConfiguration : IEntityTypeConfiguration<
 {
     public void Configure(EntityTypeBuilder<PostMachine> builder)
     {
+        builder.ToTable("PostMachines");
+        
         ConfigureBasicProperties(builder);
         
         ConfigureCityRelation(builder);

@@ -11,9 +11,7 @@ using Shared.IntegrationEvents.Interfaces;
 
 namespace Media.Application.EventHandlers;
 
-public sealed class CategoryAndProductsDeletedEventHandler(
-    IBlobResourceRepository blobResourceRepository,
-    IBlobResourceService blobResourceService)
+public sealed class CategoryAndProductsDeletedEventHandler(IBlobResourceService blobResourceService)
     : IIntegrationEventHandler<CategoryAndProductsDeleted>
 {
     public async Task<VoidResult> HandleAsync(CategoryAndProductsDeleted @event, CancellationToken ct)

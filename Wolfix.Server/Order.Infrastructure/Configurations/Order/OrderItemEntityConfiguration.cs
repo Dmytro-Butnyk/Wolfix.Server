@@ -9,6 +9,8 @@ internal sealed class OrderItemEntityConfiguration : IEntityTypeConfiguration<Or
 {
     public void Configure(EntityTypeBuilder<OrderItem> builder)
     {
+        builder.ToTable("OrderItems");
+        
         ConfigureBasicProperties(builder);
         
         ConfigureOrderRelation(builder);

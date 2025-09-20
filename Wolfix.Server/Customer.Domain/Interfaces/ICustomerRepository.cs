@@ -10,4 +10,6 @@ public interface ICustomerRepository : IBaseRepository<Customer.Domain.CustomerA
     Task<IReadOnlyCollection<CartItemProjection>> GetCartItemsAsync(Guid customerId, CancellationToken ct);
     
     Task<Guid?> GetIdByAccountIdAsync(Guid accountId, CancellationToken ct);
+    
+    Task<CustomerProjection?> GetProfileInfoAsync(Guid customerId, CancellationToken ct);
 }
