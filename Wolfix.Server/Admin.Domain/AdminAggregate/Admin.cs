@@ -11,8 +11,7 @@ public sealed class Admin : BaseEntity
     public FullName FullName { get; private set; }
     
     public PhoneNumber PhoneNumber { get; private set; }
-    //todo: дописать логику чтобы админ мог подтверждать/отменять заявки на продавца
-    // и возможно ещё добавить сущность/таблицу SellerCategoryApplication
+    //todo: возможно ещё добавить сущность/таблицу SellerCategoryApplication
     // для того чтобы уже для существующих продавцов подавать заявки на новую категорию для продаж
     private Admin() { }
 

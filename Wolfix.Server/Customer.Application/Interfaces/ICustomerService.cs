@@ -27,4 +27,8 @@ public interface ICustomerService
     Task<Result<string>> ChangeBirthDateAsync(Guid customerId, ChangeBirthDateDto request, CancellationToken ct);
     
     Task<Result<CustomerDto>> GetProfileInfoAsync(Guid customerId, CancellationToken ct);
+    
+    Task<VoidResult> DeleteFavoriteItemAsync(Guid customerId, Guid favoriteItemId, CancellationToken ct);
+    
+    Task<VoidResult> DeleteCartItemAsync(Guid customerId, Guid cartItemId, CancellationToken ct);
 }

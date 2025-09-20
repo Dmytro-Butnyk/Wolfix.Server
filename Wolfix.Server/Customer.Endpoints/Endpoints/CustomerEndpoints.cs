@@ -45,6 +45,9 @@ internal static class CustomerEndpoints
         
         group.MapPost("", AddProductToFavorite)
             .WithSummary("Add product to favorite");
+        
+        group.MapDelete("{customerId:guid}/{favoriteItemId:guid}", DeleteFavoriteItem)
+            .WithSummary("Delete favorite item");
     }
 
     private static void MapCartItemsEndpoints(RouteGroupBuilder group)
@@ -54,6 +57,9 @@ internal static class CustomerEndpoints
         
         group.MapPost("", AddProductToCart)
             .WithSummary("Add product to cart");
+        
+        group.MapDelete("{customerId:guid}/{cartItemId:guid}", DeleteCartItem)
+            .WithSummary("Delete cart item");
     }
 
     private static void MapChangeMethods(RouteGroupBuilder group)
@@ -135,6 +141,22 @@ internal static class CustomerEndpoints
         return TypedResults.NoContent();
     }
 
+    private static async Task<Results<NoContent, NotFound<string>>> DeleteFavoriteItem(
+        [FromRoute] Guid customerId,
+        [FromRoute] Guid favoriteItemId,
+        [FromServices] ICustomerService customerService,
+        CancellationToken ct)
+    {
+        VoidResult deleteFavoriteItemResult = await customerService.DeleteFavoriteItemAsync(customerId, favoriteItemId, ct);
+
+        if (deleteFavoriteItemResult.IsFailure)
+        {
+            return TypedResults.NotFound(deleteFavoriteItemResult.ErrorMessage);
+        }
+        
+        return TypedResults.NoContent();
+    }
+
     private static async Task<Results<NoContent, NotFound<string>>> AddProductToCart(
         [FromBody] AddProductToCartDto request,
         [FromServices] ICustomerService customerService,
@@ -145,6 +167,22 @@ internal static class CustomerEndpoints
         if (!addProductToCartResult.IsSuccess)
         {
             return TypedResults.NotFound(addProductToCartResult.ErrorMessage);
+        }
+        
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, NotFound<string>>> DeleteCartItem(
+        [FromRoute] Guid customerId,
+        [FromRoute] Guid cartItemId,
+        [FromServices] ICustomerService customerService,
+        CancellationToken ct)
+    {
+        VoidResult deleteCartItemResult = await customerService.DeleteCartItemAsync(customerId, cartItemId, ct);
+
+        if (deleteCartItemResult.IsFailure)
+        {
+            return TypedResults.NotFound(deleteCartItemResult.ErrorMessage);
         }
         
         return TypedResults.NoContent();
