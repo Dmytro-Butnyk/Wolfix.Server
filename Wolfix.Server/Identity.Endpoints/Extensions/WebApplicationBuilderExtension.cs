@@ -19,6 +19,7 @@ public static class WebApplicationBuilderExtension
         );
         
         services.AddIdentityApplicationServices();
+        services.AddIdentityEventHandlers();
         
         return services;
     }

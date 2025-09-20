@@ -1,7 +1,11 @@
+using System.Net;
 using Media.IntegrationEvents.Dto;
 using Seller.Application.Dto.SellerApplication;
 using Seller.Application.Interfaces;
+using Seller.Application.Mapping.SellerApplication;
 using Seller.Domain.Interfaces;
+using Seller.Domain.Interfaces.DomainServices;
+using Seller.Domain.Projections.SellerApplication;
 using Seller.Domain.SellerApplicationAggregate;
 using Seller.Domain.SellerApplicationAggregate.Enums;
 using Seller.IntegrationEvents;
@@ -12,7 +16,8 @@ namespace Seller.Application.Services;
 
 internal sealed class SellerApplicationService(
     ISellerApplicationRepository sellerApplicationRepository,
-    IEventBus eventBus) 
+    IEventBus eventBus,
+    ISellerDomainService sellerDomainService) 
     : ISellerApplicationService
 {
     public async Task<VoidResult> CreateAsync(Guid accountId, CreateSellerApplicationDto request, CancellationToken ct)
@@ -64,9 +69,9 @@ internal sealed class SellerApplicationService(
 
         (Guid blobResourceId, string documentUrl) = createBlobResourceResult.Value!;
         
-        Result<SellerApplication> createSellerApplicationResult = SellerApplication.Create(accountId, request.CategoryName,
-            blobResourceId, documentUrl, request.FirstName, request.LastName, request.MiddleName, request.PhoneNumber,
-            request.City, request.Street, request.HouseNumber, request.ApartmentNumber, request.BirthDate);
+        Result<SellerApplication> createSellerApplicationResult = SellerApplication.Create(accountId, request.CategoryId,
+            request.CategoryName, blobResourceId, documentUrl, request.FirstName, request.LastName, request.MiddleName,
+            request.PhoneNumber, request.City, request.Street, request.HouseNumber, request.ApartmentNumber, request.BirthDate);
 
         if (createSellerApplicationResult.IsFailure)
         {
@@ -76,6 +81,87 @@ internal sealed class SellerApplicationService(
         SellerApplication sellerApplication = createSellerApplicationResult.Value!;
 
         await sellerApplicationRepository.AddAsync(sellerApplication, ct);
+        await sellerApplicationRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<IReadOnlyCollection<SellerApplicationDto>> GetPendingApplicationsAsync(CancellationToken ct)
+    {
+        IReadOnlyCollection<SellerApplicationProjection> pendingApplications = 
+            await sellerApplicationRepository.GetPendingApplicationsAsync(ct);
+
+        return pendingApplications
+            .Select(pa => pa.ToDto())
+            .ToList();
+    }
+
+    public async Task<VoidResult> ApproveApplicationAsync(Guid sellerApplicationId, CancellationToken ct)
+    {
+        SellerApplication? application = await sellerApplicationRepository.GetByIdAsync(sellerApplicationId, ct);
+
+        if (application is null)
+        {
+            return VoidResult.Failure(
+                $"Seller application with id: {sellerApplicationId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        VoidResult approveApplicationResult = application.Approve();
+
+        if (approveApplicationResult.IsFailure)
+        {
+            return approveApplicationResult;
+        }
+
+        VoidResult addSellerRoleToAccountResult = await eventBus.PublishWithoutResultAsync(new SellerApplicationApproved
+        {
+            AccountId = application.AccountId
+        }, ct);
+
+        if (addSellerRoleToAccountResult.IsFailure)
+        {
+            return addSellerRoleToAccountResult;
+        }
+        
+        await sellerApplicationRepository.SaveChangesAsync(ct);
+
+        VoidResult createSellerResult = await sellerDomainService.CreateSellerWithFirstCategoryAsync(
+            application.AccountId,
+            application.SellerProfileData,
+            application.CategoryId,
+            application.CategoryName,
+            ct
+        );
+
+        if (createSellerResult.IsFailure)
+        {
+            return createSellerResult;
+        }
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> RejectApplicationAsync(Guid sellerApplicationId, CancellationToken ct)
+    {
+        SellerApplication? application = await sellerApplicationRepository.GetByIdAsync(sellerApplicationId, ct);
+
+        if (application is null)
+        {
+            return VoidResult.Failure(
+                $"Seller application with id: {sellerApplicationId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        VoidResult rejectApplicationResult = application.Reject();
+
+        if (rejectApplicationResult.IsFailure)
+        {
+            return rejectApplicationResult;
+        }
+        
         await sellerApplicationRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();

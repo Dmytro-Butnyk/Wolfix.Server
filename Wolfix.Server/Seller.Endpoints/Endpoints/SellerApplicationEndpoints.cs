@@ -22,6 +22,15 @@ internal static class SellerApplicationEndpoints
         sellerApplicationGroup.MapPost("{accountId:guid}", CreateApplication)
             .DisableAntiforgery()
             .WithSummary("Create application to be a seller");
+        
+        sellerApplicationGroup.MapGet("", GetAllPendingApplications)
+            .WithSummary("Get all pending applications");
+        
+        sellerApplicationGroup.MapPatch("{sellerApplicationId:guid}/approve", ApproveApplication)
+            .WithSummary("Approve application");
+        
+        sellerApplicationGroup.MapPatch("{sellerApplicationId:guid}/reject", RejectApplication)
+            .WithSummary("Reject application");
     }
 
     private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>>> CreateApplication(
@@ -39,6 +48,59 @@ internal static class SellerApplicationEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(createApplicationResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(createApplicationResult.ErrorMessage),
                 _ => throw new Exception($"Endpoint: {nameof(CreateApplication)} -> Unknown status code: {createApplicationResult.StatusCode}")
+            };
+        }
+        
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Ok<IReadOnlyCollection<SellerApplicationDto>>> GetAllPendingApplications(
+        [FromServices] ISellerApplicationService sellerApplicationService,
+        CancellationToken ct)
+    {
+        IReadOnlyCollection<SellerApplicationDto> pendingApplications =
+            await sellerApplicationService.GetPendingApplicationsAsync(ct);
+        
+        return TypedResults.Ok(pendingApplications);
+    }
+
+    private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>, InternalServerError<string>, Conflict<string>>>
+        ApproveApplication(
+            [FromRoute] Guid sellerApplicationId,
+            [FromServices] ISellerApplicationService sellerApplicationService,
+            CancellationToken ct)
+    {
+        VoidResult approveApplicationResult = await sellerApplicationService.ApproveApplicationAsync(sellerApplicationId, ct);
+
+        if (approveApplicationResult.IsFailure)
+        {
+            return approveApplicationResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(approveApplicationResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(approveApplicationResult.ErrorMessage),
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(approveApplicationResult.ErrorMessage),
+                HttpStatusCode.Conflict => TypedResults.Conflict(approveApplicationResult.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(ApproveApplication)} -> Unknown status code: {approveApplicationResult.StatusCode}")
+            };
+        }
+        
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>>> RejectApplication(
+        [FromRoute] Guid sellerApplicationId,
+        [FromServices] ISellerApplicationService sellerApplicationService,
+        CancellationToken ct)
+    {
+        VoidResult rejectApplicationResult = await sellerApplicationService.RejectApplicationAsync(sellerApplicationId, ct);
+
+        if (rejectApplicationResult.IsFailure)
+        {
+            return rejectApplicationResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(rejectApplicationResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(rejectApplicationResult.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(RejectApplication)} -> Unknown status code: {rejectApplicationResult.StatusCode}")
             };
         }
         

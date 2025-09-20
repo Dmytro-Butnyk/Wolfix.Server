@@ -3,6 +3,7 @@ using Seller.Application.Dto;
 using Seller.Application.Dto.Seller;
 using Seller.Application.Interfaces;
 using Seller.Application.Mapping;
+using Seller.Application.Mapping.Seller;
 using Seller.Domain.Enums;
 using Seller.Domain.Interfaces;
 using Shared.Application.Dto;

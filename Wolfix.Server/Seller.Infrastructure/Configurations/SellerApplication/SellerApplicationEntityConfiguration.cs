@@ -22,6 +22,9 @@ internal sealed class SellerApplicationEntityConfiguration : IEntityTypeConfigur
         builder.Property(sa => sa.AccountId)
             .IsRequired();
 
+        builder.Property(sa => sa.CategoryId)
+            .IsRequired();
+
         builder.Property(sa => sa.CategoryName)
             .IsRequired();
 

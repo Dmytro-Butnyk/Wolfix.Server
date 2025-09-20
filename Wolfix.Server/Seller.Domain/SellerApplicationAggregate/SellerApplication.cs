@@ -9,6 +9,8 @@ public sealed class SellerApplication : BaseEntity
 {
     public Guid AccountId { get; private set; }
     
+    public Guid CategoryId { get; private set; }
+    
     public string CategoryName { get; private set; }
     
     public Guid BlobResourceId { get; private set; }
@@ -21,22 +23,28 @@ public sealed class SellerApplication : BaseEntity
 
     private SellerApplication() { }
 
-    private SellerApplication(Guid accountId, string categoryName, Guid blobResourceId, string documentUrl, SellerProfileData sellerProfileData)
+    private SellerApplication(Guid accountId, Guid categoryId, string categoryName, Guid blobResourceId, string documentUrl, SellerProfileData sellerProfileData)
     {
         AccountId = accountId;
+        CategoryId = categoryId;
         CategoryName = categoryName;
         BlobResourceId = blobResourceId;
         DocumentUrl = documentUrl;
         SellerProfileData = sellerProfileData;
     }
 
-    public static Result<SellerApplication> Create(Guid accountId, string categoryName, Guid blobResourceId, string documentUrl,
-        string firstName, string lastName, string middleName, string phoneNumber, string city, string street,
+    public static Result<SellerApplication> Create(Guid accountId, Guid categoryId, string categoryName, Guid blobResourceId,
+        string documentUrl, string firstName, string lastName, string middleName, string phoneNumber, string city, string street,
         uint houseNumber, uint? apartmentNumber, DateOnly birthDate)
     {
         if (accountId == Guid.Empty)
         {
             return Result<SellerApplication>.Failure($"{nameof(accountId)} cannot be empty");
+        }
+
+        if (categoryId == Guid.Empty)
+        {
+            return Result<SellerApplication>.Failure($"{nameof(categoryId)} cannot be empty");
         }
         
         if (string.IsNullOrWhiteSpace(categoryName))
@@ -64,7 +72,7 @@ public sealed class SellerApplication : BaseEntity
 
         SellerProfileData sellerProfileData = createSellerProfileDataResult.Value!;
 
-        return Result<SellerApplication>.Success(new(accountId, categoryName,
+        return Result<SellerApplication>.Success(new(accountId, categoryId, categoryName,
             blobResourceId,documentUrl, sellerProfileData));
     }
 

@@ -12,6 +12,7 @@ public static class WebApplicationBuilderExtension
         services.AddSellerRepositories();
         services.AddSellerApplicationServices();
         services.AddSellerEventHandlers();
+        services.AddSellerDomainServices();
 
         return services;
     }
