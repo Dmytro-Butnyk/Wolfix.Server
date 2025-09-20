@@ -457,14 +457,24 @@ internal sealed class ProductService(
 
         return Result<IReadOnlyCollection<ProductShortDto>>.Success(randomProductsDto);
     }
-
-    //TODO: implement full products search
+    
     public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetBySearchQueryAsync(
         string searchQuery,
         int pageSize,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(searchQuery))
+        {
+            return Result<IReadOnlyCollection<ProductShortDto>>.Failure("Search query is null or empty");
+        }
+        
+        IReadOnlyCollection<ProductShortProjection> productShortProjections = await productRepository
+            .GetBySearchQueryAsync(searchQuery, pageSize, ct);
+
+        IReadOnlyCollection<ProductShortDto> productShortDtos =
+            productShortProjections.Select(p => p.ToShortDto()).ToList();
+
+        return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
     }
 
     public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetBySearchQueryAndCategoryAsync(

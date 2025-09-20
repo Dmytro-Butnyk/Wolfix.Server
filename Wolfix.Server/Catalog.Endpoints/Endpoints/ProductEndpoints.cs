@@ -60,8 +60,11 @@ internal static class ProductEndpoints
         group.MapGet("random", GetRandom)
             .WithSummary("Get random products");
         
-        group.MapGet("category/{categoryId:guid}", GetSearchByCategory)
+        group.MapGet("search/category/{categoryId:guid}", GetSearchByCategory)
             .WithSummary("Get products by search query and category");
+        
+        group.MapGet("search", GetSearch)
+            .WithSummary("Get products by search query");
     }
 
     private static void MapReviewEndpoints(RouteGroupBuilder group)
@@ -305,6 +308,28 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getProductsBySearchQueryAndCategoryResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(getProductsBySearchQueryAndCategoryResult.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(ChangeProductMainPhoto)} -> Unknown status code: {getProductsBySearchQueryAndCategoryResult.StatusCode}")
+            };
+        }
+
+        return TypedResults.Ok(getProductsBySearchQueryAndCategoryResult.Value);
+    }
+    
+    private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>>>
+        GetSearch(
+            [FromQuery] string searchQuery,
+            [FromServices] IProductService productService,
+            CancellationToken ct,
+            [FromQuery] int pageSize = 20)
+    {
+        Result<IReadOnlyCollection<ProductShortDto>> getProductsBySearchQueryAndCategoryResult =
+            await productService.GetBySearchQueryAsync(searchQuery, pageSize, ct);
+
+        if (!getProductsBySearchQueryAndCategoryResult.IsSuccess)
+        {
+            return getProductsBySearchQueryAndCategoryResult.StatusCode switch
+            {
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(getProductsBySearchQueryAndCategoryResult.ErrorMessage),
                 _ => throw new Exception($"Endpoint: {nameof(ChangeProductMainPhoto)} -> Unknown status code: {getProductsBySearchQueryAndCategoryResult.StatusCode}")
             };
         }

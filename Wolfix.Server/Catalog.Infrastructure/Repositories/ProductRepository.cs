@@ -232,7 +232,24 @@ internal sealed class ProductRepository(CatalogContext context)
     public async Task<IReadOnlyCollection<ProductShortProjection>> GetBySearchQueryAsync(string searchQuery,
         int pageSize, CancellationToken ct)
     {
-        throw new NotImplementedException();
+        const double threshold = 0.30; // можно варьировать 0.25..0.45
+
+        return await _products
+            .Include("_productMedias")
+            .AsNoTracking()
+            .Where(p =>
+                EF.Functions.TrigramsSimilarity(p.Title, searchQuery) > threshold)
+            .OrderByDescending(p => EF.Functions.TrigramsSimilarity(p.Title, searchQuery))
+            .Take(pageSize)
+            .Select(product => new ProductShortProjection(
+                product.Id,
+                product.Title,
+                product.AverageRating,
+                product.Price,
+                product.FinalPrice,
+                product.Bonuses,
+                product.MainPhotoUrl))
+            .ToListAsync(ct);
     }
 
     public async Task<IReadOnlyCollection<ProductShortProjection>> GetBySearchQueryAndCategoryAsync(
@@ -241,6 +258,7 @@ internal sealed class ProductRepository(CatalogContext context)
         const double threshold = 0.30; // можно варьировать 0.25..0.45
 
         return await _products
+            .Include("_productMedias")
             .AsNoTracking()
             .Where(p => p.CategoryId == categoryId &&
                         // использовать TrigramsSimilarity (возвращает double 0..1)
