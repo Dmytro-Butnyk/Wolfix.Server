@@ -45,7 +45,7 @@ internal sealed class CatalogContext : DbContext, IContextWithConfigurations
     // {
     //     if (optionsBuilder.IsConfigured) return;
     //     
-    //     optionsBuilder.UseNpgsql(connectionString);
+    //     optionsBuilder.UseNpgsql();
     // }
     
     internal DbSet<Product> Products { get; set; } // Aggregate 
