@@ -32,7 +32,13 @@ internal sealed class ProductService(
     public async Task<VoidResult> AddProductAsync(
         AddProductDto addProductDto, CancellationToken ct)
     {
-        
+        VoidResult checkSellerExistsResult = await eventBus.PublishWithoutResultAsync(
+            new CheckSellerExistsForProductAddition(addProductDto.SellerId), ct);
+
+        if (checkSellerExistsResult.IsFailure)
+        {
+            return VoidResult.Failure(checkSellerExistsResult);
+        }
         
         ProductStatus productStatus;
 

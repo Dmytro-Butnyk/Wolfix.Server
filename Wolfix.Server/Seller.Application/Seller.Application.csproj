@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Catalog.IntegrationEvents\Catalog.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Identity.IntegrationEvents\Identity.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Media.IntegrationEvents\Media.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Seller.Domain\Seller.Domain.csproj" />

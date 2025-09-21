@@ -1,3 +1,4 @@
+using Catalog.IntegrationEvents;
 using Identity.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
 using Seller.Application.EventHandlers;
@@ -23,7 +24,9 @@ public static class DependencyInjection
     {
         services.AddScoped<IIntegrationEventHandler<SellerAccountCreated, Guid>, SellerAccountCreatedEventHandler>();
         services.AddScoped<IIntegrationEventHandler<GetSellerProfileId, Guid>, GetSellerProfileIdEventHandler>();
-
+        services
+            .AddScoped<IIntegrationEventHandler<CheckSellerExistsForProductAddition>,
+                CheckSellerExistsForProductAdditionEventHandler>();
         return services;
     }
 
