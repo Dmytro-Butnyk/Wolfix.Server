@@ -1,6 +1,9 @@
+using Admin.Application.EventHandlers;
 using Admin.Application.Interfaces;
 using Admin.Application.Services;
+using Identity.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.IntegrationEvents.Interfaces;
 
 namespace Admin.Application.Extensions;
 
@@ -10,6 +13,13 @@ public static class DependencyInjection
     {
         services.AddScoped<IAdminService, AdminService>();
 
+        return services;
+    }
+
+    public static IServiceCollection AddAdminEventHandlers(this IServiceCollection services)
+    {
+        services.AddScoped<IIntegrationEventHandler<GetAdminProfileId, Guid>, GetAdminProfileIdEventHandler>();
+        
         return services;
     }
 }

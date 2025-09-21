@@ -12,6 +12,7 @@ public static class WebApplicationBuilderExtension
         services.AddAdminRepositories();
 
         services.AddAdminApplicationServices();
+        services.AddAdminEventHandlers();
 
         return services;
     }
