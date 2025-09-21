@@ -21,15 +21,19 @@ internal static class SellerApplicationEndpoints
         
         sellerApplicationGroup.MapPost("{accountId:guid}", CreateApplication)
             .DisableAntiforgery()
+            .RequireAuthorization("Customer")
             .WithSummary("Create application to be a seller");
         
         sellerApplicationGroup.MapGet("", GetAllPendingApplications)
+            .RequireAuthorization("Admin")
             .WithSummary("Get all pending applications");
         
         sellerApplicationGroup.MapPatch("{sellerApplicationId:guid}/approve", ApproveApplication)
+            .RequireAuthorization("Admin")
             .WithSummary("Approve application");
         
         sellerApplicationGroup.MapPatch("{sellerApplicationId:guid}/reject", RejectApplication)
+            .RequireAuthorization("Admin")
             .WithSummary("Reject application");
     }
 

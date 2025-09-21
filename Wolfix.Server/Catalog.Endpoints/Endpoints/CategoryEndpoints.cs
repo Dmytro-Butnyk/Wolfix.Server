@@ -37,6 +37,7 @@ internal static class CategoryEndpoints
             .WithSummary("Get all child categories");
 
         group.MapGet("child/{childId:guid}/attributes", GetAllAttributesByCategory)
+            .RequireAuthorization("Seller")
             .WithSummary("Get all attributes by specific category");
         
         group.MapGet("child/{childId:guid}/attributes-with-values", GetAllAttributesWithUniqueValues)
@@ -47,31 +48,40 @@ internal static class CategoryEndpoints
     {
         group.MapPost("", AddParent)
             .DisableAntiforgery()
+            .RequireAuthorization("Admin")
             .WithSummary("Add parent category");
         
         group.MapPatch("{categoryId:guid}", ChangeParent)
+            .RequireAuthorization("Admin")
             .WithSummary("Change parent category");
 
         group.MapDelete("{categoryId:guid}", DeleteCategory)
+            .RequireAuthorization("Admin")
             .WithSummary("Delete category");
         
         group.MapPost("{parentId:guid}", AddChild)
             .DisableAntiforgery()
+            .RequireAuthorization("Admin")
             .WithSummary("Add child category");
         
         group.MapPatch("child/{childCategoryId:guid}", ChangeChild)
+            .RequireAuthorization("Admin")
             .WithSummary("Change child category");
         
         group.MapPost("child/{childCategoryId:guid}/attributes", AddAttribute)
+            .RequireAuthorization("Admin")
             .WithSummary("Add attribute to child category");
         
         group.MapDelete("child/{childCategoryId:guid}/attributes/{attributeId:guid}", DeleteAttribute)
+            .RequireAuthorization("Admin")
             .WithSummary("Delete attribute of child category");
 
         group.MapPost("child/{childCategoryId:guid}/variants", AddVariant)
+            .RequireAuthorization("Admin")
             .WithSummary("Add variant to child category");
 
         group.MapDelete("child/{childCategoryId:guid}/variants/{variantId:guid}", DeleteVariant)
+            .RequireAuthorization("Admin")
             .WithSummary("Delete variant of child category");
     }
 

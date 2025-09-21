@@ -22,26 +22,35 @@ internal static class SellerEndpoints
             .WithTags("Seller");
 
         sellerGroup.MapGet("{sellerId:guid}", GetProfileInfo)
+            .RequireAuthorization("Seller")
             .WithSummary("Get profile info");
         
         var changeGroup = sellerGroup.MapGroup("{sellerId:guid}");
         MapChangeEndpoints(changeGroup);
-        
+
+        changeGroup.MapGet("categories", GetAllSellerCategories)
+            .RequireAuthorization("Seller")
+            .WithSummary("Get all seller categories");
+
         //todo: ендпоинт для смены фото
     }
     
     private static void MapChangeEndpoints(RouteGroupBuilder group)
     {
         group.MapPatch("full-name", ChangeFullName)
+            .RequireAuthorization("Seller")
             .WithSummary("Change full name");
         
         group.MapPatch("phone-number", ChangePhoneNumber)
+            .RequireAuthorization("Seller")
             .WithSummary("Change phone number");
         
         group.MapPatch("address", ChangeAddress)
+            .RequireAuthorization("Seller")
             .WithSummary("Change address");
         
         group.MapPatch("birth-date", ChangeBirthDate)
+            .RequireAuthorization("Seller")
             .WithSummary("Change birth date");
     }
 
@@ -58,6 +67,21 @@ internal static class SellerEndpoints
         }
         
         return TypedResults.Ok(getProfileInfoResult.Value);
+    }
+
+    private static async Task<Results<Ok<IReadOnlyCollection<SellerCategoryDto>>, NotFound<string>>> GetAllSellerCategories(
+        [FromRoute] Guid sellerId,
+        [FromServices] ISellerService sellerService,
+        CancellationToken ct)
+    {
+        Result<IReadOnlyCollection<SellerCategoryDto>> getSellerCategories = await sellerService.GetAllSellerCategoriesAsync(sellerId, ct);
+
+        if (getSellerCategories.IsFailure)
+        {
+            return TypedResults.NotFound(getSellerCategories.ErrorMessage);
+        }
+
+        return TypedResults.Ok(getSellerCategories.Value!);
     }
 
     private static async Task<Results<Ok<FullNameDto>, NotFound<string>, BadRequest<string>>> ChangeFullName(

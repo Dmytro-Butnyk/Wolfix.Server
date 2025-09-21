@@ -6,6 +6,7 @@ using Seller.Application.Mapping;
 using Seller.Application.Mapping.Seller;
 using Seller.Domain.Enums;
 using Seller.Domain.Interfaces;
+using Seller.Domain.SellerAggregate.Entities;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
 
@@ -127,5 +128,32 @@ internal sealed class SellerService(ISellerRepository sellerRepository) : ISelle
         }
 
         return Result<SellerDto>.Success(seller.ToDto());
+    }
+
+    public async Task<Result<IReadOnlyCollection<SellerCategoryDto>>> GetAllSellerCategoriesAsync(Guid sellerId, CancellationToken ct)
+    {
+        var seller = await sellerRepository.GetByIdAsNoTrackingAsync(sellerId, ct, "_sellerCategories");
+
+        if (seller is null)
+        {
+            return Result<IReadOnlyCollection<SellerCategoryDto>>.Failure(
+                $"Seller with id: {sellerId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        if (seller.SellerCategories.Count == 0)
+        {
+            return Result<IReadOnlyCollection<SellerCategoryDto>>.Failure(
+                $"Seller does not have any categories",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        IReadOnlyCollection<SellerCategoryDto> dto = seller.SellerCategories
+            .Select(sc => new SellerCategoryDto(sc.Id, sc.Name))
+            .ToList();
+        
+        return Result<IReadOnlyCollection<SellerCategoryDto>>.Success(dto);
     }
 }

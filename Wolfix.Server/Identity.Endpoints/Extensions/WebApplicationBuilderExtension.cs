@@ -20,6 +20,7 @@ public static class WebApplicationBuilderExtension
         
         services.AddIdentityApplicationServices();
         services.AddIdentityEventHandlers();
+        services.AddJwtBearer(tokenKey);
         
         return services;
     }

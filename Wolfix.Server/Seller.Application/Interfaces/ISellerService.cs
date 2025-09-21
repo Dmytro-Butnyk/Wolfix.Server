@@ -16,4 +16,6 @@ public interface ISellerService
     Task<Result<string>> ChangeBirthDateAsync(Guid sellerId, ChangeBirthDateDto request, CancellationToken ct);
     
     Task<Result<SellerDto>> GetProfileInfoAsync(Guid sellerId, CancellationToken ct);
+    
+    Task<Result<IReadOnlyCollection<SellerCategoryDto>>> GetAllSellerCategoriesAsync(Guid sellerId, CancellationToken ct);
 }

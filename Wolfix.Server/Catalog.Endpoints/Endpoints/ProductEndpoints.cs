@@ -34,16 +34,20 @@ internal static class ProductEndpoints
     {
         group.MapPost("", AddProduct)
             .DisableAntiforgery()
+            .RequireAuthorization("Seller")
             .WithSummary("Add product");
 
         group.MapPatch("product/{productId:guid}/new-main-photo/{newMainPhotoId:guid}", ChangeProductMainPhoto)
+            .RequireAuthorization("Seller")
             .WithSummary("Change product main photo");
 
         group.MapPatch("add-product-media", AddProductMedia)
             .DisableAntiforgery()
+            .RequireAuthorization("Seller")
             .WithSummary("Add product media");
 
         group.MapDelete("product/{productId:guid}/media/{mediaId:guid}", DeleteProductMedia)
+            .RequireAuthorization("Seller")
             .WithSummary("Delete product media");
         
         group.MapGet("product/{productId:guid}", GetProductFullInfo)
@@ -77,6 +81,7 @@ internal static class ProductEndpoints
             .WithSummary("Get all reviews by specific product");
         
         group.MapPost("", AddReview)
+            .RequireAuthorization("Customer")
             .WithSummary("Add review");
     }
 

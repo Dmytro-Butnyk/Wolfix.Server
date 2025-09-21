@@ -2,4 +2,4 @@
 
 namespace Catalog.IntegrationEvents;
 
-public sealed record CheckSellerExistsForProductAddition(Guid SellerId) : IIntegrationEvent;
+public sealed record CheckSellerExistsForProductAddition(Guid SellerId, Guid CategoryId) : IIntegrationEvent;

@@ -4,6 +4,7 @@ using Customer.Endpoints.Extensions;
 using Identity.Endpoints.Extensions;
 using Media.Api;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.OpenApi.Models;
 using Order.Endpoints.Extensions;
 using Seller.Endpoints.Extensions;
 using Shared.Application.Extensions;
@@ -95,17 +96,6 @@ public static class WebApplicationBuilderExtension
         return builder;
     }
     
-    //
-    // public static WebApplicationBuilder AddIntegrationServices(this WebApplicationBuilder builder)
-    // {
-    //     
-    // }
-    //
-    // public static WebApplicationBuilder AddOptions(this WebApplicationBuilder builder)
-    // {
-    //     
-    // }
-    //
     public static WebApplicationBuilder AddAppCache(this WebApplicationBuilder builder)
     {
         builder.Services.AddMemoryCache();
@@ -114,17 +104,7 @@ public static class WebApplicationBuilderExtension
         
         return builder;
     }
-    //
-    // public static WebApplicationBuilder AddFluentValidation(this WebApplicationBuilder builder)
-    // {
-    //     
-    // }
-    //
-    // public static WebApplicationBuilder AddSerilogLogger(this WebApplicationBuilder builder)
-    // {
-    //     
-    // }
-    //
+    
     public static WebApplicationBuilder AddCors(this WebApplicationBuilder builder)
     {
         builder.Services.AddCors(options =>
@@ -140,12 +120,40 @@ public static class WebApplicationBuilderExtension
 
         return builder;
     }
-    //
-    // public static WebApplicationBuilder AddJwtBearer(this WebApplicationBuilder builder)
-    // {
-    //     
-    // }
-    //
+    
+    public static WebApplicationBuilder AddSwaggerJwtBearer(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+            {
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                Description =
+                    "Input your JWT token in the 'Authorization' header like this: \"Authorization: Bearer {yourJWT}\""
+            });
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
+
+        return builder;
+    }
+    
     public static WebApplicationBuilder AddResponseCompression(this WebApplicationBuilder builder)
     {
         builder.Services.AddResponseCompression(options =>

@@ -35,7 +35,7 @@ internal sealed class ProductService(
         AddProductDto addProductDto, CancellationToken ct)
     {
         VoidResult checkSellerExistsResult = await eventBus.PublishWithoutResultAsync(
-            new CheckSellerExistsForProductAddition(addProductDto.SellerId), ct);
+            new CheckSellerExistsForProductAddition(addProductDto.SellerId, addProductDto.CategoryId), ct);
 
         if (checkSellerExistsResult.IsFailure)
         {

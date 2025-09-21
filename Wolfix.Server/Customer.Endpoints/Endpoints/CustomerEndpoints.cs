@@ -24,6 +24,7 @@ internal static class CustomerEndpoints
             .WithTags("Customer");
         
         customerGroup.MapGet("{customerId:guid}", GetProfileInfo)
+            .RequireAuthorization("Customer")
             .WithSummary("Get profile info");
         
         var favoriteItemsGroup = customerGroup.MapGroup("favorites");
@@ -41,44 +42,52 @@ internal static class CustomerEndpoints
     private static void MapFavoriteItemsEndpoints(RouteGroupBuilder group)
     {
         group.MapGet("{customerId:guid}", GetFavoriteProducts)
+            .RequireAuthorization("Customer")
             .WithSummary("Get all favorite products by specific customer");
         
         group.MapPost("", AddProductToFavorite)
+            .RequireAuthorization("Customer")
             .WithSummary("Add product to favorite");
         
         group.MapDelete("{customerId:guid}/{favoriteItemId:guid}", DeleteFavoriteItem)
+            .RequireAuthorization("Customer")
             .WithSummary("Delete favorite item");
     }
 
     private static void MapCartItemsEndpoints(RouteGroupBuilder group)
     {
         group.MapGet("{customerId:guid}", GetCartProducts)
+            .RequireAuthorization("Customer")
             .WithSummary("Get all products in cart by specific customer");
         
         group.MapPost("", AddProductToCart)
+            .RequireAuthorization("Customer")
             .WithSummary("Add product to cart");
         
         group.MapDelete("{customerId:guid}/{cartItemId:guid}", DeleteCartItem)
+            .RequireAuthorization("Customer")
             .WithSummary("Delete cart item");
     }
 
     private static void MapChangeMethods(RouteGroupBuilder group)
     {
         group.MapPatch("full-name", ChangeFullName)
+            .RequireAuthorization("Customer")
             .WithSummary("Change full name");
 
         group.MapPatch("phone-number", ChangePhoneNumber)
+            .RequireAuthorization("Customer")
             .WithSummary("Change phone number");
         
         group.MapPatch("address", ChangeAddress)
+            .RequireAuthorization("Customer")
             .WithSummary("Change address");
         
         group.MapPatch("birth-date", ChangeBirthDate)
+            .RequireAuthorization("Customer")
             .WithSummary("Change birth date");
     }
     
-    //todo: эндпоинт для того чтобы отзыв оставить
-
     private static async Task<Results<Ok<CustomerDto>, NotFound<string>>> GetProfileInfo(
         [FromRoute] Guid customerId,
         [FromServices] ICustomerService customerService,

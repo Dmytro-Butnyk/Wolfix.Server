@@ -21,15 +21,19 @@ internal static class OrderEndpoints
             .WithTags("Order");
 
         orderGroup.MapGet("{customerId:guid}", GetCustomerOrders)
+            .RequireAuthorization("Customer")
             .WithSummary("Get all orders by specific customer");
         
         orderGroup.MapPost("with-payment", PlaceOrderWithPayment)
+            .RequireAuthorization("Customer")
             .WithSummary("Creates an order and returns client secret for payment");
 
         orderGroup.MapPatch("{orderId:guid}/paid", MarkOrderPaid)
+            .RequireAuthorization("Customer")
             .WithSummary("Marks order as paid");
 
         orderGroup.MapPost("", PlaceOrder)
+            .RequireAuthorization("Customer")
             .WithSummary("Creates an order without payment");
     }
 

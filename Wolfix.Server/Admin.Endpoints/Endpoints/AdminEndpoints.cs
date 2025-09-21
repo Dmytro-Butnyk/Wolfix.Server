@@ -19,6 +19,7 @@ internal static class AdminEndpoints
             .WithTags("Admin");
         
         adminGroup.MapPost("", CreateAdmin)
+            .RequireAuthorization("SuperAdmin")
             .WithSummary("Add admin");
     }
 
