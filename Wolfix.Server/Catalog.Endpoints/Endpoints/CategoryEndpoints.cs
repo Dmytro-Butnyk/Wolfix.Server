@@ -31,6 +31,9 @@ internal static class CategoryEndpoints
         
         group.MapGet("child/{parentId:guid}", GetAllChildCategoriesByParent)
             .WithSummary("Get all child categories by parent");
+        
+        group.MapGet("child", GetAllChildCategories)
+            .WithSummary("Get all child categories");
     }
 
     private static void MapManageEndpoints(RouteGroupBuilder group)
