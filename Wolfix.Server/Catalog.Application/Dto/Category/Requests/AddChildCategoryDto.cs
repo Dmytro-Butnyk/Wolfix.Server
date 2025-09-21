@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Http;
+
 namespace Catalog.Application.Dto.Category.Requests;
 
-public sealed record AddChildCategoryDto(string Name, string? Description,
+public sealed record AddChildCategoryDto(IFormFile Photo, string Name, string? Description,
     IReadOnlyCollection<string> AttributeKeys, IReadOnlyCollection<string> VariantKeys);

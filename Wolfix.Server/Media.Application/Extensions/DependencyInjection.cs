@@ -1,4 +1,5 @@
 ﻿using Catalog.IntegrationEvents;
+using Catalog.IntegrationEvents.Dto;
 using Media.Application.EventHandlers;
 using Media.Application.Interfaces;
 using Media.Application.Options;
@@ -39,6 +40,7 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<ProductMediaDeleted>, ProductMediaDeletedEventHandler>();
         services.AddScoped<IIntegrationEventHandler<CategoryAndProductsDeleted>, CategoryAndProductsDeletedEventHandler>();
         services.AddScoped<IIntegrationEventHandler<SellerApplicationCreating, CreatedBlobResourceDto>, SellerApplicationCreatingEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<AddPhotoForNewCategory, CreatedMediaDto>, AddPhotoForNewCategoryEventHandler>();
         
         return services;
     }

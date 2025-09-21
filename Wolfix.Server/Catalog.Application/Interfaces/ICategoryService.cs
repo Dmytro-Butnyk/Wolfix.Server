@@ -7,9 +7,9 @@ namespace Catalog.Application.Interfaces;
 
 public interface ICategoryService
 {
-    Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllParentCategoriesAsync(CancellationToken ct);
+    Task<Result<IReadOnlyCollection<CategoryFullDto>>> GetAllParentCategoriesAsync(CancellationToken ct);
     
-    Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllChildCategoriesByParentAsync(Guid parentId,
+    Task<Result<IReadOnlyCollection<CategoryFullDto>>> GetAllChildCategoriesByParentAsync(Guid parentId,
         CancellationToken ct);
     
     Task<IReadOnlyCollection<CategoryShortDto>> GetAllChildCategoriesAsync(CancellationToken ct);

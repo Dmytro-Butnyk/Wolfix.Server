@@ -28,31 +28,31 @@ internal sealed class CategoryRepository(CatalogContext context) :
             .AnyAsync(category => category.Name == name, ct);
     }
 
-    public async Task<IReadOnlyCollection<CategoryShortProjection>> GetAllParentCategoriesAsNoTrackingAsync(
+    public async Task<IReadOnlyCollection<CategoryFullProjection>> GetAllParentCategoriesAsNoTrackingAsync(
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         
-        List<CategoryShortProjection> parentCategories = await _categories
+        List<CategoryFullProjection> parentCategories = await _categories
             .Include(c => c.Parent)
             .AsNoTracking()
             .Where(category => category.Parent == null)
-            .Select(category => new CategoryShortProjection(category.Id, category.Name))
+            .Select(category => new CategoryFullProjection(category.Id, category.Name, category.PhotoUrl))
             .ToListAsync(ct);
         
         return parentCategories;
     }
 
-    public async Task<IReadOnlyCollection<CategoryShortProjection>> GetAllChildCategoriesByParentAsNoTrackingAsync(
+    public async Task<IReadOnlyCollection<CategoryFullProjection>> GetAllChildCategoriesByParentAsNoTrackingAsync(
         Guid parentId, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         
-        List<CategoryShortProjection> childCategories = await _categories
+        List<CategoryFullProjection> childCategories = await _categories
             .Include(c => c.Parent)
             .AsNoTracking()
             .Where(category => category.Parent != null && category.Parent.Id == parentId)
-            .Select(category => new CategoryShortProjection(category.Id, category.Name))
+            .Select(category => new CategoryFullProjection(category.Id, category.Name, category.PhotoUrl))
             .ToListAsync(ct);
         
         return childCategories;

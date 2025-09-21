@@ -39,6 +39,7 @@ internal static class CategoryEndpoints
     private static void MapManageEndpoints(RouteGroupBuilder group)
     {
         group.MapPost("", AddParent)
+            .DisableAntiforgery()
             .WithSummary("Add parent category");
         
         group.MapPatch("{categoryId:guid}", ChangeParent)
@@ -48,6 +49,7 @@ internal static class CategoryEndpoints
             .WithSummary("Delete category");
         
         group.MapPost("{parentId:guid}", AddChild)
+            .DisableAntiforgery()
             .WithSummary("Add child category");
         
         group.MapPatch("child/{childCategoryId:guid}", ChangeChild)
@@ -66,21 +68,21 @@ internal static class CategoryEndpoints
             .WithSummary("Delete variant of child category");
     }
 
-    private static async Task<Ok<IReadOnlyCollection<CategoryShortDto>>> GetAllParentCategories(
+    private static async Task<Ok<IReadOnlyCollection<CategoryFullDto>>> GetAllParentCategories(
         CancellationToken ct,
         [FromServices] ICategoryService categoryService)
     {
-        Result<IReadOnlyCollection<CategoryShortDto>> getParentCategoriesResult = await categoryService.GetAllParentCategoriesAsync(ct);
+        Result<IReadOnlyCollection<CategoryFullDto>> getParentCategoriesResult = await categoryService.GetAllParentCategoriesAsync(ct);
         
         return TypedResults.Ok(getParentCategoriesResult.Value);
     }
 
-    private static async Task<Results<Ok<IReadOnlyCollection<CategoryShortDto>>, NotFound<string>>> GetAllChildCategoriesByParent(
+    private static async Task<Results<Ok<IReadOnlyCollection<CategoryFullDto>>, NotFound<string>>> GetAllChildCategoriesByParent(
         [FromRoute] Guid parentId,
         CancellationToken ct,
         [FromServices] ICategoryService categoryService)
     {
-        Result<IReadOnlyCollection<CategoryShortDto>> getChildCategoriesResult =
+        Result<IReadOnlyCollection<CategoryFullDto>> getChildCategoriesResult =
             await categoryService.GetAllChildCategoriesByParentAsync(parentId, ct);
 
         if (!getChildCategoriesResult.IsSuccess)
@@ -102,7 +104,7 @@ internal static class CategoryEndpoints
     }
 
     private static async Task<Results<NoContent, Conflict<string>, BadRequest<string>>> AddParent(
-        [FromBody] AddParentCategoryDto request,
+        [FromForm] AddParentCategoryDto request,
         [FromServices] ICategoryService categoryService,
         CancellationToken ct)
     {
@@ -159,7 +161,7 @@ internal static class CategoryEndpoints
     }
 
     private static async Task<Results<NoContent, NotFound<string>, Conflict<string>, BadRequest<string>>> AddChild(
-        [FromBody] AddChildCategoryDto request,
+        [FromForm] AddChildCategoryDto request,
         [FromRoute] Guid parentId,
         [FromServices] ICategoryService categoryService,
         CancellationToken ct)
