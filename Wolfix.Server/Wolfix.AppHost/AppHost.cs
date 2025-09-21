@@ -6,11 +6,6 @@ if (File.Exists(".env"))
     Env.Load(options: loadOptions);
 }
 
-// builder.Host.UseDefaultHostProvider(config =>
-// {
-//     config.ValidateOnBuild = true;
-// });
-
 var builder = DistributedApplication.CreateBuilder(args);
 
 var db = builder.AddConnectionString("DB");
