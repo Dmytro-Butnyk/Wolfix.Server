@@ -30,7 +30,7 @@ public interface IProductService
     Task<Result<CursorPaginationDto<ProductReviewDto>>> GetReviewsAsync(Guid productId, int pageSize, Guid? lastId,
         CancellationToken ct);
 
-    Task<VoidResult> AddReviewAsync(Guid productId, AddProductReview addProductReviewDto, CancellationToken ct);
+    Task<VoidResult> AddReviewAsync(Guid productId, AddProductReviewDto request, CancellationToken ct);
     
     Task<Result<IReadOnlyCollection<ProductShortDto>>> GetBySearchQueryAsync(string searchQuery, int pageSize,
         CancellationToken ct);

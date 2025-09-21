@@ -1,7 +1,9 @@
+using Catalog.Application.Contracts;
 using Catalog.Domain.CategoryAggregate;
 using Catalog.Domain.Interfaces;
 using Catalog.Domain.ProductAggregate;
 using Catalog.Infrastructure.Repositories;
+using Catalog.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Domain.Interfaces;
@@ -34,6 +36,16 @@ public static class DependencyInjection
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
 
+        return services;
+    }
+
+    public static IServiceCollection AddCatalogInfrastructureServices(this IServiceCollection services)
+    {
+        services.AddHttpClient<IToxicityService, ToxicityService>(client =>
+        {
+            client.BaseAddress = new Uri("http://127.0.0.1:8000/");
+        });
+        
         return services;
     }
 }
