@@ -21,6 +21,7 @@ public sealed class ProductDomainService(
         decimal price,
         ProductStatus status,
         Guid categoryId,
+        Guid sellerId,
         IReadOnlyCollection<AddAttributeValueObject> attributes,
         CancellationToken ct)
     {
@@ -36,7 +37,8 @@ public sealed class ProductDomainService(
             description,
             price,
             status,
-            categoryId
+            categoryId,
+            sellerId
         );
 
         if (!newProduct.IsSuccess)

@@ -32,6 +32,8 @@ internal sealed class ProductService(
     public async Task<VoidResult> AddProductAsync(
         AddProductDto addProductDto, CancellationToken ct)
     {
+        
+        
         ProductStatus productStatus;
 
         if (Enum.TryParse(addProductDto.Status, out ProductStatus status))
@@ -73,6 +75,7 @@ internal sealed class ProductService(
             addProductDto.Price,
             productStatus,
             addProductDto.CategoryId,
+            addProductDto.SellerId,
             attributes,
             ct
         );

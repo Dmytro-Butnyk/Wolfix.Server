@@ -79,16 +79,17 @@ public sealed class Product : BaseEntity
     
     private Product() { }
     
-    private Product(string title, string description, decimal price, ProductStatus status, Guid categoryId)
+    private Product(string title, string description, decimal price, ProductStatus status, Guid categoryId, Guid sellerId)
     {
         Title = title;
         Description = description;
         Price = price;
         Status = status;
         CategoryId = categoryId;
+        SellerId = sellerId;
     }
 
-    public static Result<Product> Create(string title, string description, decimal price, ProductStatus status, Guid categoryId)
+    public static Result<Product> Create(string title, string description, decimal price, ProductStatus status, Guid categoryId, Guid sellerId)
     {
         if (IsTextInvalid(title, out string titleErrorMessage))
         {
@@ -115,7 +116,12 @@ public sealed class Product : BaseEntity
             return Result<Product>.Failure(categoryIdErrorMessage);
         }
 
-        var product = new Product(title, description, price, status, categoryId);
+        if (IsGuidInvalid(sellerId, out string sellerIdErrorMessage))
+        {
+            return Result<Product>.Failure(sellerIdErrorMessage);
+        }
+
+        var product = new Product(title, description, price, status, categoryId, sellerId);
         
         product.RecalculateBonuses();
         product.FinalPrice = price;

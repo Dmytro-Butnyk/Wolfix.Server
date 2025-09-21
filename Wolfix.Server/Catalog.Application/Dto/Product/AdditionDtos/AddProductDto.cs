@@ -10,6 +10,7 @@ public sealed class AddProductDto
     public decimal Price { get; init; }
     public string Status { get; init; }
     public Guid CategoryId { get; init; }
+    public Guid SellerId { get; init; }
     public string ContentType { get; init; }
     public IFormFile? Media { get; init; }
     public List<AddAttributeDto> Attributes { get; init; }

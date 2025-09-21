@@ -13,6 +13,7 @@ public interface IProductDomainService
         decimal price,
         ProductStatus status,
         Guid categoryId,
+        Guid sellerId,
         IReadOnlyCollection<AddAttributeValueObject> attributes,
         CancellationToken ct);
 
