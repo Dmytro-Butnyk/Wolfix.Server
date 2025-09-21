@@ -76,6 +76,17 @@ internal sealed class AuthService(
             return await eventBus
                 .PublishWithSingleResultAsync<GetSellerProfileId, Guid>(@event, ct);
         }
+
+        if (role == "Admin")
+        {
+            var @event = new GetAdminProfileId
+            {
+                AccountId = accountId
+            };
+            
+            return await eventBus
+                .PublishWithSingleResultAsync<GetAdminProfileId, Guid>(@event, ct);
+        }
         //todo: остаток ролей дописать когда готово будет
         
         return Result<Guid>.Failure($"Role {role} not found");

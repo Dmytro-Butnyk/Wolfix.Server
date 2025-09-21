@@ -9,5 +9,12 @@ internal sealed class AdminRepository(AdminContext context)
 {
     private readonly DbSet<Domain.AdminAggregate.Admin> _admins = context.Admins;
     
-    
+    public async Task<Guid?> GetIdByAccountIdAsync(Guid accountId, CancellationToken ct)
+    {
+        return await _admins
+            .AsNoTracking()
+            .Where(admin => admin.AccountId == accountId)
+            .Select(admin => admin.Id)
+            .FirstOrDefaultAsync(ct);
+    }
 }

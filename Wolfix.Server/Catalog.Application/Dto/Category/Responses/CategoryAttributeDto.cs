@@ -1,3 +1,3 @@
 namespace Catalog.Application.Dto.Category.Responses;
 
-public sealed record CategoryAttributeDto(string Key);
+public sealed record CategoryAttributeDto(Guid Id, string Key);

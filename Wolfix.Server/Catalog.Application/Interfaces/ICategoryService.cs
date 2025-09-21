@@ -34,4 +34,6 @@ public interface ICategoryService
     Task<VoidResult> DeleteVariantAsync(Guid childCategoryId, Guid variantId, CancellationToken ct);
     
     Task<Result<IReadOnlyCollection<AttributeAndUniqueValuesDto>>> GetCategoryAttributesAndUniqueValuesAsync(Guid childCategoryId, CancellationToken ct);
+    
+    Task<Result<IReadOnlyCollection<CategoryAttributeDto>>> GetAllAttributesByCategoryAsync(Guid childId, CancellationToken ct);
 }

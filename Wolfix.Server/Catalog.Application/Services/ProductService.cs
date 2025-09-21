@@ -480,11 +480,8 @@ internal sealed class ProductService(
             return Result<IReadOnlyCollection<ProductShortDto>>.Success([]);
         }
 
-        var random = new Random();
-        int randomSkip = random.Next(1, productCount);
-
         IReadOnlyCollection<ProductShortProjection> randomProducts =
-            await productRepository.GetRandomAsync(randomSkip, pageSize, ct);
+            await productRepository.GetRandomAsync(pageSize, ct);
 
         if (randomProducts.Count == 0)
         {
