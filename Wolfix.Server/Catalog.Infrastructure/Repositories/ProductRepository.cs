@@ -4,10 +4,10 @@ using Catalog.Domain.ProductAggregate.Entities;
 using Catalog.Domain.ProductAggregate.Enums;
 using Catalog.Domain.Projections.Product;
 using Catalog.Domain.Projections.Product.Review;
+using Catalog.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.Repositories;
 using LinqKit;
-
 
 
 namespace Catalog.Infrastructure.Repositories;
@@ -179,6 +179,8 @@ internal sealed class ProductRepository(CatalogContext context)
     public async Task<IReadOnlyCollection<ProductReviewProjection>> GetProductReviewsAsync(Guid productId, int pageSize,
         CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
+        
         return await _products
             .AsNoTracking()
             .Where(product => product.Id == productId)
@@ -199,6 +201,8 @@ internal sealed class ProductRepository(CatalogContext context)
     public async Task<IReadOnlyCollection<ProductReviewProjection>> GetNextProductReviewsAsync(Guid productId,
         int pageSize, Guid lastId, CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
+        
         return await _products
             .AsNoTracking()
             .Where(product => product.Id == productId)
@@ -220,6 +224,8 @@ internal sealed class ProductRepository(CatalogContext context)
     public async Task<IReadOnlyCollection<Guid>> GetAllMediaIdsByCategoryProductsAsync(Guid categoryId,
         CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
+        
         return await _products
             .AsNoTracking()
             .Where(product => product.CategoryId == categoryId)
@@ -232,6 +238,8 @@ internal sealed class ProductRepository(CatalogContext context)
     public async Task<IReadOnlyCollection<ProductShortProjection>> GetBySearchQueryAsync(string searchQuery,
         int pageSize, CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
+        
         const double threshold = 0.30; // можно варьировать 0.25..0.45
 
         return await _products
@@ -255,6 +263,8 @@ internal sealed class ProductRepository(CatalogContext context)
     public async Task<IReadOnlyCollection<ProductShortProjection>> GetBySearchQueryAndCategoryAsync(
         Guid categoryId, string searchQuery, int pageSize, CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
+        
         const double threshold = 0.30; // можно варьировать 0.25..0.45
 
         return await _products
@@ -279,12 +289,14 @@ internal sealed class ProductRepository(CatalogContext context)
     public async Task<IReadOnlyCollection<Guid>> GetByAttributesFiltrationAsNoTrackingAsync(
         IReadOnlyCollection<(Guid AttributeId, string Value)> filters, int pageSize, CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
+        
         var predicate = PredicateBuilder.New<ProductAttributeValue>(false);
 
         foreach (var f in filters)
         {
             var temp = f; // обязательно, чтобы захват переменной корректно
-            predicate = predicate.Or(pa => 
+            predicate = predicate.Or(pa =>
                 EF.Property<Guid>(pa, "CategoryAttributeId") == temp.AttributeId &&
                 EF.Property<string>(pa, "Value") == temp.Value
             );
@@ -305,6 +317,8 @@ internal sealed class ProductRepository(CatalogContext context)
     public async Task<IReadOnlyCollection<ProductShortProjection>> GetShortProductsByIdsAsNoTrackingAsync(
         IReadOnlyCollection<Guid> ids, CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
+        
         var products = await _products
             .Include("_productMedias")
             .AsNoTracking()
@@ -322,6 +336,27 @@ internal sealed class ProductRepository(CatalogContext context)
 
         return products;
     }
-    
-    
+
+    public async Task<IReadOnlyCollection<AttributeAndUniqueValuesValueObject>> GetAttributesAndUniqueValuesAsync(
+        Guid childCategory, IReadOnlyCollection<Guid> attributeIds, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        
+        var result = await _products
+            .AsNoTracking()
+            .Include("_productAttributeValues")
+            .Where(p => p.CategoryId == childCategory)
+            .SelectMany(p => EF.Property<List<ProductAttributeValue>>(p, "_productAttributeValues"))
+            .Where(pav => attributeIds.Contains(pav.CategoryAttributeId))
+            .GroupBy(pav => new { pav.CategoryAttributeId, pav.Key })
+            .Select(g => new AttributeAndUniqueValuesValueObject
+            {
+                AttributeId = g.Key.CategoryAttributeId,
+                Key = g.Key.Key,
+                Values = g.Select(x => x.Value).Distinct().ToList()
+            })
+            .ToListAsync(ct);
+
+        return result;
+    }
 }

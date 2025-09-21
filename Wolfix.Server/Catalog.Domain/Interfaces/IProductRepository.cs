@@ -1,6 +1,7 @@
 ﻿using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.Projections.Product;
 using Catalog.Domain.Projections.Product.Review;
+using Catalog.Domain.ValueObjects;
 using Shared.Domain.Interfaces;
 using Shared.Domain.Models;
 
@@ -40,4 +41,6 @@ public interface IProductRepository
     Task<IReadOnlyCollection<Guid>> GetByAttributesFiltrationAsNoTrackingAsync (IReadOnlyCollection<(Guid AttributeId, string Value)> filters, int pageSize, CancellationToken ct);
     
     Task<IReadOnlyCollection<ProductShortProjection>> GetShortProductsByIdsAsNoTrackingAsync (IReadOnlyCollection<Guid> ids, CancellationToken ct);
+    
+    Task<IReadOnlyCollection<AttributeAndUniqueValuesValueObject>> GetAttributesAndUniqueValuesAsync(Guid childCategory, IReadOnlyCollection<Guid> attributeIds, CancellationToken ct);
 }

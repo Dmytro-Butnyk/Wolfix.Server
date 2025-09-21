@@ -1,6 +1,7 @@
 using Catalog.Application.Dto.Category;
 using Catalog.Application.Dto.Category.Requests;
 using Catalog.Application.Dto.Category.Responses;
+using Catalog.Application.Dto.Category.Responses.CategoryAttributesAndUniqueValues;
 using Shared.Domain.Models;
 
 namespace Catalog.Application.Interfaces;
@@ -29,4 +30,6 @@ public interface ICategoryService
     Task<VoidResult> DeleteAttributeAsync(Guid childCategoryId, Guid attributeId, CancellationToken ct);
     
     Task<VoidResult> DeleteVariantAsync(Guid childCategoryId, Guid variantId, CancellationToken ct);
+    
+    Task<Result<IReadOnlyCollection<AttributeAndUniqueValuesDto>>> GetCategoryAttributesAndUniqueValuesAsync(Guid childCategoryId, CancellationToken ct);
 }

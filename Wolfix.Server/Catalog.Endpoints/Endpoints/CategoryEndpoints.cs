@@ -1,6 +1,7 @@
 using System.Net;
 using Catalog.Application.Dto.Category.Requests;
 using Catalog.Application.Dto.Category.Responses;
+using Catalog.Application.Dto.Category.Responses.CategoryAttributesAndUniqueValues;
 using Catalog.Application.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -31,6 +32,9 @@ internal static class CategoryEndpoints
         
         group.MapGet("child/{parentId:guid}", GetAllChildCategoriesByParent)
             .WithSummary("Get all child categories by parent");
+        
+        group.MapGet("attributes/child/{childId:guid}", GetAllAttributesWithUniqueValues)
+            .WithSummary("Get all attributes with unique values for filter component");
     }
 
     private static void MapManageEndpoints(RouteGroupBuilder group)
@@ -86,6 +90,27 @@ internal static class CategoryEndpoints
         }
         
         return TypedResults.Ok(getChildCategoriesResult.Value);
+    }
+    
+    private static async Task<Results<Ok<IReadOnlyCollection<AttributeAndUniqueValuesDto>>, BadRequest<string>, NotFound<string>>> GetAllAttributesWithUniqueValues(
+        [FromRoute] Guid childId,
+        CancellationToken ct,
+        [FromServices] ICategoryService categoryService)
+    {
+        Result<IReadOnlyCollection<AttributeAndUniqueValuesDto>> result =
+            await categoryService.GetCategoryAttributesAndUniqueValuesAsync(childId, ct);
+        
+        if (result.IsFailure)
+        {
+            return result.StatusCode switch
+            {
+                HttpStatusCode.Conflict => TypedResults.NotFound(result.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(result.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(AddParent)} -> Unknown status code: {result.StatusCode}")
+            };
+        }
+        
+        return TypedResults.Ok(result.Value);
     }
 
     private static async Task<Results<NoContent, Conflict<string>, BadRequest<string>>> AddParent(
