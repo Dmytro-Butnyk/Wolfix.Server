@@ -12,6 +12,8 @@ public interface ICategoryService
     Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllChildCategoriesByParentAsync(Guid parentId,
         CancellationToken ct);
     
+    Task<IReadOnlyCollection<CategoryShortDto>> GetAllChildCategoriesAsync(CancellationToken ct);
+    
     Task<VoidResult> AddParentAsync(AddParentCategoryDto request, CancellationToken ct);
     
     Task<VoidResult> AddChildAsync(AddChildCategoryDto request, Guid parentId, CancellationToken ct);

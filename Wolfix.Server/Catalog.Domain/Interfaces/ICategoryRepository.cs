@@ -12,4 +12,6 @@ public interface ICategoryRepository : IBaseRepository<Category>
     Task<IReadOnlyCollection<CategoryShortProjection>> GetAllChildCategoriesByParentAsNoTrackingAsync(Guid parentId,
         CancellationToken ct);
     Task<Category?> GetByIdWithProductAttributesAsNoTrackingAsync(Guid id, CancellationToken ct);
+    
+    Task<IReadOnlyCollection<CategoryShortProjection>> GetAllChildCategoriesAsync(CancellationToken ct);
 }

@@ -34,6 +34,7 @@ internal sealed class CategoryRepository(CatalogContext context) :
         ct.ThrowIfCancellationRequested();
         
         List<CategoryShortProjection> parentCategories = await _categories
+            .Include(c => c.Parent)
             .AsNoTracking()
             .Where(category => category.Parent == null)
             .Select(category => new CategoryShortProjection(category.Id, category.Name))
@@ -48,6 +49,7 @@ internal sealed class CategoryRepository(CatalogContext context) :
         ct.ThrowIfCancellationRequested();
         
         List<CategoryShortProjection> childCategories = await _categories
+            .Include(c => c.Parent)
             .AsNoTracking()
             .Where(category => category.Parent != null && category.Parent.Id == parentId)
             .Select(category => new CategoryShortProjection(category.Id, category.Name))
@@ -62,5 +64,19 @@ internal sealed class CategoryRepository(CatalogContext context) :
             .AsNoTracking()
             .Include("_productAttributes")
             .FirstOrDefaultAsync(category => category.Id == id, ct);
+    }
+
+    public async Task<IReadOnlyCollection<CategoryShortProjection>> GetAllChildCategoriesAsync(CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        List<CategoryShortProjection> childCategories = await _categories
+            .Include(c => c.Parent)
+            .AsNoTracking()
+            .Where(category => category.IsChild)
+            .Select(category => new CategoryShortProjection(category.Id, category.Name))
+            .ToListAsync(ct);
+        
+        return childCategories;
     }
 }

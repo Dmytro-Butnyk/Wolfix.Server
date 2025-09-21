@@ -88,6 +88,16 @@ internal static class CategoryEndpoints
         return TypedResults.Ok(getChildCategoriesResult.Value);
     }
 
+    private static async Task<Ok<IReadOnlyCollection<CategoryShortDto>>> GetAllChildCategories(
+        [FromServices] ICategoryService categoryService,
+        CancellationToken ct)
+    {
+        IReadOnlyCollection<CategoryShortDto> getChildCategoriesResult =
+            await categoryService.GetAllChildCategoriesAsync(ct);
+        
+        return TypedResults.Ok(getChildCategoriesResult);
+    }
+
     private static async Task<Results<NoContent, Conflict<string>, BadRequest<string>>> AddParent(
         [FromBody] AddParentCategoryDto request,
         [FromServices] ICategoryService categoryService,

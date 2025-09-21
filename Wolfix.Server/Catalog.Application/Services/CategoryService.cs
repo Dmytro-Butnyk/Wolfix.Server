@@ -65,6 +65,16 @@ internal sealed class CategoryService(
         return Result<IReadOnlyCollection<CategoryShortDto>>.Success(childCategoriesDto);
     }
 
+    public async Task<IReadOnlyCollection<CategoryShortDto>> GetAllChildCategoriesAsync(CancellationToken ct)
+    {
+        IReadOnlyCollection<CategoryShortProjection> childCategories =
+            await categoryRepository.GetAllChildCategoriesAsync(ct);
+        
+        return childCategories
+            .Select(category => category.ToShortDto())
+            .ToList();
+    }
+
     public async Task<VoidResult> AddParentAsync(AddParentCategoryDto request, CancellationToken ct)
     {
         if (await categoryRepository.IsExistAsync(request.Name, ct))
