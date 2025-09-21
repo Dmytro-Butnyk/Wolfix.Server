@@ -35,8 +35,11 @@ internal static class CategoryEndpoints
         
         group.MapGet("child", GetAllChildCategories)
             .WithSummary("Get all child categories");
+
+        group.MapGet("child/{childId:guid}/attributes", GetAllAttributesByCategory)
+            .WithSummary("Get all attributes by specific category");
         
-        group.MapGet("attributes/child/{childId:guid}", GetAllAttributesWithUniqueValues)
+        group.MapGet("child/{childId:guid}/attributes-with-values", GetAllAttributesWithUniqueValues)
             .WithSummary("Get all attributes with unique values for filter component");
     }
 
@@ -126,6 +129,22 @@ internal static class CategoryEndpoints
             await categoryService.GetAllChildCategoriesAsync(ct);
         
         return TypedResults.Ok(getChildCategoriesResult);
+    }
+
+    private static async Task<Results<Ok<IReadOnlyCollection<CategoryAttributeDto>>, NotFound<string>>> GetAllAttributesByCategory(
+        [FromRoute] Guid childId,
+        [FromServices] ICategoryService categoryService,
+        CancellationToken ct)
+    {
+        Result<IReadOnlyCollection<CategoryAttributeDto>> getAllAttributeResult =
+            await categoryService.GetAllAttributesByCategoryAsync(childId, ct);
+
+        if (getAllAttributeResult.IsFailure)
+        {
+            return TypedResults.NotFound(getAllAttributeResult.ErrorMessage);
+        }
+        
+        return TypedResults.Ok(getAllAttributeResult.Value);
     }
 
     private static async Task<Results<NoContent, Conflict<string>, BadRequest<string>>> AddParent(

@@ -516,4 +516,29 @@ internal sealed class CategoryService(
         
         return Result<IReadOnlyCollection<AttributeAndUniqueValuesDto>>.Success(attributeAndUniqueValuesDtos);   
     }
+
+    public async Task<Result<IReadOnlyCollection<CategoryAttributeDto>>> GetAllAttributesByCategoryAsync(Guid childId, CancellationToken ct)
+    {
+        Category? category = await categoryRepository.GetByIdAsNoTrackingAsync(childId, ct, 
+            "_productAttributes", "Parent");
+
+        if (category is null)
+        {
+            return Result<IReadOnlyCollection<CategoryAttributeDto>>.Failure(
+                $"Category with id: {childId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        if (!category.IsChild)
+        {
+            return Result<IReadOnlyCollection<CategoryAttributeDto>>.Failure($"Category with id: {childId}is not a child category");
+        }
+
+        IReadOnlyCollection<CategoryAttributeDto> dto = category.ProductAttributes
+            .Select(attribute => new CategoryAttributeDto(attribute.Id, attribute.Key))
+            .ToList();
+        
+        return Result<IReadOnlyCollection<CategoryAttributeDto>>.Success(dto);
+    }
 }
