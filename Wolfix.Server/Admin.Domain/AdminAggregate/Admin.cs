@@ -1,3 +1,4 @@
+using Admin.Domain.AdminAggregate.Enums;
 using Shared.Domain.Entities;
 using Shared.Domain.Models;
 using Shared.Domain.ValueObjects;
@@ -13,6 +14,8 @@ public sealed class Admin : BaseEntity
     public PhoneNumber PhoneNumber { get; private set; }
     //todo: возможно ещё добавить сущность/таблицу SellerCategoryApplication
     // для того чтобы уже для существующих продавцов подавать заявки на новую категорию для продаж
+    public AdminType Type { get; private set; } = AdminType.Basic;
+    
     private Admin() { }
 
     private Admin(Guid accountId, FullName fullName, PhoneNumber phoneNumber)

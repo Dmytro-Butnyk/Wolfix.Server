@@ -10,7 +10,7 @@ public sealed class SellerApplicationApprovedEventHandler(IAuthStore authStore)
 {
     public async Task<VoidResult> HandleAsync(SellerApplicationApproved @event, CancellationToken ct)
     {
-        VoidResult addSellerRoleToCustomer = await authStore.AddSellerRoleAsync(@event.AccountId, Roles.Seller, ct);
+        VoidResult addSellerRoleToCustomer = await authStore.AddSellerRoleAsync(@event.AccountId, ct);
 
         if (addSellerRoleToCustomer.IsFailure)
         {

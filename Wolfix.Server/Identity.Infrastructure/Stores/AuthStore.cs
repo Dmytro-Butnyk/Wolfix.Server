@@ -130,7 +130,7 @@ internal sealed class AuthStore(
         return Result<Guid>.Success(user.Id);
     }
 
-    public async Task<VoidResult> AddSellerRoleAsync(Guid accountId, string role, CancellationToken ct)
+    public async Task<VoidResult> AddSellerRoleAsync(Guid accountId, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         
@@ -151,7 +151,7 @@ internal sealed class AuthStore(
             return VoidResult.Failure("Customer already has seller role");
         }
         
-        IdentityResult addRoleResult = await userManager.AddToRoleAsync(account, role);
+        IdentityResult addRoleResult = await userManager.AddToRoleAsync(account, Roles.Seller);
         
         if (!addRoleResult.Succeeded)
         {
@@ -228,6 +228,37 @@ internal sealed class AuthStore(
         if (userHasSellerRole)
         {
             return VoidResult.Failure("User already has seller role");
+        }
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> AddAdminRoleAsync(Guid accountId, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        
+        Account? account = await userManager.FindByIdAsync(accountId.ToString());
+        
+        if (account is null)
+        {
+            return VoidResult.Failure(
+                $"Account with id: {accountId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        bool customerAlreadyHasAdminRole = await userManager.IsInRoleAsync(account, Roles.Admin);
+
+        if (customerAlreadyHasAdminRole)
+        {
+            return VoidResult.Failure("Customer already has admin role");
+        }
+        
+        IdentityResult addRoleResult = await userManager.AddToRoleAsync(account, Roles.Admin);
+        
+        if (!addRoleResult.Succeeded)
+        {
+            return VoidResult.Failure(addRoleResult.GetErrorMessage(), HttpStatusCode.InternalServerError);
         }
         
         return VoidResult.Success();
