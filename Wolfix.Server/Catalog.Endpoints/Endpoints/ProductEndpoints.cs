@@ -280,12 +280,12 @@ internal static class ProductEndpoints
     }
 
     private static async Task<Results<NoContent, NotFound<string>>> AddReview(
-        [FromBody] AddProductReview addProductReviewDto,
+        [FromBody] AddProductReviewDto addProductReviewDtoDto,
         [FromRoute] Guid productId,
         [FromServices] IProductService productService,
         CancellationToken ct)
     {
-        VoidResult addReviewResult = await productService.AddReviewAsync(productId, addProductReviewDto, ct);
+        VoidResult addReviewResult = await productService.AddReviewAsync(productId, addProductReviewDtoDto, ct);
 
         if (!addReviewResult.IsSuccess)
         {

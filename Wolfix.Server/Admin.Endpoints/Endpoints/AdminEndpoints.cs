@@ -1,3 +1,4 @@
+using Admin.Application.Dto.Requests;
 using Admin.Application.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -17,22 +18,22 @@ internal static class AdminEndpoints
         var adminGroup = app.MapGroup(Route)
             .WithTags("Admin");
         
-        // adminGroup.MapPost("", CreateAdmin)
-        //     .WithSummary("Add admin");
+        adminGroup.MapPost("", CreateAdmin)
+            .WithSummary("Add admin");
     }
 
-    // private static async Task<Results<NoContent, BadRequest<string>>> CreateAdmin(
-    //     [FromBody] CreateAdminDto request,
-    //     [FromServices] IAdminService adminService,
-    //     CancellationToken ct)
-    // {
-    //     VoidResult createAdminResult = await adminService.CreateAdminAsync(request, ct);
-    //
-    //     if (createAdminResult.IsFailure)
-    //     {
-    //         return TypedResults.BadRequest(createAdminResult.ErrorMessage);
-    //     }
-    //     
-    //     return TypedResults.NoContent();
-    // }
+    private static async Task<Results<NoContent, BadRequest<string>>> CreateAdmin(
+        [FromBody] CreateAdminDto request,
+        [FromServices] IAdminService adminService,
+        CancellationToken ct)
+    {
+        VoidResult createAdminResult = await adminService.CreateAdminAsync(request, ct);
+    
+        if (createAdminResult.IsFailure)
+        {
+            return TypedResults.BadRequest(createAdminResult.ErrorMessage);
+        }
+        
+        return TypedResults.NoContent();
+    }
 }

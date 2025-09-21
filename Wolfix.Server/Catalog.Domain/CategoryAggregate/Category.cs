@@ -7,6 +7,10 @@ namespace Catalog.Domain.CategoryAggregate;
 
 public sealed class Category : BaseEntity
 {
+    public Guid BlobResourceId { get; private set; }
+    
+    public string PhotoUrl { get; private set; }
+    
     public Category? Parent { get; private set; }
     
     public string Name { get; private set; }
@@ -40,15 +44,27 @@ public sealed class Category : BaseEntity
     
     private Category() { }
 
-    private Category(string name, string? description = null, Category? parent = null)
+    private Category(Guid blobResourceId, string photoUrl, string name, string? description = null, Category? parent = null)
     {
+        BlobResourceId = blobResourceId;
+        PhotoUrl = photoUrl;
         Name = name;
         Description = description;
         Parent = parent;
     }
 
-    public static Result<Category> Create(string name, string? description = null, Category? parent = null)
+    public static Result<Category> Create(Guid blobResourceId, string photoUrl, string name, string? description = null, Category? parent = null)
     {
+        if (blobResourceId == Guid.Empty)
+        {
+            return Result<Category>.Failure($"{nameof(blobResourceId)} cannot be empty");
+        }
+        
+        if (string.IsNullOrWhiteSpace(photoUrl))
+        {
+            return Result<Category>.Failure($"{nameof(photoUrl)} cannot be empty");
+        }
+        
         if (IsTextInvalid(name, out string nameErrorMessage))
         {
             return Result<Category>.Failure(nameErrorMessage);
@@ -59,12 +75,23 @@ public sealed class Category : BaseEntity
             return Result<Category>.Failure(descriptionErrorMessage);
         }
 
-        var category = new Category(name, description, parent)
+        var category = new Category(blobResourceId, photoUrl, name, description, parent)
         {
             ProductsCount = 0
         };
 
         return Result<Category>.Success(category, HttpStatusCode.Created);
+    }
+
+    public VoidResult ChangePhotoUrl(string photoUrl)
+    {
+        if (string.IsNullOrWhiteSpace(photoUrl))
+        {
+            return VoidResult.Failure($"{nameof(photoUrl)} cannot be empty");
+        }
+        
+        PhotoUrl = photoUrl;
+        return VoidResult.Success();   
     }
 
     public VoidResult ChangeName(string name)

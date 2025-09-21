@@ -11,6 +11,7 @@ using Catalog.Domain.Interfaces.DomainServices;
 using Catalog.Domain.Projections.Category;
 using Catalog.Domain.ValueObjects;
 using Catalog.IntegrationEvents;
+using Catalog.IntegrationEvents.Dto;
 using Shared.Application.Interfaces;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents.Interfaces;
@@ -25,29 +26,29 @@ internal sealed class CategoryService(
     IAppCache appCache
     ) : ICategoryService
 {
-    public async Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllParentCategoriesAsync(CancellationToken ct)
+    public async Task<Result<IReadOnlyCollection<CategoryFullDto>>> GetAllParentCategoriesAsync(CancellationToken ct)
     {
         const string cacheKey = "all_parent_categories";
 
-        List<CategoryShortDto> parentCategoriesDto = await appCache.GetOrCreateAsync(cacheKey, async ctx =>
+        List<CategoryFullDto> parentCategoriesDto = await appCache.GetOrCreateAsync(cacheKey, async ctx =>
         {
-            IReadOnlyCollection<CategoryShortProjection> parentCategories =
+            IReadOnlyCollection<CategoryFullProjection> parentCategories =
                 await categoryRepository.GetAllParentCategoriesAsNoTrackingAsync(ctx);
 
             return parentCategories
-                .Select(category => category.ToShortDto())
+                .Select(category => category.ToFullDto())
                 .ToList();
         }, ct, TimeSpan.FromMinutes(20));
         
-        return Result<IReadOnlyCollection<CategoryShortDto>>.Success(parentCategoriesDto);
+        return Result<IReadOnlyCollection<CategoryFullDto>>.Success(parentCategoriesDto);
     }
 
-    public async Task<Result<IReadOnlyCollection<CategoryShortDto>>> GetAllChildCategoriesByParentAsync(Guid parentId,
+    public async Task<Result<IReadOnlyCollection<CategoryFullDto>>> GetAllChildCategoriesByParentAsync(Guid parentId,
         CancellationToken ct)
     {
         if (!await categoryRepository.IsExistAsync(parentId, ct))
         {
-            return Result<IReadOnlyCollection<CategoryShortDto>>.Failure(
+            return Result<IReadOnlyCollection<CategoryFullDto>>.Failure(
                 $"Parent category with id: {parentId} not found",
                 HttpStatusCode.NotFound
             );
@@ -55,17 +56,27 @@ internal sealed class CategoryService(
         
         var cacheKey = $"child_categories_by_parent_{parentId}";
         
-        List<CategoryShortDto> childCategoriesDto = await appCache.GetOrCreateAsync(cacheKey, async ctx =>
+        List<CategoryFullDto> childCategoriesDto = await appCache.GetOrCreateAsync(cacheKey, async ctx =>
         {
-            IReadOnlyCollection<CategoryShortProjection> childCategories =
+            IReadOnlyCollection<CategoryFullProjection> childCategories =
                 await categoryRepository.GetAllChildCategoriesByParentAsNoTrackingAsync(parentId, ctx);
 
             return childCategories
-                .Select(category => category.ToShortDto())
+                .Select(category => category.ToFullDto())
                 .ToList();
         }, ct, TimeSpan.FromMinutes(20));
         
-        return Result<IReadOnlyCollection<CategoryShortDto>>.Success(childCategoriesDto);
+        return Result<IReadOnlyCollection<CategoryFullDto>>.Success(childCategoriesDto);
+    }
+
+    public async Task<IReadOnlyCollection<CategoryShortDto>> GetAllChildCategoriesAsync(CancellationToken ct)
+    {
+        IReadOnlyCollection<CategoryShortProjection> childCategories =
+            await categoryRepository.GetAllChildCategoriesAsync(ct);
+        
+        return childCategories
+            .Select(category => category.ToShortDto())
+            .ToList();
     }
 
     public async Task<VoidResult> AddParentAsync(AddParentCategoryDto request, CancellationToken ct)
@@ -77,8 +88,24 @@ internal sealed class CategoryService(
                 HttpStatusCode.Conflict
             );
         }
+
+        var @event = new AddPhotoForNewCategory
+        {
+            Stream = request.Photo.OpenReadStream()
+        };
         
-        Result<Category> createCategoryResult = Category.Create(request.Name, request.Description);
+        Result<CreatedMediaDto> createImageResult =
+            await eventBus.PublishWithSingleResultAsync<AddPhotoForNewCategory, CreatedMediaDto>(@event, ct);
+
+        if (createImageResult.IsFailure)
+        {
+            return VoidResult.Failure(createImageResult);
+        }
+
+        CreatedMediaDto createdBlobResource = createImageResult.Value!;
+        
+        Result<Category> createCategoryResult = Category.Create(createdBlobResource.BlobResourceId, createdBlobResource.Url,
+            request.Name, request.Description);
 
         if (!createCategoryResult.IsSuccess)
         {
@@ -121,7 +148,23 @@ internal sealed class CategoryService(
             );
         }
         
-        Result<Category> createCategoryResult = Category.Create(request.Name, request.Description, parentCategory);
+        var @event = new AddPhotoForNewCategory
+        {
+            Stream = request.Photo.OpenReadStream()
+        };
+        
+        Result<CreatedMediaDto> createImageResult =
+            await eventBus.PublishWithSingleResultAsync<AddPhotoForNewCategory, CreatedMediaDto>(@event, ct);
+
+        if (createImageResult.IsFailure)
+        {
+            return VoidResult.Failure(createImageResult);
+        }
+
+        CreatedMediaDto createdBlobResource = createImageResult.Value!;
+        
+        Result<Category> createCategoryResult = Category.Create(createdBlobResource.BlobResourceId, createdBlobResource.Url,
+            request.Name, request.Description, parentCategory);
 
         if (!createCategoryResult.IsSuccess)
         {

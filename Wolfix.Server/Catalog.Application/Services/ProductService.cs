@@ -1,4 +1,5 @@
 using System.Net;
+using Catalog.Application.Contracts;
 using Catalog.Application.Dto.Product;
 using Catalog.Application.Dto.Product.AdditionDtos;
 using Catalog.Application.Dto.Product.AttributesFiltrationDto;
@@ -27,7 +28,8 @@ namespace Catalog.Application.Services;
 internal sealed class ProductService(
     IProductRepository productRepository,
     IProductDomainService productDomainService,
-    IEventBus eventBus) : IProductService
+    IEventBus eventBus,
+    IToxicityService toxicityService) : IProductService
 {
     public async Task<VoidResult> AddProductAsync(
         AddProductDto addProductDto, CancellationToken ct)
@@ -423,7 +425,7 @@ internal sealed class ProductService(
         return Result<CursorPaginationDto<ProductReviewDto>>.Success(cursorPaginationDto);
     }
 
-    public async Task<VoidResult> AddReviewAsync(Guid productId, AddProductReview addProductReviewDto,
+    public async Task<VoidResult> AddReviewAsync(Guid productId, AddProductReviewDto request,
         CancellationToken ct)
     {
         Product? product = await productRepository.GetByIdAsync(productId, ct);
@@ -438,7 +440,7 @@ internal sealed class ProductService(
 
         VoidResult result = await eventBus.PublishWithoutResultAsync(new CheckCustomerExistsForAddingReview
         {
-            CustomerId = addProductReviewDto.CustomerId
+            CustomerId = request.CustomerId
         }, ct);
 
         if (!result.IsSuccess)
@@ -446,8 +448,26 @@ internal sealed class ProductService(
             return result;
         }
 
-        product.AddReview(addProductReviewDto.Title, addProductReviewDto.Text,
-            addProductReviewDto.Rating, addProductReviewDto.CustomerId);
+        Result<bool> checkToxicityResult = await toxicityService.IsToxic(request.Text, ct);
+
+        if (checkToxicityResult.IsFailure)
+        {
+            return VoidResult.Failure(checkToxicityResult);
+        }
+        
+        bool isToxic = checkToxicityResult.Value;
+
+        if (isToxic)
+        {
+            return VoidResult.Failure("Review is toxic");
+        }
+
+        VoidResult addProductReviewResult = product.AddReview(request.Title, request.Text, request.Rating, request.CustomerId);
+
+        if (addProductReviewResult.IsFailure)
+        {
+            return addProductReviewResult;
+        }
 
         await productRepository.SaveChangesAsync(ct);
 

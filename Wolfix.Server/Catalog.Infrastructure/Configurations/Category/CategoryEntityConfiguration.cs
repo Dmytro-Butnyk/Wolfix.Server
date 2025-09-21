@@ -33,7 +33,9 @@ internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Cat
         builder.Property(p => p.Id)
             .HasValueGenerator<GuidV7ValueGenerator>()
             .ValueGeneratedOnAdd();
-        
+
+        builder.Property(c => c.BlobResourceId).IsRequired();
+        builder.Property(c => c.PhotoUrl).IsRequired();
         builder.Property(c => c.Name).IsRequired();
         builder.Property(c => c.Description).IsRequired(false);
         builder.Property(c => c.ProductsCount).IsRequired();

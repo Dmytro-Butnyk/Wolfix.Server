@@ -8,8 +8,10 @@ public interface ICategoryRepository : IBaseRepository<Category>
 {
     Task<bool> IsExistAsync(string name, CancellationToken ct, bool ignoreCase = true);
     
-    Task<IReadOnlyCollection<CategoryShortProjection>> GetAllParentCategoriesAsNoTrackingAsync(CancellationToken ct);
-    Task<IReadOnlyCollection<CategoryShortProjection>> GetAllChildCategoriesByParentAsNoTrackingAsync(Guid parentId,
+    Task<IReadOnlyCollection<CategoryFullProjection>> GetAllParentCategoriesAsNoTrackingAsync(CancellationToken ct);
+    Task<IReadOnlyCollection<CategoryFullProjection>> GetAllChildCategoriesByParentAsNoTrackingAsync(Guid parentId,
         CancellationToken ct);
     Task<Category?> GetByIdWithProductAttributesAsNoTrackingAsync(Guid id, CancellationToken ct);
+    
+    Task<IReadOnlyCollection<CategoryShortProjection>> GetAllChildCategoriesAsync(CancellationToken ct);
 }

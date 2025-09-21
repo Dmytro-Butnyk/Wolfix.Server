@@ -1,3 +1,4 @@
+using Admin.IntegrationEvents;
 using Customer.IntegrationEvents;
 using Identity.Application.EventHandlers;
 using Identity.Application.Interfaces.Services;
@@ -22,6 +23,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IIntegrationEventHandler<CustomerWantsToBeSeller>, CustomerWantsToBeSellerEventHandler>();
         services.AddScoped<IIntegrationEventHandler<SellerApplicationApproved>, SellerApplicationApprovedEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<CreateAdmin, Guid>, CreateAdminEventHandler>();
 
         return services;
     }

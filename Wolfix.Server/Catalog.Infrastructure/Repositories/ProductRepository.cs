@@ -55,6 +55,7 @@ internal sealed class ProductRepository(CatalogContext context)
 
         List<ProductShortProjection> productsByCategory = await _products
             .Include(p => p.Discount)
+            .Include("_productMedias")
             .AsNoTracking()
             .Where(product => product.CategoryId == childCategoryId)
             .OrderBy(product => product.FinalPrice)
@@ -74,6 +75,7 @@ internal sealed class ProductRepository(CatalogContext context)
 
         List<ProductShortProjection> productsWithDiscount = await _products
             .Include(p => p.Discount)
+            .Include("_productMedias")
             .AsNoTracking()
             .Where(product => product.Discount != null && product.Discount.Status == DiscountStatus.Active)
             .OrderByDescending(product => product.Discount!.Percent)
@@ -95,6 +97,7 @@ internal sealed class ProductRepository(CatalogContext context)
         return await _products
             .AsNoTracking()
             .Include(p => p.Discount)
+            .Include("_productMedias")
             .Where(product => product.CategoryId == categoryId)
             .OrderBy(_ => EF.Functions.Random())
             .Take(productsByCategorySize)

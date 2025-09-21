@@ -38,5 +38,9 @@ internal sealed class AdminEntityConfiguration : IEntityTypeConfiguration<Domain
                 .HasColumnName("PhoneNumber")
                 .IsRequired();
         });
+
+        builder.Property(admin => admin.Type)
+            .IsRequired()
+            .HasConversion<string>();
     }
 }
