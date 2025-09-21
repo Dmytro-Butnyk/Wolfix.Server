@@ -20,6 +20,7 @@ public sealed class Product : BaseEntity
     internal Discount? Discount { get; set; }
     
     public decimal FinalPrice { get; private set; }
+    public Guid SellerId { get; private set; }
     public string? MainPhotoUrl => _productMedias.FirstOrDefault(pm => pm.IsMain)?.MediaUrl;
     
     private void RecalculateFinalPrice()

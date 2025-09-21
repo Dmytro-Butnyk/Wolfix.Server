@@ -41,6 +41,7 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
         builder.Property(p => p.AverageRating).IsRequired(false);
         builder.Property(p => p.Price).IsRequired();
         builder.Property(p => p.Status).IsRequired().HasConversion<string>();
+        builder.Property(p => p.SellerId).IsRequired();
         
         builder.Ignore(r => r.Reviews);
         builder.Ignore(r => r.ProductAttributeValues);
