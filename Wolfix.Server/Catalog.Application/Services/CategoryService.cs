@@ -2,12 +2,14 @@ using System.Net;
 using Catalog.Application.Dto.Category;
 using Catalog.Application.Dto.Category.Requests;
 using Catalog.Application.Dto.Category.Responses;
+using Catalog.Application.Dto.Category.Responses.CategoryAttributesAndUniqueValues;
 using Catalog.Application.Interfaces;
 using Catalog.Application.Mapping.Category;
 using Catalog.Domain.CategoryAggregate;
 using Catalog.Domain.Interfaces;
 using Catalog.Domain.Interfaces.DomainServices;
 using Catalog.Domain.Projections.Category;
+using Catalog.Domain.ValueObjects;
 using Catalog.IntegrationEvents;
 using Shared.Application.Interfaces;
 using Shared.Domain.Models;
@@ -18,6 +20,7 @@ namespace Catalog.Application.Services;
 internal sealed class CategoryService(
     ICategoryRepository categoryRepository,
     IProductDomainService productDomainService,
+    ICategoryDomainService categoryDomainService,
     IEventBus eventBus,
     IAppCache appCache
     ) : ICategoryService
@@ -428,5 +431,46 @@ internal sealed class CategoryService(
         await categoryRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();
+    }
+
+    public async Task<Result<IReadOnlyCollection<AttributeAndUniqueValuesDto>>> GetCategoryAttributesAndUniqueValuesAsync(Guid childCategoryId, CancellationToken ct)
+    {
+        Category? childCategory =
+            await categoryRepository.GetByIdAsNoTrackingAsync(
+                childCategoryId,
+                ct,
+                "_productAttributes",
+                "Parent");
+        
+        if (childCategory is null)
+        {
+            return Result<IReadOnlyCollection<AttributeAndUniqueValuesDto>>
+                .Failure($"Category with id:{childCategoryId} not found", HttpStatusCode.NotFound);
+        }
+        
+        if (!childCategory.IsChild)
+        {
+            return Result<IReadOnlyCollection<AttributeAndUniqueValuesDto>>
+                .Failure($"Category with id: {childCategoryId} is not a child category");
+        }
+        
+        IReadOnlyCollection<Guid> attributeIds = childCategory.ProductAttributes
+            .Select(attribute => attribute.Id)
+            .ToList();
+
+        IReadOnlyCollection<AttributeAndUniqueValuesValueObject> attributesAndUniqueValues =
+            await categoryDomainService
+                .GetAttributesAndUniqueValuesAsync(childCategoryId, attributeIds, ct);
+
+        IReadOnlyCollection<AttributeAndUniqueValuesDto>  attributeAndUniqueValuesDtos =
+            attributesAndUniqueValues.Select(anu => 
+                new AttributeAndUniqueValuesDto
+                {
+                    AttributeId = anu.AttributeId,
+                    Key = anu.Key,
+                    Values = anu.Values
+                }).ToList();
+        
+        return Result<IReadOnlyCollection<AttributeAndUniqueValuesDto>>.Success(attributeAndUniqueValuesDtos);   
     }
 }
