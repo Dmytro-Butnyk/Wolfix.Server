@@ -13,8 +13,8 @@ public sealed class ProductFullDto
     public uint Bonuses { get; init; }
     public double? AverageRating { get; init; }
     public required IReadOnlyCollection<ProductVariantDto> Variants { get; init; }
-    public required IReadOnlyCollection<ProductCategoryDto> Categories  { get; init; }
+    public required IReadOnlyCollection<ProductCategoryDto> Categories { get; init; }
     public required IReadOnlyCollection<ProductMediaDto> Medias { get; init; }
     public required IReadOnlyCollection<ProductAttributeDto> Attributes { get; init; }
-    //todo: seller information
+    public required ProductSellerDto Seller { get; init; }
 }

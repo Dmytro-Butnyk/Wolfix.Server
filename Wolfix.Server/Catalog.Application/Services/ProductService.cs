@@ -272,6 +272,22 @@ internal sealed class ProductService(
                 }
             ).ToList();
 
+        Result<ProductSellerEventResult> fetchSellerInformationResult =
+            await eventBus.PublishWithSingleResultAsync<FetchSellerInformation, ProductSellerEventResult>(
+                new FetchSellerInformation(product.SellerId), ct);
+
+        if (fetchSellerInformationResult.IsFailure)
+        {
+            return Result<ProductFullDto>.Failure(fetchSellerInformationResult);
+        }
+
+        ProductSellerDto sellerDto = new ProductSellerDto
+        {
+            SellerId = fetchSellerInformationResult.Value!.SellerId,
+            SellerFullName = fetchSellerInformationResult.Value!.SellerFullName,
+            SellerPhotoUrl = fetchSellerInformationResult.Value!.SellerPhotoUrl
+        };
+
         ProductFullDto productFullDto = new()
         {
             Id = product.Id,
@@ -285,7 +301,8 @@ internal sealed class ProductService(
             Categories = categoriesLine,
             Medias = productMediasDto,
             Attributes = productAttributesDto,
-            Variants = productVariantsDto
+            Variants = productVariantsDto,
+            Seller = sellerDto
         };
 
         return Result<ProductFullDto>.Success(productFullDto);
