@@ -137,46 +137,25 @@ internal sealed class ProductRepository(CatalogContext context)
         return totalCount;
     }
 
-    public async Task<IReadOnlyCollection<ProductShortProjection>> GetRandomAsync(int randomSkip, int pageSize,
-        CancellationToken ct)
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetRandomAsync(int pageSize, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-        int totalCount = await _products.CountAsync(ct);
-
-        if (totalCount == 0) return [];
-
-        randomSkip %= totalCount;
-
-        int takeFromEnd = Math.Min(pageSize, totalCount - randomSkip);
-
-        List<ProductShortProjection> products = await _products
+        return await _products
+            .AsNoTracking()
             .Include(p => p.Discount)
             .Include("_productMedias")
-            .AsNoTracking()
-            .OrderBy(p => p.Id)
-            .Skip(randomSkip)
-            .Take(takeFromEnd)
-            .Select(p => new ProductShortProjection(p.Id, p.Title, p.AverageRating, p.Price,
-                p.FinalPrice, p.Bonuses, p.MainPhotoUrl))
+            .OrderBy(p => EF.Functions.Random())
+            .Take(pageSize)
+            .Select(p => new ProductShortProjection(
+                p.Id,
+                p.Title,
+                p.AverageRating,
+                p.Price,
+                p.FinalPrice,
+                p.Bonuses,
+                p.MainPhotoUrl))
             .ToListAsync(ct);
-
-        if (takeFromEnd < pageSize)
-        {
-            int takeFromStart = pageSize - takeFromEnd;
-            List<ProductShortProjection> productsFromStart = await _products
-                .Include(p => p.Discount)
-                .AsNoTracking()
-                .OrderBy(p => p.Id)
-                .Take(takeFromStart)
-                .Select(p => new ProductShortProjection(p.Id, p.Title, p.AverageRating,
-                    p.Price, p.FinalPrice, p.Bonuses, p.MainPhotoUrl))
-                .ToListAsync(ct);
-
-            products.AddRange(productsFromStart);
-        }
-
-        return products;
     }
 
     public async Task<IReadOnlyCollection<ProductReviewProjection>> GetProductReviewsAsync(Guid productId, int pageSize,
