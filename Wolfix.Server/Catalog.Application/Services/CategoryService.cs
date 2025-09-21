@@ -91,7 +91,7 @@ internal sealed class CategoryService(
 
         var @event = new AddPhotoForNewCategory
         {
-            Stream = request.Photo.OpenReadStream()
+            FileData = request.Photo
         };
         
         Result<CreatedMediaDto> createImageResult =
@@ -150,7 +150,7 @@ internal sealed class CategoryService(
         
         var @event = new AddPhotoForNewCategory
         {
-            Stream = request.Photo.OpenReadStream()
+            FileData = request.Photo
         };
         
         Result<CreatedMediaDto> createImageResult =

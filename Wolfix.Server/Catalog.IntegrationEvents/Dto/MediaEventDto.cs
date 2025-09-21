@@ -1,8 +1,9 @@
-﻿using Shared.Domain.Enums;
+﻿using Microsoft.AspNetCore.Http;
+using Shared.Domain.Enums;
 
 namespace Catalog.IntegrationEvents.Dto;
 
 public sealed record MediaEventDto(
     BlobResourceType ContentType,
-    Stream Filestream,
+    IFormFile FileData,
     bool IsMain);

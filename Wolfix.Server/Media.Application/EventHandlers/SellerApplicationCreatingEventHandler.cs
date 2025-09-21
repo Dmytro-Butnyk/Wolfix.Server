@@ -16,7 +16,7 @@ public sealed class SellerApplicationCreatingEventHandler(IBlobResourceService b
     {
         Result<BlobResourceShortDto> createBlobResourceResult = await blobResourceService.AddBlobResourceAsync(
             BlobResourceType.Document,
-            @event.Document.OpenReadStream(),
+            @event.Document,
             ct
         );
 

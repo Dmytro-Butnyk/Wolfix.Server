@@ -14,7 +14,7 @@ public sealed class AddPhotoForNewCategoryEventHandler(IBlobResourceService blob
     public async Task<Result<CreatedMediaDto>> HandleAsync(AddPhotoForNewCategory @event, CancellationToken ct)
     {
         Result<BlobResourceShortDto> createBlobResourceResult =
-            await blobResourceService.AddBlobResourceAsync(BlobResourceType.Photo, @event.Stream, ct);
+            await blobResourceService.AddBlobResourceAsync(BlobResourceType.Photo, @event.FileData, ct);
 
         if (createBlobResourceResult.IsFailure)
         {

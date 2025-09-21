@@ -69,8 +69,6 @@ internal sealed class ProductService(
             return VoidResult.Failure("Media is null");
         }
 
-        Stream stream = addProductDto.Media.OpenReadStream();
-
         IReadOnlyCollection<AddAttributeValueObject> attributes = addProductDto.Attributes
             .Select(attr => new AddAttributeValueObject(attr.Id, attr.Value))
             .ToList();
@@ -96,7 +94,7 @@ internal sealed class ProductService(
         VoidResult eventResult = await eventBus.PublishWithoutResultAsync(
             new ProductMediaAdded(
                 result.Value,
-                new MediaEventDto(blobResourceType, stream, false)),
+                new MediaEventDto(blobResourceType, addProductDto.Media, false)),
             ct);
 
         if (!eventResult.IsSuccess)
@@ -171,12 +169,10 @@ internal sealed class ProductService(
             return VoidResult.Failure("Media is null");
         }
 
-        Stream stream = addMediaDto.Media.OpenReadStream();
-
         VoidResult eventResult = await eventBus.PublishWithoutResultAsync(
             new ProductMediaAdded(
                 addMediaDto.ProductId,
-                new MediaEventDto(blobResourceType, stream, true)),
+                new MediaEventDto(blobResourceType, addMediaDto.Media, true)),
             ct);
 
         if (!eventResult.IsSuccess)

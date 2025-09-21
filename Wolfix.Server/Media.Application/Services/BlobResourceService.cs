@@ -3,6 +3,7 @@ using Media.Application.Interfaces;
 using Media.Application.Options;
 using Media.Domain.BlobAggregate;
 using Media.Domain.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Shared.Domain.Enums;
@@ -18,7 +19,7 @@ public sealed class BlobResourceService(
 {
     //todo: тут вынести в прайват каррент велью
     
-    public async Task<Result<BlobResourceShortDto>> AddBlobResourceAsync(BlobResourceType contentType, Stream fileStream, CancellationToken ct)
+    public async Task<Result<BlobResourceShortDto>> AddBlobResourceAsync(BlobResourceType contentType, IFormFile fileData, CancellationToken ct)
     {
         Result<BlobResource> createBlobResourceResult = BlobResource.Create(contentType);
 
@@ -34,10 +35,15 @@ public sealed class BlobResourceService(
             BlobResourceType.Document => containerNames.CurrentValue.Documents,
             _ => throw new Exception($"Unknown blob resource type: {contentType}")
         };
+        
+        Stream fileStream = fileData.OpenReadStream();
+        
+        string extension = Path.GetExtension(fileData.FileName);
+        string fileName = $"{createBlobResourceResult.Value!.Name}{extension}";
 
         string url = await azureBlobRepository.AddFileAndGetUrlAsync(
             containerName,
-            createBlobResourceResult.Value!.Name,fileStream,
+            fileName, fileStream,
             ct);
         
         VoidResult changeUrlResult = createBlobResourceResult.Value.ChangeUrl(url);

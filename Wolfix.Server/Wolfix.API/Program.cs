@@ -63,6 +63,6 @@ app.UseCors("AllowNextClient");
 
 //todo
 // await app.EnsureDatabaseExistAndMigrationsApplied();
-await app.EnsureRolesValid();
+// await app.EnsureRolesValid();
 
 app.Run();

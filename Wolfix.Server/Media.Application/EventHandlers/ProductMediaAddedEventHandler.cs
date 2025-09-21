@@ -16,7 +16,7 @@ public sealed class ProductMediaAddedEventHandler(
     public async Task<VoidResult> HandleAsync(ProductMediaAdded @event, CancellationToken ct)
     {
         Result<BlobResourceShortDto> result = await blobResourceService
-            .AddBlobResourceAsync(@event.Media.ContentType, @event.Media.Filestream, ct);
+            .AddBlobResourceAsync(@event.Media.ContentType, @event.Media.FileData, ct);
 
         if (!result.IsSuccess)
         {

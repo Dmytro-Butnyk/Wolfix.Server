@@ -1,4 +1,5 @@
 ﻿using Media.Application.Dto;
+using Microsoft.AspNetCore.Http;
 using Shared.Domain.Enums;
 using Shared.Domain.Models;
 
@@ -8,7 +9,7 @@ public interface IBlobResourceService
 {
     Task<Result<BlobResourceShortDto>> AddBlobResourceAsync(
         BlobResourceType contentType,
-        Stream fileStream,
+        IFormFile fileData,
         CancellationToken ct);
     
     Task<VoidResult> DeleteBlobResourceAsync(Guid id, CancellationToken ct);
