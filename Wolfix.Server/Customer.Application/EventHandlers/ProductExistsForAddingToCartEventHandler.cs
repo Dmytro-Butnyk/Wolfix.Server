@@ -22,7 +22,7 @@ public sealed class ProductExistsForAddingToCartEventHandler(ICustomerRepository
         }
 
         VoidResult addToCartResult = customer.AddCartItem(
-            "//todo: add photoUrl",
+            @event.PhotoUrl,
             @event.Title,
             @event.PriceWithDiscount
         );

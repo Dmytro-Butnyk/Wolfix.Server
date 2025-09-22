@@ -12,7 +12,7 @@ public sealed class CheckProductExistsForAddingToCartEventHandler(IProductReposi
 {
     public async Task<VoidResult> HandleAsync(CheckProductExistsForAddingToCart @event, CancellationToken ct)
     {
-        var product = await productRepository.GetByIdAsNoTrackingAsync(@event.ProductId, ct);
+        var product = await productRepository.GetByIdAsNoTrackingAsync(@event.ProductId, ct, "_productMedias");
 
         if (product is null)
         {
@@ -25,6 +25,7 @@ public sealed class CheckProductExistsForAddingToCartEventHandler(IProductReposi
         VoidResult result = await eventBus.PublishWithoutResultAsync(new ProductExistsForAddingToCart
         {
             CustomerId = @event.CustomerId,
+            PhotoUrl = product.MainPhotoUrl!,
             PriceWithDiscount = product.FinalPrice,
             Title = product.Title
         }, ct);

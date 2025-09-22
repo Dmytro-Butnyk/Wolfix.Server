@@ -12,7 +12,7 @@ internal sealed class CheckProductExistsForAddingToFavoriteEventHandler(IProduct
 {
     public async Task<VoidResult> HandleAsync(CheckProductExistsForAddingToFavorite @event, CancellationToken ct)
     {
-        var product = await productRepository.GetByIdAsNoTrackingAsync(@event.ProductId, ct);
+        var product = await productRepository.GetByIdAsNoTrackingAsync(@event.ProductId, ct, "_productMedias");
 
         if (product is null)
         {
@@ -24,6 +24,7 @@ internal sealed class CheckProductExistsForAddingToFavoriteEventHandler(IProduct
 
         VoidResult result = await eventBus.PublishWithoutResultAsync(new ProductExistsForAddingToFavorite
         {
+            PhotoUrl = product.MainPhotoUrl!,
             CustomerId = @event.CustomerId,
             Title = product.Title,
             Price = product.Price,

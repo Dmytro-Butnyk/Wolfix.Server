@@ -4,7 +4,7 @@ namespace Catalog.IntegrationEvents;
 
 public sealed record ProductExistsForAddingToFavorite : IIntegrationEvent
 {
-    //todo: фотку добавить
+    public required string PhotoUrl { get; init; }
     
     public required Guid CustomerId { get; init; }
     

@@ -6,7 +6,7 @@ public sealed record ProductExistsForAddingToCart : IIntegrationEvent
 {
     public required Guid CustomerId { get; init; }
     
-    //todo: добавить фото
+    public required string PhotoUrl { get; init; }
     
     public required string Title { get; init; }
     

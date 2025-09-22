@@ -23,7 +23,7 @@ internal sealed class ProductExistsForAddingToFavoriteEventHandler(ICustomerRepo
 
         VoidResult addToFavoriteResult = customer.AddFavoriteItem(
             @event.Title,
-            "//todo: add image url",
+            @event.PhotoUrl,
             @event.Price,
             @event.Bonuses,
             @event.AverageRating,
