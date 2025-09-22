@@ -225,6 +225,7 @@ internal sealed class ProductRepository(CatalogContext context)
         const double threshold = 0.30; // можно варьировать 0.25..0.45
 
         return await _products
+            .Include(p => p.Discount)
             .Include("_productMedias")
             .AsNoTracking()
             .Where(p =>
@@ -250,6 +251,7 @@ internal sealed class ProductRepository(CatalogContext context)
         const double threshold = 0.30; // можно варьировать 0.25..0.45
 
         return await _products
+            .Include(p => p.Discount)           
             .Include("_productMedias")
             .AsNoTracking()
             .Where(p => p.CategoryId == categoryId &&
