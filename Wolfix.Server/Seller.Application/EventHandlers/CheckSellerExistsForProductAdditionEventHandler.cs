@@ -22,7 +22,7 @@ public sealed class CheckSellerExistsForProductAdditionEventHandler(
             return VoidResult.Failure("Seller not found", HttpStatusCode.NotFound);
         }
 
-        SellerCategoryInfo? sellerCategory = seller.SellerCategories.FirstOrDefault(sc => sc.Id == @event.CategoryId);
+        SellerCategoryInfo? sellerCategory = seller.SellerCategories.FirstOrDefault(sc => sc.CategoryId == @event.CategoryId);
 
         if (sellerCategory is null)
         {

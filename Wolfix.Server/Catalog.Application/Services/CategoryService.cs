@@ -120,6 +120,7 @@ internal sealed class CategoryService(
         return VoidResult.Success();
     }
 
+    //todo: проблема
     public async Task<VoidResult> AddChildAsync(AddChildCategoryDto request, Guid parentId, CancellationToken ct)
     {
         Category? parentCategory = await categoryRepository.GetByIdAsync(parentId, ct, "Parent");

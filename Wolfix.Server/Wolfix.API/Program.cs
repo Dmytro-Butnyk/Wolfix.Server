@@ -1,3 +1,6 @@
+using Identity.Application;
+using Identity.Application.Interfaces.Repositories;
+using Identity.Infrastructure;
 using Wolfix.API.ExceptionHandlers;
 using Wolfix.API.Extensions;
 using Wolfix.ServiceDefaults;
@@ -61,6 +64,17 @@ app.UseResponseCompression();
 app.MapAllEndpoints();
 
 app.UseCors("AllowNextClient");
+
+// await using (var scope = app.Services.CreateAsyncScope())
+// {
+//     var services = scope.ServiceProvider;
+//     
+//     var authStore = services.GetRequiredService<IAuthStore>();
+//
+//     await authStore.RegisterAccountAsync("superadmin@gmail.com", "SUPERadmin123!", Roles.SuperAdmin, CancellationToken.None);
+//
+//     await authStore.RegisterAccountAsync("basicadmin@gmail.com", "BASICadmin123!", Roles.Admin, CancellationToken.None);
+// }
 
 //todo
 // await app.EnsureDatabaseExistAndMigrationsApplied();
