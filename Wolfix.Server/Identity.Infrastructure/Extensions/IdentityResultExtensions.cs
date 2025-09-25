@@ -4,6 +4,10 @@ namespace Identity.Infrastructure.Extensions;
 
 public static class IdentityResultExtensions
 {
-    public static string GetErrorMessage(this IdentityResult result)
-        => string.Join(Environment.NewLine, result.Errors.Select(e => e.Description));
+    public static string GetErrorMessage(this IdentityResult failedResult)
+    {
+        if (failedResult.Succeeded) throw new ArgumentException("result succeeded", nameof(failedResult));
+        
+        return string.Join(Environment.NewLine, failedResult.Errors.Select(e => e.Description));
+    }
 }

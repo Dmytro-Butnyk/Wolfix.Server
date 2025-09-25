@@ -1,10 +1,9 @@
 using DotNetEnv;
 
-if (File.Exists(".env"))
-{
-    var loadOptions = new LoadOptions(onlyExactPath: true);
-    Env.Load(options: loadOptions);
-}
+if (!File.Exists(".env")) throw new Exception(".env file not found");
+
+var loadOptions = new LoadOptions(onlyExactPath: true);
+Env.Load(options: loadOptions);
 
 var builder = DistributedApplication.CreateBuilder(args);
 

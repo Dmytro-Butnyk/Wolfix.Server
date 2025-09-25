@@ -36,7 +36,7 @@ public sealed class BlobResourceService(
             _ => throw new Exception($"Unknown blob resource type: {contentType}")
         };
         
-        Stream fileStream = fileData.OpenReadStream();
+        await using Stream fileStream = fileData.OpenReadStream();
         
         string extension = Path.GetExtension(fileData.FileName);
         string fileName = $"{createBlobResourceResult.Value!.Name}{extension}";

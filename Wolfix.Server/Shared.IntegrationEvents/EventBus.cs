@@ -27,28 +27,6 @@ public sealed class EventBus(IServiceScopeFactory serviceProvider) : IEventBus
         return VoidResult.Success();
     }
 
-    public async Task<VoidResult> PublishForParallelAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IIntegrationEvent
-    {
-        //todo
-        await using var scope = serviceProvider.CreateAsyncScope();
-        
-        var handlers = scope.ServiceProvider
-            .GetServices<IIntegrationEventHandler<TEvent>>()
-            .ToList();
-
-        var tasks = handlers.Select(handler => handler.HandleAsync(@event, ct));
-        
-        var results = await Task.WhenAll(tasks);
-        
-        if (results.Any(result => !result.IsSuccess))
-        {
-            VoidResult firstUnsuccessResult = results.First(result => !result.IsSuccess);
-            return VoidResult.Failure(firstUnsuccessResult.ErrorMessage!, firstUnsuccessResult.StatusCode);
-        }
-        
-        return VoidResult.Success();
-    }
-
     public async Task<Result<TResult>> PublishWithSingleResultAsync<TEvent, TResult>(TEvent @event,
         CancellationToken ct) where TEvent : IIntegrationEvent
     {
