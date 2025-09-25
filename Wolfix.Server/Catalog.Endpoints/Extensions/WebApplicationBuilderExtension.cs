@@ -6,11 +6,11 @@ namespace Catalog.Endpoints.Extensions;
 
 public static class WebApplicationBuilderExtension
 {
-    public static IServiceCollection AddCatalogModule(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddCatalogModule(this IServiceCollection services, string connectionString, string toxicApiBaseUrl)
     {
         services.AddCatalogDbContext(connectionString);
         services.AddCatalogRepositories();
-        services.AddCatalogInfrastructureServices();
+        services.AddCatalogInfrastructureServices(toxicApiBaseUrl);
         services.AddCatalogApplicationServices();
         services.AddCatalogEventHandlers();
         

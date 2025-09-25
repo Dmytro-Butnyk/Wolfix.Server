@@ -444,19 +444,19 @@ internal sealed class ProductService(
             return result;
         }
 
-        // Result<bool> checkToxicityResult = await toxicityService.IsToxic(request.Text, ct);
-        //
-        // if (checkToxicityResult.IsFailure)
-        // {
-        //     return VoidResult.Failure(checkToxicityResult);
-        // }
-        //
-        // bool isToxic = checkToxicityResult.Value;
-        //
-        // if (isToxic)
-        // {
-        //     return VoidResult.Failure("Review is toxic");
-        // }
+        Result<bool> checkToxicityResult = await toxicityService.IsToxic(request.Text, ct);
+        
+        if (checkToxicityResult.IsFailure)
+        {
+            return VoidResult.Failure(checkToxicityResult);
+        }
+        
+        bool isToxic = checkToxicityResult.Value;
+        
+        if (isToxic)
+        {
+            return VoidResult.Failure("Review is toxic");
+        }
 
         VoidResult addProductReviewResult = product.AddReview(request.Title, request.Text, request.Rating, request.CustomerId);
 

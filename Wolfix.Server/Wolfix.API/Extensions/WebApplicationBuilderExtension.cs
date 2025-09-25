@@ -40,7 +40,9 @@ public static class WebApplicationBuilderExtension
 
     private static WebApplicationBuilder AddCatalogModule(this WebApplicationBuilder builder, string connectionString)
     {
-        builder.Services.AddCatalogModule(connectionString);
+        string toxicApiBaseUrl = builder.Configuration.GetOrThrow("TOXIC_API_BASE_URL");
+        
+        builder.Services.AddCatalogModule(connectionString, toxicApiBaseUrl);
 
         return builder;
     }

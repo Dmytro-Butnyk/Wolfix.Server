@@ -39,11 +39,11 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddCatalogInfrastructureServices(this IServiceCollection services)
+    public static IServiceCollection AddCatalogInfrastructureServices(this IServiceCollection services, string toxicApiBaseUrl)
     {
         services.AddHttpClient<IToxicityService, ToxicityService>(client =>
         {
-            client.BaseAddress = new Uri("http://127.0.0.1:8000/");
+            client.BaseAddress = new Uri(toxicApiBaseUrl);
         });
         
         return services;

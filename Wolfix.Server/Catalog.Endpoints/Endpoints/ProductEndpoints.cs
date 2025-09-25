@@ -283,17 +283,22 @@ internal static class ProductEndpoints
         return TypedResults.Ok(getProductReviewsResult.Value);
     }
 
-    private static async Task<Results<NoContent, NotFound<string>>> AddReview(
-        [FromBody] AddProductReviewDto addProductReviewDtoDto,
+    private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>>> AddReview(
+        [FromBody] AddProductReviewDto addProductReviewDto,
         [FromRoute] Guid productId,
         [FromServices] IProductService productService,
         CancellationToken ct)
     {
-        VoidResult addReviewResult = await productService.AddReviewAsync(productId, addProductReviewDtoDto, ct);
+        VoidResult addReviewResult = await productService.AddReviewAsync(productId, addProductReviewDto, ct);
 
         if (!addReviewResult.IsSuccess)
         {
-            return TypedResults.NotFound(addReviewResult.ErrorMessage);
+            return addReviewResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(addReviewResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(addReviewResult.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(AddReview)} -> Unknown status code: {addReviewResult.StatusCode}")
+            };
         }
 
         return TypedResults.NoContent();
