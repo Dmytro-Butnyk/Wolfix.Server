@@ -1,9 +1,8 @@
 using DotNetEnv;
+using Wolfix.AppHost;
 
-if (!File.Exists(".env")) throw new Exception(".env file not found");
-
-var loadOptions = new LoadOptions(onlyExactPath: true);
-Env.Load(options: loadOptions);
+LoadOptions options = new(onlyExactPath: true);
+EnvExtensions.LoadOrThrow(options);
 
 var builder = DistributedApplication.CreateBuilder(args);
 
