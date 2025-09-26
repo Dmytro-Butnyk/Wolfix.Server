@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/aspire-8.0.json",
+  "resources": {
+    "toxic-api": {
+      "type": "container.v0",
+      "image": "iluhahr/toxic-ai-api:latest",
+      "bindings": {
+        "http": {
+          "scheme": "http",
+          "protocol": "tcp",
+          "transport": "http",
+          "targetPort": 8000
+        }
+      }
+    },
+    "api": {
+      "type": "project.v0",
+      "path": "../Wolfix.API/Wolfix.API.csproj",
+      "env": {
+        "TOXIC_API_BASE_URL": "{toxic-api.bindings.http.url}"
+      },
+      "bindings": {
+        "http": {
+          "scheme": "http",
+          "protocol": "tcp",
+          "transport": "http"
+        },
+        "https": {
+          "scheme": "https",
+          "protocol": "tcp",
+          "transport": "http"
+        }
+      }
+    }
+  }
+}
