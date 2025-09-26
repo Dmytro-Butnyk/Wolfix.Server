@@ -1,5 +1,6 @@
 using DotNetEnv;
 using Wolfix.AppHost;
+using Wolfix.AppHost.Extensions;
 
 LoadOptions options = new(onlyExactPath: true);
 EnvExtensions.LoadOrThrow(options);
