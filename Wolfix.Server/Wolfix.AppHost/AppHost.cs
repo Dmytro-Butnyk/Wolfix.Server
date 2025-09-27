@@ -20,4 +20,7 @@ builder.AddProject<Projects.Wolfix_API>("api")
     .WithEnvironment("TOXIC_API_BASE_URL", toxicApi.GetEndpoint("http"))
     .WaitFor(toxicApi);
 
+//todo: убрать тут db, blobResource(и не забыть подправить в проектах где используется)
+// и разобраться с аспайр дашборд(из-за него деплой падает)
+
 builder.Build().Run();
