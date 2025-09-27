@@ -17,7 +17,7 @@ public static class WebApplicationBuilderExtension
 {
     public static WebApplicationBuilder AddAllModules(this WebApplicationBuilder builder)
     {
-        string connectionString = builder.Configuration.GetConnectionString("DB")!;
+        string connectionString = builder.Configuration.GetOrThrow("DB");
 
         builder
             .AddCatalogModule(connectionString)
