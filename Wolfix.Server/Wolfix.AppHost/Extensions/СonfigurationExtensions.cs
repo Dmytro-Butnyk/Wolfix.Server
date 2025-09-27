@@ -1,4 +1,6 @@
-namespace Wolfix.API.Extensions;
+using Microsoft.Extensions.Configuration;
+
+namespace Wolfix.AppHost.Extensions;
 
 public static class СonfigurationExtensions
 {
