@@ -43,7 +43,7 @@ internal sealed class ProductRepository(CatalogContext context)
 
         return await _products
             .AsNoTracking()
-            .Where(product => ids.Contains(product.Id))
+            .Where(product => ids.Contains(product.Id) && product.Status == ProductStatus.InStock)
             .CountAsync(ct);
     }
 

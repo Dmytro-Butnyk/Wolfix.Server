@@ -5,8 +5,6 @@ using Shared.Domain.Interfaces;
 
 namespace Shared.Infrastructure.Repositories;
 
-//TODO: REMOVE SAVE CHANGES
-
 public class BaseRepository<TContext, TEntity>(TContext context)
     : IBaseRepository<TEntity>
     where TEntity : BaseEntity

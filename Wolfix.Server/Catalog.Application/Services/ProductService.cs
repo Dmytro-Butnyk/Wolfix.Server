@@ -315,8 +315,7 @@ internal sealed class ProductService(
 
         if (totalCount == 0)
         {
-            PaginationDto<ProductShortDto> dto = new(1, 1, 0, new List<ProductShortDto>());
-            return Result<PaginationDto<ProductShortDto>>.Success(dto);
+            return Result<PaginationDto<ProductShortDto>>.Success(PaginationDto<ProductShortDto>.Empty(page));
         }
 
         IReadOnlyCollection<ProductShortProjection> productsByCategory =
@@ -340,8 +339,7 @@ internal sealed class ProductService(
 
         if (totalCount == 0)
         {
-            PaginationDto<ProductShortDto> dto = new(1, 1, 0, new List<ProductShortDto>());
-            return Result<PaginationDto<ProductShortDto>>.Success(dto);
+            return Result<PaginationDto<ProductShortDto>>.Success(PaginationDto<ProductShortDto>.Empty(page));
         }
 
         IReadOnlyCollection<ProductShortProjection> productsWithDiscount =

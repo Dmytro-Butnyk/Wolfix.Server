@@ -10,7 +10,7 @@ public interface IBaseRepository<TEntity> where TEntity : BaseEntity
     Task AddAsync(TEntity entity,  CancellationToken cancellationToken);
     void Update(TEntity entity, Action updateAction, CancellationToken cancellationToken);
     void Delete(TEntity entity, CancellationToken cancellationToken);
-    //TODO: add include parameter
+    
     Task<TEntity?> GetByIdAsync(
         Guid id,
         CancellationToken cancellationToken,

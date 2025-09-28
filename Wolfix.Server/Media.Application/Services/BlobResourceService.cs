@@ -17,7 +17,7 @@ public sealed class BlobResourceService(
     IAzureBlobRepository azureBlobRepository,
     ILogger<BlobResourceService> logger) : IBlobResourceService
 {
-    //todo: тут вынести в прайват каррент велью
+    private readonly AzureBlobContainersNames _containerNames = containerNames.CurrentValue;
     
     public async Task<Result<BlobResourceShortDto>> AddBlobResourceAsync(BlobResourceType contentType, IFormFile fileData, CancellationToken ct)
     {
@@ -30,10 +30,10 @@ public sealed class BlobResourceService(
 
         string containerName = contentType switch
         {
-            BlobResourceType.Photo => containerNames.CurrentValue.Photos,
-            BlobResourceType.Video => containerNames.CurrentValue.Videos,
-            BlobResourceType.Document => containerNames.CurrentValue.Documents,
-            _ => throw new Exception($"Unknown blob resource type: {contentType}")
+            BlobResourceType.Photo => _containerNames.Photos,
+            BlobResourceType.Video => _containerNames.Videos,
+            BlobResourceType.Document => _containerNames.Documents,
+            _ => throw new Exception($"{nameof(AddBlobResourceAsync)} -> Unknown blob resource type: {contentType}")
         };
         
         await using Stream fileStream = fileData.OpenReadStream();
@@ -76,9 +76,13 @@ public sealed class BlobResourceService(
             return VoidResult.Failure("Blob resource not found");
         }
         
-        string containerName = blobResource.Type == BlobResourceType.Photo
-            ? containerNames.CurrentValue.Photos
-            : containerNames.CurrentValue.Videos;
+        string containerName = blobResource.Type switch
+        {
+            BlobResourceType.Photo => _containerNames.Photos,
+            BlobResourceType.Video => _containerNames.Videos,
+            BlobResourceType.Document => _containerNames.Documents,
+            _ => throw new Exception($"{nameof(DeleteBlobResourceAsync)} -> Unknown blob resource type: {blobResource.Type}")
+        };
         
         string fileName = blobResource.Name;
         
@@ -104,10 +108,10 @@ public sealed class BlobResourceService(
         {
             string containerName = blobResource.Type switch
             {
-                BlobResourceType.Photo => containerNames.CurrentValue.Photos,
-                BlobResourceType.Video => containerNames.CurrentValue.Videos,
-                //todo: добавить для документов
-                _ => throw new Exception($"Unknown blob resource type: {blobResource.Type}")
+                BlobResourceType.Photo => _containerNames.Photos,
+                BlobResourceType.Video => _containerNames.Videos,
+                BlobResourceType.Document => _containerNames.Documents,
+                _ => throw new Exception($"{nameof(ExecuteDeleteBlobResourceAsync)} -> Unknown blob resource type: {blobResource.Type}")
             };
             
             await TryDeleteBlobFromAzureAsync(containerName, blobResource.Name, ct);

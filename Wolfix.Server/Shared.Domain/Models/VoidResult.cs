@@ -42,17 +42,4 @@ public sealed class VoidResult
 
     public TResult Map<TResult>(Func<TResult> onSuccess, Func<string, TResult> onFailure)
         => IsSuccess ? onSuccess() : onFailure(ErrorMessage!);
-
-    //todo
-    // public void Map(Action onSuccess, Action<string> onFailure)
-    // {
-    //     if (IsSuccess)
-    //     {
-    //         onSuccess();
-    //     }
-    //     else
-    //     {
-    //         onFailure(ErrorMessage!);
-    //     }
-    // }
 }
