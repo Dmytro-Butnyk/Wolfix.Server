@@ -42,13 +42,7 @@ internal sealed class ProductService(
             return VoidResult.Failure(checkSellerExistsResult);
         }
         
-        ProductStatus productStatus;
-
-        if (Enum.TryParse(addProductDto.Status, out ProductStatus status))
-        {
-            productStatus = status;
-        }
-        else
+        if (!Enum.TryParse(addProductDto.Status, out ProductStatus productStatus))
         {
             return VoidResult.Failure("Invalid status");
         }
