@@ -38,3 +38,7 @@ artifacts/
 # Log files
 *.log
 /obj/
+
+# Azure publishing
+infra/
+.azure
