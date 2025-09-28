@@ -7,7 +7,8 @@ public static class ResourceBuilderExtensions
     {
         foreach (var keyValuePair in envKeyValues)
         {
-            builder.WithEnvironment(keyValuePair.Key, keyValuePair.Value);
+            (string key, string value) = keyValuePair;
+            builder.WithEnvironment(key, value);
         }
         
         return builder;
