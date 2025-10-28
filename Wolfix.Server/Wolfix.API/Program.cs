@@ -70,17 +70,6 @@ app.MapAllEndpoints();
 
 app.UseCors("AllowNextClient");
 
-// await using (var scope = app.Services.CreateAsyncScope())
-// {
-//     var services = scope.ServiceProvider;
-//     
-//     var authStore = services.GetRequiredService<IAuthStore>();
-//
-//     await authStore.RegisterAccountAsync("superadmin@gmail.com", "SUPERadmin123!", Roles.SuperAdmin, CancellationToken.None);
-//
-//     await authStore.RegisterAccountAsync("basicadmin@gmail.com", "BASICadmin123!", Roles.Admin, CancellationToken.None);
-// }
-
 //todo
 // await app.EnsureDatabaseExistAndMigrationsApplied();
 // await app.EnsureRolesValid();
