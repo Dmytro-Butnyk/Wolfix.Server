@@ -1,3 +1,4 @@
+using Google.Apis.Auth;
 using Identity.Application.Dto.Requests;
 using Identity.Application.Dto.Responses;
 using Shared.Domain.Models;
@@ -15,4 +16,6 @@ public interface IAuthService
     Task<Result<string>> ChangeEmailAsync(Guid accountId, ChangeEmailDto request, string token, CancellationToken ct);
     
     Task<VoidResult> ChangePasswordAsync(Guid accountId, ChangePasswordDto request, CancellationToken ct);
+    
+    Task<Result<string>> ContinueWithGoogleAsync(GoogleJsonWebSignature.Payload payload, CancellationToken ct);
 }

@@ -1,4 +1,5 @@
 using System.Net;
+using Google.Apis.Auth;
 using Identity.Application.Dto.Requests;
 using Identity.Application.Dto.Responses;
 using Identity.Application.Interfaces;
@@ -146,5 +147,10 @@ internal sealed class AuthService(
         }
         
         return VoidResult.Success();
+    }
+
+    public async Task<Result<string>> ContinueWithGoogleAsync(GoogleJsonWebSignature.Payload payload, CancellationToken ct)
+    {
+        //todo
     }
 }

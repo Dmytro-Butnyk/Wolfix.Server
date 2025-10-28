@@ -1,4 +1,5 @@
 using System.Net;
+using Google.Apis.Auth;
 using Identity.Application.Dto;
 using Identity.Application.Dto.Requests;
 using Identity.Application.Dto.Responses;
@@ -9,7 +10,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Shared.Domain.Models;
+
+using GooglePayload = Google.Apis.Auth.GoogleJsonWebSignature.Payload;
 
 namespace Identity.Endpoints.Endpoints;
 
@@ -48,6 +52,27 @@ internal static class IdentityEndpoints
         
         group.MapPatch("password", ChangePassword)
             .WithSummary("Change password");
+    }
+
+    //todo
+    private static async Task<Ok<string>> ContinueWithGoogle([FromBody] GoogleLoginDto request,
+        [FromServices] IConfiguration configuration,
+        [FromServices] IAuthService authService,
+        CancellationToken ct)
+    {
+        GooglePayload? payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, new GoogleJsonWebSignature.ValidationSettings
+        {
+            Audience = [configuration["GOOGLE_CLIENT_ID"]]
+        });
+
+        Result<string> getTokenResult = await authService.ContinueWithGoogleAsync(payload, ct);
+
+        if (getTokenResult.IsFailure)
+        {
+            //todo
+        }
+        
+        return TypedResults.Ok(getTokenResult.Value);
     }
     
     private static async Task<Results<Ok<UserRolesDto>, NotFound<string>, BadRequest<string>, InternalServerError<string>>> LogInAndGetUserRoles(
