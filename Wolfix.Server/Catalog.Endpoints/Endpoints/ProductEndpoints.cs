@@ -32,6 +32,7 @@ internal static class ProductEndpoints
 
     private static void MapProductEndpoints(RouteGroupBuilder group)
     {
+        //todo: в RequireAuthorization поменять со строки на Roles. везде
         group.MapPost("", AddProduct)
             .DisableAntiforgery()
             .RequireAuthorization("Seller")
