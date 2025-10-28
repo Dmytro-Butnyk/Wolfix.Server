@@ -183,4 +183,13 @@ public static class WebApplicationBuilderExtension
     // {
     //     
     // }
+
+    public static void ValidateDIOnBuild(this WebApplicationBuilder builder)
+    {
+        builder.Host.UseDefaultServiceProvider((context, options) =>
+        {
+            options.ValidateOnBuild = true;
+            options.ValidateScopes = true;
+        });
+    }
 }

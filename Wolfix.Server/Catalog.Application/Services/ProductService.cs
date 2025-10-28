@@ -47,13 +47,7 @@ internal sealed class ProductService(
             return VoidResult.Failure("Invalid status");
         }
 
-        BlobResourceType blobResourceType;
-
-        if (Enum.TryParse(addProductDto.ContentType, out BlobResourceType resourceType))
-        {
-            blobResourceType = resourceType;
-        }
-        else
+        if (!Enum.TryParse(addProductDto.ContentType, out BlobResourceType blobResourceType))
         {
             return VoidResult.Failure("Invalid blob resource type");
         }
@@ -127,21 +121,12 @@ internal sealed class ProductService(
 
     public async Task<VoidResult> AddProductMediaAsync(AddMediaDto addMediaDto, CancellationToken ct)
     {
-        BlobResourceType blobResourceType;
-
-        if (Enum.TryParse(addMediaDto.ContentType, out BlobResourceType resourceType))
-        {
-            blobResourceType = resourceType;
-        }
-        else
+        if (!Enum.TryParse(addMediaDto.ContentType, out BlobResourceType blobResourceType))
         {
             return VoidResult.Failure("Invalid blob resource type");
         }
 
-        Product? product = await productRepository.GetByIdAsync(
-            addMediaDto.ProductId,
-            ct,
-            "_productMedias");
+        Product? product = await productRepository.GetByIdAsync(addMediaDto.ProductId, ct, "_productMedias");
 
         if (product is null)
         {

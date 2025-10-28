@@ -32,6 +32,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.ValidateDIOnBuild();
+}
+
 WebApplication app = builder.Build();
 
 app.MapDefaultEndpoints();

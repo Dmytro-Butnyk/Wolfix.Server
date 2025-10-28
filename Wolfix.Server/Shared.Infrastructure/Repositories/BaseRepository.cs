@@ -11,7 +11,6 @@ public class BaseRepository<TContext, TEntity>(TContext context)
     where TContext : DbContext
 {
     private readonly DbSet<TEntity> _dbSet = context.Set<TEntity>();
-    public TContext Context => context;
 
     public async Task<bool> IsExistAsync(Guid id, CancellationToken cancellationToken)
     {
@@ -81,7 +80,9 @@ public class BaseRepository<TContext, TEntity>(TContext context)
             }
         }
 
-        return await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        return await query
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
     public async Task ExecuteDeleteAsync(CancellationToken cancellationToken)
