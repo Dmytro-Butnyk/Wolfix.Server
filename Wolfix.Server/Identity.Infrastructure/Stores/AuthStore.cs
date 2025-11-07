@@ -2,6 +2,7 @@ using System.Net;
 using Identity.Application;
 using Identity.Application.Interfaces.Repositories;
 using Identity.Application.Projections;
+using Identity.Infrastructure.Enums;
 using Identity.Infrastructure.Extensions;
 using Identity.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -19,7 +20,7 @@ internal sealed class AuthStore(
     {
         ct.ThrowIfCancellationRequested();
 
-        Result<Account> getUserResult = await GetUser(email, password, ct);
+        Result<Account> getUserResult = await GetUserAsync(email, password, ct);
 
         if (!getUserResult.IsSuccess)
         {
@@ -27,6 +28,11 @@ internal sealed class AuthStore(
         }
         
         Account user = getUserResult.Value!;
+
+        if (user.AuthProvider != AccountAuthProvider.Custom)
+        {
+            return Result<UserRolesProjection>.Failure("User is not registered with custom auth provider", HttpStatusCode.Forbidden);
+        }
         
         IList<string> userRoles = await userManager.GetRolesAsync(user);
 
@@ -39,11 +45,26 @@ internal sealed class AuthStore(
         return Result<UserRolesProjection>.Success(userRolesProjection);
     }
 
-    public async Task<Result<Guid>> CheckUserExistsAndHasRole(string email, string password, string role, CancellationToken ct)
+    public async Task<Result<Guid>> CheckUserExistsAsync(string email, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        
+        Account? user = await userManager.FindByEmailAsync(email);
+
+        if (user == null)
+        {
+            return Result<Guid>.Failure($"User with email: {email} not found", HttpStatusCode.NotFound);
+        }
+        
+        return Result<Guid>.Success(user.Id);
+    }
+
+    public async Task<Result<Guid>> CheckUserExistsAndHasRoleAsync(string email, string password, string role,
+        CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-        Result<Account> getUserResult = await GetUser(email, password, ct);
+        Result<Account> getUserResult = await GetUserAsync(email, password, ct);
 
         if (!getUserResult.IsSuccess)
         {
@@ -69,7 +90,7 @@ internal sealed class AuthStore(
         return Result<Guid>.Success(user.Id);
     }
 
-    private async Task<Result<Account>> GetUser(string email, string password, CancellationToken ct)
+    private async Task<Result<Account>> GetUserAsync(string email, string password, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
@@ -90,7 +111,7 @@ internal sealed class AuthStore(
         return Result<Account>.Success(user);
     }
 
-    public async Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role, CancellationToken ct)
+    public async Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role, CancellationToken ct, string? authProvider = "Custom")
     {
         ct.ThrowIfCancellationRequested();
 
@@ -101,10 +122,20 @@ internal sealed class AuthStore(
             return Result<Guid>.Failure("This email already taken", HttpStatusCode.Conflict);
         }
 
+        var authProviderEnum = AccountAuthProvider.Custom;
+        if (authProvider != null)
+        {
+            if (!Enum.TryParse(authProvider, out authProviderEnum))
+            {
+                return Result<Guid>.Failure($"Invalid auth provider: {authProvider}");
+            }
+        }
+
         var user = new Account
         {
             Email = email,
-            UserName = email
+            UserName = email,
+            AuthProvider = authProviderEnum
         };
 
         await using var transaction = await context.Database.BeginTransactionAsync(ct);
@@ -209,7 +240,7 @@ internal sealed class AuthStore(
         return VoidResult.Success();
     }
 
-    public async Task<VoidResult> CheckUserCanBeSeller(Guid accountId, CancellationToken ct)
+    public async Task<VoidResult> CheckUserCanBeSellerAsync(Guid accountId, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 

@@ -1,3 +1,4 @@
+using Identity.Infrastructure.Configurations;
 using Identity.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -23,6 +24,9 @@ public sealed class IdentityContext : IdentityDbContext<Account, Role, Guid>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.ApplyConfiguration(new AccountEntityConfiguration());
+        builder.ApplyConfiguration(new RoleEntityConfiguration());
         
         builder.HasDefaultSchema("identity");
     }

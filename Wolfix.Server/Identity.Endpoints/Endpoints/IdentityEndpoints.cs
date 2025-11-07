@@ -43,6 +43,9 @@ internal static class IdentityEndpoints
     {
         customerGroup.MapPost("register", Register)
             .WithSummary("Register as customer");
+        
+        customerGroup.MapPatch("google", ContinueWithGoogle)
+            .WithSummary("Continue with google");
     }
 
     private static void MapChangeEndpoints(RouteGroupBuilder group)
@@ -54,8 +57,8 @@ internal static class IdentityEndpoints
             .WithSummary("Change password");
     }
 
-    //todo
-    private static async Task<Ok<string>> ContinueWithGoogle([FromBody] GoogleLoginDto request,
+    private static async Task<Results<Ok<string>, Conflict<string>, BadRequest<string>, InternalServerError<string>, NotFound<string>>>
+        ContinueWithGoogle([FromBody] GoogleLoginDto request,
         [FromServices] IConfiguration configuration,
         [FromServices] IAuthService authService,
         CancellationToken ct)
@@ -65,17 +68,30 @@ internal static class IdentityEndpoints
             Audience = [configuration["GOOGLE_CLIENT_ID"]]
         });
 
+        if (payload is null)
+        {
+            return TypedResults.BadRequest("Invalid token");
+        }
+
         Result<string> getTokenResult = await authService.ContinueWithGoogleAsync(payload, ct);
 
         if (getTokenResult.IsFailure)
         {
-            //todo
+            return getTokenResult.StatusCode switch
+            {
+                HttpStatusCode.Conflict => TypedResults.Conflict(getTokenResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(getTokenResult.ErrorMessage),
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(getTokenResult.ErrorMessage),
+                HttpStatusCode.NotFound => TypedResults.NotFound(getTokenResult.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(ContinueWithGoogle)} -> Unknown status code: {getTokenResult.StatusCode}")
+            };
         }
         
         return TypedResults.Ok(getTokenResult.Value);
     }
     
-    private static async Task<Results<Ok<UserRolesDto>, NotFound<string>, BadRequest<string>, InternalServerError<string>>> LogInAndGetUserRoles(
+    private static async Task<Results<Ok<UserRolesDto>, NotFound<string>, BadRequest<string>, InternalServerError<string>, ForbidHttpResult>>
+        LogInAndGetUserRoles(
         [FromBody] LogInDto logInDto,
         [FromServices] IAuthService authService,
         CancellationToken ct)
@@ -89,6 +105,7 @@ internal static class IdentityEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(logInResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(logInResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(logInResult.ErrorMessage),
+                HttpStatusCode.Forbidden => TypedResults.Forbid(),
                 _ => throw new Exception($"Endpoint: {nameof(LogInAndGetUserRoles)} -> Unknown status code: {logInResult.StatusCode}")
             };
         }

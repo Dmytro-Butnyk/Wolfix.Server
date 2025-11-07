@@ -10,7 +10,7 @@ public sealed class CreateAdminEventHandler(IAuthStore authStore)
 {
     public async Task<Result<Guid>> HandleAsync(CreateAdmin @event, CancellationToken ct)
     {
-        Result<Guid> existingAccountId = await authStore.CheckUserExistsAndHasRole(@event.Email, @event.Password, 
+        Result<Guid> existingAccountId = await authStore.CheckUserExistsAndHasRoleAsync(@event.Email, @event.Password, 
             Roles.Customer, ct);
         
         if (existingAccountId.IsSuccess)

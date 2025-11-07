@@ -7,9 +7,11 @@ public interface IAuthStore
 {
     Task<Result<UserRolesProjection>> LogInAndGetUserRolesAsync(string email, string password, CancellationToken ct);
     
-    Task<Result<Guid>> CheckUserExistsAndHasRole(string email, string password, string role, CancellationToken ct);
+    Task<Result<Guid>> CheckUserExistsAsync(string email, CancellationToken ct);
     
-    Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role, CancellationToken ct);
+    Task<Result<Guid>> CheckUserExistsAndHasRoleAsync(string email, string password, string role, CancellationToken ct);
+    
+    Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role, CancellationToken ct, string? authProvider = "Custom");
     
     Task<VoidResult> AddSellerRoleAsync(Guid accountId, CancellationToken ct);
     
@@ -17,7 +19,7 @@ public interface IAuthStore
     
     Task<VoidResult> ChangePasswordAsync(Guid accountId, string currentPassword, string newPassword, CancellationToken ct);
     
-    Task<VoidResult> CheckUserCanBeSeller(Guid accountId, CancellationToken ct);
+    Task<VoidResult> CheckUserCanBeSellerAsync(Guid accountId, CancellationToken ct);
     
     Task<VoidResult> AddAdminRoleAsync(Guid accountId, CancellationToken ct);
 }

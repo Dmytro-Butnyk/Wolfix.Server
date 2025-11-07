@@ -33,7 +33,7 @@ internal sealed class AuthService(
 
     public async Task<Result<string>> GetTokenByRoleAsync(TokenDto dto, CancellationToken ct)
     {
-        Result<Guid> checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRole(dto.Email, dto.Password, dto.Role, ct);
+        Result<Guid> checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRoleAsync(dto.Email, dto.Password, dto.Role, ct);
 
         if (checkUserExistsAndHasRoleResult.IsFailure)
         {
@@ -151,6 +151,60 @@ internal sealed class AuthService(
 
     public async Task<Result<string>> ContinueWithGoogleAsync(GoogleJsonWebSignature.Payload payload, CancellationToken ct)
     {
-        //todo
+        Result<Guid> checkUserExistsResult = await authStore.CheckUserExistsAsync(payload.Email, ct);
+
+        Guid accountId, customerId;
+        
+        if (checkUserExistsResult.IsFailure)
+        {
+            const string password = "NULL BECAUSE REGISTERED VIA GOOGLE";
+
+            Result<Guid> registerAccountResult = await authStore.RegisterAccountAsync(payload.Email, password, Roles.Customer, ct);
+
+            if (registerAccountResult.IsFailure)
+            {
+                return Result<string>.Failure(registerAccountResult);
+            }
+            
+            accountId = registerAccountResult.Value;
+            
+            var @event = new CustomerAccountCreated
+            {
+                AccountId = accountId
+            };
+        
+            Result<Guid> createCustomerAndGetIdResult = await eventBus
+                .PublishWithSingleResultAsync<CustomerAccountCreated, Guid>(@event, ct);
+
+            if (createCustomerAndGetIdResult.IsFailure)
+            {
+                return Result<string>.Failure(createCustomerAndGetIdResult);
+            }
+        
+            customerId = createCustomerAndGetIdResult.Value;
+        }
+        else
+        {
+            accountId = checkUserExistsResult.Value;
+
+            var @event = new GetCustomerProfileId
+            {
+                AccountId = accountId
+            };
+            
+            Result<Guid> getCustomerProfileIdResult = await eventBus
+                .PublishWithSingleResultAsync<GetCustomerProfileId, Guid>(@event, ct);
+            
+            if (getCustomerProfileIdResult.IsFailure)
+            {
+                return Result<string>.Failure(getCustomerProfileIdResult);
+            }
+            
+            customerId = getCustomerProfileIdResult.Value;
+        }
+        
+        string token = jwtService.GenerateToken(accountId, customerId, payload.Email, Roles.Customer);
+        
+        return Result<string>.Success(token);
     }
 }

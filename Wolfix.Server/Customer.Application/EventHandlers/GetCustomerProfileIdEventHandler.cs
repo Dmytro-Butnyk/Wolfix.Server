@@ -1,3 +1,4 @@
+using System.Net;
 using Customer.Domain.Interfaces;
 using Identity.IntegrationEvents;
 using Shared.Domain.Models;
@@ -14,7 +15,10 @@ internal sealed class GetCustomerProfileIdEventHandler(ICustomerRepository custo
 
         if (customerId == null)
         {
-            return Result<Guid>.Failure($"Customer with account id: {@event.AccountId} not found");
+            return Result<Guid>.Failure(
+                $"Customer with account id: {@event.AccountId} not found",
+                HttpStatusCode.NotFound
+            );
         }
         
         return Result<Guid>.Success(customerId.Value);

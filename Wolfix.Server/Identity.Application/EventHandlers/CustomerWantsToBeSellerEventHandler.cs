@@ -10,7 +10,7 @@ public sealed class CustomerWantsToBeSellerEventHandler(IAuthStore authStore)
 {
     public async Task<VoidResult> HandleAsync(CustomerWantsToBeSeller @event, CancellationToken ct)
     {
-        VoidResult customerExistsAndHasRoleResult = await authStore.CheckUserCanBeSeller(@event.AccountId, ct);
+        VoidResult customerExistsAndHasRoleResult = await authStore.CheckUserCanBeSellerAsync(@event.AccountId, ct);
 
         if (customerExistsAndHasRoleResult.IsFailure)
         {
