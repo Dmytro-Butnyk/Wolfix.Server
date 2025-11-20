@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Sdk Name="Aspire.AppHost.Sdk" Version="9.4.2"/>
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <UserSecretsId>eca230ae-c6c0-4bb0-b7b1-433a05ae5b69</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="9.5.0" />
+        <PackageReference Include="DotNetEnv" Version="3.1.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
+      <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
+      <ProjectReference Include="..\Catalog.Endpoints\Catalog.Endpoints.csproj" />
+      <ProjectReference Include="..\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
+      <ProjectReference Include="..\Catalog.IntegrationEvents\Catalog.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Catalog.Tests\Catalog.Tests.csproj" />
+      <ProjectReference Include="..\Customer.Application\Customer.Application.csproj" />
+      <ProjectReference Include="..\Customer.Domain\Customer.Domain.csproj" />
+      <ProjectReference Include="..\Customer.Endpoints\Customer.Endpoints.csproj" />
+      <ProjectReference Include="..\Customer.Infrastructure\Customer.Infrastructure.csproj" />
+      <ProjectReference Include="..\Customer.IntegrationEvents\Customer.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Identity.Application\Identity.Application.csproj" />
+      <ProjectReference Include="..\Identity.Endpoints\Identity.Endpoints.csproj" />
+      <ProjectReference Include="..\Identity.Infrastructure\Identity.Infrastructure.csproj" />
+      <ProjectReference Include="..\Identity.IntegrationEvents\Identity.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Media.Api\Media.Api.csproj" />
+      <ProjectReference Include="..\Media.Application\Media.Application.csproj" />
+      <ProjectReference Include="..\Media.Domain\Media.Domain.csproj" />
+      <ProjectReference Include="..\Media.Infrastructure\Media.Infrastructure.csproj" />
+      <ProjectReference Include="..\Media.IntegrationEvents\Media.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Seller.Application\Seller.Application.csproj" />
+      <ProjectReference Include="..\Seller.Domain\Seller.Domain.csproj" />
+      <ProjectReference Include="..\Seller.Endpoints\Seller.Endpoints.csproj" />
+      <ProjectReference Include="..\Seller.Infrastructure\Seller.Infrastructure.csproj" />
+      <ProjectReference Include="..\Shared.Application\Shared.Application.csproj" />
+      <ProjectReference Include="..\Shared.Domain\Shared.Domain.csproj" />
+      <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
+      <ProjectReference Include="..\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Wolfix.API\Wolfix.API.csproj" />
+    </ItemGroup>
+
+</Project>

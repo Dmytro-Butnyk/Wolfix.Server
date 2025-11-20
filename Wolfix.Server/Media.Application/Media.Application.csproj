@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Catalog.IntegrationEvents\Catalog.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Media.Domain\Media.Domain.csproj" />
+      <ProjectReference Include="..\Media.IntegrationEvents\Media.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Seller.IntegrationEvents\Seller.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.8" />
+      <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
+      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
+      <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.8" />
+    </ItemGroup>
+
+</Project>
