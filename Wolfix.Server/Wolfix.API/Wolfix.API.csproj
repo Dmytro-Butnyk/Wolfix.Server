@@ -4,14 +4,33 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Сontrollers\" />
+      <ProjectReference Include="..\Admin.Endpoints\Admin.Endpoints.csproj" />
+      <ProjectReference Include="..\Catalog.Endpoints\Catalog.Endpoints.csproj" />
+      <ProjectReference Include="..\Media.Api\Media.Api.csproj" />
+      <ProjectReference Include="..\Customer.Endpoints\Customer.Endpoints.csproj" />
+      <ProjectReference Include="..\Identity.Endpoints\Identity.Endpoints.csproj" />
+      <ProjectReference Include="..\Order.Endpoints\Order.Endpoints.csproj" />
+      <ProjectReference Include="..\Seller.Endpoints\Seller.Endpoints.csproj" />
+      <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>
