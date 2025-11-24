@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using Order.Application.Dto.Order.Requests;
 using Order.Application.Dto.Order.Responses;
 using Order.Application.Interfaces;
+using Order.Domain.DeliveryAggregate;
 using Shared.Domain.Models;
 
 namespace Order.Endpoints.Endpoints;
@@ -19,6 +20,8 @@ internal static class OrderEndpoints
     {
         var orderGroup = app.MapGroup(Route)
             .WithTags("Order");
+        
+        
 
         orderGroup.MapGet("{customerId:guid}", GetCustomerOrders)
             .RequireAuthorization("Customer")
