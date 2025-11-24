@@ -5,6 +5,7 @@ using Identity.Endpoints.Extensions;
 using Media.Api;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.OpenApi.Models;
+using Notification.Endpoints.Extensions;
 using Order.Endpoints.Extensions;
 using Seller.Endpoints.Extensions;
 using Shared.Application.Extensions;
@@ -26,7 +27,8 @@ public static class WebApplicationBuilderExtension
             .AddMediaModule(connectionString)
             .AddSellerModule(connectionString)
             .AddOrderModule(connectionString)
-            .AddAdminModule(connectionString);
+            .AddAdminModule(connectionString)
+            .AddNotificationModule(connectionString);
         
         return builder;
     }
@@ -87,6 +89,13 @@ public static class WebApplicationBuilderExtension
     private static WebApplicationBuilder AddAdminModule(this WebApplicationBuilder builder, string connectionString)
     {
         builder.Services.AddAdminModule(connectionString);
+
+        return builder;
+    }
+    
+    private static WebApplicationBuilder AddNotificationModule(this WebApplicationBuilder builder, string connectionString)
+    {
+        builder.Services.AddNotificationModule(connectionString);
 
         return builder;
     }

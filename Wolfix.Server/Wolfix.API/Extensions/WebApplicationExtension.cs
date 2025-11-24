@@ -11,6 +11,7 @@ using Identity.Infrastructure.Helpers;
 using Identity.Infrastructure.Identity;
 using Media.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Identity;
+using Notification.Endpoints.Extensions;
 using Order.Endpoints.Extensions;
 using Order.Infrastructure.Extensions;
 using Seller.Endpoints.Extensions;
@@ -28,6 +29,7 @@ public static class WebApplicationExtension
         app.MapSellerApi();
         app.MapOrderApi();
         app.MapAdminApi();
+        app.MapNotificationApi();
     }
 
     public static async Task EnsureDatabaseExistAndMigrationsApplied(this WebApplication app)

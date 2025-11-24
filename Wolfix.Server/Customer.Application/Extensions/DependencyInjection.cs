@@ -5,6 +5,7 @@ using Customer.Application.Services;
 using Customer.IntegrationEvents;
 using Identity.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
+using Notification.IntegrationEvents;
 using Order.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 
@@ -28,6 +29,7 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<CustomerWantsToPlaceOrder>, CustomerWantsToPlaceOrderEventHandler>();
         services.AddScoped<IIntegrationEventHandler<GetCustomerProfileId, Guid>, GetCustomerProfileIdEventHandler>();
         services.AddScoped<IIntegrationEventHandler<CustomerWantsToGetOrders>, CustomerWantsToGetOrdersEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<FetchUserFavorites>, FetchUserFavoritesEventHandler>();
 
         return services;
     }
