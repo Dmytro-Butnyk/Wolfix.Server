@@ -55,6 +55,7 @@ internal static class OrderEndpoints
         return TypedResults.Ok(getCustomerOrders.Value!);
     }
 
+    //todo: добавить проверку чтобы не создавать повторно такой же заказ
     private static async Task<Results<Ok<string>, BadRequest<string>, NotFound<string>, InternalServerError<string>>> PlaceOrderWithPayment(
         [FromBody] PlaceOrderDto request,
         [FromServices] IOrderService orderService,
@@ -76,6 +77,7 @@ internal static class OrderEndpoints
         return TypedResults.Ok(placeOrderWithPaymentResult.Value!);
     }
 
+    //todo: добавить проверку чтобы не создавать повторно такой же заказ
     private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> PlaceOrder(
         [FromBody] PlaceOrderDto request,
         [FromServices] IOrderService orderService,
