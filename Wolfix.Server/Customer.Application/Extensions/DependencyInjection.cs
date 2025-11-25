@@ -28,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<CustomerWantsToPlaceOrder>, CustomerWantsToPlaceOrderEventHandler>();
         services.AddScoped<IIntegrationEventHandler<GetCustomerProfileId, Guid>, GetCustomerProfileIdEventHandler>();
         services.AddScoped<IIntegrationEventHandler<CustomerWantsToGetOrders>, CustomerWantsToGetOrdersEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<CustomerOrderCreated>, CustomerOrderCreatedEventHandler>();
 
         return services;
     }

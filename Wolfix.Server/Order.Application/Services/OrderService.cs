@@ -56,6 +56,13 @@ internal sealed class OrderService(
         await orderRepository.AddAsync(order, ct);
         await orderRepository.SaveChangesAsync(ct);
         
+        VoidResult deleteCustomerCartItemsResult = await DeleteCartItemsAsync(order, ct);
+
+        if (deleteCustomerCartItemsResult.IsFailure)
+        {
+            return Result<OrderPlacedWithPaymentDto>.Failure(deleteCustomerCartItemsResult);
+        }
+        
         OrderPlacedWithPaymentDto dto = new(paymentResponse.ClientSecret, order.Id);
         
         return Result<OrderPlacedWithPaymentDto>.Success(dto);
@@ -72,6 +79,13 @@ internal sealed class OrderService(
         
         await orderRepository.AddAsync(createOrderResult.Value!, ct);
         await orderRepository.SaveChangesAsync(ct);
+
+        VoidResult deleteCustomerCartItemsResult = await DeleteCartItemsAsync(createOrderResult.Value!, ct);
+
+        if (deleteCustomerCartItemsResult.IsFailure)
+        {
+            return VoidResult.Failure(deleteCustomerCartItemsResult);
+        }
         
         return VoidResult.Success();
     }
@@ -136,10 +150,25 @@ internal sealed class OrderService(
         return Result<OrderAggregate>.Success(order);
     }
 
-    // private async Task<VoidResult> DeleteCartItemsAsync(OrderAggregate order, CancellationToken ct)
-    // {
-    //     List<Guid> cartItemsIds = order.OrderItems.Select(oi => oi)
-    // }
+    private async Task<VoidResult> DeleteCartItemsAsync(OrderAggregate order, CancellationToken ct)
+    {
+        List<Guid> cartItemsIds = order.OrderItems
+            .Select(oi => oi.CartItemId)
+            .ToList();
+
+        VoidResult deleteCustomerCartItemsResult = await eventBus.PublishWithoutResultAsync(new CustomerOrderCreated
+        {
+            CartItemsIds = cartItemsIds,
+            CustomerId = order.CustomerId
+        }, ct);
+
+        if (deleteCustomerCartItemsResult.IsFailure)
+        {
+            return VoidResult.Failure(deleteCustomerCartItemsResult);
+        }
+        
+        return VoidResult.Success();
+    }
 
     public async Task<VoidResult> MarkOrderPaidAsync(Guid orderId, CancellationToken ct)
     {
