@@ -56,6 +56,7 @@ internal static class OrderEndpoints
     }
 
     //todo: добавить проверку чтобы не создавать повторно такой же заказ
+    //todo: если перешёл на страницу оплаты, не оплатил и вышел то помечается как оплачено
     private static async Task<Results<Ok<OrderPlacedWithPaymentDto>, BadRequest<string>, NotFound<string>, InternalServerError<string>>> PlaceOrderWithPayment(
         [FromBody] PlaceOrderDto request,
         [FromServices] IOrderService orderService,

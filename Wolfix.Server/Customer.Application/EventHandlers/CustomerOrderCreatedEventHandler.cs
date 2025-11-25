@@ -11,7 +11,7 @@ internal sealed class CustomerOrderCreatedEventHandler(ICustomerRepository custo
 {
     public async Task<VoidResult> HandleAsync(CustomerOrderCreated @event, CancellationToken ct)
     {
-        Domain.CustomerAggregate.Customer? customer = await customerRepository.GetByIdAsync(@event.CustomerId, ct);
+        Domain.CustomerAggregate.Customer? customer = await customerRepository.GetByIdAsync(@event.CustomerId, ct, "_cartItems");
 
         if (customer is null)
         {
