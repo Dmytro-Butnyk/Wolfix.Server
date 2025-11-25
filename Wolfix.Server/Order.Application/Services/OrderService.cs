@@ -6,6 +6,7 @@ using Order.Application.Interfaces;
 using Order.Application.Mapping;
 using Order.Application.Models;
 using Order.Domain.Interfaces.Order;
+using Order.Domain.OrderAggregate.Entities;
 using Order.Domain.OrderAggregate.Enums;
 using Order.Domain.Projections;
 using Order.IntegrationEvents;
@@ -123,7 +124,7 @@ internal sealed class OrderService(
         
         foreach (var orderItem in request.OrderItems)
         {
-            VoidResult addOrderItemResult = order.AddOrderItem(orderItem.ProductId, orderItem.PhotoUrl, orderItem.Title,
+            VoidResult addOrderItemResult = order.AddOrderItem(orderItem.ProductId, orderItem.CartItemId, orderItem.PhotoUrl, orderItem.Title,
                 orderItem.Quantity, orderItem.Price);
 
             if (addOrderItemResult.IsFailure)
@@ -134,6 +135,11 @@ internal sealed class OrderService(
         
         return Result<OrderAggregate>.Success(order);
     }
+
+    // private async Task<VoidResult> DeleteCartItemsAsync(OrderAggregate order, CancellationToken ct)
+    // {
+    //     List<Guid> cartItemsIds = order.OrderItems.Select(oi => oi)
+    // }
 
     public async Task<VoidResult> MarkOrderPaidAsync(Guid orderId, CancellationToken ct)
     {

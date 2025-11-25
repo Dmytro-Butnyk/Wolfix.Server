@@ -168,14 +168,14 @@ public sealed class Order : BaseEntity
     }
 
     #region orderItems
-    public VoidResult AddOrderItem(Guid productId, string photoUrl, string title, uint quantity, decimal price)
+    public VoidResult AddOrderItem(Guid productId, Guid cartItemId, string photoUrl, string title, uint quantity, decimal price)
     {
         if (_orderItems.Any(oi => oi.ProductId == productId))
         {
             return VoidResult.Failure($"Order item with product id: {productId} already exist");
         }
 
-        Result<OrderItem> createOrderItemResult = OrderItem.Create(productId, photoUrl, title, quantity, price, this);
+        Result<OrderItem> createOrderItemResult = OrderItem.Create(productId, cartItemId, photoUrl, title, quantity, price, this);
 
         if (createOrderItemResult.IsFailure)
         {

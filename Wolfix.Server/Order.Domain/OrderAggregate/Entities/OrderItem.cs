@@ -13,6 +13,8 @@ internal sealed class OrderItem : BaseEntity
     
     public decimal Price { get; private set; }
     
+    public Guid CartItemId { get; private set; }
+    
     public Guid ProductId { get; private set; }
     
     public Order Order { get; private set; }
@@ -20,9 +22,10 @@ internal sealed class OrderItem : BaseEntity
     
     private OrderItem() { }
 
-    private OrderItem(Guid productId, string photoUrl, string title, uint quantity, decimal price, Order order)
+    private OrderItem(Guid productId, Guid cartItemId, string photoUrl, string title, uint quantity, decimal price, Order order)
     {
         ProductId = productId;
+        CartItemId = cartItemId;
         PhotoUrl = photoUrl;
         Title = title;
         Quantity = quantity;
@@ -31,12 +34,17 @@ internal sealed class OrderItem : BaseEntity
         OrderId = order.Id;
     }
 
-    public static Result<OrderItem> Create(Guid productId, string photoUrl, string title, uint quantity,
+    public static Result<OrderItem> Create(Guid productId, Guid cartItemId, string photoUrl, string title, uint quantity,
         decimal price, Order order)
     {
         if (Guid.Empty == productId)
         {
             return Result<OrderItem>.Failure($"{nameof(productId)} cannot be empty");
+        }
+
+        if (Guid.Empty == cartItemId)
+        {
+            return Result<OrderItem>.Failure($"{nameof(cartItemId)} cannot be empty");
         }
 
         if (string.IsNullOrWhiteSpace(photoUrl))
@@ -59,12 +67,12 @@ internal sealed class OrderItem : BaseEntity
             return Result<OrderItem>.Failure($"{nameof(price)} must be positive");
         }
 
-        return Result<OrderItem>.Success(new(productId, photoUrl, title, quantity, price, order));
+        return Result<OrderItem>.Success(new(productId, cartItemId, photoUrl, title, quantity, price, order));
     }
     
     public static explicit operator OrderItemInfo(OrderItem orderItem)
-        => new(orderItem.Id, orderItem.ProductId, orderItem.PhotoUrl, orderItem.Title,
+        => new(orderItem.Id, orderItem.ProductId, orderItem.CartItemId, orderItem.PhotoUrl, orderItem.Title,
             orderItem.Quantity, orderItem.Price);
 }
 
-public sealed record OrderItemInfo(Guid Id, Guid ProductId, string PhotoUrl, string Title, uint Quantity, decimal Price);
+public sealed record OrderItemInfo(Guid Id, Guid ProductId, Guid CartItemId, string PhotoUrl, string Title, uint Quantity, decimal Price);
