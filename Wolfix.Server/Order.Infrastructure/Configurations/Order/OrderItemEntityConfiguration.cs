@@ -34,6 +34,9 @@ internal sealed class OrderItemEntityConfiguration : IEntityTypeConfiguration<Or
         builder.Property(oi => oi.Price)
             .IsRequired();
 
+        builder.Property(oi => oi.CartItemId)
+            .IsRequired();
+
         builder.Property(oi => oi.ProductId)
             .IsRequired();
     }

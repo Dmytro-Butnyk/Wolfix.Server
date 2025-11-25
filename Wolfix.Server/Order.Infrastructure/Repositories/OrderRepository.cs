@@ -19,6 +19,7 @@ public sealed class OrderRepository(OrderContext context)
             .Select(order => new CustomerOrderProjection(
                 order.Id,
                 order.Number,
+                order.DeliveryStatus,
                 order.PaymentOption,
                 order.PaymentStatus,
                 order.DeliveryInfo,

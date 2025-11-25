@@ -15,6 +15,8 @@ public sealed class Order : BaseEntity
     public Guid CustomerId { get; private set; }
     
     public RecipientInfo RecipientInfo { get; private set; }
+
+    public OrderDeliveryStatus DeliveryStatus = OrderDeliveryStatus.Preparing;
     
     public OrderPaymentOption PaymentOption { get; private set; }
     

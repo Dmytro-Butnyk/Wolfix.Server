@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Order.Domain.OrderAggregate.Entities;
+using Order.Domain.OrderAggregate.Enums;
 using Shared.Infrastructure.ValueGenerators;
 using OrderAggregate = Order.Domain.OrderAggregate.Order;
 
@@ -22,6 +23,10 @@ internal sealed class OrderEntityConfiguration : IEntityTypeConfiguration<OrderA
         builder.Property(order => order.Id)
             .HasValueGenerator<GuidV7ValueGenerator>()
             .ValueGeneratedOnAdd();
+
+        builder.Property(order => order.Number)
+            .HasDefaultValue(Guid.NewGuid().ToString())
+            .IsRequired();
 
         builder.OwnsOne(order => order.CustomerInfo, customerInfo =>
         {
@@ -82,6 +87,11 @@ internal sealed class OrderEntityConfiguration : IEntityTypeConfiguration<OrderA
                     .IsRequired();
             });
         });
+
+        builder.Property(order => order.DeliveryStatus)
+            .HasConversion<string>()
+            .HasDefaultValue(OrderDeliveryStatus.Preparing)
+            .IsRequired();
 
         builder.Property(order => order.PaymentOption)
             .HasConversion<string>()
