@@ -18,6 +18,7 @@ public sealed class OrderRepository(OrderContext context)
             .OrderByDescending(order => order.CreatedAt)
             .Select(order => new CustomerOrderProjection(
                 order.Id,
+                order.Number,
                 order.PaymentOption,
                 order.PaymentStatus,
                 order.DeliveryInfo,

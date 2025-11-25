@@ -6,7 +6,7 @@ namespace Order.Application.Mapping;
 internal static class OrderMapper
 {
     public static CustomerOrderDto ToDto(this CustomerOrderProjection projection)
-        => new(projection.Id, projection.PaymentOption, projection.PaymentStatus,
+        => new(projection.Id, projection.Number, projection.PaymentOption, projection.PaymentStatus,
             projection.DeliveryInfo, projection.DeliveryMethodName, projection.Price,
             projection.CreatedAt);
 }
