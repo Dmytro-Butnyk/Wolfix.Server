@@ -27,7 +27,8 @@ public sealed class CheckProductExistsForAddingToCartEventHandler(IProductReposi
             CustomerId = @event.CustomerId,
             PhotoUrl = product.MainPhotoUrl!,
             PriceWithDiscount = product.FinalPrice,
-            Title = product.Title
+            Title = product.Title,
+            ProductId = product.Id
         }, ct);
         
         return !result.IsSuccess ? result : VoidResult.Success();

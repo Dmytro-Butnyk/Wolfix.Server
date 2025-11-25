@@ -12,24 +12,32 @@ internal sealed class CartItem : BaseEntity
     
     public decimal PriceWithDiscount { get; private set; }
     
+    public Guid ProductId { get; private set; }
+    
     public Customer Customer { get; private set; }
     public Guid CustomerId { get; private set; }
     
     private CartItem() { }
     
     private CartItem(Customer customer, string photoUrl, string title,
-        decimal priceWithDiscount)
+        decimal priceWithDiscount, Guid productId)
     {
         Customer = customer;
         CustomerId = customer.Id;
         PhotoUrl = photoUrl;
         Title = title;
         PriceWithDiscount = priceWithDiscount;
+        ProductId = productId;
     }
 
     public static Result<CartItem> Create(Customer customer, string photoUrl, string title,
-        decimal priceWithDiscount)
+        decimal priceWithDiscount, Guid productId)
     {
+        if (productId == Guid.Empty)
+        {
+            return Result<CartItem>.Failure($"{nameof(productId)} cannot be empty");
+        }
+        
         if (string.IsNullOrWhiteSpace(photoUrl))
         {
             return Result<CartItem>.Failure($"{nameof(photoUrl)} cannot be null or empty");
@@ -45,13 +53,13 @@ internal sealed class CartItem : BaseEntity
             return Result<CartItem>.Failure($"{nameof(priceWithDiscount)} cannot be less than or equal to zero");
         }
 
-        CartItem cartItem = new(customer, photoUrl, title, priceWithDiscount);
+        CartItem cartItem = new(customer, photoUrl, title, priceWithDiscount, productId);
         return Result<CartItem>.Success(cartItem);
     }
 
     public static explicit operator CartItemInfo(CartItem cartItem)
-        => new(cartItem.Id, cartItem.CustomerId, cartItem.PhotoUrl, cartItem.Title, cartItem.PriceWithDiscount);
+        => new(cartItem.Id, cartItem.CustomerId, cartItem.PhotoUrl, cartItem.Title, cartItem.PriceWithDiscount, cartItem.ProductId);
 }
 
 public sealed record CartItemInfo(Guid Id, Guid CustomerId, string PhotoUrl, string Title,
-    decimal PriceWithDiscount);
+    decimal PriceWithDiscount, Guid ProductId);

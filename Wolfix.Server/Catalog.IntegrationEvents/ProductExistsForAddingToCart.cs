@@ -11,4 +11,6 @@ public sealed record ProductExistsForAddingToCart : IIntegrationEvent
     public required string Title { get; init; }
     
     public required decimal PriceWithDiscount { get; init; }
+    
+    public required Guid ProductId { get; init; }
 }

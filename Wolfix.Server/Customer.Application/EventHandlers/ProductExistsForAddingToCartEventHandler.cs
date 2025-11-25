@@ -24,7 +24,8 @@ public sealed class ProductExistsForAddingToCartEventHandler(ICustomerRepository
         VoidResult addToCartResult = customer.AddCartItem(
             @event.PhotoUrl,
             @event.Title,
-            @event.PriceWithDiscount
+            @event.PriceWithDiscount,
+            @event.ProductId
         );
         
         if (!addToCartResult.IsSuccess)

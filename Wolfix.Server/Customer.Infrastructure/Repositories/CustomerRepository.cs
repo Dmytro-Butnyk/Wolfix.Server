@@ -38,12 +38,13 @@ public sealed class CustomerRepository(CustomerContext context)
             .Include("_cartItems")
             .Where(customer => customer.Id == customerId && customer.ViolationStatus.Status == AccountStatus.Active)
             .SelectMany(customer => EF.Property<List<CartItem>>(customer, "_cartItems"))
-            .Select(fi => new CartItemProjection(
-                fi.Id,
-                fi.CustomerId,
-                fi.PhotoUrl,
-                fi.Title,
-                fi.PriceWithDiscount))
+            .Select(cartItem => new CartItemProjection(
+                cartItem.Id,
+                cartItem.ProductId,
+                cartItem.CustomerId,
+                cartItem.PhotoUrl,
+                cartItem.Title,
+                cartItem.PriceWithDiscount))
             .ToListAsync(ct);
     }
 
