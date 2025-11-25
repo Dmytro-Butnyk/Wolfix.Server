@@ -6,7 +6,7 @@ namespace Order.Application.Interfaces;
 
 public interface IOrderService
 {
-    Task<Result<string>> PlaceOrderWithPaymentAsync(PlaceOrderDto request, CancellationToken ct);
+    Task<Result<OrderPlacedWithPaymentDto>> PlaceOrderWithPaymentAsync(PlaceOrderDto request, CancellationToken ct);
     
     Task<VoidResult> PlaceOrderAsync(PlaceOrderDto request, CancellationToken ct);
     

@@ -20,13 +20,13 @@ internal sealed class OrderService(
     IPaymentService<StripePaymentResponse> paymentService,
     IEventBus eventBus) : IOrderService
 {
-    public async Task<Result<string>> PlaceOrderWithPaymentAsync(PlaceOrderDto request, CancellationToken ct)
+    public async Task<Result<OrderPlacedWithPaymentDto>> PlaceOrderWithPaymentAsync(PlaceOrderDto request, CancellationToken ct)
     {
         Result<OrderAggregate> createOrderResult = await CreateOrderAsync(request, true, ct);
         
         if (createOrderResult.IsFailure)
         {
-            return Result<string>.Failure(createOrderResult);
+            return Result<OrderPlacedWithPaymentDto>.Failure(createOrderResult);
         }
         
         OrderAggregate order = createOrderResult.Value!;
@@ -40,7 +40,7 @@ internal sealed class OrderService(
 
         if (payResult.IsFailure)
         {
-            return Result<string>.Failure(payResult);
+            return Result<OrderPlacedWithPaymentDto>.Failure(payResult);
         }
         
         StripePaymentResponse paymentResponse = payResult.Value!;
@@ -49,13 +49,15 @@ internal sealed class OrderService(
 
         if (addPaymentIntentIdResult.IsFailure)
         {
-            return Result<string>.Failure(addPaymentIntentIdResult);
+            return Result<OrderPlacedWithPaymentDto>.Failure(addPaymentIntentIdResult);
         }
         
         await orderRepository.AddAsync(order, ct);
         await orderRepository.SaveChangesAsync(ct);
         
-        return Result<string>.Success(paymentResponse.ClientSecret);
+        OrderPlacedWithPaymentDto dto = new(paymentResponse.ClientSecret, order.Id);
+        
+        return Result<OrderPlacedWithPaymentDto>.Success(dto);
     }
 
     public async Task<VoidResult> PlaceOrderAsync(PlaceOrderDto request, CancellationToken ct)

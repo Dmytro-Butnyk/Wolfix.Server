@@ -56,12 +56,12 @@ internal static class OrderEndpoints
     }
 
     //todo: добавить проверку чтобы не создавать повторно такой же заказ
-    private static async Task<Results<Ok<string>, BadRequest<string>, NotFound<string>, InternalServerError<string>>> PlaceOrderWithPayment(
+    private static async Task<Results<Ok<OrderPlacedWithPaymentDto>, BadRequest<string>, NotFound<string>, InternalServerError<string>>> PlaceOrderWithPayment(
         [FromBody] PlaceOrderDto request,
         [FromServices] IOrderService orderService,
         CancellationToken ct)
     {
-        Result<string> placeOrderWithPaymentResult = await orderService.PlaceOrderWithPaymentAsync(request, ct);
+        Result<OrderPlacedWithPaymentDto> placeOrderWithPaymentResult = await orderService.PlaceOrderWithPaymentAsync(request, ct);
 
         if (placeOrderWithPaymentResult.IsFailure)
         {
