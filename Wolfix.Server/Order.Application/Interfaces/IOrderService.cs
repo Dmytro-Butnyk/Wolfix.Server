@@ -13,4 +13,6 @@ public interface IOrderService
     Task<VoidResult> MarkOrderPaidAsync(Guid orderId, CancellationToken ct);
     
     Task<Result<IReadOnlyCollection<CustomerOrderDto>>> GetCustomerOrdersAsync(Guid customerId, CancellationToken ct);
+    
+    Task<Result<OrderDetailsDto>> GetOrderDetailsAsync(Guid orderId, CancellationToken ct);
 }

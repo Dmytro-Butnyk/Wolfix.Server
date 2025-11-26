@@ -21,7 +21,9 @@ internal static class OrderEndpoints
         var orderGroup = app.MapGroup(Route)
             .WithTags("Order");
         
-        
+        orderGroup.MapGet("{orderId:guid}/details", GetOrderDetails)
+            .RequireAuthorization("Customer")
+            .WithSummary("Get order details");
 
         orderGroup.MapGet("{customerId:guid}", GetCustomerOrders)
             .RequireAuthorization("Customer")
@@ -38,6 +40,21 @@ internal static class OrderEndpoints
         orderGroup.MapPost("", PlaceOrder)
             .RequireAuthorization("Customer")
             .WithSummary("Creates an order without payment");
+    }
+
+    private static async Task<Results<Ok<OrderDetailsDto>, NotFound<string>>> GetOrderDetails(
+        [FromRoute] Guid orderId,
+        [FromServices] IOrderService orderService,
+        CancellationToken ct)
+    {
+        Result<OrderDetailsDto> getOrderDetailsResult = await orderService.GetOrderDetailsAsync(orderId, ct);
+
+        if (getOrderDetailsResult.IsFailure)
+        {
+            return TypedResults.NotFound(getOrderDetailsResult.ErrorMessage);
+        }
+
+        return TypedResults.Ok(getOrderDetailsResult.Value!);
     }
 
     private static async Task<Results<Ok<IReadOnlyCollection<CustomerOrderDto>>, NotFound<string>>> GetCustomerOrders(

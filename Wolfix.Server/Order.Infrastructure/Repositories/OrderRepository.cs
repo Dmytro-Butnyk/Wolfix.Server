@@ -33,4 +33,32 @@ public sealed class OrderRepository(OrderContext context)
                 order.CreatedAt))
             .ToListAsync(ct);
     }
+
+    public async Task<OrderDetailsProjection?> GetOrderDetailsAsync(Guid orderId, CancellationToken ct)
+    {
+        return await _orders
+            .AsNoTracking()
+            .Where(order => order.Id == orderId)
+            .Include("_orderItems")
+            .Select(order => new OrderDetailsProjection(
+                order.Id,
+                order.Number,
+                order.RecipientInfo.FullName.FirstName,
+                order.RecipientInfo.FullName.LastName,
+                order.RecipientInfo.FullName.MiddleName,
+                order.RecipientInfo.PhoneNumber.Value,
+                order.DeliveryStatus.ToString(),
+                order.PaymentOption.ToString(),
+                order.PaymentStatus.ToString(),
+                order.DeliveryInfo.Number,
+                order.DeliveryInfo.City,
+                order.DeliveryInfo.Street,
+                order.DeliveryInfo.HouseNumber,
+                order.DeliveryMethodName,
+                order.Price,
+                EF.Property<List<OrderItem>>(order, "_orderItems").Select(oi =>
+                    new OrderItemDetailsProjection(oi.Id, oi.PhotoUrl, oi.Title, oi.Quantity, oi.Price,
+                        oi.ProductId)).ToList()))
+            .FirstOrDefaultAsync(ct);
+    }
 }

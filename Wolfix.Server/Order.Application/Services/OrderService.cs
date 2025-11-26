@@ -209,9 +209,26 @@ internal sealed class OrderService(
         IReadOnlyCollection<CustomerOrderProjection> customerOrders = await orderRepository.GetCustomerOrdersAsync(customerId, ct);
 
         IReadOnlyCollection<CustomerOrderDto> dto = customerOrders
-            .Select(order => order.ToDto())
+            .Select(order => order.ToCustomerShortDto())
             .ToList();
 
         return Result<IReadOnlyCollection<CustomerOrderDto>>.Success(dto);
+    }
+
+    public async Task<Result<OrderDetailsDto>> GetOrderDetailsAsync(Guid orderId, CancellationToken ct)
+    {
+        OrderDetailsProjection? projection = await orderRepository.GetOrderDetailsAsync(orderId, ct);
+
+        if (projection is null)
+        {
+            return Result<OrderDetailsDto>.Failure(
+                $"Order with id: {orderId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        OrderDetailsDto dto = projection.ToCustomerDetailsDto();
+        
+        return Result<OrderDetailsDto>.Success(dto);
     }
 }
