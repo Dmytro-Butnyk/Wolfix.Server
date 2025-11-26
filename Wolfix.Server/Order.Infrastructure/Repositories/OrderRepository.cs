@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Order.Domain.Interfaces.Order;
+using Order.Domain.OrderAggregate.Entities;
 using Order.Domain.Projections;
 using Shared.Infrastructure.Repositories;
 
@@ -15,10 +16,14 @@ public sealed class OrderRepository(OrderContext context)
         return await _orders
             .AsNoTracking()
             .Where(order => order.CustomerId == customerId)
+            .Include("_orderItems")
             .OrderByDescending(order => order.CreatedAt)
             .Select(order => new CustomerOrderProjection(
                 order.Id,
                 order.Number,
+                EF.Property<List<OrderItem>>(order, "_orderItems")
+                    .Select(oi => oi.Title)
+                    .ToList(),
                 order.DeliveryStatus,
                 order.PaymentOption,
                 order.PaymentStatus,

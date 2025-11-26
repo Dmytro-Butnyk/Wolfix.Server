@@ -145,6 +145,8 @@ public sealed class Order : BaseEntity
         }
         
         PaymentIntentId = paymentIntentId;
+        
+        PaymentStatus = OrderPaymentStatus.Pending;
         return VoidResult.Success();
     }
 

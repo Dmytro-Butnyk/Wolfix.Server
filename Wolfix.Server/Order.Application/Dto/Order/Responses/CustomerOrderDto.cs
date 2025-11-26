@@ -3,5 +3,5 @@ using Order.Domain.OrderAggregate.ValueObjects;
 
 namespace Order.Application.Dto.Order.Responses;
 
-public sealed record CustomerOrderDto(Guid Id, string Number, OrderDeliveryStatus DeliveryStatus, OrderPaymentOption PaymentOption, OrderPaymentStatus PaymentStatus,
+public sealed record CustomerOrderDto(Guid Id, string Number, List<string> ProductsNames, OrderDeliveryStatus DeliveryStatus, OrderPaymentOption PaymentOption, OrderPaymentStatus PaymentStatus,
     DeliveryInfo DeliveryInfo, string DeliveryMethodName, decimal Price, DateTime CreatedAt);
