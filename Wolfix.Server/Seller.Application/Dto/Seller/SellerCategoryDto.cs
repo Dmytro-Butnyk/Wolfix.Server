@@ -1,3 +1,3 @@
 namespace Seller.Application.Dto.Seller;
 
-public sealed record SellerCategoryDto(Guid Id, string Name);
+public sealed record SellerCategoryDto(Guid Id, Guid CategoryId, string Name);

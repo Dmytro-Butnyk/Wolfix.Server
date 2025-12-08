@@ -41,4 +41,8 @@ public interface IProductService
     //todo: add pagination
     Task<Result<IReadOnlyCollection<ProductShortDto>>> GetByAttributesFiltrationAsync(AttributesFiltrationDto attributesFiltrationDto,
         int pageSize, CancellationToken ct);
+
+    
+    Task<Result<PaginationDto<ProductShortDto>>> GetAllBySellerCategoryForPageAsync(Guid sellerId, Guid categoryId,
+        int page, int pageSize, CancellationToken ct);
 }

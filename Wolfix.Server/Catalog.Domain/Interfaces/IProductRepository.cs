@@ -24,6 +24,8 @@ public interface IProductRepository
     Task<int> GetTotalCountWithDiscountAsync(CancellationToken ct);
     
     Task<int> GetTotalCountByCategoryAsync(Guid categoryId, CancellationToken ct);
+    
+    Task<int> GetTotalCountBySellerCategoryAsync(Guid sellerId, Guid categoryId, CancellationToken ct);
 
     Task<IReadOnlyCollection<ProductShortProjection>> GetRandomAsync(int pageSize, CancellationToken ct);
     
@@ -43,4 +45,6 @@ public interface IProductRepository
     Task<IReadOnlyCollection<ProductShortProjection>> GetShortProductsByIdsAsNoTrackingAsync (IReadOnlyCollection<Guid> ids, CancellationToken ct);
     
     Task<IReadOnlyCollection<AttributeAndUniqueValuesValueObject>> GetAttributesAndUniqueValuesAsync(Guid childCategory, IReadOnlyCollection<Guid> attributeIds, CancellationToken ct);
+    
+    Task<IReadOnlyCollection<ProductShortProjection>> GetAllBySellerCategoryForPageAsync(Guid sellerId, Guid categoryId, int page, int pageSize, CancellationToken ct);
 }

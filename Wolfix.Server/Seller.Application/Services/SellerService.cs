@@ -151,7 +151,7 @@ internal sealed class SellerService(ISellerRepository sellerRepository) : ISelle
         }
 
         IReadOnlyCollection<SellerCategoryDto> dto = seller.SellerCategories
-            .Select(sc => new SellerCategoryDto(sc.Id, sc.Name))
+            .Select(sc => new SellerCategoryDto(sc.Id, sc.CategoryId, sc.Name))
             .ToList();
         
         return Result<IReadOnlyCollection<SellerCategoryDto>>.Success(dto);

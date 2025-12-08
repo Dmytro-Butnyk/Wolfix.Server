@@ -39,6 +39,9 @@ internal sealed class OrderItemEntityConfiguration : IEntityTypeConfiguration<Or
 
         builder.Property(oi => oi.ProductId)
             .IsRequired();
+
+        builder.Property(oi => oi.SellerId)
+            .IsRequired();
     }
 
     private void ConfigureOrderRelation(EntityTypeBuilder<OrderItem> builder)

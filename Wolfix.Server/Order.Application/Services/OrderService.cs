@@ -2,11 +2,11 @@ using System.Net;
 using Order.Application.Contracts;
 using Order.Application.Dto.Order.Requests;
 using Order.Application.Dto.Order.Responses;
+using Order.Application.Dto.OrderItem.Responses;
 using Order.Application.Interfaces;
 using Order.Application.Mapping;
 using Order.Application.Models;
 using Order.Domain.Interfaces.Order;
-using Order.Domain.OrderAggregate.Entities;
 using Order.Domain.OrderAggregate.Enums;
 using Order.Domain.Projections;
 using Order.IntegrationEvents;
@@ -138,7 +138,7 @@ internal sealed class OrderService(
         
         foreach (var orderItem in request.OrderItems)
         {
-            VoidResult addOrderItemResult = order.AddOrderItem(orderItem.ProductId, orderItem.CartItemId, orderItem.PhotoUrl, orderItem.Title,
+            VoidResult addOrderItemResult = order.AddOrderItem(orderItem.ProductId, orderItem.SellerId, orderItem.CartItemId, orderItem.PhotoUrl, orderItem.Title,
                 orderItem.Quantity, orderItem.Price);
 
             if (addOrderItemResult.IsFailure)
@@ -230,5 +230,23 @@ internal sealed class OrderService(
         OrderDetailsDto dto = projection.ToCustomerDetailsDto();
         
         return Result<OrderDetailsDto>.Success(dto);
+    }
+
+    public async Task<Result<IReadOnlyCollection<SellerOrderItemDto>>> GetSellerOrdersAsync(Guid sellerId, CancellationToken ct)
+    {
+        VoidResult checkSellerExistResult = await eventBus.PublishWithoutResultAsync(new CheckSellerExist(sellerId), ct);
+
+        if (checkSellerExistResult.IsFailure)
+        {
+            return Result<IReadOnlyCollection<SellerOrderItemDto>>.Failure(checkSellerExistResult);
+        }
+        
+        IReadOnlyCollection<SellerOrderItemProjection> sellerOrders = await orderRepository.GetSellerOrdersAsync(sellerId, ct);
+
+        IReadOnlyCollection<SellerOrderItemDto> dto = sellerOrders
+            .Select(order => order.ToSellerShortDto())
+            .ToList();
+
+        return Result<IReadOnlyCollection<SellerOrderItemDto>>.Success(dto);
     }
 }

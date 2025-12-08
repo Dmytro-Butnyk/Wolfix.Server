@@ -2,6 +2,7 @@ using Catalog.IntegrationEvents;
 using Catalog.IntegrationEvents.Dto;
 using Identity.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
+using Order.IntegrationEvents;
 using Seller.Application.EventHandlers;
 using Seller.Application.Interfaces;
 using Seller.Application.Services;
@@ -27,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<GetSellerProfileId, Guid>, GetSellerProfileIdEventHandler>();
         services.AddScoped<IIntegrationEventHandler<CheckSellerExistsForProductAddition>, CheckSellerExistsForProductAdditionEventHandler>();
         services.AddScoped<IIntegrationEventHandler<FetchSellerInformation, ProductSellerEventResult>, FetchSellerInformationEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<CheckSellerWithCategoryExist>, CheckSellerWithCategoryExistEventHandler>();
         
         return services;
     }

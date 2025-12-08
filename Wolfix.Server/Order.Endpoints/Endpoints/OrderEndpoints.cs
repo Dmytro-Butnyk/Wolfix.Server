@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Order.Application.Dto.Order.Requests;
 using Order.Application.Dto.Order.Responses;
+using Order.Application.Dto.OrderItem.Responses;
 using Order.Application.Interfaces;
 using Order.Domain.DeliveryAggregate;
 using Shared.Domain.Models;
@@ -25,9 +26,15 @@ internal static class OrderEndpoints
             .RequireAuthorization("Customer")
             .WithSummary("Get order details");
 
+        //todo: переделать роут на: /api/orders/customers/{customerId:guid}
+        //todo: та и вообще перенести заказы пользователя в модуль пользователей а заказы продавца в модуль продавца
         orderGroup.MapGet("{customerId:guid}", GetCustomerOrders)
             .RequireAuthorization("Customer")
             .WithSummary("Get all orders by specific customer");
+        
+        orderGroup.MapGet("sellers/{sellerId:guid}", GetSellerOrders)
+            .RequireAuthorization("Seller")
+            .WithSummary("Get all orders by specific seller");
         
         orderGroup.MapPost("with-payment", PlaceOrderWithPayment)
             .RequireAuthorization("Customer")
@@ -70,6 +77,21 @@ internal static class OrderEndpoints
         }
 
         return TypedResults.Ok(getCustomerOrders.Value!);
+    }
+
+    private static async Task<Results<Ok<IReadOnlyCollection<SellerOrderItemDto>>, NotFound<string>>> GetSellerOrders(
+        [FromRoute] Guid sellerId,
+        [FromServices] IOrderService orderService,
+        CancellationToken ct)
+    {
+        Result<IReadOnlyCollection<SellerOrderItemDto>> getSellerOrders = await orderService.GetSellerOrdersAsync(sellerId, ct);
+
+        if (getSellerOrders.IsFailure)
+        {
+            return TypedResults.NotFound(getSellerOrders.ErrorMessage);
+        }
+
+        return TypedResults.Ok(getSellerOrders.Value!);
     }
 
     //todo: добавить проверку чтобы не создавать повторно такой же заказ

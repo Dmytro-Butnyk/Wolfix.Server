@@ -66,6 +66,10 @@ internal static class ProductEndpoints
         group.MapGet("random", GetRandom)
             .WithSummary("Get random products");
         
+        group.MapGet("seller/{sellerId:guid}/category/{categoryId:guid}/page/{page:int}", GetAllBySellerCategoryForPage)
+            .RequireAuthorization("Seller")
+            .WithSummary("Get all products by specific seller category");
+        
         group.MapGet("search/category/{categoryId:guid}", GetSearchByCategory)
             .WithSummary("Get products by search query and category");
         
@@ -264,6 +268,25 @@ internal static class ProductEndpoints
             await productService.GetRandomProductsAsync(pageSize, ct);
 
         return TypedResults.Ok(getRandomProductsResult.Value);
+    }
+
+    private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, NotFound<string>>> GetAllBySellerCategoryForPage(
+        [FromRoute] Guid sellerId,
+        [FromRoute] Guid categoryId,
+        [FromRoute] int page,
+        [FromServices] IProductService productService,
+        CancellationToken ct,
+        [FromQuery] int pageSize = 20)
+    {
+        Result<PaginationDto<ProductShortDto>> getProductsBySellerCategoryResult =
+            await productService.GetAllBySellerCategoryForPageAsync(sellerId, categoryId, page, pageSize, ct);
+
+        if (getProductsBySellerCategoryResult.IsFailure)
+        {
+            return TypedResults.NotFound(getProductsBySellerCategoryResult.ErrorMessage);
+        }
+
+        return TypedResults.Ok(getProductsBySellerCategoryResult.Value);
     }
 
     private static async Task<Results<Ok<CursorPaginationDto<ProductReviewDto>>, NotFound<string>>> GetReviews(

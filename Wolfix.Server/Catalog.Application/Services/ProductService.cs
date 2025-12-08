@@ -541,9 +541,53 @@ internal sealed class ProductService(
         IReadOnlyCollection<ProductShortProjection> productShortProjections =
             await productRepository.GetShortProductsByIdsAsNoTrackingAsync(productIds, ct);
         
-        IReadOnlyCollection<ProductShortDto> productShortDtos =
-            productShortProjections.Select(p => p.ToShortDto()).ToList();
+        IReadOnlyCollection<ProductShortDto> productShortDtos = productShortProjections
+            .Select(p => p.ToShortDto())
+            .ToList();
         
         return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
+    }
+
+    public async Task<Result<PaginationDto<ProductShortDto>>> GetAllBySellerCategoryForPageAsync(Guid sellerId,
+        Guid categoryId, int page, int pageSize, CancellationToken ct)
+    {
+        VoidResult checkCategoryExistResult = await productDomainService.IsCategoryExistAsync(categoryId, ct);
+
+        if (checkCategoryExistResult.IsFailure)
+        {
+            return Result<PaginationDto<ProductShortDto>>.Failure(checkCategoryExistResult);
+        }
+        
+        VoidResult checkSellerExistResult = await eventBus.PublishWithoutResultAsync(new CheckSellerWithCategoryExist(sellerId, categoryId), ct);
+
+        if (checkSellerExistResult.IsFailure)
+        {
+            return Result<PaginationDto<ProductShortDto>>.Failure(checkSellerExistResult);
+        }
+        
+        int totalCount = await productRepository.GetTotalCountBySellerCategoryAsync(sellerId, categoryId, ct);
+        
+        IReadOnlyCollection<ProductShortProjection> projections =
+            await productRepository.GetAllBySellerCategoryForPageAsync(sellerId, categoryId, page, pageSize, ct);
+
+        if (projections.Count == 0)
+        {
+            return Result<PaginationDto<ProductShortDto>>.Success(PaginationDto<ProductShortDto>.Empty(page));
+        }
+
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+        
+        IReadOnlyCollection<ProductShortDto> dto = projections
+            .Select(projection => projection.ToShortDto())
+            .ToList();
+
+        PaginationDto<ProductShortDto> paginationDto = new(
+            page,
+            totalPages,
+            totalCount,
+            dto
+        );
+        
+        return Result<PaginationDto<ProductShortDto>>.Success(paginationDto);
     }
 }

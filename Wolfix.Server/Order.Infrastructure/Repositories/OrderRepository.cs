@@ -61,4 +61,19 @@ public sealed class OrderRepository(OrderContext context)
                         oi.ProductId)).ToList()))
             .FirstOrDefaultAsync(ct);
     }
+
+    public async Task<IReadOnlyCollection<SellerOrderItemProjection>> GetSellerOrdersAsync(Guid sellerId, CancellationToken ct)
+    {
+        return await _orders
+            .AsNoTracking()
+            .SelectMany(order => EF.Property<List<OrderItem>>(order, "_orderItems"))
+            .Where(oi => oi.SellerId == sellerId)
+            .Select(oi => new SellerOrderItemProjection(
+                oi.Id,
+                oi.Title,
+                oi.Price,
+                oi.Quantity,
+                oi.PhotoUrl))
+            .ToListAsync(ct);
+    }
 }

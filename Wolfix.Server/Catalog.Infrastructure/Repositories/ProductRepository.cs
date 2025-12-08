@@ -137,6 +137,16 @@ internal sealed class ProductRepository(CatalogContext context)
         return totalCount;
     }
 
+    public async Task<int> GetTotalCountBySellerCategoryAsync(Guid sellerId, Guid categoryId, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        
+        return await _products
+            .AsNoTracking()
+            .Where(product => product.SellerId == sellerId && product.CategoryId == categoryId)
+            .CountAsync(ct);
+    }
+
     public async Task<IReadOnlyCollection<ProductShortProjection>> GetRandomAsync(int pageSize, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
@@ -342,5 +352,26 @@ internal sealed class ProductRepository(CatalogContext context)
             .ToListAsync(ct);
 
         return result;
+    }
+
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllBySellerCategoryForPageAsync(Guid sellerId, Guid categoryId, int page, int pageSize, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        
+        return await _products
+            .AsNoTracking()
+            .Include("_reviews")
+            .Where(product => product.SellerId == sellerId && product.CategoryId == categoryId)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(product => new ProductShortProjection(
+                product.Id,
+                product.Title,
+                product.AverageRating,
+                product.Price,
+                product.FinalPrice,
+                product.Bonuses,
+                product.MainPhotoUrl))
+            .ToListAsync(ct);
     }
 }
