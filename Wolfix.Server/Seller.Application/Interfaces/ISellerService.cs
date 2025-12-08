@@ -1,4 +1,3 @@
-using Seller.Application.Dto;
 using Seller.Application.Dto.Seller;
 using Shared.Application.Dto;
 using Shared.Domain.Models;

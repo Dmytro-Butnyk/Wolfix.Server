@@ -3,7 +3,6 @@ using Catalog.Domain.Projections.Product;
 using Catalog.Domain.Projections.Product.Review;
 using Catalog.Domain.ValueObjects;
 using Shared.Domain.Interfaces;
-using Shared.Domain.Models;
 
 namespace Catalog.Domain.Interfaces;
 

@@ -5,7 +5,6 @@ using Catalog.Domain.ProductAggregate.Entities;
 using Catalog.Infrastructure.Configurations.Category;
 using Catalog.Infrastructure.Configurations.Product;
 using Microsoft.EntityFrameworkCore;
-using Shared.Domain.Entities;
 using Shared.Infrastructure;
 
 namespace Catalog.Infrastructure;

@@ -1,14 +1,12 @@
 using System.Net;
-using Catalog.Application.Dto.Category;
 using Catalog.Application.Dto.Category.Requests;
 using Catalog.Application.Dto.Category.Responses;
 using Catalog.Application.Dto.Category.Responses.CategoryAttributesAndUniqueValues;
-using Catalog.Application.Interfaces;
 using Catalog.Application.Mapping.Category;
 using Catalog.Domain.CategoryAggregate;
 using Catalog.Domain.Interfaces;
-using Catalog.Domain.Interfaces.DomainServices;
 using Catalog.Domain.Projections.Category;
+using Catalog.Domain.Services;
 using Catalog.Domain.ValueObjects;
 using Catalog.IntegrationEvents;
 using Catalog.IntegrationEvents.Dto;
@@ -18,13 +16,12 @@ using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.Services;
 
-internal sealed class CategoryService(
+public sealed class CategoryService(
     ICategoryRepository categoryRepository,
-    IProductDomainService productDomainService,
-    ICategoryDomainService categoryDomainService,
+    ProductDomainService productDomainService,
+    CategoryDomainService categoryDomainService,
     IEventBus eventBus,
-    IAppCache appCache
-    ) : ICategoryService
+    IAppCache appCache)
 {
     public async Task<Result<IReadOnlyCollection<CategoryFullDto>>> GetAllParentCategoriesAsync(CancellationToken ct)
     {

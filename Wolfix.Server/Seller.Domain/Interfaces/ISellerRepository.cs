@@ -1,4 +1,3 @@
-using Seller.Domain.Projections;
 using Seller.Domain.Projections.Seller;
 using Shared.Domain.Interfaces;
 

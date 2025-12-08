@@ -1,13 +1,9 @@
 ﻿using Catalog.Domain.Interfaces;
-using Catalog.Domain.Interfaces.DomainServices;
 using Catalog.Domain.ValueObjects;
-using Shared.Domain.Models;
 
 namespace Catalog.Domain.Services;
 
-public sealed class CategoryDomainService(
-    IProductRepository productRepository)
-    : ICategoryDomainService
+public sealed class CategoryDomainService(IProductRepository productRepository)
 {
     public async Task<IReadOnlyCollection<AttributeAndUniqueValuesValueObject>> 
         GetAttributesAndUniqueValuesAsync(

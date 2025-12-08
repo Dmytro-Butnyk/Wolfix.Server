@@ -1,8 +1,6 @@
 using System.Net;
 using Catalog.IntegrationEvents;
-using Order.IntegrationEvents;
 using Seller.Domain.Interfaces;
-using Seller.Domain.SellerAggregate.Entities;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents.Interfaces;
 

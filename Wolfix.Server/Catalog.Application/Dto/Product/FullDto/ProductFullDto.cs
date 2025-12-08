@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Catalog.Application.Dto.Product.FullDto;
+﻿namespace Catalog.Application.Dto.Product.FullDto;
 
 public sealed class ProductFullDto
 {

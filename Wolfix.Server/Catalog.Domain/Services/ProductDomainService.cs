@@ -2,7 +2,6 @@
 using Catalog.Domain.CategoryAggregate;
 using Catalog.Domain.CategoryAggregate.Entities;
 using Catalog.Domain.Interfaces;
-using Catalog.Domain.Interfaces.DomainServices;
 using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.ProductAggregate.Enums;
 using Catalog.Domain.ValueObjects.AddProduct;
@@ -13,7 +12,7 @@ namespace Catalog.Domain.Services;
 
 public sealed class ProductDomainService(
     IProductRepository productRepository,
-    ICategoryRepository categoryRepository) : IProductDomainService
+    ICategoryRepository categoryRepository)
 {
     public async Task<Result<Guid>> AddProductAsync(
         string title,

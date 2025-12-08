@@ -1,10 +1,8 @@
 using System.Net;
-using Customer.Application.Dto;
 using Customer.Application.Dto.CartItem;
 using Customer.Application.Dto.Customer;
 using Customer.Application.Dto.FavoriteItem;
 using Customer.Application.Dto.Product;
-using Customer.Application.Interfaces;
 using Customer.Application.Mapping.CartItem;
 using Customer.Application.Mapping.Customer;
 using Customer.Application.Mapping.FavoriteItem;
@@ -18,7 +16,7 @@ using CustomerAggregate = Customer.Domain.CustomerAggregate.Customer;
 
 namespace Customer.Application.Services;
 
-internal sealed class CustomerService(ICustomerRepository customerRepository, IEventBus eventBus) : ICustomerService
+public sealed class CustomerService(ICustomerRepository customerRepository, IEventBus eventBus)
 {
     public async Task<VoidResult> AddProductToFavoriteAsync(AddProductToFavoriteDto request, CancellationToken ct)
     {

@@ -1,4 +1,3 @@
-using Catalog.Application.Dto.Category;
 using Catalog.Application.Dto.Category.Responses;
 using Catalog.Domain.Projections.Category;
 

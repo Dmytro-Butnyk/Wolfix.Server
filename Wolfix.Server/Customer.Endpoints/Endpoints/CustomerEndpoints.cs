@@ -3,7 +3,7 @@ using Customer.Application.Dto.CartItem;
 using Customer.Application.Dto.Customer;
 using Customer.Application.Dto.FavoriteItem;
 using Customer.Application.Dto.Product;
-using Customer.Application.Interfaces;
+using Customer.Application.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -90,7 +90,7 @@ internal static class CustomerEndpoints
     
     private static async Task<Results<Ok<CustomerDto>, NotFound<string>>> GetProfileInfo(
         [FromRoute] Guid customerId,
-        [FromServices] ICustomerService customerService,
+        [FromServices] CustomerService customerService,
         CancellationToken ct)
     {
         Result<CustomerDto> getProfileInfoResult = await customerService.GetProfileInfoAsync(customerId, ct);
@@ -105,7 +105,7 @@ internal static class CustomerEndpoints
     
     private static async Task<Results<Ok<IReadOnlyCollection<FavoriteItemDto>>, NotFound<string>>> GetFavoriteProducts(
         [FromRoute] Guid customerId,
-        [FromServices] ICustomerService customerService,
+        [FromServices] CustomerService customerService,
         CancellationToken ct)
     {
         Result<IReadOnlyCollection<FavoriteItemDto>> getFavoriteItemsResult =
@@ -121,7 +121,7 @@ internal static class CustomerEndpoints
 
     private static async Task<Results<Ok<CustomerCartItemsDto>, NotFound<string>>> GetCartProducts(
         [FromRoute] Guid customerId,
-        [FromServices] ICustomerService customerService,
+        [FromServices] CustomerService customerService,
         CancellationToken ct)
     {
         Result<CustomerCartItemsDto> getCartItemsResult =
@@ -137,7 +137,7 @@ internal static class CustomerEndpoints
     
     private static async Task<Results<NoContent, NotFound<string>>> AddProductToFavorite(
         [FromBody] AddProductToFavoriteDto request,
-        [FromServices] ICustomerService customerService,
+        [FromServices] CustomerService customerService,
         CancellationToken ct)
     {
         VoidResult addProductToFavoriteResult = await customerService.AddProductToFavoriteAsync(request, ct);
@@ -153,7 +153,7 @@ internal static class CustomerEndpoints
     private static async Task<Results<NoContent, NotFound<string>>> DeleteFavoriteItem(
         [FromRoute] Guid customerId,
         [FromRoute] Guid favoriteItemId,
-        [FromServices] ICustomerService customerService,
+        [FromServices] CustomerService customerService,
         CancellationToken ct)
     {
         VoidResult deleteFavoriteItemResult = await customerService.DeleteFavoriteItemAsync(customerId, favoriteItemId, ct);
@@ -168,7 +168,7 @@ internal static class CustomerEndpoints
 
     private static async Task<Results<NoContent, NotFound<string>>> AddProductToCart(
         [FromBody] AddProductToCartDto request,
-        [FromServices] ICustomerService customerService,
+        [FromServices] CustomerService customerService,
         CancellationToken ct)
     {
         VoidResult addProductToCartResult = await customerService.AddProductToCartAsync(request, ct);
@@ -184,7 +184,7 @@ internal static class CustomerEndpoints
     private static async Task<Results<NoContent, NotFound<string>>> DeleteCartItem(
         [FromRoute] Guid customerId,
         [FromRoute] Guid cartItemId,
-        [FromServices] ICustomerService customerService,
+        [FromServices] CustomerService customerService,
         CancellationToken ct)
     {
         VoidResult deleteCartItemResult = await customerService.DeleteCartItemAsync(customerId, cartItemId, ct);
@@ -200,7 +200,7 @@ internal static class CustomerEndpoints
     private static async Task<Results<Ok<FullNameDto>, NotFound<string>, BadRequest<string>>> ChangeFullName(
         [FromBody] ChangeFullNameDto request,
         [FromRoute] Guid customerId,
-        [FromServices] ICustomerService customerService,
+        [FromServices] CustomerService customerService,
         CancellationToken ct)
     {
         Result<FullNameDto> changeFullNameResult = await customerService.ChangeFullNameAsync(customerId, request, ct);
@@ -221,7 +221,7 @@ internal static class CustomerEndpoints
     private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> ChangePhoneNumber(
         [FromBody] ChangePhoneNumberDto request,
         [FromRoute] Guid customerId,
-        [FromServices] ICustomerService customerService,
+        [FromServices] CustomerService customerService,
         CancellationToken ct)
     {
         Result<string> changePhoneNumberResult = await customerService.ChangePhoneNumberAsync(customerId, request, ct);
@@ -242,7 +242,7 @@ internal static class CustomerEndpoints
     private static async Task<Results<Ok<AddressDto>, NotFound<string>, BadRequest<string>>> ChangeAddress(
         [FromBody] ChangeAddressDto request,
         [FromRoute] Guid customerId,
-        [FromServices] ICustomerService customerService,
+        [FromServices] CustomerService customerService,
         CancellationToken ct)
     {
         Result<AddressDto> changeAddressResult = await customerService.ChangeAddressAsync(customerId, request, ct);
@@ -263,7 +263,7 @@ internal static class CustomerEndpoints
     private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> ChangeBirthDate(
         [FromBody] ChangeBirthDateDto request,
         [FromRoute] Guid customerId,
-        [FromServices] ICustomerService customerService,
+        [FromServices] CustomerService customerService,
         CancellationToken ct)
     {
         Result<string> changeBirthDateResult = await customerService.ChangeBirthDateAsync(customerId, request, ct);

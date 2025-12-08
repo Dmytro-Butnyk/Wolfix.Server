@@ -1,5 +1,5 @@
 using Admin.Application.Dto.Requests;
-using Admin.Application.Interfaces;
+using Admin.Application.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -25,7 +25,7 @@ internal static class AdminEndpoints
 
     private static async Task<Results<NoContent, BadRequest<string>>> CreateAdmin(
         [FromBody] CreateAdminDto request,
-        [FromServices] IAdminService adminService,
+        [FromServices] AdminService adminService,
         CancellationToken ct)
     {
         VoidResult createAdminResult = await adminService.CreateAdminAsync(request, ct);

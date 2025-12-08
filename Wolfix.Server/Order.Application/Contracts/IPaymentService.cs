@@ -1,4 +1,3 @@
-using Order.Application.Models;
 using Shared.Domain.Models;
 
 namespace Order.Application.Contracts;

@@ -1,6 +1,5 @@
 using Shared.Domain.Entities;
 using Shared.Domain.Models;
-using Shared.Domain.ValueObjects;
 
 namespace Order.Domain.DeliveryAggregate.Entities;
 

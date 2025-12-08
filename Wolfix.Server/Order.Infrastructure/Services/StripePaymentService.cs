@@ -8,7 +8,7 @@ using Stripe;
 
 namespace Order.Infrastructure.Services;
 
-public sealed class StripePaymentService(IOptions<StripeOptions> stripeOptions) : IPaymentService<StripePaymentResponse>
+internal sealed class StripePaymentService(IOptions<StripeOptions> stripeOptions) : IPaymentService<StripePaymentResponse>
 {
     private readonly StripeClient _stripeClient = new(stripeOptions.Value.SecretKey);
     

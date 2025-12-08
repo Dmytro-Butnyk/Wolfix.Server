@@ -1,6 +1,5 @@
 ﻿using Media.Domain.BlobAggregate;
 using Media.Domain.Interfaces;
-using Media.Domain.Projections;
 using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.Repositories;
 

@@ -1,8 +1,6 @@
 using Catalog.IntegrationEvents;
 using Customer.Application.EventHandlers;
-using Customer.Application.Interfaces;
 using Customer.Application.Services;
-using Customer.IntegrationEvents;
 using Identity.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
 using Order.IntegrationEvents;
@@ -14,7 +12,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddCustomerApplicationServices(this IServiceCollection services)
     {
-        services.AddScoped<ICustomerService, CustomerService>();
+        services.AddScoped<CustomerService>();
         
         return services;
     }

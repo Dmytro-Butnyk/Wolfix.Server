@@ -2,7 +2,7 @@ using System.Net;
 using Catalog.Application.Dto.Category.Requests;
 using Catalog.Application.Dto.Category.Responses;
 using Catalog.Application.Dto.Category.Responses.CategoryAttributesAndUniqueValues;
-using Catalog.Application.Interfaces;
+using Catalog.Application.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -87,7 +87,7 @@ internal static class CategoryEndpoints
 
     private static async Task<Ok<IReadOnlyCollection<CategoryFullDto>>> GetAllParentCategories(
         CancellationToken ct,
-        [FromServices] ICategoryService categoryService)
+        [FromServices] CategoryService categoryService)
     {
         Result<IReadOnlyCollection<CategoryFullDto>> getParentCategoriesResult = await categoryService.GetAllParentCategoriesAsync(ct);
         
@@ -97,7 +97,7 @@ internal static class CategoryEndpoints
     private static async Task<Results<Ok<IReadOnlyCollection<CategoryFullDto>>, NotFound<string>>> GetAllChildCategoriesByParent(
         [FromRoute] Guid parentId,
         CancellationToken ct,
-        [FromServices] ICategoryService categoryService)
+        [FromServices] CategoryService categoryService)
     {
         Result<IReadOnlyCollection<CategoryFullDto>> getChildCategoriesResult =
             await categoryService.GetAllChildCategoriesByParentAsync(parentId, ct);
@@ -113,7 +113,7 @@ internal static class CategoryEndpoints
     private static async Task<Results<Ok<IReadOnlyCollection<AttributeAndUniqueValuesDto>>, BadRequest<string>, NotFound<string>>> GetAllAttributesWithUniqueValues(
         [FromRoute] Guid childId,
         CancellationToken ct,
-        [FromServices] ICategoryService categoryService)
+        [FromServices] CategoryService categoryService)
     {
         Result<IReadOnlyCollection<AttributeAndUniqueValuesDto>> result =
             await categoryService.GetCategoryAttributesAndUniqueValuesAsync(childId, ct);
@@ -132,7 +132,7 @@ internal static class CategoryEndpoints
     }
 
     private static async Task<Ok<IReadOnlyCollection<CategoryShortDto>>> GetAllChildCategories(
-        [FromServices] ICategoryService categoryService,
+        [FromServices] CategoryService categoryService,
         CancellationToken ct)
     {
         IReadOnlyCollection<CategoryShortDto> getChildCategoriesResult =
@@ -143,7 +143,7 @@ internal static class CategoryEndpoints
 
     private static async Task<Results<Ok<IReadOnlyCollection<CategoryAttributeDto>>, NotFound<string>>> GetAllAttributesByCategory(
         [FromRoute] Guid childId,
-        [FromServices] ICategoryService categoryService,
+        [FromServices] CategoryService categoryService,
         CancellationToken ct)
     {
         Result<IReadOnlyCollection<CategoryAttributeDto>> getAllAttributeResult =
@@ -159,7 +159,7 @@ internal static class CategoryEndpoints
 
     private static async Task<Results<NoContent, Conflict<string>, BadRequest<string>>> AddParent(
         [FromForm] AddParentCategoryDto request,
-        [FromServices] ICategoryService categoryService,
+        [FromServices] CategoryService categoryService,
         CancellationToken ct)
     {
         VoidResult addParentCategoryResult = await categoryService.AddParentAsync(request, ct);
@@ -180,7 +180,7 @@ internal static class CategoryEndpoints
     private static async Task<Results<Ok<ParentCategoryDto>, NotFound<string>, Conflict<string>, BadRequest<string>>> ChangeParent(
         [FromBody] ChangeParentCategoryDto request,
         [FromRoute] Guid categoryId,
-        [FromServices] ICategoryService categoryService,
+        [FromServices] CategoryService categoryService,
         CancellationToken ct)
     {
         Result<ParentCategoryDto> changeParentCategoryResult = await categoryService.ChangeParentAsync(request, categoryId, ct);
@@ -201,7 +201,7 @@ internal static class CategoryEndpoints
 
     private static async Task<Results<NoContent, NotFound<string>>> DeleteCategory(
         [FromRoute] Guid categoryId,
-        [FromServices] ICategoryService categoryService,
+        [FromServices] CategoryService categoryService,
         CancellationToken ct)
     {
         VoidResult deleteCategoryResult = await categoryService.DeleteCategoryAsync(categoryId, ct);
@@ -217,7 +217,7 @@ internal static class CategoryEndpoints
     private static async Task<Results<NoContent, NotFound<string>, Conflict<string>, BadRequest<string>>> AddChild(
         [FromForm] AddChildCategoryDto request,
         [FromRoute] Guid parentId,
-        [FromServices] ICategoryService categoryService,
+        [FromServices] CategoryService categoryService,
         CancellationToken ct)
     {
         VoidResult addChildCategoryResult = await categoryService.AddChildAsync(request, parentId, ct);
@@ -239,7 +239,7 @@ internal static class CategoryEndpoints
     private static async Task<Results<Ok<ChildCategoryDto>, NotFound<string>, Conflict<string>, BadRequest<string>>> ChangeChild(
         [FromBody] ChangeChildCategoryDto request,
         [FromRoute] Guid childCategoryId,
-        [FromServices] ICategoryService categoryService,
+        [FromServices] CategoryService categoryService,
         CancellationToken ct)
     {
         Result<ChildCategoryDto> changeChildCategoryResult = await categoryService.ChangeChildAsync(request, childCategoryId, ct);
@@ -261,7 +261,7 @@ internal static class CategoryEndpoints
     private static async Task<Results<NoContent, NotFound<string>, Conflict<string>, BadRequest<string>>> AddAttribute(
         [FromBody] AddCategoryAttributeDto request,
         [FromRoute] Guid childCategoryId,
-        [FromServices] ICategoryService categoryService,
+        [FromServices] CategoryService categoryService,
         CancellationToken ct)
     {
         VoidResult addCategoryAttributeResult = await categoryService.AddAttributeAsync(request, childCategoryId, ct);
@@ -283,7 +283,7 @@ internal static class CategoryEndpoints
     private static async Task<Results<NoContent, NotFound<string>>> DeleteAttribute(
         [FromRoute] Guid childCategoryId,
         [FromRoute] Guid attributeId,
-        [FromServices] ICategoryService categoryService,
+        [FromServices] CategoryService categoryService,
         CancellationToken ct)
     {
         VoidResult deleteAttributeResult = await categoryService.DeleteAttributeAsync(childCategoryId, attributeId, ct);
@@ -299,7 +299,7 @@ internal static class CategoryEndpoints
     private static async Task<Results<NoContent, NotFound<string>, Conflict<string>, BadRequest<string>>> AddVariant(
         [FromBody] AddCategoryVariantDto request,
         [FromRoute] Guid childCategoryId,
-        [FromServices] ICategoryService categoryService,
+        [FromServices] CategoryService categoryService,
         CancellationToken ct)
     {
         VoidResult addCategoryVariantResult = await categoryService.AddVariantAsync(request, childCategoryId, ct);
@@ -321,7 +321,7 @@ internal static class CategoryEndpoints
     private static async Task<Results<NoContent, NotFound<string>>> DeleteVariant(
         [FromRoute] Guid childCategoryId,
         [FromRoute] Guid variantId,
-        [FromServices] ICategoryService categoryService,
+        [FromServices] CategoryService categoryService,
         CancellationToken ct)
     {
         VoidResult deleteVariantResult = await categoryService.DeleteVariantAsync(childCategoryId, variantId, ct);

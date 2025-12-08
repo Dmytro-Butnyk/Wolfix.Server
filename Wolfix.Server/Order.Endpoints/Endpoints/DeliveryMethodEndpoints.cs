@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Order.Application.Dto.DeliveryMethod;
-using Order.Application.Interfaces;
+using Order.Application.Services;
 using Shared.Domain.Models;
 
 namespace Order.Endpoints.Endpoints;
@@ -24,7 +24,7 @@ internal static class DeliveryMethodEndpoints
     }
     
     private static async Task<Results<Ok<IReadOnlyCollection<DeliveryMethodDto>>, NotFound<string>>> GetDeliveryMethods(
-        [FromServices] IDeliveryMethodService deliveryMethodService,
+        [FromServices] DeliveryMethodService deliveryMethodService,
         CancellationToken ct)
     {
         Result<IReadOnlyCollection<DeliveryMethodDto>> getDeliveryMethodsResult = await deliveryMethodService.GetDeliveryMethodsAsync(ct);

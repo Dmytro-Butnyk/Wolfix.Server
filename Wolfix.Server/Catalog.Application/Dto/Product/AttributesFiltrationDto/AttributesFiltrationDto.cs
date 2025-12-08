@@ -1,6 +1,4 @@
-﻿using Catalog.Application.Dto.Product.FullDto;
-
-namespace Catalog.Application.Dto.Product.AttributesFiltrationDto;
+﻿namespace Catalog.Application.Dto.Product.AttributesFiltrationDto;
 
 public sealed class AttributesFiltrationDto
 {

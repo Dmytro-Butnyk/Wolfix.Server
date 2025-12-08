@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Seller.Domain.Interfaces;
-using Seller.Domain.Projections;
 using Seller.Domain.Projections.Seller;
 using Shared.Infrastructure.Repositories;
 

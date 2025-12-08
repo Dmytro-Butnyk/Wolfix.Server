@@ -1,14 +1,14 @@
 using Catalog.IntegrationEvents;
 using Catalog.IntegrationEvents.Dto;
 using Media.Application.Dto;
-using Media.Application.Interfaces;
+using Media.Application.Services;
 using Shared.Domain.Enums;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents.Interfaces;
 
 namespace Media.Application.EventHandlers;
 
-public sealed class AddPhotoForNewCategoryEventHandler(IBlobResourceService blobResourceService)
+public sealed class AddPhotoForNewCategoryEventHandler(BlobResourceService blobResourceService)
     : IIntegrationEventHandler<AddPhotoForNewCategory, CreatedMediaDto>
 {
     public async Task<Result<CreatedMediaDto>> HandleAsync(AddPhotoForNewCategory @event, CancellationToken ct)

@@ -1,8 +1,6 @@
 using System.Text;
 using Admin.IntegrationEvents;
-using Customer.IntegrationEvents;
 using Identity.Application.EventHandlers;
-using Identity.Application.Interfaces.Services;
 using Identity.Application.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -17,8 +15,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddIdentityApplicationServices(this IServiceCollection services)
     {
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<AuthService>();
+        services.AddScoped<JwtService>();
 
         return services;
     }

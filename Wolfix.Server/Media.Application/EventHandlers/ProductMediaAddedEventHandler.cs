@@ -1,6 +1,6 @@
 ﻿using Catalog.IntegrationEvents;
 using Media.Application.Dto;
-using Media.Application.Interfaces;
+using Media.Application.Services;
 using Media.IntegrationEvents;
 using Media.IntegrationEvents.Dto;
 using Shared.Domain.Models;
@@ -9,7 +9,7 @@ using Shared.IntegrationEvents.Interfaces;
 namespace Media.Application.EventHandlers;
 
 public sealed class ProductMediaAddedEventHandler(
-    IBlobResourceService blobResourceService,
+    BlobResourceService blobResourceService,
     IEventBus eventBus)
     : IIntegrationEventHandler<ProductMediaAdded>
 {

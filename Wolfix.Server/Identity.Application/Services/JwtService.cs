@@ -1,13 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Identity.Application.Interfaces.Services;
 using Identity.Application.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Identity.Application.Services;
 
-internal sealed class JwtService(IOptions<JwtOptions> jwtOptions) : IJwtService
+public sealed class JwtService(IOptions<JwtOptions> jwtOptions)
 {
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
     

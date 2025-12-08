@@ -1,10 +1,7 @@
-using System.Net;
 using Google.Apis.Auth;
 using Identity.Application.Dto.Requests;
 using Identity.Application.Dto.Responses;
-using Identity.Application.Interfaces;
 using Identity.Application.Interfaces.Repositories;
-using Identity.Application.Interfaces.Services;
 using Identity.Application.Mapping;
 using Identity.Application.Projections;
 using Identity.IntegrationEvents;
@@ -13,10 +10,10 @@ using Shared.IntegrationEvents.Interfaces;
 
 namespace Identity.Application.Services;
 
-internal sealed class AuthService(
+public sealed class AuthService(
     IAuthStore authStore,
-    IJwtService jwtService,
-    IEventBus eventBus) : IAuthService
+    JwtService jwtService,
+    IEventBus eventBus)
 {
     public async Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(LogInDto logInDto, CancellationToken ct)
     {

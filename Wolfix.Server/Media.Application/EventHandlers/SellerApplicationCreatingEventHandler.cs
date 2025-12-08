@@ -1,6 +1,5 @@
 using Media.Application.Dto;
-using Media.Application.Interfaces;
-using Media.Domain.Interfaces;
+using Media.Application.Services;
 using Media.IntegrationEvents.Dto;
 using Seller.IntegrationEvents;
 using Shared.Domain.Enums;
@@ -9,7 +8,7 @@ using Shared.IntegrationEvents.Interfaces;
 
 namespace Media.Application.EventHandlers;
 
-public sealed class SellerApplicationCreatingEventHandler(IBlobResourceService blobResourceService)
+public sealed class SellerApplicationCreatingEventHandler(BlobResourceService blobResourceService)
     : IIntegrationEventHandler<SellerApplicationCreating, CreatedBlobResourceDto>
 {
     public async Task<Result<CreatedBlobResourceDto>> HandleAsync(SellerApplicationCreating @event, CancellationToken ct)

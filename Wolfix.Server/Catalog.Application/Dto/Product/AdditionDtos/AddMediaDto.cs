@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Shared.Domain.Enums;
 
 namespace Catalog.Application.Dto.Product.AdditionDtos;
 

@@ -3,7 +3,6 @@ using Order.Application.Contracts;
 using Order.Application.Dto.Order.Requests;
 using Order.Application.Dto.Order.Responses;
 using Order.Application.Dto.OrderItem.Responses;
-using Order.Application.Interfaces;
 using Order.Application.Mapping;
 using Order.Application.Models;
 using Order.Domain.Interfaces.Order;
@@ -16,10 +15,10 @@ using OrderAggregate = Order.Domain.OrderAggregate.Order;
 
 namespace Order.Application.Services;
 
-internal sealed class OrderService(
+public sealed class OrderService(
     IOrderRepository orderRepository,
     IPaymentService<StripePaymentResponse> paymentService,
-    IEventBus eventBus) : IOrderService
+    IEventBus eventBus)
 {
     public async Task<Result<OrderPlacedWithPaymentDto>> PlaceOrderWithPaymentAsync(PlaceOrderDto request, CancellationToken ct)
     {

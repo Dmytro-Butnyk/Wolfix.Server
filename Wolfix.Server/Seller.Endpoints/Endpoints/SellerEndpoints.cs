@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Seller.Application.Dto;
 using Seller.Application.Dto.Seller;
 using Seller.Application.Interfaces;
 using Shared.Application.Dto;

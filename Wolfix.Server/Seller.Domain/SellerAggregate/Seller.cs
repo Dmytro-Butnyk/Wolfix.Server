@@ -1,5 +1,4 @@
 using System.Net;
-using Seller.Domain.Enums;
 using Seller.Domain.SellerAggregate.Entities;
 using Shared.Domain.Entities;
 using Shared.Domain.Models;

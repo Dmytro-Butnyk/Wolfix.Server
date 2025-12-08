@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Seller.Domain.SellerAggregate.Entities;
 using Seller.Domain.SellerApplicationAggregate;
-using Seller.Infrastructure.Configurations;
 using Seller.Infrastructure.Configurations.Seller;
 using Seller.Infrastructure.Configurations.SellerApplication;
 using Shared.Infrastructure;

@@ -2,7 +2,6 @@ using Catalog.IntegrationEvents;
 using Catalog.IntegrationEvents.Dto;
 using Identity.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
-using Order.IntegrationEvents;
 using Seller.Application.EventHandlers;
 using Seller.Application.Interfaces;
 using Seller.Application.Services;

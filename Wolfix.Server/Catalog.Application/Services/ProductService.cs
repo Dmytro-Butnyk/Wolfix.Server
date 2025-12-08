@@ -5,15 +5,14 @@ using Catalog.Application.Dto.Product.AdditionDtos;
 using Catalog.Application.Dto.Product.AttributesFiltrationDto;
 using Catalog.Application.Dto.Product.FullDto;
 using Catalog.Application.Dto.Product.Review;
-using Catalog.Application.Interfaces;
 using Catalog.Application.Mapping.Product;
 using Catalog.Application.Mapping.Product.Review;
 using Catalog.Domain.Interfaces;
-using Catalog.Domain.Interfaces.DomainServices;
 using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.ProductAggregate.Enums;
 using Catalog.Domain.Projections.Product;
 using Catalog.Domain.Projections.Product.Review;
+using Catalog.Domain.Services;
 using Catalog.Domain.ValueObjects.AddProduct;
 using Catalog.Domain.ValueObjects.FullProductDto;
 using Catalog.IntegrationEvents;
@@ -25,11 +24,11 @@ using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.Services;
 
-internal sealed class ProductService(
+public sealed class ProductService(
     IProductRepository productRepository,
-    IProductDomainService productDomainService,
+    ProductDomainService productDomainService,
     IEventBus eventBus,
-    IToxicityService toxicityService) : IProductService
+    IToxicityService toxicityService)
 {
     public async Task<VoidResult> AddProductAsync(
         AddProductDto addProductDto, CancellationToken ct)

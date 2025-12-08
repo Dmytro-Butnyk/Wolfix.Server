@@ -6,9 +6,8 @@ using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.EventHandlers;
 
-public sealed class BlobResourceForProductAddedEventHandler(
-    IProductRepository productRepository
-) : IIntegrationEventHandler<BlobResourceForProductAdded>
+public sealed class BlobResourceForProductAddedEventHandler(IProductRepository productRepository)
+    : IIntegrationEventHandler<BlobResourceForProductAdded>
 {
     public async Task<VoidResult> HandleAsync(BlobResourceForProductAdded @event, CancellationToken ct)
     {

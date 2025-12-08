@@ -4,7 +4,7 @@ using Catalog.Application.Dto.Product.AdditionDtos;
 using Catalog.Application.Dto.Product.AttributesFiltrationDto;
 using Catalog.Application.Dto.Product.FullDto;
 using Catalog.Application.Dto.Product.Review;
-using Catalog.Application.Interfaces;
+using Catalog.Application.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -92,7 +92,7 @@ internal static class ProductEndpoints
 
     private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> AddProduct(
         [FromForm] AddProductDto addProductDto,
-        [FromServices] IProductService productService,
+        [FromServices] ProductService productService,
         CancellationToken ct)
     {
         VoidResult addProductResult = await productService.AddProductAsync(addProductDto, ct);
@@ -113,7 +113,7 @@ internal static class ProductEndpoints
     private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> ChangeProductMainPhoto(
         [FromRoute] Guid productId,
         [FromRoute] Guid newMainPhotoId,
-        [FromServices] IProductService productService,
+        [FromServices] ProductService productService,
         CancellationToken ct)
     {
         VoidResult changeMainPhotoResult =
@@ -134,7 +134,7 @@ internal static class ProductEndpoints
 
     private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> AddProductMedia(
         [FromForm] AddMediaDto addMediaDto,
-        [FromServices] IProductService productService,
+        [FromServices] ProductService productService,
         CancellationToken ct
     )
     {
@@ -156,7 +156,7 @@ internal static class ProductEndpoints
     private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> DeleteProductMedia(
         [FromRoute] Guid productId,
         [FromRoute] Guid mediaId,
-        [FromServices] IProductService productService,
+        [FromServices] ProductService productService,
         CancellationToken ct)
     {
         VoidResult deleteProductMediaResult = await productService.DeleteProductMediaAsync(productId, mediaId, ct);
@@ -176,7 +176,7 @@ internal static class ProductEndpoints
     
     private static async Task<Results<Ok<ProductFullDto>, BadRequest<string>, NotFound<string>>> GetProductFullInfo(
         [FromRoute] Guid productId,
-        [FromServices] IProductService productService,
+        [FromServices] ProductService productService,
         CancellationToken ct)
     {
         Result<ProductFullDto> getProductFullInfoResult =
@@ -199,7 +199,7 @@ internal static class ProductEndpoints
         GetAllByCategoryForPage(
             [FromRoute] Guid childCategoryId,
             [FromRoute] int page,
-            [FromServices] IProductService productService,
+            [FromServices] ProductService productService,
             CancellationToken ct,
             [FromQuery] int pageSize = 20)
     {
@@ -221,7 +221,7 @@ internal static class ProductEndpoints
 
     private static async Task<Results<Ok<PaginationDto<ProductShortDto>>, BadRequest<string>>> GetWithDiscountForPage(
         [FromRoute] int page,
-        [FromServices] IProductService productService,
+        [FromServices] ProductService productService,
         CancellationToken ct,
         [FromQuery] int pageSize = 4)
     {
@@ -239,7 +239,7 @@ internal static class ProductEndpoints
     private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>, NotFound<string>>>
         GetRecommendedForPage(
             [FromQuery] Guid[] visitedCategoriesIds,
-            [FromServices] IProductService productService,
+            [FromServices] ProductService productService,
             CancellationToken ct,
             [FromQuery] int pageSize = 12)
     {
@@ -260,7 +260,7 @@ internal static class ProductEndpoints
     }
 
     private static async Task<Ok<IReadOnlyCollection<ProductShortDto>>> GetRandom(
-        [FromServices] IProductService productService,
+        [FromServices] ProductService productService,
         CancellationToken ct,
         [FromQuery] int pageSize = 12)
     {
@@ -274,7 +274,7 @@ internal static class ProductEndpoints
         [FromRoute] Guid sellerId,
         [FromRoute] Guid categoryId,
         [FromRoute] int page,
-        [FromServices] IProductService productService,
+        [FromServices] ProductService productService,
         CancellationToken ct,
         [FromQuery] int pageSize = 20)
     {
@@ -291,7 +291,7 @@ internal static class ProductEndpoints
 
     private static async Task<Results<Ok<CursorPaginationDto<ProductReviewDto>>, NotFound<string>>> GetReviews(
         [FromRoute] Guid productId,
-        [FromServices] IProductService productService,
+        [FromServices] ProductService productService,
         CancellationToken ct,
         [FromQuery] int pageSize = 10,
         [FromQuery] Guid? lastId = null)
@@ -310,7 +310,7 @@ internal static class ProductEndpoints
     private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>>> AddReview(
         [FromBody] AddProductReviewDto addProductReviewDto,
         [FromRoute] Guid productId,
-        [FromServices] IProductService productService,
+        [FromServices] ProductService productService,
         CancellationToken ct)
     {
         VoidResult addReviewResult = await productService.AddReviewAsync(productId, addProductReviewDto, ct);
@@ -332,7 +332,7 @@ internal static class ProductEndpoints
         GetSearchByCategory(
             [FromRoute] Guid categoryId,
             [FromQuery] string searchQuery,
-            [FromServices] IProductService productService,
+            [FromServices] ProductService productService,
             CancellationToken ct,
             [FromQuery] int pageSize = 20)
     {
@@ -355,7 +355,7 @@ internal static class ProductEndpoints
     private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>>>
         GetSearch(
             [FromQuery] string searchQuery,
-            [FromServices] IProductService productService,
+            [FromServices] ProductService productService,
             CancellationToken ct,
             [FromQuery] int pageSize = 20)
     {
@@ -377,7 +377,7 @@ internal static class ProductEndpoints
     private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>, NotFound<string>>>
         GetProductsByAttributes(
             [FromBody] AttributesFiltrationDto attributesFiltrationDto,
-            [FromServices] IProductService productService,
+            [FromServices] ProductService productService,
             CancellationToken ct,
             [FromQuery] int pageSize = 20)
     {

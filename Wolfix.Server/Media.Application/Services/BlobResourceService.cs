@@ -1,5 +1,4 @@
 ﻿using Media.Application.Dto;
-using Media.Application.Interfaces;
 using Media.Application.Options;
 using Media.Domain.BlobAggregate;
 using Media.Domain.Interfaces;
@@ -15,7 +14,7 @@ public sealed class BlobResourceService(
     IOptionsMonitor<AzureBlobContainersNames> containerNames,
     IBlobResourceRepository blobResourceRepository,
     IAzureBlobRepository azureBlobRepository,
-    ILogger<BlobResourceService> logger) : IBlobResourceService
+    ILogger<BlobResourceService> logger)
 {
     private readonly AzureBlobContainersNames _containerNames = containerNames.CurrentValue;
     

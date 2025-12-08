@@ -7,8 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using Order.Application.Dto.Order.Requests;
 using Order.Application.Dto.Order.Responses;
 using Order.Application.Dto.OrderItem.Responses;
-using Order.Application.Interfaces;
-using Order.Domain.DeliveryAggregate;
+using Order.Application.Services;
 using Shared.Domain.Models;
 
 namespace Order.Endpoints.Endpoints;
@@ -51,7 +50,7 @@ internal static class OrderEndpoints
 
     private static async Task<Results<Ok<OrderDetailsDto>, NotFound<string>>> GetOrderDetails(
         [FromRoute] Guid orderId,
-        [FromServices] IOrderService orderService,
+        [FromServices] OrderService orderService,
         CancellationToken ct)
     {
         Result<OrderDetailsDto> getOrderDetailsResult = await orderService.GetOrderDetailsAsync(orderId, ct);
@@ -66,7 +65,7 @@ internal static class OrderEndpoints
 
     private static async Task<Results<Ok<IReadOnlyCollection<CustomerOrderDto>>, NotFound<string>>> GetCustomerOrders(
         [FromRoute] Guid customerId,
-        [FromServices] IOrderService orderService,
+        [FromServices] OrderService orderService,
         CancellationToken ct)
     {
         Result<IReadOnlyCollection<CustomerOrderDto>> getCustomerOrders = await orderService.GetCustomerOrdersAsync(customerId, ct);
@@ -81,7 +80,7 @@ internal static class OrderEndpoints
 
     private static async Task<Results<Ok<IReadOnlyCollection<SellerOrderItemDto>>, NotFound<string>>> GetSellerOrders(
         [FromRoute] Guid sellerId,
-        [FromServices] IOrderService orderService,
+        [FromServices] OrderService orderService,
         CancellationToken ct)
     {
         Result<IReadOnlyCollection<SellerOrderItemDto>> getSellerOrders = await orderService.GetSellerOrdersAsync(sellerId, ct);
@@ -98,7 +97,7 @@ internal static class OrderEndpoints
     //todo: если перешёл на страницу оплаты, не оплатил и вышел то помечается как оплачено
     private static async Task<Results<Ok<OrderPlacedWithPaymentDto>, BadRequest<string>, NotFound<string>, InternalServerError<string>>> PlaceOrderWithPayment(
         [FromBody] PlaceOrderDto request,
-        [FromServices] IOrderService orderService,
+        [FromServices] OrderService orderService,
         CancellationToken ct)
     {
         Result<OrderPlacedWithPaymentDto> placeOrderWithPaymentResult = await orderService.PlaceOrderWithPaymentAsync(request, ct);
@@ -120,7 +119,7 @@ internal static class OrderEndpoints
     //todo: добавить проверку чтобы не создавать повторно такой же заказ
     private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> PlaceOrder(
         [FromBody] PlaceOrderDto request,
-        [FromServices] IOrderService orderService,
+        [FromServices] OrderService orderService,
         CancellationToken ct)
     {
         VoidResult placeOrderResult = await orderService.PlaceOrderAsync(request, ct);
@@ -140,7 +139,7 @@ internal static class OrderEndpoints
 
     private static async Task<Results<NoContent, BadRequest<string>>> MarkOrderPaid(
         [FromRoute] Guid orderId,
-        [FromServices] IOrderService orderService,
+        [FromServices] OrderService orderService,
         CancellationToken ct)
     {
         VoidResult markOrderPaidResult = await orderService.MarkOrderPaidAsync(orderId, ct);

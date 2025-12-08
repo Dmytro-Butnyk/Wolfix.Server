@@ -1,10 +1,8 @@
 ﻿using Catalog.IntegrationEvents;
 using Catalog.IntegrationEvents.Dto;
 using Media.Application.EventHandlers;
-using Media.Application.Interfaces;
 using Media.Application.Options;
 using Media.Application.Services;
-using Media.IntegrationEvents;
 using Media.IntegrationEvents.Dto;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +26,7 @@ public static class DependencyInjection
 
     public static IServiceCollection AddMediaServices(this IServiceCollection services)
     {
-        services.AddScoped<IBlobResourceService, BlobResourceService>();
+        services.AddScoped<BlobResourceService>();
         
         return services;
     }

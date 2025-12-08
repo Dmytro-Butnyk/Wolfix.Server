@@ -2,7 +2,6 @@
 using Catalog.Domain.Interfaces;
 using Catalog.Domain.Projections.Category;
 using Microsoft.EntityFrameworkCore;
-using Shared.Infrastructure;
 using Shared.Infrastructure.Repositories;
 
 namespace Catalog.Infrastructure.Repositories;

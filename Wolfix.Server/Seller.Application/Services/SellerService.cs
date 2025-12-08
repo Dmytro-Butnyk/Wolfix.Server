@@ -1,12 +1,8 @@
 using System.Net;
-using Seller.Application.Dto;
 using Seller.Application.Dto.Seller;
 using Seller.Application.Interfaces;
-using Seller.Application.Mapping;
 using Seller.Application.Mapping.Seller;
-using Seller.Domain.Enums;
 using Seller.Domain.Interfaces;
-using Seller.Domain.SellerAggregate.Entities;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
 

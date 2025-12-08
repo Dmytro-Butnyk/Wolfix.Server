@@ -1,8 +1,6 @@
 using Catalog.Domain.ProductAggregate.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Npgsql.EntityFrameworkCore.PostgreSQL.ValueGeneration;
-using Shared.Domain.Entities;
 using Shared.Infrastructure.ValueGenerators;
 
 namespace Catalog.Infrastructure.Configurations.Product;

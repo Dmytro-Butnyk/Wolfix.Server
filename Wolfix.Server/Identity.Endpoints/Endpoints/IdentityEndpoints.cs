@@ -1,10 +1,8 @@
 using System.Net;
 using Google.Apis.Auth;
-using Identity.Application.Dto;
 using Identity.Application.Dto.Requests;
 using Identity.Application.Dto.Responses;
-using Identity.Application.Interfaces.Services;
-using Microsoft.AspNetCore.Authentication;
+using Identity.Application.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -60,7 +58,7 @@ internal static class IdentityEndpoints
     private static async Task<Results<Ok<string>, Conflict<string>, BadRequest<string>, InternalServerError<string>, NotFound<string>>>
         ContinueWithGoogle([FromBody] GoogleLoginDto request,
         [FromServices] IConfiguration configuration,
-        [FromServices] IAuthService authService,
+        [FromServices] AuthService authService,
         CancellationToken ct)
     {
         GooglePayload? payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, new GoogleJsonWebSignature.ValidationSettings
@@ -93,7 +91,7 @@ internal static class IdentityEndpoints
     private static async Task<Results<Ok<UserRolesDto>, NotFound<string>, BadRequest<string>, InternalServerError<string>, ForbidHttpResult>>
         LogInAndGetUserRoles(
         [FromBody] LogInDto logInDto,
-        [FromServices] IAuthService authService,
+        [FromServices] AuthService authService,
         CancellationToken ct)
     {
         Result<UserRolesDto> logInResult = await authService.LogInAndGetUserRolesAsync(logInDto, ct);
@@ -115,7 +113,7 @@ internal static class IdentityEndpoints
 
     private static async Task<Results<Ok<string>, NotFound<string>, ForbidHttpResult, BadRequest<string>>> GetTokenByRole(
         [FromBody] TokenDto tokenDto,
-        [FromServices] IAuthService authService,
+        [FromServices] AuthService authService,
         CancellationToken ct)
     {
         Result<string> getTokenResult = await authService.GetTokenByRoleAsync(tokenDto, ct);
@@ -136,7 +134,7 @@ internal static class IdentityEndpoints
 
     private static async Task<Results<Ok<string>, Conflict<string>, InternalServerError<string>, BadRequest<string>>> Register(
         [FromBody] RegisterAsCustomerDto registerAsCustomerDto,
-        [FromServices] IAuthService authService,
+        [FromServices] AuthService authService,
         CancellationToken ct)
     {
         Result<string> registerResult = await authService.RegisterAsync(registerAsCustomerDto, ct);
@@ -158,7 +156,7 @@ internal static class IdentityEndpoints
     private static async Task<Results<Ok<string>, UnauthorizedHttpResult, NotFound<string>, BadRequest<string>>> ChangeEmail(
         [FromBody] ChangeEmailDto request,
         [FromRoute] Guid accountId,
-        [FromServices] IAuthService authService,
+        [FromServices] AuthService authService,
         HttpContext context,
         CancellationToken ct)
     {
@@ -199,7 +197,7 @@ internal static class IdentityEndpoints
     private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>>> ChangePassword(
             [FromBody] ChangePasswordDto request,
             [FromRoute] Guid accountId,
-            [FromServices] IAuthService authService,
+            [FromServices] AuthService authService,
             CancellationToken ct)
     {
         if (request.CurrentPassword == request.NewPassword)

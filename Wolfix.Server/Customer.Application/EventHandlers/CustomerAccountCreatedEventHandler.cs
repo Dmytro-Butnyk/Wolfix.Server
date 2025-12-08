@@ -1,5 +1,4 @@
 using Customer.Domain.Interfaces;
-using Customer.IntegrationEvents;
 using Identity.IntegrationEvents;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents.Interfaces;
