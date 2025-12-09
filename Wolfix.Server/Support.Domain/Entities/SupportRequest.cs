@@ -1,12 +1,13 @@
 using Shared.Domain.Entities;
 using Shared.Domain.Models;
 using Shared.Domain.ValueObjects;
+using Support.Domain.Enums;
 
 namespace Support.Domain.Entities;
 
 public sealed class SupportRequest : BaseEntity
 {
-    public string Email { get; private set; }
+    public Email Email { get; private set; }
     
     public FullName FullName { get; private set; }
     
@@ -22,26 +23,109 @@ public sealed class SupportRequest : BaseEntity
     
     public string Content { get; private set; }
 
-    public bool IsProcessed { get; private set; } = false;
+    public SupportRequestStatus Status { get; private set; } = SupportRequestStatus.Pending;
 
     public Support? ProcessedBy { get; private set; } = null;
     
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
     
+    private SupportRequest() { }
+
+    private SupportRequest(Email email, FullName fullName, PhoneNumber phoneNumber, BirthDate birthDate, Guid customerId,
+        string title, Guid? productId, string content)
+    {
+        Email = email;
+        FullName = fullName;
+        PhoneNumber = phoneNumber;
+        BirthDate = birthDate;
+        CustomerId = customerId;
+        Title = title;
+        ProductId = productId;
+        Content = content;
+    }
+
+    public static Result<SupportRequest> Create(string email, string firstName, string lastName, string middleName,
+        string phoneNumber, DateOnly birthDate, Guid customerId, string title, string content, Guid? productId = null)
+    {
+        Result<Email> createEmailResult = Email.Create(email);
+
+        if (createEmailResult.IsFailure)
+        {
+            return Result<SupportRequest>.Failure(createEmailResult);
+        }
+        
+        Result<FullName> createFullNameResult = FullName.Create(firstName, lastName, middleName);
+
+        if (createFullNameResult.IsFailure)
+        {
+            return Result<SupportRequest>.Failure(createFullNameResult);
+        }
+        
+        Result<PhoneNumber> createPhoneNumberResult = PhoneNumber.Create(phoneNumber);
+        
+        if (createPhoneNumberResult.IsFailure)
+        {
+            return Result<SupportRequest>.Failure(createPhoneNumberResult);
+        }
+
+        Result<BirthDate> createBirthDateResult = BirthDate.Create(birthDate);
+
+        if (createBirthDateResult.IsFailure)
+        {
+            return Result<SupportRequest>.Failure(createBirthDateResult);
+        }
+
+        if (customerId == Guid.Empty)
+        {
+            return Result<SupportRequest>.Failure("Customer Id is required");
+        }
+
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            return Result<SupportRequest>.Failure("Title is required");
+        }
+
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return Result<SupportRequest>.Failure("Content is required");
+        }
+
+        SupportRequest supportRequest = new(createEmailResult.Value!, createFullNameResult.Value!,
+            createPhoneNumberResult.Value!, createBirthDateResult.Value!, customerId, title, productId, content);
+        return Result<SupportRequest>.Success(supportRequest);
+    }
+    
     public VoidResult Process(Support support)
     {
-        if (IsProcessed)
+        if (Status != SupportRequestStatus.Pending)
         {
-            return VoidResult.Failure("Request is already processed");
+            return VoidResult.Failure("Request must be pending to be processed");
         }
 
         if (ProcessedBy != null)
         {
             return VoidResult.Failure("Request is already processed by another support");
         }
-        
-        IsProcessed = true;
+
+        Status = SupportRequestStatus.Processed;
         ProcessedBy = support;
         return VoidResult.Success();
+    }
+
+    public VoidResult Cancel(Support support)
+    {
+        if (Status != SupportRequestStatus.Pending)
+        {
+            return VoidResult.Failure("Request must be pending to be canceled");
+        }
+
+        if (ProcessedBy != null)
+        {
+            return VoidResult.Failure("Request is already processed by another support"); 
+        }
+        
+        Status = SupportRequestStatus.Canceled;
+        ProcessedBy = support;
+        return VoidResult.Success();       
     }
 }

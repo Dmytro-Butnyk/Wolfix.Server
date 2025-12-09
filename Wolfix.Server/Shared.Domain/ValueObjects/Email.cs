@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using Shared.Domain.Models;
 
-namespace Order.Domain.OrderAggregate.ValueObjects;
+namespace Shared.Domain.ValueObjects;
 
 public sealed class Email
 {
