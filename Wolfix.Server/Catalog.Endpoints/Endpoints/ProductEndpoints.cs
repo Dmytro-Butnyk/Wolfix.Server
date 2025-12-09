@@ -1,7 +1,9 @@
 using System.Net;
+using Catalog.Application.Dto.Discount.Requests;
 using Catalog.Application.Dto.Product;
 using Catalog.Application.Dto.Product.AdditionDtos;
 using Catalog.Application.Dto.Product.AttributesFiltrationDto;
+using Catalog.Application.Dto.Product.Change;
 using Catalog.Application.Dto.Product.FullDto;
 using Catalog.Application.Dto.Product.Review;
 using Catalog.Application.Services;
@@ -41,6 +43,14 @@ internal static class ProductEndpoints
         group.MapPatch("product/{productId:guid}/new-main-photo/{newMainPhotoId:guid}", ChangeProductMainPhoto)
             .RequireAuthorization("Seller")
             .WithSummary("Change product main photo");
+        
+        group.MapPatch("product/{productId:guid}/general-info", ChangeProductGeneralInfo)
+            .RequireAuthorization("Seller")
+            .WithSummary("Change product general info");
+        
+        group.MapPatch("product/{productId:guid}/price", ChangePrice)
+            .RequireAuthorization("Seller")
+            .WithSummary("Change product price");
 
         group.MapPatch("add-product-media", AddProductMedia)
             .DisableAntiforgery()
@@ -78,6 +88,14 @@ internal static class ProductEndpoints
         
         group.MapPost("filter-by-attributes", GetProductsByAttributes)
             .WithSummary("Get products by attributes filtration");
+        
+        group.MapPost("product/{productId:guid}/discount", AddDiscount)
+            .RequireAuthorization("Seller")
+            .WithSummary("Add discount to product");
+
+        group.MapDelete("product/{productId:guid}/discount", DeleteDiscount)
+            .RequireAuthorization("Seller")
+            .WithSummary("Delete product discount");
     }
 
     private static void MapReviewEndpoints(RouteGroupBuilder group)
@@ -97,7 +115,7 @@ internal static class ProductEndpoints
     {
         VoidResult addProductResult = await productService.AddProductAsync(addProductDto, ct);
 
-        if (!addProductResult.IsSuccess)
+        if (addProductResult.IsFailure)
         {
             return addProductResult.StatusCode switch
             {
@@ -110,6 +128,47 @@ internal static class ProductEndpoints
         return TypedResults.NoContent();
     }
 
+    private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>>> AddDiscount(
+        [FromRoute] Guid productId,
+        [FromBody] AddDiscountDto request,
+        [FromServices] ProductService productService,
+        CancellationToken ct)
+    {
+        VoidResult addDiscountResult = await productService.AddDiscountAsync(productId, request, ct);
+
+        if (addDiscountResult.IsFailure)
+        {
+            return addDiscountResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(addDiscountResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(addDiscountResult.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(AddDiscount)} -> Unknown status code: {addDiscountResult.StatusCode}")
+            };
+        }
+        
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>>> DeleteDiscount(
+        [FromRoute] Guid productId,
+        [FromServices] ProductService productService,
+        CancellationToken ct)
+    {
+        VoidResult deleteDiscountResult = await productService.DeleteDiscountAsync(productId, ct);
+
+        if (deleteDiscountResult.IsFailure)
+        {
+            return deleteDiscountResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(deleteDiscountResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(deleteDiscountResult.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(DeleteDiscount)} -> Unknown status code: {deleteDiscountResult.StatusCode}")
+            };
+        }
+        
+        return TypedResults.NoContent();
+    }
+
     private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> ChangeProductMainPhoto(
         [FromRoute] Guid productId,
         [FromRoute] Guid newMainPhotoId,
@@ -119,7 +178,7 @@ internal static class ProductEndpoints
         VoidResult changeMainPhotoResult =
             await productService.ChangeProductMainPhotoAsync(productId, newMainPhotoId, ct);
 
-        if (!changeMainPhotoResult.IsSuccess)
+        if (changeMainPhotoResult.IsFailure)
         {
             return changeMainPhotoResult.StatusCode switch
             {
@@ -132,6 +191,48 @@ internal static class ProductEndpoints
         return TypedResults.NoContent();
     }
 
+    private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>>> ChangeProductGeneralInfo(
+        [FromRoute] Guid productId,
+        [FromBody] ChangeProductGeneralInfoDto request,
+        [FromServices] ProductService productService,
+        CancellationToken ct)
+    {
+        VoidResult changeProductGeneralInfoResult = await productService.ChangeProductGeneralInfoAsync(productId, request, ct);
+
+        if (changeProductGeneralInfoResult.IsFailure)
+        {
+            return changeProductGeneralInfoResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(changeProductGeneralInfoResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(changeProductGeneralInfoResult.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(ChangeProductGeneralInfo)} -> Unknown status code: {changeProductGeneralInfoResult.StatusCode}")
+            };
+        }
+        
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>>> ChangePrice(
+        [FromRoute] Guid productId,
+        [FromBody] ChangeProductPriceDto request,
+        [FromServices] ProductService productService,
+        CancellationToken ct)
+    {
+        VoidResult changeProductResult = await productService.ChangeProductPrice(productId, request, ct);
+
+        if (changeProductResult.IsFailure)
+        {
+            return changeProductResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(changeProductResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(changeProductResult.ErrorMessage),
+                _ => throw new Exception($"Endpoint: {nameof(ChangePrice)} -> Unknown status code: {changeProductResult.StatusCode}")
+            };
+        }
+        
+        return TypedResults.NoContent();
+    }
+
     private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> AddProductMedia(
         [FromForm] AddMediaDto addMediaDto,
         [FromServices] ProductService productService,
@@ -140,7 +241,7 @@ internal static class ProductEndpoints
     {
         VoidResult addProductMediaResult = await productService.AddProductMediaAsync(addMediaDto, ct);
         
-        if (!addProductMediaResult.IsSuccess)
+        if (addProductMediaResult.IsFailure)
         {
             return addProductMediaResult.StatusCode switch
             {
@@ -161,7 +262,7 @@ internal static class ProductEndpoints
     {
         VoidResult deleteProductMediaResult = await productService.DeleteProductMediaAsync(productId, mediaId, ct);
 
-        if (!deleteProductMediaResult.IsSuccess)
+        if (deleteProductMediaResult.IsFailure)
         {
             return deleteProductMediaResult.StatusCode switch
             {
@@ -182,7 +283,7 @@ internal static class ProductEndpoints
         Result<ProductFullDto> getProductFullInfoResult =
             await productService.GetProductFullInfoAsync(productId, ct);
 
-        if (!getProductFullInfoResult.IsSuccess)
+        if (getProductFullInfoResult.IsFailure)
         {
             return getProductFullInfoResult.StatusCode switch
             {
@@ -211,7 +312,7 @@ internal static class ProductEndpoints
         Result<PaginationDto<ProductShortDto>> getProductsByCategoryResult =
             await productService.GetForPageByCategoryIdAsync(childCategoryId, page, pageSize, ct);
 
-        if (!getProductsByCategoryResult.IsSuccess)
+        if (getProductsByCategoryResult.IsFailure)
         {
             return TypedResults.NotFound(getProductsByCategoryResult.ErrorMessage);
         }
@@ -251,7 +352,7 @@ internal static class ProductEndpoints
         Result<IReadOnlyCollection<ProductShortDto>> getRecommendedProductsResult =
             await productService.GetRecommendedForPageAsync(pageSize, visitedCategoriesIds.ToList(), ct);
 
-        if (!getRecommendedProductsResult.IsSuccess)
+        if (getRecommendedProductsResult.IsFailure)
         {
             return TypedResults.NotFound(getRecommendedProductsResult.ErrorMessage);
         }
@@ -299,7 +400,7 @@ internal static class ProductEndpoints
         Result<CursorPaginationDto<ProductReviewDto>> getProductReviewsResult =
             await productService.GetReviewsAsync(productId, pageSize, lastId, ct);
 
-        if (!getProductReviewsResult.IsSuccess)
+        if (getProductReviewsResult.IsFailure)
         {
             return TypedResults.NotFound(getProductReviewsResult.ErrorMessage);
         }
@@ -315,7 +416,7 @@ internal static class ProductEndpoints
     {
         VoidResult addReviewResult = await productService.AddReviewAsync(productId, addProductReviewDto, ct);
 
-        if (!addReviewResult.IsSuccess)
+        if (addReviewResult.IsFailure)
         {
             return addReviewResult.StatusCode switch
             {
@@ -339,7 +440,7 @@ internal static class ProductEndpoints
         Result<IReadOnlyCollection<ProductShortDto>> getProductsBySearchQueryAndCategoryResult =
             await productService.GetBySearchQueryAndCategoryAsync(categoryId, searchQuery, pageSize, ct);
 
-        if (!getProductsBySearchQueryAndCategoryResult.IsSuccess)
+        if (getProductsBySearchQueryAndCategoryResult.IsFailure)
         {
             return getProductsBySearchQueryAndCategoryResult.StatusCode switch
             {
@@ -362,7 +463,7 @@ internal static class ProductEndpoints
         Result<IReadOnlyCollection<ProductShortDto>> getProductsBySearchQueryAndCategoryResult =
             await productService.GetBySearchQueryAsync(searchQuery, pageSize, ct);
 
-        if (!getProductsBySearchQueryAndCategoryResult.IsSuccess)
+        if (getProductsBySearchQueryAndCategoryResult.IsFailure)
         {
             return getProductsBySearchQueryAndCategoryResult.StatusCode switch
             {
@@ -384,7 +485,7 @@ internal static class ProductEndpoints
         Result<IReadOnlyCollection<ProductShortDto>> getProductsByAttributes =
             await productService.GetByAttributesFiltrationAsync(attributesFiltrationDto, pageSize, ct);
 
-        if (!getProductsByAttributes.IsSuccess)
+        if (getProductsByAttributes.IsFailure)
         {
             return getProductsByAttributes.StatusCode switch
             {

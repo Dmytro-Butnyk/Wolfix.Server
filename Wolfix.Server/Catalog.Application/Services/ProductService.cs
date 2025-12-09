@@ -1,8 +1,10 @@
 using System.Net;
 using Catalog.Application.Contracts;
+using Catalog.Application.Dto.Discount.Requests;
 using Catalog.Application.Dto.Product;
 using Catalog.Application.Dto.Product.AdditionDtos;
 using Catalog.Application.Dto.Product.AttributesFiltrationDto;
+using Catalog.Application.Dto.Product.Change;
 using Catalog.Application.Dto.Product.FullDto;
 using Catalog.Application.Dto.Product.Review;
 using Catalog.Application.Mapping.Product;
@@ -588,5 +590,115 @@ public sealed class ProductService(
         );
         
         return Result<PaginationDto<ProductShortDto>>.Success(paginationDto);
+    }
+
+    public async Task<VoidResult> AddDiscountAsync(Guid productId, AddDiscountDto addDiscountDto, CancellationToken ct)
+    {
+        Product? product = await productRepository.GetByIdAsync(productId, ct, "Discount");
+
+        if (product is null)
+        {
+            return VoidResult.Failure(
+                $"product with id: {productId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        VoidResult addDiscountResult = product.AddDiscount(addDiscountDto.Percent, addDiscountDto.ExpirationDateTime);
+
+        if (addDiscountResult.IsFailure)
+        {
+            return addDiscountResult;
+        }
+        
+        await productRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> DeleteDiscountAsync(Guid productId, CancellationToken ct)
+    {
+        Product? product = await productRepository.GetByIdAsync(productId, ct, "Discount");
+
+        if (product is null)
+        {
+            return VoidResult.Failure(
+                $"product with id: {productId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        VoidResult deleteDiscountResult = product.RemoveDiscount();
+
+        if (deleteDiscountResult.IsFailure)
+        {
+            return deleteDiscountResult;
+        }
+        
+        await productRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> ChangeProductGeneralInfoAsync(Guid productId, ChangeProductGeneralInfoDto request, CancellationToken ct)
+    {
+        Product? product = await productRepository.GetByIdAsync(productId, ct);
+
+        if (product is null)
+        {
+            return VoidResult.Failure(
+                $"product with id: {productId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        VoidResult changeTitleResult = product.ChangeTitle(request.Title);
+
+        if (changeTitleResult.IsFailure)
+        {
+            return changeTitleResult;
+        }
+
+        VoidResult changeDescriptionResult = product.ChangeDescription(request.Description);
+
+        if (changeDescriptionResult.IsFailure)
+        {
+            return changeDescriptionResult;
+        }
+
+        VoidResult changeCategoryResult = product.ChangeCategory(request.CategoryId);
+
+        if (changeCategoryResult.IsFailure)
+        {
+            return changeCategoryResult;
+        }
+        
+        await productRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> ChangeProductPrice(Guid productId, ChangeProductPriceDto request, CancellationToken ct)
+    {
+        Product? product = await productRepository.GetByIdAsync(productId, ct, "Discount");
+
+        if (product is null)
+        {
+            return VoidResult.Failure(
+                $"product with id: {productId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        VoidResult changePriceResult = product.ChangePrice(request.Price);
+
+        if (changePriceResult.IsFailure)
+        {
+            return changePriceResult;
+        }
+        
+        await productRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
     }
 }
