@@ -21,18 +21,23 @@ public sealed class SupportRequest : BaseEntity
     
     public Guid? ProductId { get; private set; }
     
-    public string Content { get; private set; }
+    public string RequestContent { get; private set; }
 
     public SupportRequestStatus Status { get; private set; } = SupportRequestStatus.Pending;
 
     public Support? ProcessedBy { get; private set; } = null;
+    public Guid? SupportId { get; private set; } = null;
+    
+    public string ResponseContent { get; private set; } = string.Empty;
     
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+    
+    public DateTime? ProcessedAt { get; private set; } = null;
     
     private SupportRequest() { }
 
     private SupportRequest(Email email, FullName fullName, PhoneNumber phoneNumber, BirthDate birthDate, Guid customerId,
-        string title, Guid? productId, string content)
+        string title, Guid? productId, string requestContent)
     {
         Email = email;
         FullName = fullName;
@@ -41,7 +46,7 @@ public sealed class SupportRequest : BaseEntity
         CustomerId = customerId;
         Title = title;
         ProductId = productId;
-        Content = content;
+        RequestContent = requestContent;
     }
 
     public static Result<SupportRequest> Create(string email, string firstName, string lastName, string middleName,
@@ -87,7 +92,7 @@ public sealed class SupportRequest : BaseEntity
 
         if (string.IsNullOrWhiteSpace(content))
         {
-            return Result<SupportRequest>.Failure("Content is required");
+            return Result<SupportRequest>.Failure("RequestContent is required");
         }
 
         SupportRequest supportRequest = new(createEmailResult.Value!, createFullNameResult.Value!,
@@ -95,20 +100,38 @@ public sealed class SupportRequest : BaseEntity
         return Result<SupportRequest>.Success(supportRequest);
     }
     
-    public VoidResult Process(Support support)
+    public VoidResult Respond(Support support, string responseContent)
     {
         if (Status != SupportRequestStatus.Pending)
         {
             return VoidResult.Failure("Request must be pending to be processed");
         }
 
-        if (ProcessedBy != null)
+        if (ProcessedBy != null || SupportId != null)
         {
             return VoidResult.Failure("Request is already processed by another support");
         }
 
+        if (ResponseContent != string.Empty)
+        {
+            return VoidResult.Failure("Response content is already set");
+        }
+
+        if (ProcessedAt != null)
+        {
+            return VoidResult.Failure("Request is already processed");
+        }
+
+        if (string.IsNullOrWhiteSpace(responseContent))
+        {
+            return VoidResult.Failure("Response content is required");
+        }
+
         Status = SupportRequestStatus.Processed;
         ProcessedBy = support;
+        SupportId = support.Id;
+        ResponseContent = responseContent;
+        ProcessedAt = DateTime.UtcNow;
         return VoidResult.Success();
     }
 
@@ -119,13 +142,20 @@ public sealed class SupportRequest : BaseEntity
             return VoidResult.Failure("Request must be pending to be canceled");
         }
 
-        if (ProcessedBy != null)
+        if (ProcessedBy != null || SupportId != null)
         {
             return VoidResult.Failure("Request is already processed by another support"); 
+        }
+
+        if (ProcessedAt != null)
+        {
+            return VoidResult.Failure("Request is already processed");
         }
         
         Status = SupportRequestStatus.Canceled;
         ProcessedBy = support;
+        SupportId = support.Id;
+        ProcessedAt = DateTime.UtcNow;
         return VoidResult.Success();       
     }
 }

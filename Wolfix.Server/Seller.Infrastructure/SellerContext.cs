@@ -20,7 +20,6 @@ public sealed class SellerContext : DbContext, IContextWithConfigurations
         
         modelBuilder.HasDefaultSchema("seller");
         ApplyConfigurations(modelBuilder);
-        
     }
 
     public void ApplyConfigurations(ModelBuilder modelBuilder)
