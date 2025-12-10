@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Shared.Domain.Interfaces;
 using Shared.Infrastructure.Repositories;
 using Support.Domain.Entities;
+using Support.Domain.Interfaces;
+using Support.Infrastructure.Repositories;
 
 namespace Support.Infrastructure.Extensions;
 
@@ -28,8 +30,9 @@ public static class DependencyInjection
     {
         services.AddScoped<IBaseRepository<Domain.Entities.Support>, BaseRepository<SupportContext, Domain.Entities.Support>>();
         services.AddScoped<IBaseRepository<SupportRequest>, BaseRepository<SupportContext, SupportRequest>>();
-        
-        //todo: добавить репозитории
+
+        services.AddScoped<ISupportRepository, SupportRepository>();
+        services.AddScoped<ISupportRequestRepository, SupportRequestRepository>();
         
         return services;
     }
