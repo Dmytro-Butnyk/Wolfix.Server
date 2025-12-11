@@ -1,6 +1,5 @@
 using System.Net;
 using Seller.Application.Dto.Seller;
-using Seller.Application.Interfaces;
 using Seller.Application.Mapping.Seller;
 using Seller.Domain.Interfaces;
 using Shared.Application.Dto;
@@ -8,7 +7,7 @@ using Shared.Domain.Models;
 
 namespace Seller.Application.Services;
 
-internal sealed class SellerService(ISellerRepository sellerRepository) : ISellerService
+public sealed class SellerService(ISellerRepository sellerRepository)
 {
     public async Task<Result<FullNameDto>> ChangeFullNameAsync(Guid sellerId, ChangeFullNameDto request, CancellationToken ct)
     {

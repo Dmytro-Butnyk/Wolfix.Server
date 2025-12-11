@@ -1,12 +1,11 @@
 using Seller.Domain.Interfaces;
-using Seller.Domain.Interfaces.DomainServices;
 using Seller.Domain.SellerApplicationAggregate.ValueObjects;
 using Shared.Domain.Models;
 using SellerEntity = Seller.Domain.SellerAggregate.Seller;
 
 namespace Seller.Domain.Services;
 
-public sealed class SellerDomainService(ISellerRepository sellerRepository) : ISellerDomainService
+public sealed class SellerDomainService(ISellerRepository sellerRepository)
 {
     public async Task<VoidResult> CreateSellerWithFirstCategoryAsync(Guid accountId, SellerProfileData sellerProfileData,
         Guid categoryId, string categoryName, CancellationToken ct)

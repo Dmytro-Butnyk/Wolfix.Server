@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Seller.Application.Dto.Seller;
-using Seller.Application.Interfaces;
+using Seller.Application.Services;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
 
@@ -55,7 +55,7 @@ internal static class SellerEndpoints
 
     private static async Task<Results<Ok<SellerDto>, NotFound<string>>> GetProfileInfo(
         [FromRoute] Guid sellerId,
-        [FromServices] ISellerService sellerService,
+        [FromServices] SellerService sellerService,
         CancellationToken ct)
     {
         Result<SellerDto> getProfileInfoResult = await sellerService.GetProfileInfoAsync(sellerId, ct);
@@ -70,7 +70,7 @@ internal static class SellerEndpoints
 
     private static async Task<Results<Ok<IReadOnlyCollection<SellerCategoryDto>>, NotFound<string>>> GetAllSellerCategories(
         [FromRoute] Guid sellerId,
-        [FromServices] ISellerService sellerService,
+        [FromServices] SellerService sellerService,
         CancellationToken ct)
     {
         Result<IReadOnlyCollection<SellerCategoryDto>> getSellerCategories = await sellerService.GetAllSellerCategoriesAsync(sellerId, ct);
@@ -86,7 +86,7 @@ internal static class SellerEndpoints
     private static async Task<Results<Ok<FullNameDto>, NotFound<string>, BadRequest<string>>> ChangeFullName(
         [FromBody] ChangeFullNameDto request,
         [FromRoute] Guid sellerId,
-        [FromServices] ISellerService sellerService,
+        [FromServices] SellerService sellerService,
         CancellationToken ct)
     {
         Result<FullNameDto> changeFullNameResult = await sellerService.ChangeFullNameAsync(sellerId, request, ct);
@@ -107,7 +107,7 @@ internal static class SellerEndpoints
     private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> ChangePhoneNumber(
         [FromBody] ChangePhoneNumberDto request,
         [FromRoute] Guid sellerId,
-        [FromServices] ISellerService sellerService,
+        [FromServices] SellerService sellerService,
         CancellationToken ct)
     {
         Result<string> changePhoneNumberResult = await sellerService.ChangePhoneNumberAsync(sellerId, request, ct);
@@ -128,7 +128,7 @@ internal static class SellerEndpoints
     private static async Task<Results<Ok<AddressDto>, NotFound<string>, BadRequest<string>>> ChangeAddress(
         [FromBody] ChangeAddressDto request,
         [FromRoute] Guid sellerId,
-        [FromServices] ISellerService sellerService,
+        [FromServices] SellerService sellerService,
         CancellationToken ct)
     {
         Result<AddressDto> changeAddressResult = await sellerService.ChangeAddressAsync(sellerId, request, ct);
@@ -149,7 +149,7 @@ internal static class SellerEndpoints
     private static async Task<Results<Ok<string>, NotFound<string>, BadRequest<string>>> ChangeBirthDate(
         [FromBody] ChangeBirthDateDto request,
         [FromRoute] Guid sellerId,
-        [FromServices] ISellerService sellerService,
+        [FromServices] SellerService sellerService,
         CancellationToken ct)
     {
         Result<string> changeBirthDateResult = await sellerService.ChangeBirthDateAsync(sellerId, request, ct);

@@ -3,9 +3,7 @@ using Catalog.IntegrationEvents.Dto;
 using Identity.IntegrationEvents;
 using Microsoft.Extensions.DependencyInjection;
 using Seller.Application.EventHandlers;
-using Seller.Application.Interfaces;
 using Seller.Application.Services;
-using Seller.Domain.Interfaces.DomainServices;
 using Seller.Domain.Services;
 using Shared.IntegrationEvents.Interfaces;
 
@@ -15,8 +13,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddSellerApplicationServices(this IServiceCollection services)
     {
-        services.AddScoped<ISellerService, SellerService>();
-        services.AddScoped<ISellerApplicationService, SellerApplicationService>();
+        services.AddScoped<SellerService>();
+        services.AddScoped<SellerApplicationService>();
         
         return services;
     }
@@ -34,7 +32,7 @@ public static class DependencyInjection
 
     public static IServiceCollection AddSellerDomainServices(this IServiceCollection services)
     {
-        services.AddScoped<ISellerDomainService, SellerDomainService>();
+        services.AddScoped<SellerDomainService>();
 
         return services;
     }

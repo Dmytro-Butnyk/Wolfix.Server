@@ -1,24 +1,22 @@
 using System.Net;
 using Media.IntegrationEvents.Dto;
 using Seller.Application.Dto.SellerApplication;
-using Seller.Application.Interfaces;
 using Seller.Application.Mapping.SellerApplication;
 using Seller.Domain.Interfaces;
-using Seller.Domain.Interfaces.DomainServices;
 using Seller.Domain.Projections.SellerApplication;
 using Seller.Domain.SellerApplicationAggregate;
 using Seller.Domain.SellerApplicationAggregate.Enums;
+using Seller.Domain.Services;
 using Seller.IntegrationEvents;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents.Interfaces;
 
 namespace Seller.Application.Services;
 
-internal sealed class SellerApplicationService(
+public sealed class SellerApplicationService(
     ISellerApplicationRepository sellerApplicationRepository,
     IEventBus eventBus,
-    ISellerDomainService sellerDomainService) 
-    : ISellerApplicationService
+    SellerDomainService sellerDomainService)
 {
     public async Task<VoidResult> CreateAsync(Guid accountId, CreateSellerApplicationDto request, CancellationToken ct)
     {

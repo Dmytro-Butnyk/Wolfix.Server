@@ -20,6 +20,7 @@
       <ProjectReference Include="..\Identity.Endpoints\Identity.Endpoints.csproj" />
       <ProjectReference Include="..\Order.Endpoints\Order.Endpoints.csproj" />
       <ProjectReference Include="..\Seller.Endpoints\Seller.Endpoints.csproj" />
+      <ProjectReference Include="..\Support.Endpoints\Support.Endpoints.csproj" />
       <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
     </ItemGroup>
 

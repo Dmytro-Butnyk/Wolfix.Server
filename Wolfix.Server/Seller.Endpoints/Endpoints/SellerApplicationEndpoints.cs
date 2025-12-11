@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Seller.Application.Dto.SellerApplication;
-using Seller.Application.Interfaces;
+using Seller.Application.Services;
 using Shared.Domain.Models;
 
 namespace Seller.Endpoints.Endpoints;
@@ -40,7 +40,7 @@ internal static class SellerApplicationEndpoints
     private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>>> CreateApplication(
         [FromForm] CreateSellerApplicationDto request,
         [FromRoute] Guid accountId,
-        [FromServices] ISellerApplicationService sellerApplicationService,
+        [FromServices] SellerApplicationService sellerApplicationService,
         CancellationToken ct)
     {
         VoidResult createApplicationResult = await sellerApplicationService.CreateAsync(accountId, request, ct);
@@ -59,7 +59,7 @@ internal static class SellerApplicationEndpoints
     }
 
     private static async Task<Ok<IReadOnlyCollection<SellerApplicationDto>>> GetAllPendingApplications(
-        [FromServices] ISellerApplicationService sellerApplicationService,
+        [FromServices] SellerApplicationService sellerApplicationService,
         CancellationToken ct)
     {
         IReadOnlyCollection<SellerApplicationDto> pendingApplications =
@@ -71,7 +71,7 @@ internal static class SellerApplicationEndpoints
     private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>, InternalServerError<string>, Conflict<string>>>
         ApproveApplication(
             [FromRoute] Guid sellerApplicationId,
-            [FromServices] ISellerApplicationService sellerApplicationService,
+            [FromServices] SellerApplicationService sellerApplicationService,
             CancellationToken ct)
     {
         VoidResult approveApplicationResult = await sellerApplicationService.ApproveApplicationAsync(sellerApplicationId, ct);
@@ -93,7 +93,7 @@ internal static class SellerApplicationEndpoints
 
     private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>>> RejectApplication(
         [FromRoute] Guid sellerApplicationId,
-        [FromServices] ISellerApplicationService sellerApplicationService,
+        [FromServices] SellerApplicationService sellerApplicationService,
         CancellationToken ct)
     {
         VoidResult rejectApplicationResult = await sellerApplicationService.RejectApplicationAsync(sellerApplicationId, ct);

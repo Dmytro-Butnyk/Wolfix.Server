@@ -15,6 +15,8 @@ using Order.Endpoints.Extensions;
 using Order.Infrastructure.Extensions;
 using Seller.Endpoints.Extensions;
 using Seller.Infrastructure.Extensions;
+using Support.Endpoints.Extensions;
+using Support.Infrastructure.Extensions;
 
 namespace Wolfix.API.Extensions;
 
@@ -28,6 +30,7 @@ public static class WebApplicationExtension
         app.MapSellerApi();
         app.MapOrderApi();
         app.MapAdminApi();
+        app.MapSupportApi();
     }
 
     public static async Task EnsureDatabaseExistAndMigrationsApplied(this WebApplication app)
@@ -42,6 +45,7 @@ public static class WebApplicationExtension
         await services.EnsureSellerSchemeExistAndMigrateAsync();
         await services.EnsureOrderSchemeExistAndMigrateAsync();
         await services.EnsureAdminSchemeExistAndMigrateAsync();
+        await services.EnsureSupportSchemeExistAndMigrateAsync();
     }
 
     public static async Task EnsureRolesValid(this WebApplication app)

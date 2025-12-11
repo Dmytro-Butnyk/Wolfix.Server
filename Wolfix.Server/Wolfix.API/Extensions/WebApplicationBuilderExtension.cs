@@ -10,6 +10,7 @@ using Seller.Endpoints.Extensions;
 using Shared.Application.Extensions;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
+using Support.Endpoints.Extensions;
 
 namespace Wolfix.API.Extensions;
 
@@ -26,7 +27,8 @@ public static class WebApplicationBuilderExtension
             .AddMediaModule(connectionString)
             .AddSellerModule(connectionString)
             .AddOrderModule(connectionString)
-            .AddAdminModule(connectionString);
+            .AddAdminModule(connectionString)
+            .AddSupportModule(connectionString);
         
         return builder;
     }
@@ -70,6 +72,13 @@ public static class WebApplicationBuilderExtension
     {
         builder.Services.AddSellerModule(connectionString);
 
+        return builder;
+    }
+
+    private static WebApplicationBuilder AddSupportModule(this WebApplicationBuilder builder, string connectionString)
+    {
+        builder.Services.AddSupportModule(connectionString);
+        
         return builder;
     }
 
