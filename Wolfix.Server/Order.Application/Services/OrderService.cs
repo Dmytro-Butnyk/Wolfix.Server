@@ -10,6 +10,7 @@ using Order.Domain.OrderAggregate.Enums;
 using Order.Domain.Projections;
 using Order.IntegrationEvents;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 using OrderAggregate = Order.Domain.OrderAggregate.Order;
 
@@ -18,7 +19,7 @@ namespace Order.Application.Services;
 public sealed class OrderService(
     IOrderRepository orderRepository,
     IPaymentService<StripePaymentResponse> paymentService,
-    IEventBus eventBus)
+    EventBus eventBus)
 {
     public async Task<Result<OrderPlacedWithPaymentDto>> PlaceOrderWithPaymentAsync(PlaceOrderDto request, CancellationToken ct)
     {

@@ -3,11 +3,12 @@ using Catalog.Domain.Interfaces;
 using Catalog.IntegrationEvents;
 using Customer.IntegrationEvents;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.EventHandlers;
 
-public sealed class CheckProductExistsForAddingToCartEventHandler(IProductRepository productRepository, IEventBus eventBus)
+public sealed class CheckProductExistsForAddingToCartEventHandler(IProductRepository productRepository, EventBus eventBus)
     : IIntegrationEventHandler<CheckProductExistsForAddingToCart>
 {
     public async Task<VoidResult> HandleAsync(CheckProductExistsForAddingToCart @event, CancellationToken ct)

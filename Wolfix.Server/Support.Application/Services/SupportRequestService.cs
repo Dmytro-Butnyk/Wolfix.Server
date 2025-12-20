@@ -1,5 +1,6 @@
 using System.Net;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 using Support.Application.Dto;
 using Support.Application.Mapping;
@@ -13,7 +14,7 @@ namespace Support.Application.Services;
 public sealed class SupportRequestService(
     ISupportRequestRepository supportRequestRepository,
     ISupportRepository supportRepository,
-    IEventBus eventBus)
+    EventBus eventBus)
 {
     public async Task<VoidResult> RespondAsync(Guid supportId, Guid supportRequestId, RespondOnRequestDto request, CancellationToken ct)
     {

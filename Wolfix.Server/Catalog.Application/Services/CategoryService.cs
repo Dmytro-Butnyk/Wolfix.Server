@@ -12,6 +12,7 @@ using Catalog.IntegrationEvents;
 using Catalog.IntegrationEvents.Dto;
 using Shared.Application.Interfaces;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.Services;
@@ -20,7 +21,7 @@ public sealed class CategoryService(
     ICategoryRepository categoryRepository,
     ProductDomainService productDomainService,
     CategoryDomainService categoryDomainService,
-    IEventBus eventBus,
+    EventBus eventBus,
     IAppCache appCache)
 {
     public async Task<Result<IReadOnlyCollection<CategoryFullDto>>> GetAllParentCategoriesAsync(CancellationToken ct)

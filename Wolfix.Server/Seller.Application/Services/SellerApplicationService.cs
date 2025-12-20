@@ -9,13 +9,14 @@ using Seller.Domain.SellerApplicationAggregate.Enums;
 using Seller.Domain.Services;
 using Seller.IntegrationEvents;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 
 namespace Seller.Application.Services;
 
 public sealed class SellerApplicationService(
     ISellerApplicationRepository sellerApplicationRepository,
-    IEventBus eventBus,
+    EventBus eventBus,
     SellerDomainService sellerDomainService)
 {
     public async Task<VoidResult> CreateAsync(Guid accountId, CreateSellerApplicationDto request, CancellationToken ct)

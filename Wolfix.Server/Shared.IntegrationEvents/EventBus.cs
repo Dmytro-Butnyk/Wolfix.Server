@@ -4,7 +4,7 @@ using Shared.IntegrationEvents.Interfaces;
 
 namespace Shared.IntegrationEvents;
 
-public sealed class EventBus(IServiceScopeFactory serviceProvider) : IEventBus
+public sealed class EventBus(IServiceScopeFactory serviceProvider)
 {
     public async Task<VoidResult> PublishWithoutResultAsync<TEvent>(TEvent @event, CancellationToken ct) where TEvent : IIntegrationEvent
     {

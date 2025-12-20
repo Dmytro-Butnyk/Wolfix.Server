@@ -11,12 +11,13 @@ using Customer.Domain.Projections;
 using Customer.IntegrationEvents;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 using CustomerAggregate = Customer.Domain.CustomerAggregate.Customer;
 
 namespace Customer.Application.Services;
 
-public sealed class CustomerService(ICustomerRepository customerRepository, IEventBus eventBus)
+public sealed class CustomerService(ICustomerRepository customerRepository, EventBus eventBus)
 {
     public async Task<VoidResult> AddProductToFavoriteAsync(AddProductToFavoriteDto request, CancellationToken ct)
     {

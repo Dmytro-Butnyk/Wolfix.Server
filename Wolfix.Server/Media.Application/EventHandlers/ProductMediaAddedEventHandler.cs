@@ -4,13 +4,14 @@ using Media.Application.Services;
 using Media.IntegrationEvents;
 using Media.IntegrationEvents.Dto;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 
 namespace Media.Application.EventHandlers;
 
 public sealed class ProductMediaAddedEventHandler(
     BlobResourceService blobResourceService,
-    IEventBus eventBus)
+    EventBus eventBus)
     : IIntegrationEventHandler<ProductMediaAdded>
 {
     public async Task<VoidResult> HandleAsync(ProductMediaAdded @event, CancellationToken ct)

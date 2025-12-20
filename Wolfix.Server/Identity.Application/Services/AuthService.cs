@@ -7,6 +7,7 @@ using Identity.Application.Projections;
 using Identity.IntegrationEvents;
 using Microsoft.AspNetCore.Identity;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 
 namespace Identity.Application.Services;
@@ -14,7 +15,7 @@ namespace Identity.Application.Services;
 public sealed class AuthService(
     IAuthStore authStore,
     JwtService jwtService,
-    IEventBus eventBus)
+    EventBus eventBus)
 {
     public async Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(LogInDto logInDto, CancellationToken ct)
     {

@@ -102,7 +102,7 @@ public static class WebApplicationBuilderExtension
 
     public static WebApplicationBuilder AddEventBus(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSingleton<IEventBus, EventBus>();
+        builder.Services.AddSingleton<EventBus>();
         
         return builder;
     }

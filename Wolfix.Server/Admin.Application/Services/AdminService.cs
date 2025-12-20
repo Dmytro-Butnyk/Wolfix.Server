@@ -2,6 +2,7 @@ using Admin.Application.Dto.Requests;
 using Admin.Domain.Interfaces;
 using Admin.IntegrationEvents;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 using AdminAggregate = Admin.Domain.AdminAggregate.Admin;
 
@@ -9,7 +10,7 @@ namespace Admin.Application.Services;
 
 public sealed class AdminService(
     IAdminRepository adminRepository,
-    IEventBus eventBus)
+    EventBus eventBus)
 {
     public async Task<VoidResult> CreateAdminAsync(CreateAdminDto request, CancellationToken ct)
     {

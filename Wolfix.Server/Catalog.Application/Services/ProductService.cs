@@ -22,6 +22,7 @@ using Catalog.IntegrationEvents.Dto;
 using Shared.Application.Dto;
 using Shared.Domain.Enums;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.Services;
@@ -29,7 +30,7 @@ namespace Catalog.Application.Services;
 public sealed class ProductService(
     IProductRepository productRepository,
     ProductDomainService productDomainService,
-    IEventBus eventBus,
+    EventBus eventBus,
     IToxicityService toxicityService)
 {
     public async Task<VoidResult> AddProductAsync(

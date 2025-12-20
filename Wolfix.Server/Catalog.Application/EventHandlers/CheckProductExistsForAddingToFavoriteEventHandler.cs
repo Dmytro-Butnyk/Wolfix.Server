@@ -3,11 +3,12 @@ using Catalog.Domain.Interfaces;
 using Catalog.IntegrationEvents;
 using Customer.IntegrationEvents;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.EventHandlers;
 
-internal sealed class CheckProductExistsForAddingToFavoriteEventHandler(IProductRepository productRepository, IEventBus eventBus)
+internal sealed class CheckProductExistsForAddingToFavoriteEventHandler(IProductRepository productRepository, EventBus eventBus)
     : IIntegrationEventHandler<CheckProductExistsForAddingToFavorite>
 {
     public async Task<VoidResult> HandleAsync(CheckProductExistsForAddingToFavorite @event, CancellationToken ct)
