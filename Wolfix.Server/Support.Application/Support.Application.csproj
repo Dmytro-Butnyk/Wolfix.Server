@@ -7,8 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Identity.IntegrationEvents\Identity.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Shared.Application\Shared.Application.csproj" />
+      <ProjectReference Include="..\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Support.Domain\Support.Domain.csproj" />
+      <ProjectReference Include="..\Support.IntegrationEvents\Support.IntegrationEvents.csproj" />
     </ItemGroup>
 
 </Project>

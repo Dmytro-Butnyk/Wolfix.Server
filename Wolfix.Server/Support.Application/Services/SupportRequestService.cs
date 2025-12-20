@@ -1,12 +1,19 @@
 using System.Net;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents.Interfaces;
 using Support.Application.Dto;
+using Support.Application.Mapping;
 using Support.Domain.Entities;
 using Support.Domain.Interfaces;
+using Support.Domain.Projections;
+using Support.IntegrationEvents;
 
 namespace Support.Application.Services;
 
-public sealed class SupportRequestService(ISupportRequestRepository supportRequestRepository, ISupportRepository supportRepository)
+public sealed class SupportRequestService(
+    ISupportRequestRepository supportRequestRepository,
+    ISupportRepository supportRepository,
+    IEventBus eventBus)
 {
     public async Task<VoidResult> RespondAsync(Guid supportId, Guid supportRequestId, RespondOnRequestDto request, CancellationToken ct)
     {
@@ -74,5 +81,50 @@ public sealed class SupportRequestService(ISupportRequestRepository supportReque
         await supportRequestRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> CreateAsync(CreateSupportRequestDto request, CancellationToken ct)
+    {
+        VoidResult checkCustomerExistsResult = await eventBus.PublishWithoutResultAsync(new CheckCustomerExistsForCreatingSupportRequest(request.CustomerId), ct);
+
+        if (checkCustomerExistsResult.IsFailure)
+        {
+            return checkCustomerExistsResult;
+        }
+
+        if (request.ProductId is not null)
+        {
+            VoidResult checkProductExistsResult = await eventBus.PublishWithoutResultAsync(new CheckProductExistsForCreatingSupportRequest(request.ProductId.Value), ct);
+            
+            if (checkProductExistsResult.IsFailure)
+            {
+                return checkProductExistsResult;
+            }
+        }
+
+        Result<SupportRequest> createSupportRequestResult = SupportRequest.Create(request.Email, request.FirstName,
+            request.LastName, request.MiddleName, request.PhoneNumber, request.BirthDate, request.CustomerId,
+            request.Title, request.Content, request.ProductId);
+
+        if (createSupportRequestResult.IsFailure)
+        {
+            return VoidResult.Failure(createSupportRequestResult);
+        }
+
+        await supportRequestRepository.AddAsync(createSupportRequestResult.Value!, ct);
+        await supportRequestRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<IReadOnlyCollection<SupportRequestShortDto>> GetAllPendingAsync(CancellationToken ct)
+    {
+        IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequestRepository.GetAllPendingAsync(ct);
+
+        IReadOnlyCollection<SupportRequestShortDto> dto = projection
+            .Select(pr => pr.ToShortDto())
+            .ToList();
+        
+        return dto;
     }
 }

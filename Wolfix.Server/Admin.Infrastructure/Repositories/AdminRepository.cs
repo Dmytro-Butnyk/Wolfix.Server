@@ -1,3 +1,4 @@
+using Admin.Domain.AdminAggregate.Enums;
 using Admin.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.Repositories;
@@ -9,11 +10,12 @@ internal sealed class AdminRepository(AdminContext context)
 {
     private readonly DbSet<Domain.AdminAggregate.Admin> _admins = context.Admins;
     
-    public async Task<Guid?> GetIdByAccountIdAsync(Guid accountId, CancellationToken ct)
+    public async Task<Guid?> GetIdByAccountIdAsync(Guid accountId, bool isSuperAdmin, CancellationToken ct)
     {
         return await _admins
             .AsNoTracking()
-            .Where(admin => admin.AccountId == accountId)
+            .Where(admin => admin.AccountId == accountId 
+                    && (isSuperAdmin ? admin.Type == AdminType.Super : admin.Type == AdminType.Basic))
             .Select(admin => admin.Id)
             .FirstOrDefaultAsync(ct);
     }

@@ -13,6 +13,7 @@
       <ProjectReference Include="..\Identity.IntegrationEvents\Identity.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Order.IntegrationEvents\Order.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Shared.Application\Shared.Application.csproj" />
+      <ProjectReference Include="..\Support.IntegrationEvents\Support.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
     </ItemGroup>
 

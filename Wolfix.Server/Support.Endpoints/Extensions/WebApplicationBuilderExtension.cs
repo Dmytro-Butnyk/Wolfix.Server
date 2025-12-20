@@ -11,6 +11,7 @@ public static class WebApplicationBuilderExtension
         services.AddSupportDbContext(connectionString);
         services.AddSupportRepositories();
         services.AddSupportApplicationServices();
+        services.AddSupportEventHandlers();
 
         return services;
     }

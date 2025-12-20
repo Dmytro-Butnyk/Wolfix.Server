@@ -18,9 +18,9 @@ public sealed class EventBus(IServiceScopeFactory serviceProvider) : IEventBus
         {
             VoidResult result = await handler.HandleAsync(@event, ct);
 
-            if (!result.IsSuccess)
+            if (result.IsFailure)
             {
-                return VoidResult.Failure(result.ErrorMessage!, result.StatusCode);
+                return result;
             }
         }
         

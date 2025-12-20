@@ -15,6 +15,7 @@
       <ProjectReference Include="..\Seller.IntegrationEvents\Seller.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Shared.Application\Shared.Application.csproj" />
       <ProjectReference Include="..\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Support.IntegrationEvents\Support.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
     </ItemGroup>
 

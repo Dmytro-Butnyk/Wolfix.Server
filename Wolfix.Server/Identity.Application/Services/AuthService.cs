@@ -5,6 +5,7 @@ using Identity.Application.Interfaces.Repositories;
 using Identity.Application.Mapping;
 using Identity.Application.Projections;
 using Identity.IntegrationEvents;
+using Microsoft.AspNetCore.Identity;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents.Interfaces;
 
@@ -54,7 +55,7 @@ public sealed class AuthService(
 
     private async Task<Result<Guid>> GetProfileId(Guid accountId, string role, CancellationToken ct)
     {
-        if (role == "Customer")
+        if (role == Roles.Customer)
         {
             var @event = new GetCustomerProfileId
             {
@@ -64,7 +65,8 @@ public sealed class AuthService(
             return await eventBus
                 .PublishWithSingleResultAsync<GetCustomerProfileId, Guid>(@event, ct);
         }
-        if (role == "Seller")
+        
+        if (role == Roles.Seller)
         {
             var @event = new GetSellerProfileId
             {
@@ -75,7 +77,7 @@ public sealed class AuthService(
                 .PublishWithSingleResultAsync<GetSellerProfileId, Guid>(@event, ct);
         }
 
-        if (role == "Admin")
+        if (role == Roles.Admin)
         {
             var @event = new GetAdminProfileId
             {
@@ -85,7 +87,28 @@ public sealed class AuthService(
             return await eventBus
                 .PublishWithSingleResultAsync<GetAdminProfileId, Guid>(@event, ct);
         }
-        //todo: остаток ролей дописать когда готово будет
+
+        if (role == Roles.SuperAdmin)
+        {
+            var @event = new GetSuperAdminProfileId
+            {
+                AccountId = accountId
+            };
+            
+            return await eventBus
+                .PublishWithSingleResultAsync<GetSuperAdminProfileId, Guid>(@event, ct);
+        }
+
+        if (role == Roles.Support)
+        {
+            var @event = new GetSupportProfileId
+            {
+                AccountId = accountId
+            };
+            
+            return await eventBus
+                .PublishWithSingleResultAsync<GetSupportProfileId, Guid>(@event, ct);
+        }
         
         return Result<Guid>.Failure($"Role {role} not found");
     }

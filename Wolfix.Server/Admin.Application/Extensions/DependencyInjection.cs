@@ -18,6 +18,7 @@ public static class DependencyInjection
     public static IServiceCollection AddAdminEventHandlers(this IServiceCollection services)
     {
         services.AddScoped<IIntegrationEventHandler<GetAdminProfileId, Guid>, GetAdminProfileIdEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<GetSuperAdminProfileId, Guid>, GetSuperAdminProfileIdEventHandler>();
         
         return services;
     }

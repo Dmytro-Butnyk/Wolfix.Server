@@ -28,6 +28,13 @@ public sealed class SupportRequest : BaseEntity
     public Support? ProcessedBy { get; private set; } = null;
     public Guid? SupportId { get; private set; } = null;
     
+    public bool IsProcessed
+        => Status != SupportRequestStatus.Pending
+           && ProcessedBy != null
+           && SupportId != null
+           && SupportId == ProcessedBy.Id
+           && ProcessedAt != null;
+    
     public string ResponseContent { get; private set; } = string.Empty;
     
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
@@ -102,24 +109,14 @@ public sealed class SupportRequest : BaseEntity
     
     public VoidResult Respond(Support support, string responseContent)
     {
-        if (Status != SupportRequestStatus.Pending)
+        if (IsProcessed)
         {
-            return VoidResult.Failure("Request must be pending to be processed");
-        }
-
-        if (ProcessedBy != null || SupportId != null)
-        {
-            return VoidResult.Failure("Request is already processed by another support");
+            return VoidResult.Failure("Request must be not processed yet to be responded");
         }
 
         if (ResponseContent != string.Empty)
         {
             return VoidResult.Failure("Response content is already set");
-        }
-
-        if (ProcessedAt != null)
-        {
-            return VoidResult.Failure("Request is already processed");
         }
 
         if (string.IsNullOrWhiteSpace(responseContent))
@@ -137,19 +134,9 @@ public sealed class SupportRequest : BaseEntity
 
     public VoidResult Cancel(Support support)
     {
-        if (Status != SupportRequestStatus.Pending)
+        if (IsProcessed)
         {
-            return VoidResult.Failure("Request must be pending to be canceled");
-        }
-
-        if (ProcessedBy != null || SupportId != null)
-        {
-            return VoidResult.Failure("Request is already processed by another support"); 
-        }
-
-        if (ProcessedAt != null)
-        {
-            return VoidResult.Failure("Request is already processed");
+            return VoidResult.Failure("Request must be not processed yet to be canceled");
         }
         
         Status = SupportRequestStatus.Canceled;

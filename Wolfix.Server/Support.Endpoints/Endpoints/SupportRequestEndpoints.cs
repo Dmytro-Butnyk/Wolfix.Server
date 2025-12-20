@@ -19,11 +19,43 @@ internal static class SupportRequestEndpoints
             .WithTags("Support Requests")
             .RequireAuthorization("Support");
         
-        group.MapPost("{supportRequestId:guid}/supports/{supportId:guid}/respond", Respond)
+        group.MapGet("", GetAllPending)
+            .WithSummary("Get all support requests");
+        
+        app.MapPost("", Create)
+            .WithTags("Support Requests")
+            .RequireAuthorization("Customer")
+            .WithSummary("Create support request");
+        
+        group.MapPatch("{supportRequestId:guid}/supports/{supportId:guid}/respond", Respond)
             .WithSummary("Respond on support request");
         
-        group.MapPost("{supportRequestId:guid}/supports/{supportId:guid}/cancel", Cancel)
+        group.MapPatch("{supportRequestId:guid}/supports/{supportId:guid}/cancel", Cancel)
             .WithSummary("Cancel support request");
+    }
+
+    private static async Task<Ok<IReadOnlyCollection<SupportRequestShortDto>>> GetAllPending(
+        [FromServices] SupportRequestService supportRequestService,
+        CancellationToken ct)
+    {
+        IReadOnlyCollection<SupportRequestShortDto> getAllRequestsResult = await supportRequestService.GetAllPendingAsync(ct);
+
+        return TypedResults.Ok(getAllRequestsResult);
+    }
+
+    private static async Task<Results<NoContent, BadRequest<string>>> Create(
+        [FromBody] CreateSupportRequestDto request,
+        [FromServices] SupportRequestService supportRequestService,
+        CancellationToken ct)
+    {
+        VoidResult createRequestResult = await supportRequestService.CreateAsync(request, ct);
+
+        if (createRequestResult.IsFailure)
+        {
+            return TypedResults.BadRequest(createRequestResult.ErrorMessage);
+        }
+        
+        return TypedResults.NoContent();
     }
 
     private static async Task<Results<NoContent, NotFound<string>>> Respond(

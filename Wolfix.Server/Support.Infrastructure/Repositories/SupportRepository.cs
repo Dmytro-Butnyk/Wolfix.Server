@@ -8,4 +8,13 @@ internal sealed class SupportRepository(SupportContext context)
     : BaseRepository<SupportContext, Domain.Entities.Support>(context), ISupportRepository
 {
     private readonly DbSet<Domain.Entities.Support> _supports = context.Set<Domain.Entities.Support>();
+    
+    public async Task<Guid?> GetIdByAccountIdAsync(Guid accountId, CancellationToken ct)
+    {
+        return await _supports
+            .AsNoTracking()
+            .Where(support => support.AccountId == accountId)
+            .Select(support => support.Id)
+            .FirstOrDefaultAsync(ct);
+    }
 }
