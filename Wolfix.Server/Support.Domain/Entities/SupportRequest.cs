@@ -20,6 +20,7 @@ public sealed class SupportRequest : BaseEntity
     public string Title { get; private set; }
     
     public Guid? ProductId { get; private set; }
+    public SupportRequestCategory Category { get; private set; }
     
     public string RequestContent { get; private set; }
 
@@ -44,7 +45,7 @@ public sealed class SupportRequest : BaseEntity
     private SupportRequest() { }
 
     private SupportRequest(Email email, FullName fullName, PhoneNumber phoneNumber, BirthDate birthDate, Guid customerId,
-        string title, Guid? productId, string requestContent)
+        string title, Guid? productId, SupportRequestCategory category, string requestContent)
     {
         Email = email;
         FullName = fullName;
@@ -53,11 +54,12 @@ public sealed class SupportRequest : BaseEntity
         CustomerId = customerId;
         Title = title;
         ProductId = productId;
+        Category = category;
         RequestContent = requestContent;
     }
 
     public static Result<SupportRequest> Create(string email, string firstName, string lastName, string middleName,
-        string phoneNumber, DateOnly birthDate, Guid customerId, string title, string content, Guid? productId = null)
+        string phoneNumber, DateOnly birthDate, Guid customerId, string title, string category, string content, Guid? productId = null)
     {
         Result<Email> createEmailResult = Email.Create(email);
 
@@ -102,8 +104,13 @@ public sealed class SupportRequest : BaseEntity
             return Result<SupportRequest>.Failure("RequestContent is required");
         }
 
+        if (string.IsNullOrWhiteSpace(category) || !Enum.TryParse<SupportRequestCategory>(category, out var categoryValue))
+        {
+            return Result<SupportRequest>.Failure("Category is required");
+        }
+        
         SupportRequest supportRequest = new(createEmailResult.Value!, createFullNameResult.Value!,
-            createPhoneNumberResult.Value!, createBirthDateResult.Value!, customerId, title, productId, content);
+            createPhoneNumberResult.Value!, createBirthDateResult.Value!, customerId, title, productId, categoryValue, content);
         return Result<SupportRequest>.Success(supportRequest);
     }
     
