@@ -7,13 +7,11 @@ namespace Support.Domain.Entities;
 
 public sealed class SupportRequest : BaseEntity
 {
-    public Email Email { get; private set; }
-    
     public FullName FullName { get; private set; }
     
     public PhoneNumber PhoneNumber { get; private set; }
     
-    public BirthDate BirthDate { get; private set; }
+    public BirthDate? BirthDate { get; private set; }
     
     public Guid CustomerId { get; private set; }
     
@@ -44,10 +42,9 @@ public sealed class SupportRequest : BaseEntity
     
     private SupportRequest() { }
 
-    private SupportRequest(Email email, FullName fullName, PhoneNumber phoneNumber, BirthDate birthDate, Guid customerId,
+    private SupportRequest(FullName fullName, PhoneNumber phoneNumber, BirthDate? birthDate, Guid customerId,
         string title, Guid? productId, SupportRequestCategory category, string requestContent)
     {
-        Email = email;
         FullName = fullName;
         PhoneNumber = phoneNumber;
         BirthDate = birthDate;
@@ -58,16 +55,9 @@ public sealed class SupportRequest : BaseEntity
         RequestContent = requestContent;
     }
 
-    public static Result<SupportRequest> Create(string email, string firstName, string lastName, string middleName,
-        string phoneNumber, DateOnly birthDate, Guid customerId, string title, string category, string content, Guid? productId = null)
+    public static Result<SupportRequest> Create(string firstName, string lastName, string middleName,
+        string phoneNumber, DateOnly? birthDate, Guid customerId, string title, string category, string content, Guid? productId = null)
     {
-        Result<Email> createEmailResult = Email.Create(email);
-
-        if (createEmailResult.IsFailure)
-        {
-            return Result<SupportRequest>.Failure(createEmailResult);
-        }
-        
         Result<FullName> createFullNameResult = FullName.Create(firstName, lastName, middleName);
 
         if (createFullNameResult.IsFailure)
@@ -82,11 +72,18 @@ public sealed class SupportRequest : BaseEntity
             return Result<SupportRequest>.Failure(createPhoneNumberResult);
         }
 
-        Result<BirthDate> createBirthDateResult = BirthDate.Create(birthDate);
-
-        if (createBirthDateResult.IsFailure)
+        Shared.Domain.ValueObjects.BirthDate? birthDateVO = null;
+        
+        if (birthDate is not null)
         {
-            return Result<SupportRequest>.Failure(createBirthDateResult);
+            Result<BirthDate> createBirthDateResult = BirthDate.Create(birthDate.Value);
+            
+            if (createBirthDateResult.IsFailure)
+            {
+                return Result<SupportRequest>.Failure(createBirthDateResult);
+            }
+            
+            birthDateVO = createBirthDateResult.Value!;
         }
 
         if (customerId == Guid.Empty)
@@ -109,8 +106,8 @@ public sealed class SupportRequest : BaseEntity
             return Result<SupportRequest>.Failure("Category is required");
         }
         
-        SupportRequest supportRequest = new(createEmailResult.Value!, createFullNameResult.Value!,
-            createPhoneNumberResult.Value!, createBirthDateResult.Value!, customerId, title, productId, categoryValue, content);
+        SupportRequest supportRequest = new(createFullNameResult.Value!,
+            createPhoneNumberResult.Value!, birthDateVO, customerId, title, productId, categoryValue, content);
         return Result<SupportRequest>.Success(supportRequest);
     }
     

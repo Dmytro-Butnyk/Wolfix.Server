@@ -18,13 +18,6 @@ public sealed class SupportRequestEntityConfiguration : IEntityTypeConfiguration
     
     private void ConfigureBasicProperties(EntityTypeBuilder<SupportRequest> builder)
     {
-        builder.OwnsOne(sr => sr.Email, email =>
-        {
-            email.Property(e => e.Value)
-                .HasColumnName("Email")
-                .IsRequired();
-        });
-        
         builder.OwnsOne(sr => sr.FullName, fullName =>
         {
             fullName.Property(fn => fn.FirstName)

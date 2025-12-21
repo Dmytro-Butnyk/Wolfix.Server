@@ -8,6 +8,7 @@ using Support.Domain.Entities;
 using Support.Domain.Interfaces;
 using Support.Domain.Projections;
 using Support.IntegrationEvents;
+using Support.IntegrationEvents.Dto;
 
 namespace Support.Application.Services;
 
@@ -102,10 +103,23 @@ public sealed class SupportRequestService(
                 return checkProductExistsResult;
             }
         }
+        
+        Result<CustomerInformationForSupportRequestDto> fetchCustomerInfoResult
+            = await eventBus.PublishWithSingleResultAsync<
+                FetchCustomerInformationForCreatingSupportRequest,
+                CustomerInformationForSupportRequestDto>(
+                new FetchCustomerInformationForCreatingSupportRequest(request.CustomerId),
+                ct);
 
-        Result<SupportRequest> createSupportRequestResult = SupportRequest.Create(request.Email, request.FirstName,
-            request.LastName, request.MiddleName, request.PhoneNumber, request.BirthDate, request.CustomerId,
-            request.Title, request.Content, request.ProductId);
+        if (fetchCustomerInfoResult.IsFailure)
+        {
+            return VoidResult.Failure(fetchCustomerInfoResult);
+        }
+
+        Result<SupportRequest> createSupportRequestResult = SupportRequest.Create(fetchCustomerInfoResult.Value!.FirstName,
+            fetchCustomerInfoResult.Value!.LastName, fetchCustomerInfoResult.Value!.MiddleName,
+            fetchCustomerInfoResult.Value!.PhoneNumber, fetchCustomerInfoResult.Value.BirthDate,
+            request.CustomerId, request.Title, request.Category, request.Content, request.ProductId);
 
         if (createSupportRequestResult.IsFailure)
         {
