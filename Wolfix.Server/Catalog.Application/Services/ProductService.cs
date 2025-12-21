@@ -76,21 +76,23 @@ public sealed class ProductService(
             ct
         );
 
-        if (!result.IsSuccess)
+        if (result.IsFailure)
         {
-            return VoidResult.Failure(result.ErrorMessage!, result.StatusCode);
+            return VoidResult.Failure(result);
         }
 
-        VoidResult eventResult = await eventBus.PublishWithoutResultAsync(
-            new ProductMediaAdded(
-                result.Value,
-                new MediaEventDto(blobResourceType, addProductDto.Media, false)),
-            ct);
-
-        if (!eventResult.IsSuccess)
-        {
-            return VoidResult.Failure(eventResult.ErrorMessage!, eventResult.StatusCode);
-        }
+        //todo: пофиксить (ажур аккаунт срок истёк)
+        
+        // VoidResult eventResult = await eventBus.PublishWithoutResultAsync(
+        //     new ProductMediaAdded(
+        //         result.Value,
+        //         new MediaEventDto(blobResourceType, addProductDto.Media, false)),
+        //     ct);
+        //
+        // if (eventResult.IsFailure)
+        // {
+        //     return VoidResult.Failure(eventResult);
+        // }
 
         return VoidResult.Success();
     }
@@ -686,7 +688,7 @@ public sealed class ProductService(
         if (product is null)
         {
             return VoidResult.Failure(
-                $"product with id: {productId} not found",
+                $"Product with id: {productId} not found",
                 HttpStatusCode.NotFound
             );
         }
@@ -698,6 +700,38 @@ public sealed class ProductService(
             return changePriceResult;
         }
         
+        await productRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> DeleteProductAsync(Guid productId, CancellationToken ct)
+    {
+        Product? product = await productRepository.GetByIdAsync(productId, ct);
+
+        if (product is null)
+        {
+            return VoidResult.Failure(
+                $"Product with id: {productId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        var @event = new DeleteProductMedia
+        {
+            MediaUrl = product.MainPhotoUrl
+        };
+        
+        //todo: пофиксить (ажур аккаунт срок истёк)
+        
+        // VoidResult deleteProductMediaResult = await eventBus.PublishWithoutResultAsync(@event, ct);
+        //
+        // if (deleteProductMediaResult.IsFailure)
+        // {
+        //     return deleteProductMediaResult;
+        // }
+        
+        productRepository.Delete(product, ct);
         await productRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();

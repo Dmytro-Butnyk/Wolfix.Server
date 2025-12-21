@@ -38,6 +38,10 @@ internal static class ProductEndpoints
             .DisableAntiforgery()
             .RequireAuthorization("Seller")
             .WithSummary("Add product");
+        
+        group.MapDelete("{productId:guid}", DeleteProduct)
+            .RequireAuthorization("Seller")
+            .WithSummary("Delete product");
 
         group.MapPatch("product/{productId:guid}/new-main-photo/{newMainPhotoId:guid}", ChangeProductMainPhoto)
             .RequireAuthorization("Seller")
@@ -124,6 +128,21 @@ internal static class ProductEndpoints
             };
         }
 
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, NotFound<string>>> DeleteProduct(
+        [FromRoute] Guid productId,
+        [FromServices] ProductService productService,
+        CancellationToken ct)
+    {
+        VoidResult deleteResult = await productService.DeleteProductAsync(productId, ct);
+        
+        if (deleteResult.IsFailure)
+        {
+            return TypedResults.NotFound(deleteResult.ErrorMessage);
+        }
+        
         return TypedResults.NoContent();
     }
 

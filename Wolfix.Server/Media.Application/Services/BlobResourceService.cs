@@ -1,4 +1,5 @@
-﻿using Media.Application.Dto;
+﻿using System.Net;
+using Media.Application.Dto;
 using Media.Application.Options;
 using Media.Domain.BlobAggregate;
 using Media.Domain.Interfaces;
@@ -26,14 +27,6 @@ public sealed class BlobResourceService(
         {
             return Result<BlobResourceShortDto>.Failure(createBlobResourceResult);
         }
-
-        string containerName = contentType switch
-        {
-            BlobResourceType.Photo => _containerNames.Photos,
-            BlobResourceType.Video => _containerNames.Videos,
-            BlobResourceType.Document => _containerNames.Documents,
-            _ => throw new Exception($"{nameof(AddBlobResourceAsync)} -> Unknown blob resource type: {contentType}")
-        };
         
         await using Stream fileStream = fileData.OpenReadStream();
         
@@ -41,7 +34,7 @@ public sealed class BlobResourceService(
         string fileName = $"{createBlobResourceResult.Value!.Name}{extension}";
 
         string url = await azureBlobRepository.AddFileAndGetUrlAsync(
-            containerName,
+            GetContainerName(createBlobResourceResult.Value!.Type),
             fileName, fileStream,
             ct);
         
@@ -75,17 +68,9 @@ public sealed class BlobResourceService(
             return VoidResult.Failure("Blob resource not found");
         }
         
-        string containerName = blobResource.Type switch
-        {
-            BlobResourceType.Photo => _containerNames.Photos,
-            BlobResourceType.Video => _containerNames.Videos,
-            BlobResourceType.Document => _containerNames.Documents,
-            _ => throw new Exception($"{nameof(DeleteBlobResourceAsync)} -> Unknown blob resource type: {blobResource.Type}")
-        };
-        
         string fileName = blobResource.Name;
         
-        await azureBlobRepository.DeleteFileAsync(containerName, fileName, ct);
+        await azureBlobRepository.DeleteFileAsync(GetContainerName(blobResource.Type), fileName, ct);
         
         blobResourceRepository.Delete(blobResource, ct);
         
@@ -105,15 +90,7 @@ public sealed class BlobResourceService(
 
         foreach (var blobResource in medias)
         {
-            string containerName = blobResource.Type switch
-            {
-                BlobResourceType.Photo => _containerNames.Photos,
-                BlobResourceType.Video => _containerNames.Videos,
-                BlobResourceType.Document => _containerNames.Documents,
-                _ => throw new Exception($"{nameof(ExecuteDeleteBlobResourceAsync)} -> Unknown blob resource type: {blobResource.Type}")
-            };
-            
-            await TryDeleteBlobFromAzureAsync(containerName, blobResource.Name, ct);
+            await TryDeleteBlobFromAzureAsync(GetContainerName(blobResource.Type), blobResource.Name, ct);
         }
         
         await blobResourceRepository.ExecuteDeleteAsync(media => medias.Contains(media), ct);
@@ -143,4 +120,37 @@ public sealed class BlobResourceService(
             }
         }
     }
+
+    public async Task<VoidResult> DeleteByUrlAsync(string mediaUrl, CancellationToken ct)
+    {
+        BlobResource? blobResource = await blobResourceRepository.GetByUrlAsync(mediaUrl, ct);
+
+        if (blobResource is null)
+        {
+            return VoidResult.Failure(
+                $"Blob resource with url: {mediaUrl} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        VoidResult deleteFromDbResult = await DeleteBlobResourceAsync(blobResource.Id, ct);
+
+        if (deleteFromDbResult.IsFailure)
+        {
+            return deleteFromDbResult;
+        }
+
+        await TryDeleteBlobFromAzureAsync(GetContainerName(blobResource.Type), blobResource.Name, ct);
+        
+        return VoidResult.Success();
+    }
+    
+    private string GetContainerName(BlobResourceType type)
+        => type switch
+        {
+            BlobResourceType.Photo => _containerNames.Photos,
+            BlobResourceType.Video => _containerNames.Videos,
+            BlobResourceType.Document => _containerNames.Documents,
+            _ => throw new Exception($"Unknown blob resource type: {type}")
+        };
 }
