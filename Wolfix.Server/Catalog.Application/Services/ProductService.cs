@@ -63,7 +63,7 @@ public sealed class ProductService(
             .Select(attr => new AddAttributeValueObject(attr.Id, attr.Value))
             .ToList();
 
-        //todo: исправить логику доменного сервися (сейчас продукт создается внутри него, что не очень хорошо)
+        //todo: исправить логику доменного сервиса (сейчас продукт создается внутри него, что не очень хорошо)
 
         Result<Guid> result = await productDomainService.AddProductAsync(
             addProductDto.Title,
@@ -111,11 +111,9 @@ public sealed class ProductService(
 
         VoidResult changeProductMainPhotoResult = product.ChangeMainPhoto(newMainPhotoId);
 
-        if (!changeProductMainPhotoResult.IsSuccess)
+        if (changeProductMainPhotoResult.IsFailure)
         {
-            return VoidResult.Failure(
-                changeProductMainPhotoResult.ErrorMessage!,
-                changeProductMainPhotoResult.StatusCode);
+            return changeProductMainPhotoResult;
         }
 
         await productRepository.SaveChangesAsync(ct);
@@ -158,9 +156,9 @@ public sealed class ProductService(
                 new MediaEventDto(blobResourceType, addMediaDto.Media, true)),
             ct);
 
-        if (!eventResult.IsSuccess)
+        if (eventResult.IsFailure)
         {
-            return VoidResult.Failure(eventResult.ErrorMessage!, eventResult.StatusCode);
+            return eventResult;
         }
 
         return VoidResult.Success();
