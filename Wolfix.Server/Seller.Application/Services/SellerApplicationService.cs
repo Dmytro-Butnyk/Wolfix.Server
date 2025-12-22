@@ -52,23 +52,29 @@ public sealed class SellerApplicationService(
             return VoidResult.Failure("Customer is already a seller");
         }
 
-        var @event = new SellerApplicationCreating
-        {
-            Document = request.Document
-        };
+        //todo: пофиксить (ажур аккаунт срок истёк)
         
-        Result<CreatedBlobResourceDto> createBlobResourceResult =
-            await eventBus.PublishWithSingleResultAsync<SellerApplicationCreating, CreatedBlobResourceDto>(@event, ct);
-
-        if (createBlobResourceResult.IsFailure)
-        {
-            return VoidResult.Failure(createBlobResourceResult);
-        }
-
-        (Guid blobResourceId, string documentUrl) = createBlobResourceResult.Value!;
+        // var @event = new SellerApplicationCreating
+        // {
+        //     Document = request.Document
+        // };
+        //
+        // Result<CreatedBlobResourceDto> createBlobResourceResult =
+        //     await eventBus.PublishWithSingleResultAsync<SellerApplicationCreating, CreatedBlobResourceDto>(@event, ct);
+        //
+        // if (createBlobResourceResult.IsFailure)
+        // {
+        //     return VoidResult.Failure(createBlobResourceResult);
+        // }
+        //
+        // (Guid blobResourceId, string documentUrl) = createBlobResourceResult.Value!;
+        //
+        // Result<SellerApplication> createSellerApplicationResult = SellerApplication.Create(accountId, request.CategoryId,
+        //     request.CategoryName, blobResourceId, documentUrl, request.FirstName, request.LastName, request.MiddleName,
+        //     request.PhoneNumber, request.City, request.Street, request.HouseNumber, request.ApartmentNumber, request.BirthDate);
         
         Result<SellerApplication> createSellerApplicationResult = SellerApplication.Create(accountId, request.CategoryId,
-            request.CategoryName, blobResourceId, documentUrl, request.FirstName, request.LastName, request.MiddleName,
+            request.CategoryName, Guid.CreateVersion7(), "URL", request.FirstName, request.LastName, request.MiddleName,
             request.PhoneNumber, request.City, request.Street, request.HouseNumber, request.ApartmentNumber, request.BirthDate);
 
         if (createSellerApplicationResult.IsFailure)
