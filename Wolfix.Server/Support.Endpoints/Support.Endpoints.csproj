@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Shared.Endpoints\Shared.Endpoints.csproj" />
       <ProjectReference Include="..\Support.Application\Support.Application.csproj" />
       <ProjectReference Include="..\Support.Infrastructure\Support.Infrastructure.csproj" />
     </ItemGroup>

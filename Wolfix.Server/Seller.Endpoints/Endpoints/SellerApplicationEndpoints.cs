@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using Seller.Application.Dto.SellerApplication;
 using Seller.Application.Services;
 using Shared.Domain.Models;
+using Shared.Endpoints.Exceptions;
 
 namespace Seller.Endpoints.Endpoints;
 
@@ -51,7 +52,7 @@ internal static class SellerApplicationEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(createApplicationResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(createApplicationResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(CreateApplication)} -> Unknown status code: {createApplicationResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(CreateApplication), createApplicationResult.StatusCode)
             };
         }
         
@@ -83,7 +84,7 @@ internal static class SellerApplicationEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(approveApplicationResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(approveApplicationResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(approveApplicationResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ApproveApplication)} -> Unknown status code: {approveApplicationResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ApproveApplication), approveApplicationResult.StatusCode)
             };
         }
         
@@ -103,7 +104,7 @@ internal static class SellerApplicationEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(rejectApplicationResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(rejectApplicationResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(RejectApplication)} -> Unknown status code: {rejectApplicationResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(RejectApplication), rejectApplicationResult.StatusCode)
             };
         }
         

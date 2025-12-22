@@ -8,6 +8,7 @@ using Seller.Application.Dto.Seller;
 using Seller.Application.Services;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
+using Shared.Endpoints.Exceptions;
 
 namespace Seller.Endpoints.Endpoints;
 
@@ -97,7 +98,7 @@ internal static class SellerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeFullNameResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeFullNameResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangeFullName)} -> Unknown status code: {changeFullNameResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangeFullName), changeFullNameResult.StatusCode)
             };
         }
         
@@ -118,7 +119,7 @@ internal static class SellerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changePhoneNumberResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changePhoneNumberResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangePhoneNumber)} -> Unknown status code: {changePhoneNumberResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangePhoneNumber), changePhoneNumberResult.StatusCode)
             };
         }
         
@@ -139,7 +140,7 @@ internal static class SellerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeAddressResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeAddressResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangeAddress)} -> Unknown status code: {changeAddressResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangeAddress), changeAddressResult.StatusCode)
             };
         }
         
@@ -160,7 +161,7 @@ internal static class SellerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeBirthDateResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeBirthDateResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangeBirthDate)} -> Unknown status code: {changeBirthDateResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangeBirthDate), changeBirthDateResult.StatusCode)
             };
         }
         

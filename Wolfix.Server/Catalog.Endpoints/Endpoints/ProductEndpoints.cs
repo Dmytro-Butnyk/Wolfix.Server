@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
+using Shared.Endpoints.Exceptions;
 
 namespace Catalog.Endpoints.Endpoints;
 
@@ -124,7 +125,7 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addProductResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(addProductResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(AddProduct)} -> Unknown status code: {addProductResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(AddProduct), addProductResult.StatusCode)
             };
         }
 
@@ -160,7 +161,7 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(addDiscountResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addDiscountResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(AddDiscount)} -> Unknown status code: {addDiscountResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(AddDiscount), addDiscountResult.StatusCode)
             };
         }
         
@@ -180,7 +181,7 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(deleteDiscountResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(deleteDiscountResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(DeleteDiscount)} -> Unknown status code: {deleteDiscountResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(DeleteDiscount), deleteDiscountResult.StatusCode)
             };
         }
         
@@ -202,7 +203,7 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeMainPhotoResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeMainPhotoResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangeProductMainPhoto)} -> Unknown status code: {changeMainPhotoResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangeProductMainPhoto), changeMainPhotoResult.StatusCode)
             };
         }
 
@@ -223,7 +224,7 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeProductGeneralInfoResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeProductGeneralInfoResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangeProductGeneralInfo)} -> Unknown status code: {changeProductGeneralInfoResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangeProductGeneralInfo), changeProductGeneralInfoResult.StatusCode)
             };
         }
         
@@ -244,7 +245,7 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeProductResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeProductResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangePrice)} -> Unknown status code: {changeProductResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangePrice), changeProductResult.StatusCode)
             };
         }
         
@@ -265,7 +266,7 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addProductMediaResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(addProductMediaResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(AddProductMedia)} -> Unknown status code: {addProductMediaResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(AddProductMedia), addProductMediaResult.StatusCode)
             };
         }
         
@@ -286,7 +287,7 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(deleteProductMediaResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(deleteProductMediaResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(DeleteProductMedia)} -> Unknown status code: {deleteProductMediaResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(DeleteProductMedia), deleteProductMediaResult.StatusCode)
             };
         }
 
@@ -307,7 +308,7 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getProductFullInfoResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(getProductFullInfoResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(GetProductFullInfo)} -> Unknown status code: {getProductFullInfoResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(GetProductFullInfo), getProductFullInfoResult.StatusCode)
             };
         }
 
@@ -440,7 +441,7 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(addReviewResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addReviewResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(AddReview)} -> Unknown status code: {addReviewResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(AddReview), addReviewResult.StatusCode)
             };
         }
 
@@ -464,7 +465,7 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getProductsBySearchQueryAndCategoryResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(getProductsBySearchQueryAndCategoryResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangeProductMainPhoto)} -> Unknown status code: {getProductsBySearchQueryAndCategoryResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangeProductMainPhoto), getProductsBySearchQueryAndCategoryResult.StatusCode)
             };
         }
 
@@ -486,7 +487,7 @@ internal static class ProductEndpoints
             return getProductsBySearchQueryAndCategoryResult.StatusCode switch
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getProductsBySearchQueryAndCategoryResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangeProductMainPhoto)} -> Unknown status code: {getProductsBySearchQueryAndCategoryResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangeProductMainPhoto), getProductsBySearchQueryAndCategoryResult.StatusCode)
             };
         }
 
@@ -509,7 +510,7 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getProductsByAttributes.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(getProductsByAttributes.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangeProductMainPhoto)} -> Unknown status code: {getProductsByAttributes.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangeProductMainPhoto), getProductsByAttributes.StatusCode)
             };
         }
 

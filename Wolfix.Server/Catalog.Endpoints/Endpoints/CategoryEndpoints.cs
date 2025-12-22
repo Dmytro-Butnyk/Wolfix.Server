@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Shared.Domain.Models;
+using Shared.Endpoints.Exceptions;
 
 namespace Catalog.Endpoints.Endpoints;
 
@@ -87,9 +88,10 @@ internal static class CategoryEndpoints
 
     private static async Task<Ok<IReadOnlyCollection<CategoryFullDto>>> GetAllParentCategories(
         CancellationToken ct,
-        [FromServices] CategoryService categoryService)
+        [FromServices] CategoryService categoryService,
+        [FromQuery] bool withCaching = true)
     {
-        Result<IReadOnlyCollection<CategoryFullDto>> getParentCategoriesResult = await categoryService.GetAllParentCategoriesAsync(ct);
+        Result<IReadOnlyCollection<CategoryFullDto>> getParentCategoriesResult = await categoryService.GetAllParentCategoriesAsync(ct, withCaching);
         
         return TypedResults.Ok(getParentCategoriesResult.Value);
     }
@@ -97,10 +99,11 @@ internal static class CategoryEndpoints
     private static async Task<Results<Ok<IReadOnlyCollection<CategoryFullDto>>, NotFound<string>>> GetAllChildCategoriesByParent(
         [FromRoute] Guid parentId,
         CancellationToken ct,
-        [FromServices] CategoryService categoryService)
+        [FromServices] CategoryService categoryService,
+        [FromQuery] bool withCaching = true)
     {
         Result<IReadOnlyCollection<CategoryFullDto>> getChildCategoriesResult =
-            await categoryService.GetAllChildCategoriesByParentAsync(parentId, ct);
+            await categoryService.GetAllChildCategoriesByParentAsync(parentId, ct, withCaching);
 
         if (!getChildCategoriesResult.IsSuccess)
         {
@@ -124,7 +127,7 @@ internal static class CategoryEndpoints
             {
                 HttpStatusCode.Conflict => TypedResults.NotFound(result.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(result.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(AddParent)} -> Unknown status code: {result.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(AddParent), result.StatusCode)
             };
         }
         
@@ -170,7 +173,7 @@ internal static class CategoryEndpoints
             {
                 HttpStatusCode.Conflict => TypedResults.Conflict(addParentCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addParentCategoryResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(AddParent)} -> Unknown status code: {addParentCategoryResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(AddParent), addParentCategoryResult.StatusCode)
             };
         }
         
@@ -192,7 +195,7 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeParentCategoryResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(changeParentCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeParentCategoryResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangeParent)} -> Unknown status code: {changeParentCategoryResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangeParent), changeParentCategoryResult.StatusCode)
             };
         }
 
@@ -229,7 +232,7 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(addChildCategoryResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(addChildCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addChildCategoryResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(AddChild)} -> Unknown status code: {addChildCategoryResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(AddChild), addChildCategoryResult.StatusCode)
             };
         }
         
@@ -251,7 +254,7 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeChildCategoryResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(changeChildCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeChildCategoryResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangeChild)} -> Unknown status code: {changeChildCategoryResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangeChild), changeChildCategoryResult.StatusCode)
             };
         }
         
@@ -273,7 +276,7 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(addCategoryAttributeResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(addCategoryAttributeResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addCategoryAttributeResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(AddAttribute)} -> Unknown status code: {addCategoryAttributeResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(AddAttribute), addCategoryAttributeResult.StatusCode)
             };
         }
         
@@ -311,7 +314,7 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(addCategoryVariantResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(addCategoryVariantResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addCategoryVariantResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(AddVariant)} -> Unknown status code: {addCategoryVariantResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(AddVariant), addCategoryVariantResult.StatusCode)
             };
         }
         

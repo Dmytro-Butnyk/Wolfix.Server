@@ -13,6 +13,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Identity.Application\Identity.Application.csproj" />
       <ProjectReference Include="..\Identity.Infrastructure\Identity.Infrastructure.csproj" />
+      <ProjectReference Include="..\Shared.Endpoints\Shared.Endpoints.csproj" />
       <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
     </ItemGroup>
 

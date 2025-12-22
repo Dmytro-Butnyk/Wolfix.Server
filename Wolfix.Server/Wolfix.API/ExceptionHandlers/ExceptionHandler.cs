@@ -1,5 +1,7 @@
+using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Endpoints.Exceptions;
 
 namespace Wolfix.API.ExceptionHandlers;
 
@@ -9,8 +11,9 @@ public sealed class ExceptionHandler(IProblemDetailsService problemDetailsServic
     {
         (int statusCode, string title) = exception switch
         {
-            OperationCanceledException => (499, "ClientClosedRequest"),
-            _ => (500, "InternalServerError")
+            OperationCanceledException => (StatusCodes.Status499ClientClosedRequest, "ClientClosedRequest"),
+            UnknownStatusCodeException => (StatusCodes.Status500InternalServerError, exception.Message),
+            _ => (StatusCodes.Status500InternalServerError, nameof(HttpStatusCode.InternalServerError))
         };
 
         ProblemDetails problemDetails = new()

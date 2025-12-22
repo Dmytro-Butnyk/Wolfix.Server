@@ -24,25 +24,39 @@ public sealed class CategoryService(
     EventBus eventBus,
     IAppCache appCache)
 {
-    public async Task<Result<IReadOnlyCollection<CategoryFullDto>>> GetAllParentCategoriesAsync(CancellationToken ct)
+    public async Task<Result<IReadOnlyCollection<CategoryFullDto>>> GetAllParentCategoriesAsync(CancellationToken ct, bool withCaching = true)
     {
         const string cacheKey = "all_parent_categories";
 
-        List<CategoryFullDto> parentCategoriesDto = await appCache.GetOrCreateAsync(cacheKey, async ctx =>
+        List<CategoryFullDto> parentCategoriesDto;
+        
+        if (withCaching)
+        {
+            parentCategoriesDto = await appCache.GetOrCreateAsync(cacheKey, async ctx =>
+            {
+                IReadOnlyCollection<CategoryFullProjection> parentCategories =
+                    await categoryRepository.GetAllParentCategoriesAsNoTrackingAsync(ctx);
+
+                return parentCategories
+                    .Select(category => category.ToFullDto())
+                    .ToList();
+            }, ct, TimeSpan.FromMinutes(20));
+        }
+        else
         {
             IReadOnlyCollection<CategoryFullProjection> parentCategories =
-                await categoryRepository.GetAllParentCategoriesAsNoTrackingAsync(ctx);
-
-            return parentCategories
+                await categoryRepository.GetAllParentCategoriesAsNoTrackingAsync(ct);
+            
+            parentCategoriesDto = parentCategories
                 .Select(category => category.ToFullDto())
                 .ToList();
-        }, ct, TimeSpan.FromMinutes(20));
+        }
         
         return Result<IReadOnlyCollection<CategoryFullDto>>.Success(parentCategoriesDto);
     }
 
     public async Task<Result<IReadOnlyCollection<CategoryFullDto>>> GetAllChildCategoriesByParentAsync(Guid parentId,
-        CancellationToken ct)
+        CancellationToken ct, bool withCaching = true)
     {
         if (!await categoryRepository.IsExistAsync(parentId, ct))
         {
@@ -51,19 +65,33 @@ public sealed class CategoryService(
                 HttpStatusCode.NotFound
             );
         }
-        
-        var cacheKey = $"child_categories_by_parent_{parentId}";
-        
-        List<CategoryFullDto> childCategoriesDto = await appCache.GetOrCreateAsync(cacheKey, async ctx =>
+
+        List<CategoryFullDto> childCategoriesDto;
+
+        if (withCaching)
+        {
+            var cacheKey = $"child_categories_by_parent_{parentId}";
+
+            childCategoriesDto = await appCache.GetOrCreateAsync(cacheKey, async ctx =>
+            {
+                IReadOnlyCollection<CategoryFullProjection> childCategories =
+                    await categoryRepository.GetAllChildCategoriesByParentAsNoTrackingAsync(parentId, ctx);
+
+                return childCategories
+                    .Select(category => category.ToFullDto())
+                    .ToList();
+            }, ct, TimeSpan.FromMinutes(20));
+        }
+        else
         {
             IReadOnlyCollection<CategoryFullProjection> childCategories =
-                await categoryRepository.GetAllChildCategoriesByParentAsNoTrackingAsync(parentId, ctx);
-
-            return childCategories
+                await categoryRepository.GetAllChildCategoriesByParentAsNoTrackingAsync(parentId, ct);
+            
+            childCategoriesDto = childCategories
                 .Select(category => category.ToFullDto())
                 .ToList();
-        }, ct, TimeSpan.FromMinutes(20));
-        
+        }
+
         return Result<IReadOnlyCollection<CategoryFullDto>>.Success(childCategoriesDto);
     }
 
@@ -87,24 +115,29 @@ public sealed class CategoryService(
             );
         }
 
-        var @event = new AddPhotoForNewCategory
-        {
-            FileData = request.Photo
-        };
+        //todo: пофиксить (ажур аккаунт срок истёк)
         
-        Result<CreatedMediaDto> createImageResult =
-            await eventBus.PublishWithSingleResultAsync<AddPhotoForNewCategory, CreatedMediaDto>(@event, ct);
-
-        if (createImageResult.IsFailure)
-        {
-            return VoidResult.Failure(createImageResult);
-        }
-
-        CreatedMediaDto createdBlobResource = createImageResult.Value!;
+        // var @event = new AddPhotoForNewCategory
+        // {
+        //     FileData = request.Photo
+        // };
+        //
+        // Result<CreatedMediaDto> createImageResult =
+        //     await eventBus.PublishWithSingleResultAsync<AddPhotoForNewCategory, CreatedMediaDto>(@event, ct);
+        //
+        // if (createImageResult.IsFailure)
+        // {
+        //     return VoidResult.Failure(createImageResult);
+        // }
+        //
+        // CreatedMediaDto createdBlobResource = createImageResult.Value!;
+        //
+        // Result<Category> createCategoryResult = Category.Create(createdBlobResource.BlobResourceId, createdBlobResource.Url,
+        //     request.Name, request.Description);
         
-        Result<Category> createCategoryResult = Category.Create(createdBlobResource.BlobResourceId, createdBlobResource.Url,
+        Result<Category> createCategoryResult = Category.Create(Guid.CreateVersion7(), "URL",
             request.Name, request.Description);
-
+        
         if (!createCategoryResult.IsSuccess)
         {
             return VoidResult.Failure(createCategoryResult);
@@ -147,22 +180,27 @@ public sealed class CategoryService(
             );
         }
         
-        var @event = new AddPhotoForNewCategory
-        {
-            FileData = request.Photo
-        };
+        //todo: пофиксить (ажур аккаунт срок истёк)
         
-        Result<CreatedMediaDto> createImageResult =
-            await eventBus.PublishWithSingleResultAsync<AddPhotoForNewCategory, CreatedMediaDto>(@event, ct);
-
-        if (createImageResult.IsFailure)
-        {
-            return VoidResult.Failure(createImageResult);
-        }
-
-        CreatedMediaDto createdBlobResource = createImageResult.Value!;
+        // var @event = new AddPhotoForNewCategory
+        // {
+        //     FileData = request.Photo
+        // };
+        //
+        // Result<CreatedMediaDto> createImageResult =
+        //     await eventBus.PublishWithSingleResultAsync<AddPhotoForNewCategory, CreatedMediaDto>(@event, ct);
+        //
+        // if (createImageResult.IsFailure)
+        // {
+        //     return VoidResult.Failure(createImageResult);
+        // }
+        //
+        // CreatedMediaDto createdBlobResource = createImageResult.Value!;
+        //
+        // Result<Category> createCategoryResult = Category.Create(createdBlobResource.BlobResourceId, createdBlobResource.Url,
+        //     request.Name, request.Description, parentCategory);
         
-        Result<Category> createCategoryResult = Category.Create(createdBlobResource.BlobResourceId, createdBlobResource.Url,
+        Result<Category> createCategoryResult = Category.Create(Guid.CreateVersion7(), "URL",
             request.Name, request.Description, parentCategory);
 
         if (!createCategoryResult.IsSuccess)

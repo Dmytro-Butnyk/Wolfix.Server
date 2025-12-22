@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Shared.Domain.Models;
+using Shared.Endpoints.Exceptions;
 using Support.Application.Dto;
 using Support.Application.Services;
 
@@ -21,7 +22,7 @@ internal static class SupportEndpoints
         
         group.MapPost("", CreateSupport)
             .RequireAuthorization("SuperAdmin")
-            .WithSummary("Create support request");
+            .WithSummary("Create support");
     }
     
     private static async Task<Results<NoContent, BadRequest<string>, Conflict<string>, InternalServerError<string>>> CreateSupport(
@@ -38,7 +39,7 @@ internal static class SupportEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(createSupportResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(createSupportResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(createSupportResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(CreateSupport)} -> Unknown status code: {createSupportResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(CreateSupport), createSupportResult.StatusCode)
             };
         }
         

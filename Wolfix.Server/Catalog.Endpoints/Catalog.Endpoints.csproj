@@ -14,6 +14,7 @@
       <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
       <ProjectReference Include="..\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
       <FrameworkReference Include="Microsoft.AspNetCore.App" />
+      <ProjectReference Include="..\Shared.Endpoints\Shared.Endpoints.csproj" />
       <ProjectReference Include="..\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
     </ItemGroup>
 

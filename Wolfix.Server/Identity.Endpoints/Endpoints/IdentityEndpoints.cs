@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Shared.Domain.Models;
-
+using Shared.Endpoints.Exceptions;
 using GooglePayload = Google.Apis.Auth.GoogleJsonWebSignature.Payload;
 
 namespace Identity.Endpoints.Endpoints;
@@ -81,7 +81,7 @@ internal static class IdentityEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getTokenResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(getTokenResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(getTokenResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ContinueWithGoogle)} -> Unknown status code: {getTokenResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ContinueWithGoogle), getTokenResult.StatusCode)
             };
         }
         
@@ -104,7 +104,7 @@ internal static class IdentityEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(logInResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(logInResult.ErrorMessage),
                 HttpStatusCode.Forbidden => TypedResults.Forbid(),
-                _ => throw new Exception($"Endpoint: {nameof(LogInAndGetUserRoles)} -> Unknown status code: {logInResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(LogInAndGetUserRoles), logInResult.StatusCode)
             };
         }
         
@@ -125,7 +125,7 @@ internal static class IdentityEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(getTokenResult.ErrorMessage),
                 HttpStatusCode.Forbidden => TypedResults.Forbid(),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getTokenResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(GetTokenByRole)} -> Unknown status code: {getTokenResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(GetTokenByRole), getTokenResult.StatusCode)
             };
         }
         
@@ -146,7 +146,7 @@ internal static class IdentityEndpoints
                 HttpStatusCode.Conflict => TypedResults.Conflict(registerResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(registerResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(registerResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(Register)} -> Unknown status code: {registerResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(Register), registerResult.StatusCode)
             };
         }
         
@@ -175,7 +175,7 @@ internal static class IdentityEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeEmailResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeEmailResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangeEmail)} -> Unknown status code: {changeEmailResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangeEmail), changeEmailResult.StatusCode)
             };
         }
         
@@ -213,7 +213,7 @@ internal static class IdentityEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changePasswordResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changePasswordResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(ChangePassword)} -> Unknown status code: {changePasswordResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(ChangePassword), changePasswordResult.StatusCode)
             };
         }
         

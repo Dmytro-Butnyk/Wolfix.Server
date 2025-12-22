@@ -9,6 +9,7 @@ using Order.Application.Dto.Order.Responses;
 using Order.Application.Dto.OrderItem.Responses;
 using Order.Application.Services;
 using Shared.Domain.Models;
+using Shared.Endpoints.Exceptions;
 
 namespace Order.Endpoints.Endpoints;
 
@@ -109,7 +110,7 @@ internal static class OrderEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(placeOrderWithPaymentResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(placeOrderWithPaymentResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(placeOrderWithPaymentResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(PlaceOrderWithPayment)} -> Unknown status code: {placeOrderWithPaymentResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(PlaceOrderWithPayment), placeOrderWithPaymentResult.StatusCode)
             };
         }
         
@@ -130,7 +131,7 @@ internal static class OrderEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(placeOrderResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(placeOrderResult.ErrorMessage),
-                _ => throw new Exception($"Endpoint: {nameof(PlaceOrder)} -> Unknown status code: {placeOrderResult.StatusCode}")
+                _ => throw new UnknownStatusCodeException(nameof(PlaceOrder), placeOrderResult.StatusCode)
             };
         }
 
