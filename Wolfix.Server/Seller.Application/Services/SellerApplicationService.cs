@@ -10,7 +10,6 @@ using Seller.Domain.Services;
 using Seller.IntegrationEvents;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents;
-using Shared.IntegrationEvents.Interfaces;
 
 namespace Seller.Application.Services;
 

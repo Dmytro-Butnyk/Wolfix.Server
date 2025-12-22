@@ -62,8 +62,7 @@ internal static class SellerApplicationEndpoints
         [FromServices] SellerApplicationService sellerApplicationService,
         CancellationToken ct)
     {
-        IReadOnlyCollection<SellerApplicationDto> pendingApplications =
-            await sellerApplicationService.GetPendingApplicationsAsync(ct);
+        IReadOnlyCollection<SellerApplicationDto> pendingApplications = await sellerApplicationService.GetPendingApplicationsAsync(ct);
         
         return TypedResults.Ok(pendingApplications);
     }
