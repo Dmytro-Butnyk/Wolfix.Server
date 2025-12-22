@@ -11,6 +11,7 @@ public static class DependencyInjection
     public static IServiceCollection AddSupportApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<SupportRequestService>();
+        services.AddScoped<SupportService>();
 
         return services;
     }

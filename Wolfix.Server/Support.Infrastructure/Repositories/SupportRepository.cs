@@ -17,4 +17,14 @@ internal sealed class SupportRepository(SupportContext context)
             .Select(support => support.Id)
             .FirstOrDefaultAsync(ct);
     }
+
+    public async Task<bool> IsExistAsync(string firstName, string lastName, string middleName, CancellationToken ct)
+    {
+        return await _supports
+            .AsNoTracking()
+            .Where(support => support.FullName.FirstName == firstName
+            && support.FullName.LastName == lastName
+            && support.FullName.MiddleName == middleName)
+            .AnyAsync(ct);
+    }
 }

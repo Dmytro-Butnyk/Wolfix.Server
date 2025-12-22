@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Seller.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
+using Support.IntegrationEvents;
 
 namespace Identity.Application.Extensions;
 
@@ -26,6 +27,7 @@ public static class DependencyInjection
         services.AddScoped<IIntegrationEventHandler<CustomerWantsToBeSeller>, CustomerWantsToBeSellerEventHandler>();
         services.AddScoped<IIntegrationEventHandler<SellerApplicationApproved>, SellerApplicationApprovedEventHandler>();
         services.AddScoped<IIntegrationEventHandler<CreateAdmin, Guid>, CreateAdminEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<CreateSupport, Guid>, CreateSupportEventHandler>();
 
         return services;
     }

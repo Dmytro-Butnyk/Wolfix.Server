@@ -17,7 +17,7 @@ public sealed class CreateAdminEventHandler(IAuthStore authStore)
         {
             Guid accountId = existingAccountId.Value;
             
-            VoidResult addAdminRoleResult = await authStore.AddAdminRoleAsync(accountId, ct);
+            VoidResult addAdminRoleResult = await authStore.AddRoleAsync(accountId, Roles.Admin, ct);
 
             if (addAdminRoleResult.IsFailure)
             {

@@ -21,5 +21,5 @@ public interface IAuthStore
     
     Task<VoidResult> CheckUserCanBeSellerAsync(Guid accountId, CancellationToken ct);
     
-    Task<VoidResult> AddAdminRoleAsync(Guid accountId, CancellationToken ct);
+    Task<VoidResult> AddRoleAsync(Guid accountId, string role, CancellationToken ct);
 }

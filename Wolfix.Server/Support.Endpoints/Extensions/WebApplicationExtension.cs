@@ -8,6 +8,7 @@ public static class WebApplicationExtension
     public static WebApplication MapSupportApi(this WebApplication app)
     {
         app.MapSupportRequestEndpoints();
+        app.MapSupportEndpoints();
         
         return app;
     }
