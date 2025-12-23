@@ -328,4 +328,55 @@ internal sealed class AuthStore(
         
         return VoidResult.Success();
     }
+
+    public async Task<VoidResult> RemoveSupportRoleOrWholeAccountAsync(Guid accountId, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        Account? account = await userManager.FindByIdAsync(accountId.ToString());
+
+        if (account is null)
+        {
+            return VoidResult.Failure(
+                $"Account with id: {accountId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        bool accountDoesntHaveSupportRole = await userManager.IsInRoleAsync(account, Roles.Support);
+
+        if (accountDoesntHaveSupportRole)
+        {
+            return VoidResult.Failure("Account doesnt have support role");
+        }
+
+        bool accountHaveOnlySupportRole = (await userManager.GetRolesAsync(account)).Count == 1;
+
+        if (accountHaveOnlySupportRole)
+        {
+            IdentityResult deleteAccountResult = await userManager.DeleteAsync(account);
+
+            if (!deleteAccountResult.Succeeded)
+            {
+                return VoidResult.Failure(
+                    deleteAccountResult.GetErrorMessage(),
+                    HttpStatusCode.InternalServerError
+                );
+            }
+            
+            return VoidResult.Success();
+        }
+
+        IdentityResult removeFromRoleResult = await userManager.RemoveFromRoleAsync(account, Roles.Support);
+
+        if (!removeFromRoleResult.Succeeded)
+        {
+            return VoidResult.Failure(
+                removeFromRoleResult.GetErrorMessage(),
+                HttpStatusCode.InternalServerError
+            );
+        }
+        
+        return VoidResult.Success();
+    }
 }

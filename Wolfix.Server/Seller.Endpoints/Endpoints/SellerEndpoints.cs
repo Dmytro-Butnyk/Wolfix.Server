@@ -73,7 +73,7 @@ internal static class SellerEndpoints
         return TypedResults.Ok(sellers);
     }
 
-    private static async Task<Results<NoContent, NotFound<string>>> Delete(
+    private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>, InternalServerError<string>>> Delete(
         [FromRoute] Guid sellerId,
         [FromServices] SellerService sellerService,
         CancellationToken ct)
@@ -82,7 +82,13 @@ internal static class SellerEndpoints
 
         if (deleteResult.IsFailure)
         {
-            return TypedResults.NotFound(deleteResult.ErrorMessage);
+            return deleteResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(deleteResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(deleteResult.ErrorMessage),
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(deleteResult.ErrorMessage),
+                _ => throw new UnknownStatusCodeException(nameof(Delete), deleteResult.StatusCode)
+            };
         }
         
         return TypedResults.NoContent();

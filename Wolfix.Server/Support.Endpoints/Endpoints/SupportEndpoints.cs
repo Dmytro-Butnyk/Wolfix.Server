@@ -20,17 +20,21 @@ internal static class SupportEndpoints
         var group = app.MapGroup(Route)
             .WithTags("Support");
         
-        group.MapPost("", CreateSupport)
+        group.MapPost("", Create)
             .RequireAuthorization("SuperAdmin")
             .WithSummary("Create support");
+        
+        group.MapDelete("{supportId:guid}", Delete)
+            .RequireAuthorization("SuperAdmin")
+            .WithSummary("Delete support");
     }
     
-    private static async Task<Results<NoContent, BadRequest<string>, Conflict<string>, InternalServerError<string>>> CreateSupport(
+    private static async Task<Results<NoContent, BadRequest<string>, Conflict<string>, InternalServerError<string>>> Create(
         [FromBody] CreateSupportDto request,
         [FromServices] SupportService supportService,
         CancellationToken ct)
     {
-        VoidResult createSupportResult = await supportService.CreateSupportAsync(request, ct);
+        VoidResult createSupportResult = await supportService.CreateAsync(request, ct);
 
         if (createSupportResult.IsFailure)
         {
@@ -39,7 +43,28 @@ internal static class SupportEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(createSupportResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(createSupportResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(createSupportResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(CreateSupport), createSupportResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(nameof(Create), createSupportResult.StatusCode)
+            };
+        }
+        
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>, InternalServerError<string>>> Delete(
+        [FromRoute] Guid supportId,
+        [FromServices] SupportService supportService,
+        CancellationToken ct)
+    {
+        VoidResult deleteResult = await supportService.DeleteAsync(supportId, ct);
+
+        if (deleteResult.IsFailure)
+        {
+            return deleteResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(deleteResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(deleteResult.ErrorMessage),
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(deleteResult.ErrorMessage),
+                _ => throw new UnknownStatusCodeException(nameof(Delete), deleteResult.StatusCode)
             };
         }
         

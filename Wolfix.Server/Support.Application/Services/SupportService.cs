@@ -12,7 +12,7 @@ public sealed class SupportService(
     ISupportRepository supportRepository,
     EventBus eventBus)
 {
-    public async Task<VoidResult> CreateSupportAsync(CreateSupportDto request, CancellationToken ct)
+    public async Task<VoidResult> CreateAsync(CreateSupportDto request, CancellationToken ct)
     {
         var @event = new CreateSupport
         {
@@ -52,6 +52,36 @@ public sealed class SupportService(
         }
 
         await supportRepository.AddAsync(createSupportResult.Value!, ct);
+        await supportRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
+    }
+
+    public async Task<VoidResult> DeleteAsync(Guid supportId, CancellationToken ct)
+    {
+        SupportEntity? support = await supportRepository.GetByIdAsync(supportId, ct);
+
+        if (support is null)
+        {
+            return VoidResult.Failure(
+                $"Support with id: {supportId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        var @event = new DeleteSupportAccount
+        {
+            AccountId = support.AccountId
+        };
+        
+        VoidResult deleteAccountResult = await eventBus.PublishWithoutResultAsync(@event, ct);
+
+        if (deleteAccountResult.IsFailure)
+        {
+            return deleteAccountResult;
+        }
+        
+        supportRepository.Delete(support, ct);
         await supportRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();
