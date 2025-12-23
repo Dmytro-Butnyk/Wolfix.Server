@@ -32,6 +32,10 @@ internal static class SupportRequestEndpoints
         
         group.MapPatch("{supportRequestId:guid}/supports/{supportId:guid}/cancel", Cancel)
             .WithSummary("Cancel support request");
+        
+        group.MapGet("by-category", GetAllByCategory)
+            .WithSummary("Get all support requests by category")
+            .RequireAuthorization("Support");
     }
 
     private static async Task<Ok<IReadOnlyCollection<SupportRequestShortDto>>> GetAllPending(
@@ -89,5 +93,22 @@ internal static class SupportRequestEndpoints
         }
         
         return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<Ok<IReadOnlyCollection<SupportRequestShortDto>>, BadRequest<string>>>
+        GetAllByCategory(
+            [FromBody] string category,
+            [FromServices] SupportRequestService supportRequestService,
+            CancellationToken ct)
+    {
+        Result<IReadOnlyCollection<SupportRequestShortDto>> result
+            = await supportRequestService.GetAllByCategoryAsync(category, ct);
+        
+        if (result.IsFailure)
+        {
+            return TypedResults.BadRequest(result.ErrorMessage);
+        }
+        
+        return TypedResults.Ok(result.Value);
     }
 }

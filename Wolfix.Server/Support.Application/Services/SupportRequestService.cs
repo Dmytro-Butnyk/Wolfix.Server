@@ -134,10 +134,14 @@ public sealed class SupportRequestService(
         return dto;
     }
 
-    public async Task<IReadOnlyCollection<SupportRequestShortDto>> GetAllByCategoryAsync(string category,
+    public async Task<Result<IReadOnlyCollection<SupportRequestShortDto>>> GetAllByCategoryAsync(string category,
         CancellationToken ct)
     {
-        SupportRequestCategory categoryE = Enum.Parse<SupportRequestCategory>(category);
+        if(!Enum.TryParse<SupportRequestCategory>(category,true, out var categoryE))
+        {
+            return Result<IReadOnlyCollection<SupportRequestShortDto>>.Failure(
+                $"Category '{category}' is invalid.");
+        }
         
         IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequestRepository.GetAllByCategoryAsync(categoryE, ct);
         
@@ -145,6 +149,6 @@ public sealed class SupportRequestService(
             .Select(pr => pr.ToShortDto())
             .ToList();
         
-        return dto;
+        return Result<IReadOnlyCollection<SupportRequestShortDto>>.Success(dto);
     }
 }
