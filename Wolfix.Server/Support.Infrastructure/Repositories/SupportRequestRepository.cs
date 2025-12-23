@@ -17,7 +17,7 @@ internal sealed class SupportRequestRepository(SupportContext context)
             .AsNoTracking()
             .Include(sr => sr.ProcessedBy)
             .Where(sr => sr.IsProcessed == false)
-            .Select(sr => new SupportRequestShortProjection(sr.Id, sr.FullName, sr.PhoneNumber, sr.Title, sr.CreatedAt))
+            .Select(sr => new SupportRequestShortProjection(sr.Id, sr.Category.ToString(), sr.RequestContent, sr.CreatedAt))
             .ToListAsync(ct);
     }
 }

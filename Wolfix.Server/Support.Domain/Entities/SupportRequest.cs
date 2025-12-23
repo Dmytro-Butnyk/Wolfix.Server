@@ -15,9 +15,6 @@ public sealed class SupportRequest : BaseEntity
     
     public Guid CustomerId { get; private set; }
     
-    public string Title { get; private set; }
-    
-    public Guid? ProductId { get; private set; }
     public SupportRequestCategory Category { get; private set; }
     
     public string RequestContent { get; private set; }
@@ -42,21 +39,19 @@ public sealed class SupportRequest : BaseEntity
     
     private SupportRequest() { }
 
-    private SupportRequest(FullName fullName, PhoneNumber phoneNumber, BirthDate? birthDate, Guid customerId,
-        string title, Guid? productId, SupportRequestCategory category, string requestContent)
+    private SupportRequest(FullName fullName, PhoneNumber phoneNumber, BirthDate? birthDate, Guid customerId, 
+        SupportRequestCategory category, string requestContent)
     {
         FullName = fullName;
         PhoneNumber = phoneNumber;
         BirthDate = birthDate;
         CustomerId = customerId;
-        Title = title;
-        ProductId = productId;
         Category = category;
         RequestContent = requestContent;
     }
 
     public static Result<SupportRequest> Create(string firstName, string lastName, string middleName,
-        string phoneNumber, DateOnly? birthDate, Guid customerId, string title, string category, string content, Guid? productId = null)
+        string phoneNumber, DateOnly? birthDate, Guid customerId, string category, string content)
     {
         Result<FullName> createFullNameResult = FullName.Create(firstName, lastName, middleName);
 
@@ -72,7 +67,7 @@ public sealed class SupportRequest : BaseEntity
             return Result<SupportRequest>.Failure(createPhoneNumberResult);
         }
 
-        Shared.Domain.ValueObjects.BirthDate? birthDateVO = null;
+        Shared.Domain.ValueObjects.BirthDate? birthDateVo = null;
         
         if (birthDate is not null)
         {
@@ -83,17 +78,12 @@ public sealed class SupportRequest : BaseEntity
                 return Result<SupportRequest>.Failure(createBirthDateResult);
             }
             
-            birthDateVO = createBirthDateResult.Value!;
+            birthDateVo = createBirthDateResult.Value!;
         }
 
         if (customerId == Guid.Empty)
         {
             return Result<SupportRequest>.Failure("Customer Id is required");
-        }
-
-        if (string.IsNullOrWhiteSpace(title))
-        {
-            return Result<SupportRequest>.Failure("Title is required");
         }
 
         if (string.IsNullOrWhiteSpace(content))
@@ -107,7 +97,7 @@ public sealed class SupportRequest : BaseEntity
         }
         
         SupportRequest supportRequest = new(createFullNameResult.Value!,
-            createPhoneNumberResult.Value!, birthDateVO, customerId, title, productId, categoryValue, content);
+            createPhoneNumberResult.Value!, birthDateVo, customerId, categoryValue, content);
         return Result<SupportRequest>.Success(supportRequest);
     }
     

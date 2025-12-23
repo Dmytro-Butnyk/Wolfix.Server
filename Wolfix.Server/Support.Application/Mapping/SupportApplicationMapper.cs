@@ -6,6 +6,5 @@ namespace Support.Application.Mapping;
 internal static class SupportApplicationMapper
 {
     public static SupportRequestShortDto ToShortDto(this SupportRequestShortProjection projection)
-        => new(projection.Id, projection.Email, projection.FullName, projection.PhoneNumber,
-            projection.Title, projection.CreatedAt);
+        => new(projection.Id, projection.Category, projection.RequestContent, projection.CreatedAt);
 }

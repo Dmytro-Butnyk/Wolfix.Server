@@ -94,16 +94,6 @@ public sealed class SupportRequestService(
             return checkCustomerExistsResult;
         }
 
-        if (request.ProductId is not null)
-        {
-            VoidResult checkProductExistsResult = await eventBus.PublishWithoutResultAsync(new CheckProductExistsForCreatingSupportRequest(request.ProductId.Value), ct);
-            
-            if (checkProductExistsResult.IsFailure)
-            {
-                return checkProductExistsResult;
-            }
-        }
-        
         Result<CustomerInformationForSupportRequestDto> fetchCustomerInfoResult
             = await eventBus.PublishWithSingleResultAsync<
                 FetchCustomerInformationForCreatingSupportRequest,
@@ -119,7 +109,7 @@ public sealed class SupportRequestService(
         Result<SupportRequest> createSupportRequestResult = SupportRequest.Create(fetchCustomerInfoResult.Value!.FirstName,
             fetchCustomerInfoResult.Value!.LastName, fetchCustomerInfoResult.Value!.MiddleName,
             fetchCustomerInfoResult.Value!.PhoneNumber, fetchCustomerInfoResult.Value.BirthDate,
-            request.CustomerId, request.Title, request.Category, request.Content, request.ProductId);
+            request.CustomerId, request.Category, request.Content);
 
         if (createSupportRequestResult.IsFailure)
         {
@@ -131,7 +121,7 @@ public sealed class SupportRequestService(
         
         return VoidResult.Success();
     }
-
+    
     public async Task<IReadOnlyCollection<SupportRequestShortDto>> GetAllPendingAsync(CancellationToken ct)
     {
         IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequestRepository.GetAllPendingAsync(ct);

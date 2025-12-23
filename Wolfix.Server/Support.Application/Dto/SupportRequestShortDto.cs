@@ -2,5 +2,4 @@ using Shared.Domain.ValueObjects;
 
 namespace Support.Application.Dto;
 
-public sealed record SupportRequestShortDto(Guid Id, Email Email, FullName FullName, PhoneNumber PhoneNumber,
-    string Title, DateTime CreatedAt);
+public sealed record SupportRequestShortDto(Guid Id, string Category, string RequestContent, DateTime CreatedAt);

@@ -50,12 +50,9 @@ public sealed class SupportRequestEntityConfiguration : IEntityTypeConfiguration
         builder.Property(sr => sr.CustomerId)
             .IsRequired();
 
-        builder.Property(sr => sr.Title)
+        builder.Property(sr => sr.Category)
+            .HasConversion<string>()
             .IsRequired();
-
-        builder.Property(sr => sr.ProductId)
-            .IsRequired(false)
-            .HasDefaultValue(null);
 
         builder.Property(sr => sr.RequestContent)
             .IsRequired();
