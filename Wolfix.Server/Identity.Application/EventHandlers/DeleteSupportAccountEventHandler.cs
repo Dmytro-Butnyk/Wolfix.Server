@@ -9,14 +9,5 @@ public sealed class DeleteSupportAccountEventHandler(IAuthStore authStore)
     : IIntegrationEventHandler<DeleteSupportAccount>
 {
     public async Task<VoidResult> HandleAsync(DeleteSupportAccount @event, CancellationToken ct)
-    {
-        VoidResult removeRoleOrAccountResult = await authStore.RemoveSupportRoleOrWholeAccountAsync(@event.AccountId, ct);
-
-        if (removeRoleOrAccountResult.IsFailure)
-        {
-            return removeRoleOrAccountResult;
-        }
-        
-        return VoidResult.Success();
-    }
+        => await authStore.RemoveRoleOrWholeAccountAsync(@event.AccountId, Roles.Support, ct);
 }

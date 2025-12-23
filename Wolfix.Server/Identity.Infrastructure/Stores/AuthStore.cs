@@ -329,7 +329,7 @@ internal sealed class AuthStore(
         return VoidResult.Success();
     }
 
-    public async Task<VoidResult> RemoveSupportRoleOrWholeAccountAsync(Guid accountId, CancellationToken ct)
+    public async Task<VoidResult> RemoveRoleOrWholeAccountAsync(Guid accountId, string role, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
@@ -343,16 +343,16 @@ internal sealed class AuthStore(
             );
         }
 
-        bool accountDoesntHaveSupportRole = await userManager.IsInRoleAsync(account, Roles.Support);
+        bool accountDoesntHaveThisRole = await userManager.IsInRoleAsync(account, role);
 
-        if (accountDoesntHaveSupportRole)
+        if (accountDoesntHaveThisRole)
         {
-            return VoidResult.Failure("Account doesnt have support role");
+            return VoidResult.Failure($"Account doesnt have {role} role");
         }
 
-        bool accountHaveOnlySupportRole = (await userManager.GetRolesAsync(account)).Count == 1;
+        bool accountHaveOnlyThisRole = (await userManager.GetRolesAsync(account)).Count == 1;
 
-        if (accountHaveOnlySupportRole)
+        if (accountHaveOnlyThisRole)
         {
             IdentityResult deleteAccountResult = await userManager.DeleteAsync(account);
 
@@ -367,7 +367,7 @@ internal sealed class AuthStore(
             return VoidResult.Success();
         }
 
-        IdentityResult removeFromRoleResult = await userManager.RemoveFromRoleAsync(account, Roles.Support);
+        IdentityResult removeFromRoleResult = await userManager.RemoveFromRoleAsync(account, role);
 
         if (!removeFromRoleResult.Succeeded)
         {

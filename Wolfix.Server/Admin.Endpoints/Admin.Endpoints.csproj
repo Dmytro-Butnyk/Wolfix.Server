@@ -13,6 +13,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Admin.Application\Admin.Application.csproj" />
       <ProjectReference Include="..\Admin.Infrastructure\Admin.Infrastructure.csproj" />
+      <ProjectReference Include="..\Shared.Endpoints\Shared.Endpoints.csproj" />
     </ItemGroup>
 
 </Project>

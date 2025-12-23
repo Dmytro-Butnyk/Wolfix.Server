@@ -1,3 +1,4 @@
+using System.Net;
 using Admin.Application.Dto.Requests;
 using Admin.Application.Dto.Responses;
 using Admin.Application.Mapping;
@@ -67,5 +68,35 @@ public sealed class AdminService(
             .ToList();
         
         return new PaginationDto<BasicAdminDto>(page, totalPages, totalCount, dto);
+    }
+
+    public async Task<VoidResult> DeleteAsync(Guid adminId, CancellationToken ct)
+    {
+        AdminAggregate? admin = await adminRepository.GetByIdAsync(adminId, ct);
+
+        if (admin is null)
+        {
+            return VoidResult.Failure(
+                $"Admin with id: {adminId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        var @event = new DeleteAdminAccount
+        {
+            AccountId = admin.AccountId
+        };
+        
+        VoidResult deleteAccountResult = await eventBus.PublishWithoutResultAsync(@event, ct);
+
+        if (deleteAccountResult.IsFailure)
+        {
+            return deleteAccountResult;
+        }
+        
+        adminRepository.Delete(admin, ct);
+        await adminRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
     }
 }

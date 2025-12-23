@@ -25,5 +25,5 @@ public interface IAuthStore
     
     Task<VoidResult> RemoveSellerRoleAsync(Guid accountId, CancellationToken ct);
     
-    Task<VoidResult> RemoveSupportRoleOrWholeAccountAsync(Guid accountId, CancellationToken ct);
+    Task<VoidResult> RemoveRoleOrWholeAccountAsync(Guid accountId, string role, CancellationToken ct);
 }

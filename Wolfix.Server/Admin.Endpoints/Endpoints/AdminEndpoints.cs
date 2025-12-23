@@ -1,3 +1,4 @@
+using System.Net;
 using Admin.Application.Dto.Requests;
 using Admin.Application.Dto.Responses;
 using Admin.Application.Services;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
+using Shared.Endpoints.Exceptions;
 
 namespace Admin.Endpoints.Endpoints;
 
@@ -27,6 +29,14 @@ internal static class AdminEndpoints
         adminGroup.MapPost("", Create)
             .RequireAuthorization("SuperAdmin")
             .WithSummary("Add admin");
+        
+        adminGroup.MapDelete("{adminId:guid}", Delete)
+            .RequireAuthorization("SuperAdmin")
+            .WithSummary("Delete admin");
+        
+        //todo: возможность удаления обычного админа супер админом
+        // подогнать фронт под это
+        // стили подогнать чтобы соответствовало цветовой гамме
     }
 
     private static async Task<Ok<PaginationDto<BasicAdminDto>>> GetAllForPage(
@@ -50,6 +60,27 @@ internal static class AdminEndpoints
         if (createAdminResult.IsFailure)
         {
             return TypedResults.BadRequest(createAdminResult.ErrorMessage);
+        }
+        
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>, InternalServerError<string>>> Delete(
+        [FromRoute] Guid adminId,
+        [FromServices] AdminService adminService,
+        CancellationToken ct)
+    {
+        VoidResult deleteResult = await adminService.DeleteAsync(adminId, ct);
+
+        if (deleteResult.IsFailure)
+        {
+            return deleteResult.StatusCode switch
+            {
+                HttpStatusCode.NotFound => TypedResults.NotFound(deleteResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(deleteResult.ErrorMessage),
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(deleteResult.ErrorMessage),
+                _ => throw new UnknownStatusCodeException(nameof(Delete), deleteResult.StatusCode)
+            };
         }
         
         return TypedResults.NoContent();
