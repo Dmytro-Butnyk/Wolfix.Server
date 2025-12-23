@@ -17,6 +17,16 @@ public sealed class SupportService(
 {
     public async Task<VoidResult> CreateAsync(CreateSupportDto request, CancellationToken ct)
     {
+        bool isAlreadyExist = await supportRepository.IsExistAsync(request.FirstName, request.LastName, request.MiddleName, ct);
+
+        if (isAlreadyExist)
+        {
+            return VoidResult.Failure(
+                $"Support with FirstName: {request.FirstName} + LastName: {request.LastName} + MiddleName: {request.MiddleName} already exist",
+                HttpStatusCode.Conflict
+            );
+        }
+        
         var @event = new CreateSupport
         {
             Email = request.Email,
@@ -31,16 +41,6 @@ public sealed class SupportService(
         }
 
         Guid accountId = createAccountResult.Value;
-        
-        bool isAlreadyExist = await supportRepository.IsExistAsync(request.FirstName, request.LastName, request.MiddleName, ct);
-
-        if (isAlreadyExist)
-        {
-            return VoidResult.Failure(
-                $"Support with FirstName: {request.FirstName} + LastName: {request.LastName} + MiddleName: {request.MiddleName} already exist",
-                HttpStatusCode.Conflict
-            );
-        }
 
         Result<SupportEntity> createSupportResult = SupportEntity.Create(
             accountId,

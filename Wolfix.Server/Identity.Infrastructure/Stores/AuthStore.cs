@@ -309,9 +309,9 @@ internal sealed class AuthStore(
             );
         }
         
-        bool customerDoesntHaveSellerRole = await userManager.IsInRoleAsync(account, Roles.Seller);
+        bool customerHasSellerRole = await userManager.IsInRoleAsync(account, Roles.Seller);
 
-        if (customerDoesntHaveSellerRole)
+        if (customerHasSellerRole is false)
         {
             return VoidResult.Failure("Customer doesnt have Seller role");
         }
@@ -343,9 +343,9 @@ internal sealed class AuthStore(
             );
         }
 
-        bool accountDoesntHaveThisRole = await userManager.IsInRoleAsync(account, role);
+        bool accountHasThisRole = await userManager.IsInRoleAsync(account, role);
 
-        if (accountDoesntHaveThisRole)
+        if (accountHasThisRole is false)
         {
             return VoidResult.Failure($"Account doesnt have {role} role");
         }
