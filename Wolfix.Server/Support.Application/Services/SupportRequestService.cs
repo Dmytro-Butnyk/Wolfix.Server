@@ -5,6 +5,7 @@ using Shared.IntegrationEvents.Interfaces;
 using Support.Application.Dto;
 using Support.Application.Mapping;
 using Support.Domain.Entities;
+using Support.Domain.Enums;
 using Support.Domain.Interfaces;
 using Support.Domain.Projections;
 using Support.IntegrationEvents;
@@ -126,6 +127,20 @@ public sealed class SupportRequestService(
     {
         IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequestRepository.GetAllPendingAsync(ct);
 
+        IReadOnlyCollection<SupportRequestShortDto> dto = projection
+            .Select(pr => pr.ToShortDto())
+            .ToList();
+        
+        return dto;
+    }
+
+    public async Task<IReadOnlyCollection<SupportRequestShortDto>> GetAllByCategoryAsync(string category,
+        CancellationToken ct)
+    {
+        SupportRequestCategory categoryE = Enum.Parse<SupportRequestCategory>(category);
+        
+        IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequestRepository.GetAllByCategoryAsync(categoryE, ct);
+        
         IReadOnlyCollection<SupportRequestShortDto> dto = projection
             .Select(pr => pr.ToShortDto())
             .ToList();

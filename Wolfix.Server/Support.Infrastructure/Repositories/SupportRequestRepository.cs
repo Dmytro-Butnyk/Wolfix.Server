@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.Repositories;
 using Support.Domain.Entities;
+using Support.Domain.Enums;
 using Support.Domain.Interfaces;
 using Support.Domain.Projections;
 
@@ -17,6 +18,17 @@ internal sealed class SupportRequestRepository(SupportContext context)
             .AsNoTracking()
             .Include(sr => sr.ProcessedBy)
             .Where(sr => sr.IsProcessed == false)
+            .Select(sr => new SupportRequestShortProjection(sr.Id, sr.Category.ToString(), sr.RequestContent, sr.CreatedAt))
+            .ToListAsync(ct);
+    }
+
+    public async Task<IReadOnlyCollection<SupportRequestShortProjection>> GetAllByCategoryAsync(
+        SupportRequestCategory category, CancellationToken ct)
+    {
+        return await _supportRequests
+            .AsNoTracking()
+            .Include(sr => sr.ProcessedBy)
+            .Where(sr => sr.Category == category)
             .Select(sr => new SupportRequestShortProjection(sr.Id, sr.Category.ToString(), sr.RequestContent, sr.CreatedAt))
             .ToListAsync(ct);
     }
