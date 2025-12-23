@@ -33,10 +33,6 @@ internal static class AdminEndpoints
         adminGroup.MapDelete("{adminId:guid}", Delete)
             .RequireAuthorization("SuperAdmin")
             .WithSummary("Delete admin");
-        
-        //todo: возможность удаления обычного админа супер админом
-        // подогнать фронт под это
-        // стили подогнать чтобы соответствовало цветовой гамме
     }
 
     private static async Task<Ok<PaginationDto<BasicAdminDto>>> GetAllForPage(
