@@ -1,6 +1,10 @@
 using Admin.Application.Dto.Requests;
+using Admin.Application.Dto.Responses;
+using Admin.Application.Mapping;
 using Admin.Domain.Interfaces;
+using Admin.Domain.Projections;
 using Admin.IntegrationEvents;
+using Shared.Application.Dto;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
@@ -12,7 +16,7 @@ public sealed class AdminService(
     IAdminRepository adminRepository,
     EventBus eventBus)
 {
-    public async Task<VoidResult> CreateAdminAsync(CreateAdminDto request, CancellationToken ct)
+    public async Task<VoidResult> CreateAsync(CreateAdminDto request, CancellationToken ct)
     {
         var @event = new CreateAdmin
         {
@@ -43,5 +47,25 @@ public sealed class AdminService(
         await adminRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();
+    }
+
+    public async Task<PaginationDto<BasicAdminDto>> GetForPageAsync(int page, int pageSize, CancellationToken ct)
+    {
+        int totalCount = await adminRepository.GetBasicAdminsTotalCountAsync(ct);
+
+        if (totalCount == 0)
+        {
+            return PaginationDto<BasicAdminDto>.Empty(page);
+        }
+
+        IReadOnlyCollection<BasicAdminProjection> projections = await adminRepository.GetForPageAsync(page, pageSize, ct);
+
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+        
+        List<BasicAdminDto> dto = projections
+            .Select(projection => projection.ToDto())
+            .ToList();
+        
+        return new PaginationDto<BasicAdminDto>(page, totalPages, totalCount, dto);
     }
 }

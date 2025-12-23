@@ -1,8 +1,11 @@
 using System.Net;
+using Shared.Application.Dto;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents;
 using Support.Application.Dto;
+using Support.Application.Mapping;
 using Support.Domain.Interfaces;
+using Support.Domain.Projections;
 using Support.IntegrationEvents;
 using SupportEntity = Support.Domain.Entities.Support;
 
@@ -85,5 +88,25 @@ public sealed class SupportService(
         await supportRepository.SaveChangesAsync(ct);
         
         return VoidResult.Success();
+    }
+
+    public async Task<PaginationDto<SupportForAdminDto>> GetForPageAsync(int page, int pageSize, CancellationToken ct)
+    {
+        int totalCount = await supportRepository.GetTotalCountAsync(ct);
+
+        if (totalCount == 0)
+        {
+            return PaginationDto<SupportForAdminDto>.Empty(page);
+        }
+        
+        IReadOnlyCollection<SupportForAdminProjection> projections = await supportRepository.GetForPageAsync(page, pageSize, ct);
+
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+        List<SupportForAdminDto> dto = projections
+            .Select(pr => pr.ToAdminDto())
+            .ToList();
+        
+        return new PaginationDto<SupportForAdminDto>(page, totalPages, totalCount, dto);
     }
 }

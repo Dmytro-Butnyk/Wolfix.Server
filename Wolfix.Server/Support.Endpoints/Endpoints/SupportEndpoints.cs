@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Shared.Application.Dto;
 using Shared.Domain.Models;
 using Shared.Endpoints.Exceptions;
 using Support.Application.Dto;
@@ -20,6 +21,10 @@ internal static class SupportEndpoints
         var group = app.MapGroup(Route)
             .WithTags("Support");
         
+        group.MapGet("page/{page:int}", GetAllForPage)
+            .RequireAuthorization("SuperAdmin")
+            .WithSummary("Get all supports for page");
+        
         group.MapPost("", Create)
             .RequireAuthorization("SuperAdmin")
             .WithSummary("Create support");
@@ -27,6 +32,17 @@ internal static class SupportEndpoints
         group.MapDelete("{supportId:guid}", Delete)
             .RequireAuthorization("SuperAdmin")
             .WithSummary("Delete support");
+    }
+
+    private static async Task<Ok<PaginationDto<SupportForAdminDto>>> GetAllForPage(
+        [FromRoute] int page,
+        [FromServices] SupportService supportService,
+        CancellationToken ct,
+        [FromQuery] int pageSize = 50)
+    {
+        PaginationDto<SupportForAdminDto> dto = await supportService.GetForPageAsync(page, pageSize, ct);
+        
+        return TypedResults.Ok(dto);
     }
     
     private static async Task<Results<NoContent, BadRequest<string>, Conflict<string>, InternalServerError<string>>> Create(

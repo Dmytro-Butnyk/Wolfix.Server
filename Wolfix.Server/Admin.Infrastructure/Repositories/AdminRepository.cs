@@ -1,5 +1,6 @@
 using Admin.Domain.AdminAggregate.Enums;
 using Admin.Domain.Interfaces;
+using Admin.Domain.Projections;
 using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.Repositories;
 
@@ -18,5 +19,28 @@ internal sealed class AdminRepository(AdminContext context)
                     && (isSuperAdmin ? admin.Type == AdminType.Super : admin.Type == AdminType.Basic))
             .Select(admin => admin.Id)
             .FirstOrDefaultAsync(ct);
+    }
+
+    public async Task<int> GetBasicAdminsTotalCountAsync(CancellationToken ct)
+    {
+        return await _admins
+            .AsNoTracking()
+            .Where(admin => admin.Type == AdminType.Basic)
+            .CountAsync(ct);
+    }
+
+    public async Task<IReadOnlyCollection<BasicAdminProjection>> GetForPageAsync(int page, int pageSize, CancellationToken ct)
+    {
+        return await _admins
+            .AsNoTracking()
+            .Where(admin => admin.Type == AdminType.Basic)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(admin => new BasicAdminProjection(
+                admin.Id,
+                admin.FullName,
+                admin.PhoneNumber
+            ))
+            .ToListAsync(ct);
     }
 }
