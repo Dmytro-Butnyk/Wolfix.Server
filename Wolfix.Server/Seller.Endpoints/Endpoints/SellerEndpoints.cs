@@ -25,6 +25,14 @@ internal static class SellerEndpoints
             .RequireAuthorization("Seller")
             .WithSummary("Get profile info");
         
+        sellerGroup.MapGet("page/{page:int}", GetAllForPage)
+            .RequireAuthorization("SuperAdmin")
+            .WithSummary("Get all sellers for page");
+        
+        sellerGroup.MapDelete("{sellerId:guid}", Delete)
+            .RequireAuthorization("SuperAdmin")
+            .WithSummary("Delete seller");
+        
         var changeGroup = sellerGroup.MapGroup("{sellerId:guid}");
         MapChangeEndpoints(changeGroup);
 
@@ -52,6 +60,32 @@ internal static class SellerEndpoints
         group.MapPatch("birth-date", ChangeBirthDate)
             .RequireAuthorization("Seller")
             .WithSummary("Change birth date");
+    }
+
+    private static async Task<Ok<PaginationDto<SellerForAdminDto>>> GetAllForPage(
+        [FromRoute] int page,
+        [FromServices] SellerService sellerService,
+        CancellationToken ct,
+        [FromQuery] int pageSize = 50)
+    {
+        PaginationDto<SellerForAdminDto> sellers = await sellerService.GetForPageAsync(page, pageSize, ct);
+        
+        return TypedResults.Ok(sellers);
+    }
+
+    private static async Task<Results<NoContent, NotFound<string>>> Delete(
+        [FromRoute] Guid sellerId,
+        [FromServices] SellerService sellerService,
+        CancellationToken ct)
+    {
+        VoidResult deleteResult = await sellerService.DeleteAsync(sellerId, ct);
+
+        if (deleteResult.IsFailure)
+        {
+            return TypedResults.NotFound(deleteResult.ErrorMessage);
+        }
+        
+        return TypedResults.NoContent();
     }
 
     private static async Task<Results<Ok<SellerDto>, NotFound<string>>> GetProfileInfo(

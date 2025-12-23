@@ -294,4 +294,38 @@ internal sealed class AuthStore(
         
         return VoidResult.Success();
     }
+
+    public async Task<VoidResult> RemoveSellerRoleAsync(Guid accountId, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        Account? account = await userManager.FindByIdAsync(accountId.ToString());
+
+        if (account is null)
+        {
+            return VoidResult.Failure(
+                $"Account with id: {accountId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+        
+        bool customerDoesntHaveSellerRole = await userManager.IsInRoleAsync(account, Roles.Seller);
+
+        if (customerDoesntHaveSellerRole)
+        {
+            return VoidResult.Failure("Customer doesnt have Seller role");
+        }
+        
+        IdentityResult removeRoleResult = await userManager.RemoveFromRoleAsync(account, Roles.Seller);
+
+        if (!removeRoleResult.Succeeded)
+        {
+            return VoidResult.Failure(
+                removeRoleResult.GetErrorMessage(),
+                HttpStatusCode.InternalServerError
+            );
+        }
+        
+        return VoidResult.Success();
+    }
 }

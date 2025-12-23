@@ -1,5 +1,4 @@
 using System.Net;
-using Media.IntegrationEvents.Dto;
 using Seller.Application.Dto.SellerApplication;
 using Seller.Application.Mapping.SellerApplication;
 using Seller.Domain.Interfaces;

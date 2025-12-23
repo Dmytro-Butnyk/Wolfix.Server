@@ -2,12 +2,17 @@ using System.Net;
 using Seller.Application.Dto.Seller;
 using Seller.Application.Mapping.Seller;
 using Seller.Domain.Interfaces;
+using Seller.Domain.Projections.Seller;
+using Seller.IntegrationEvents;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
+using Shared.IntegrationEvents;
 
 namespace Seller.Application.Services;
 
-public sealed class SellerService(ISellerRepository sellerRepository)
+public sealed class SellerService(
+    ISellerRepository sellerRepository,
+    EventBus eventBus)
 {
     public async Task<Result<FullNameDto>> ChangeFullNameAsync(Guid sellerId, ChangeFullNameDto request, CancellationToken ct)
     {
@@ -150,5 +155,60 @@ public sealed class SellerService(ISellerRepository sellerRepository)
             .ToList();
         
         return Result<IReadOnlyCollection<SellerCategoryDto>>.Success(dto);
+    }
+
+    public async Task<PaginationDto<SellerForAdminDto>> GetForPageAsync(int page, int pageSize, CancellationToken ct)
+    {
+        int totalCount = await sellerRepository.GetTotalCountAsync(ct);
+
+        if (totalCount == 0)
+        {
+            return PaginationDto<SellerForAdminDto>.Empty(page);
+        }
+        
+        IReadOnlyCollection<SellerForAdminProjection> projections = await sellerRepository.GetForPageAsync(page, pageSize, ct);
+        
+        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+        List<SellerForAdminDto> dto = projections
+            .Select(projection => projection.ToAdminDto())
+            .ToList();
+        
+        return new PaginationDto<SellerForAdminDto>(
+            CurrentPage: page,
+            TotalPages: totalPages,
+            TotalItems: totalCount,
+            Items: dto
+        );
+    }
+
+    public async Task<VoidResult> DeleteAsync(Guid sellerId, CancellationToken ct)
+    {
+        Domain.SellerAggregate.Seller? seller = await sellerRepository.GetByIdAsync(sellerId, ct);
+
+        if (seller is null)
+        {
+            return VoidResult.Failure(
+                $"Seller with id: {sellerId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        var @event = new DeleteSellerAccount
+        {
+            AccountId = seller.AccountId
+        };
+
+        VoidResult deleteAccountResult = await eventBus.PublishWithoutResultAsync(@event, ct);
+
+        if (deleteAccountResult.IsFailure)
+        {
+            return deleteAccountResult;
+        }
+        
+        sellerRepository.Delete(seller, ct);
+        await sellerRepository.SaveChangesAsync(ct);
+        
+        return VoidResult.Success();
     }
 }
