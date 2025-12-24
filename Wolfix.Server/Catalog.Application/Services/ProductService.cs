@@ -49,7 +49,8 @@ public sealed class ProductService(
             return VoidResult.Failure("Invalid status");
         }
 
-        if (!Enum.TryParse(addProductDto.ContentType, out BlobResourceType blobResourceType))
+        //todo: вместо хардкода указать тут addProductDto.ContentType
+        if (!Enum.TryParse("Photo", out BlobResourceType blobResourceType))
         {
             return VoidResult.Failure("Invalid blob resource type");
         }
