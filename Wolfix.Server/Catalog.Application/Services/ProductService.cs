@@ -33,7 +33,7 @@ public sealed class ProductService(
     EventBus eventBus,
     IToxicityService toxicityService)
 {
-    public async Task<VoidResult> AddProductAsync(
+    public async Task<VoidResult> CreateProductAsync(
         AddProductDto addProductDto, CancellationToken ct)
     {
         VoidResult checkSellerExistsResult = await eventBus.PublishWithoutResultAsync(

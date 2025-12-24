@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
+using Shared.Endpoints;
 using Shared.Endpoints.Exceptions;
 
 namespace Catalog.Endpoints.Endpoints;
@@ -35,34 +36,34 @@ internal static class ProductEndpoints
 
     private static void MapProductEndpoints(RouteGroupBuilder group)
     {
-        group.MapPost("", AddProduct)
+        group.MapPost("", CreateProduct)
             .DisableAntiforgery()
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Add product");
         
         group.MapDelete("{productId:guid}", DeleteProduct)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Delete product");
 
         group.MapPatch("product/{productId:guid}/new-main-photo/{newMainPhotoId:guid}", ChangeProductMainPhoto)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Change product main photo");
         
         group.MapPatch("product/{productId:guid}/general-info", ChangeProductGeneralInfo)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Change product general info");
         
         group.MapPatch("product/{productId:guid}/price", ChangePrice)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Change product price");
 
         group.MapPatch("add-product-media", AddProductMedia)
             .DisableAntiforgery()
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Add product media");
 
         group.MapDelete("product/{productId:guid}/media/{mediaId:guid}", DeleteProductMedia)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Delete product media");
         
         group.MapGet("product/{productId:guid}", GetProductFullInfo)
@@ -81,7 +82,7 @@ internal static class ProductEndpoints
             .WithSummary("Get random products");
         
         group.MapGet("seller/{sellerId:guid}/category/{categoryId:guid}/page/{page:int}", GetAllBySellerCategoryForPage)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Get all products by specific seller category");
         
         group.MapGet("search/category/{categoryId:guid}", GetSearchByCategory)
@@ -94,11 +95,11 @@ internal static class ProductEndpoints
             .WithSummary("Get products by attributes filtration");
         
         group.MapPost("product/{productId:guid}/discount", AddDiscount)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Add discount to product");
 
         group.MapDelete("product/{productId:guid}/discount", DeleteDiscount)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Delete product discount");
     }
 
@@ -108,16 +109,16 @@ internal static class ProductEndpoints
             .WithSummary("Get all reviews by specific product");
         
         group.MapPost("", AddReview)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Add review");
     }
 
-    private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> AddProduct(
+    private static async Task<Results<NoContent, BadRequest<string>, NotFound<string>>> CreateProduct(
         [FromForm] AddProductDto addProductDto,
         [FromServices] ProductService productService,
         CancellationToken ct)
     {
-        VoidResult addProductResult = await productService.AddProductAsync(addProductDto, ct);
+        VoidResult addProductResult = await productService.CreateProductAsync(addProductDto, ct);
 
         if (addProductResult.IsFailure)
         {
@@ -125,7 +126,7 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addProductResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(addProductResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddProduct), addProductResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(nameof(CreateProduct), addProductResult.StatusCode)
             };
         }
 

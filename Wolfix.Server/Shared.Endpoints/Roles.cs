@@ -1,4 +1,4 @@
-namespace Identity.Application;
+namespace Shared.Endpoints;
 
 public static class Roles
 {

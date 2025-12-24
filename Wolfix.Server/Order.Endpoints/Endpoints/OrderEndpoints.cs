@@ -9,6 +9,7 @@ using Order.Application.Dto.Order.Responses;
 using Order.Application.Dto.OrderItem.Responses;
 using Order.Application.Services;
 using Shared.Domain.Models;
+using Shared.Endpoints;
 using Shared.Endpoints.Exceptions;
 
 namespace Order.Endpoints.Endpoints;
@@ -23,29 +24,29 @@ internal static class OrderEndpoints
             .WithTags("Order");
         
         orderGroup.MapGet("{orderId:guid}/details", GetOrderDetails)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Get order details");
 
         //todo: переделать роут на: /api/orders/customers/{customerId:guid}
         //todo: та и вообще перенести заказы пользователя в модуль пользователей а заказы продавца в модуль продавца
         orderGroup.MapGet("{customerId:guid}", GetCustomerOrders)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Get all orders by specific customer");
         
         orderGroup.MapGet("sellers/{sellerId:guid}", GetSellerOrders)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Get all orders by specific seller");
         
         orderGroup.MapPost("with-payment", PlaceOrderWithPayment)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Creates an order and returns client secret for payment");
 
         orderGroup.MapPatch("{orderId:guid}/paid", MarkOrderPaid)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Marks order as paid");
 
         orderGroup.MapPost("", PlaceOrder)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Creates an order without payment");
     }
 

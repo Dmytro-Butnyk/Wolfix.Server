@@ -8,6 +8,7 @@ using Seller.Application.Dto.Seller;
 using Seller.Application.Services;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
+using Shared.Endpoints;
 using Shared.Endpoints.Exceptions;
 
 namespace Seller.Endpoints.Endpoints;
@@ -22,22 +23,22 @@ internal static class SellerEndpoints
             .WithTags("Seller");
 
         sellerGroup.MapGet("{sellerId:guid}", GetProfileInfo)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Get profile info");
         
         sellerGroup.MapGet("page/{page:int}", GetAllForPage)
-            .RequireAuthorization("SuperAdmin")
+            .RequireAuthorization(Roles.SuperAdmin)
             .WithSummary("Get all sellers for page");
         
         sellerGroup.MapDelete("{sellerId:guid}", Delete)
-            .RequireAuthorization("SuperAdmin")
+            .RequireAuthorization(Roles.SuperAdmin)
             .WithSummary("Delete seller");
         
         var changeGroup = sellerGroup.MapGroup("{sellerId:guid}");
         MapChangeEndpoints(changeGroup);
 
         changeGroup.MapGet("categories", GetAllSellerCategories)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Get all seller categories");
 
         //todo: ендпоинт для смены фото
@@ -46,19 +47,19 @@ internal static class SellerEndpoints
     private static void MapChangeEndpoints(RouteGroupBuilder group)
     {
         group.MapPatch("full-name", ChangeFullName)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Change full name");
         
         group.MapPatch("phone-number", ChangePhoneNumber)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Change phone number");
         
         group.MapPatch("address", ChangeAddress)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Change address");
         
         group.MapPatch("birth-date", ChangeBirthDate)
-            .RequireAuthorization("Seller")
+            .RequireAuthorization(Roles.Seller)
             .WithSummary("Change birth date");
     }
 

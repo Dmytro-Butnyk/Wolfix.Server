@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Shared.Domain.Models;
+using Shared.Endpoints;
 using Shared.Endpoints.Exceptions;
 using GooglePayload = Google.Apis.Auth.GoogleJsonWebSignature.Payload;
 
@@ -49,9 +50,11 @@ internal static class IdentityEndpoints
     private static void MapChangeEndpoints(RouteGroupBuilder group)
     {
         group.MapPatch("email", ChangeEmail)
+            .RequireAuthorization(Roles.Customer, Roles.Seller)
             .WithSummary("Change email");
         
         group.MapPatch("password", ChangePassword)
+            .RequireAuthorization(Roles.Customer, Roles.Seller)
             .WithSummary("Change password");
     }
 

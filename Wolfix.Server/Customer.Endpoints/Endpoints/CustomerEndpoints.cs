@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
+using Shared.Endpoints;
 using Shared.Endpoints.Exceptions;
 
 namespace Customer.Endpoints.Endpoints;
@@ -25,7 +26,7 @@ internal static class CustomerEndpoints
             .WithTags("Customer");
         
         customerGroup.MapGet("{customerId:guid}", GetProfileInfo)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Get profile info");
         
         var favoriteItemsGroup = customerGroup.MapGroup("favorites");
@@ -43,49 +44,49 @@ internal static class CustomerEndpoints
     private static void MapFavoriteItemsEndpoints(RouteGroupBuilder group)
     {
         group.MapGet("{customerId:guid}", GetFavoriteProducts)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Get all favorite products by specific customer");
         
         group.MapPost("", AddProductToFavorite)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Add product to favorite");
         
         group.MapDelete("{customerId:guid}/{favoriteItemId:guid}", DeleteFavoriteItem)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Delete favorite item");
     }
 
     private static void MapCartItemsEndpoints(RouteGroupBuilder group)
     {
         group.MapGet("{customerId:guid}", GetCartProducts)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Get all products in cart by specific customer");
         
         group.MapPost("", AddProductToCart)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Add product to cart");
         
         group.MapDelete("{customerId:guid}/{cartItemId:guid}", DeleteCartItem)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Delete cart item");
     }
 
     private static void MapChangeMethods(RouteGroupBuilder group)
     {
         group.MapPatch("full-name", ChangeFullName)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Change full name");
 
         group.MapPatch("phone-number", ChangePhoneNumber)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Change phone number");
         
         group.MapPatch("address", ChangeAddress)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Change address");
         
         group.MapPatch("birth-date", ChangeBirthDate)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Change birth date");
     }
     

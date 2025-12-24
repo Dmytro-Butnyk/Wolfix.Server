@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using Seller.Application.Dto.SellerApplication;
 using Seller.Application.Services;
 using Shared.Domain.Models;
+using Shared.Endpoints;
 using Shared.Endpoints.Exceptions;
 
 namespace Seller.Endpoints.Endpoints;
@@ -22,19 +23,19 @@ internal static class SellerApplicationEndpoints
         
         sellerApplicationGroup.MapPost("{accountId:guid}", CreateApplication)
             .DisableAntiforgery()
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Create application to be a seller");
         
         sellerApplicationGroup.MapGet("", GetAllPendingApplications)
-            .RequireAuthorization("Admin")
+            .RequireAuthorization(Roles.Admin)
             .WithSummary("Get all pending applications");
         
         sellerApplicationGroup.MapPatch("{sellerApplicationId:guid}/approve", ApproveApplication)
-            .RequireAuthorization("Admin")
+            .RequireAuthorization(Roles.Admin)
             .WithSummary("Approve application");
         
         sellerApplicationGroup.MapPatch("{sellerApplicationId:guid}/reject", RejectApplication)
-            .RequireAuthorization("Admin")
+            .RequireAuthorization(Roles.Admin)
             .WithSummary("Reject application");
     }
 

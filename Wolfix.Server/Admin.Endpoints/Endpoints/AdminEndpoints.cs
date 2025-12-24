@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
+using Shared.Endpoints;
 using Shared.Endpoints.Exceptions;
 
 namespace Admin.Endpoints.Endpoints;
@@ -23,15 +24,15 @@ internal static class AdminEndpoints
             .WithTags("Admin");
         
         adminGroup.MapGet("page/{page:int}", GetAllForPage)
-            .RequireAuthorization("SuperAdmin")
+            .RequireAuthorization(Roles.SuperAdmin)
             .WithSummary("Get all admins for page");
         
         adminGroup.MapPost("", Create)
-            .RequireAuthorization("SuperAdmin")
+            .RequireAuthorization(Roles.SuperAdmin)
             .WithSummary("Add admin");
         
         adminGroup.MapDelete("{adminId:guid}", Delete)
-            .RequireAuthorization("SuperAdmin")
+            .RequireAuthorization(Roles.SuperAdmin)
             .WithSummary("Delete admin");
     }
 

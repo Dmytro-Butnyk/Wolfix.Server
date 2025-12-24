@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Shared.Domain.Models;
+using Shared.Endpoints;
 using Support.Application.Dto;
 using Support.Application.Services;
 
@@ -17,14 +18,14 @@ internal static class SupportRequestEndpoints
     {
         var group = app.MapGroup(Route)
             .WithTags("Support Requests")
-            .RequireAuthorization("Support");
+            .RequireAuthorization(Roles.Support);
         
         group.MapGet("", GetAllPending)
             .WithSummary("Get all support requests");
         
         app.MapPost("", Create)
             .WithTags("Support Requests")
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Create support request");
         
         group.MapPatch("{supportRequestId:guid}/supports/{supportId:guid}/respond", Respond)

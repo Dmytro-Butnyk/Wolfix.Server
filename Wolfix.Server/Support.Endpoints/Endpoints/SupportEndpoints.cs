@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
+using Shared.Endpoints;
 using Shared.Endpoints.Exceptions;
 using Support.Application.Dto;
 using Support.Application.Services;
@@ -22,15 +23,15 @@ internal static class SupportEndpoints
             .WithTags("Support");
         
         group.MapGet("page/{page:int}", GetAllForPage)
-            .RequireAuthorization("SuperAdmin")
+            .RequireAuthorization(Roles.SuperAdmin)
             .WithSummary("Get all supports for page");
         
         group.MapPost("", Create)
-            .RequireAuthorization("SuperAdmin")
+            .RequireAuthorization(Roles.SuperAdmin)
             .WithSummary("Create support");
         
         group.MapDelete("{supportId:guid}", Delete)
-            .RequireAuthorization("SuperAdmin")
+            .RequireAuthorization(Roles.SuperAdmin)
             .WithSummary("Delete support");
     }
 

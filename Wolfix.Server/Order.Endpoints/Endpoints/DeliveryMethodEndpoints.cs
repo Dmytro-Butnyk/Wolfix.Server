@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Order.Application.Dto.DeliveryMethod;
 using Order.Application.Services;
 using Shared.Domain.Models;
+using Shared.Endpoints;
 
 namespace Order.Endpoints.Endpoints;
 
@@ -19,7 +20,7 @@ internal static class DeliveryMethodEndpoints
             .WithTags("DeliveryMethods");
         
         deliveryMethodsGroup.MapGet("delivery-methods", GetDeliveryMethods)
-            .RequireAuthorization("Customer")
+            .RequireAuthorization(Roles.Customer)
             .WithSummary("Get delivery methods");
     }
     
