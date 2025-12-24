@@ -17,7 +17,7 @@ internal sealed class SupportRequestRepository(SupportContext context)
         return await _supportRequests
             .AsNoTracking()
             .Include(sr => sr.ProcessedBy)
-            .Where(sr => sr.IsProcessed == false)
+            .Where(sr => sr.Status == SupportRequestStatus.Pending)
             .Select(sr => new SupportRequestShortProjection(sr.Id, sr.Category.ToString(), sr.RequestContent, sr.CreatedAt))
             .ToListAsync(ct);
     }
@@ -28,7 +28,7 @@ internal sealed class SupportRequestRepository(SupportContext context)
         return await _supportRequests
             .AsNoTracking()
             .Include(sr => sr.ProcessedBy)
-            .Where(sr => sr.Category == category)
+            .Where(sr => sr.Category == category && sr.Status == SupportRequestStatus.Pending)
             .Select(sr => new SupportRequestShortProjection(sr.Id, sr.Category.ToString(), sr.RequestContent, sr.CreatedAt))
             .ToListAsync(ct);
     }
