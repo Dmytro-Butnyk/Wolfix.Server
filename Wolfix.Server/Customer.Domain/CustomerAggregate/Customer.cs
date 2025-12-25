@@ -266,7 +266,7 @@ public sealed class Customer : BaseEntity
     #endregion
     
     #region cartItems
-    public VoidResult AddCartItem(string photoUrl, string title, decimal priceWithDiscount, Guid productId)
+    public VoidResult AddCartItem(string photoUrl, string title, decimal priceWithDiscount, Guid productId, Guid sellerId)
     {
         if (_cartItems.Any(ci => ci.PhotoUrl == photoUrl && ci.Title == title && ci.PriceWithDiscount == priceWithDiscount))
         {
@@ -276,7 +276,7 @@ public sealed class Customer : BaseEntity
             );
         }
         
-        Result<CartItem> createCartItemResult = CartItem.Create(this, photoUrl, title, priceWithDiscount, productId);
+        Result<CartItem> createCartItemResult = CartItem.Create(this, photoUrl, title, priceWithDiscount, productId, sellerId);
         
         if (!createCartItemResult.IsSuccess)
         {

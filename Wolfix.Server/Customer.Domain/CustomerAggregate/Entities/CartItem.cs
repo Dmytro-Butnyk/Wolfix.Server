@@ -17,10 +17,12 @@ internal sealed class CartItem : BaseEntity
     public Customer Customer { get; private set; }
     public Guid CustomerId { get; private set; }
     
+    public Guid SellerId { get; private set; }
+    
     private CartItem() { }
     
     private CartItem(Customer customer, string photoUrl, string title,
-        decimal priceWithDiscount, Guid productId)
+        decimal priceWithDiscount, Guid productId, Guid sellerId)
     {
         Customer = customer;
         CustomerId = customer.Id;
@@ -28,10 +30,11 @@ internal sealed class CartItem : BaseEntity
         Title = title;
         PriceWithDiscount = priceWithDiscount;
         ProductId = productId;
+        SellerId = sellerId;
     }
 
     public static Result<CartItem> Create(Customer customer, string photoUrl, string title,
-        decimal priceWithDiscount, Guid productId)
+        decimal priceWithDiscount, Guid productId, Guid sellerId)
     {
         if (productId == Guid.Empty)
         {
@@ -53,7 +56,12 @@ internal sealed class CartItem : BaseEntity
             return Result<CartItem>.Failure($"{nameof(priceWithDiscount)} cannot be less than or equal to zero");
         }
 
-        CartItem cartItem = new(customer, photoUrl, title, priceWithDiscount, productId);
+        if (sellerId == Guid.Empty)
+        {
+            return Result<CartItem>.Failure($"{nameof(sellerId)} cannot be empty");
+        }
+
+        CartItem cartItem = new(customer, photoUrl, title, priceWithDiscount, productId, sellerId);
         return Result<CartItem>.Success(cartItem);
     }
 

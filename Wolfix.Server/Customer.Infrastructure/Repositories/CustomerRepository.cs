@@ -41,6 +41,7 @@ public sealed class CustomerRepository(CustomerContext context)
             .Select(cartItem => new CartItemProjection(
                 cartItem.Id,
                 cartItem.ProductId,
+                cartItem.SellerId,
                 cartItem.CustomerId,
                 cartItem.PhotoUrl,
                 cartItem.Title,

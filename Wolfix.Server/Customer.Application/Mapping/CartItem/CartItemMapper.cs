@@ -6,5 +6,5 @@ namespace Customer.Application.Mapping.CartItem;
 internal static class CartItemMapper
 {
     public static CartItemDto ToDto(this CartItemProjection projection)
-        => new(projection.Id, projection.ProductId, projection.PhotoUrl, projection.Title, projection.Price);
+        => new(projection.Id, projection.ProductId, projection.SellerId, projection.PhotoUrl, projection.Title, projection.Price);
 }

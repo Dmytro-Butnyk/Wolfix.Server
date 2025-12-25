@@ -25,10 +25,11 @@ public sealed class ProductExistsForAddingToCartEventHandler(ICustomerRepository
             @event.PhotoUrl,
             @event.Title,
             @event.PriceWithDiscount,
-            @event.ProductId
+            @event.ProductId,
+            @event.SellerId
         );
         
-        if (!addToCartResult.IsSuccess)
+        if (addToCartResult.IsFailure)
         {
             return addToCartResult;
         }

@@ -34,6 +34,8 @@ internal static class AdminEndpoints
         adminGroup.MapDelete("{adminId:guid}", Delete)
             .RequireAuthorization(Roles.SuperAdmin)
             .WithSummary("Delete admin");
+        
+        //todo: добавить админу(обычному) возможность добавлять города и отделения в них
     }
 
     private static async Task<Ok<PaginationDto<BasicAdminDto>>> GetAllForPage(

@@ -33,6 +33,9 @@ internal sealed class CartItemEntityConfiguration : IEntityTypeConfiguration<Car
 
         builder.Property(ci => ci.ProductId)
             .IsRequired();
+
+        builder.Property(ci => ci.SellerId)
+            .IsRequired();
     }
 
     private void ConfigureCustomerRelation(EntityTypeBuilder<CartItem> builder)

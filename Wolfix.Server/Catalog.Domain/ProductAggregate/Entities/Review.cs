@@ -18,6 +18,7 @@ internal sealed class Review : BaseEntity
     public Guid ProductId { get; private set; }
     
     public Guid CustomerId { get; private set; }
+    //todo: добавить фио пользователя
     
     private Review() { }
     
