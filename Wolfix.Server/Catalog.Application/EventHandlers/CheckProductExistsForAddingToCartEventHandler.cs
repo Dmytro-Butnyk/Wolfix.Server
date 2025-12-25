@@ -23,10 +23,11 @@ public sealed class CheckProductExistsForAddingToCartEventHandler(IProductReposi
             );
         }
 
+        //todo: пофиксить (ажур аккаунт срок истёк)
         VoidResult result = await eventBus.PublishWithoutResultAsync(new ProductExistsForAddingToCart
         {
             CustomerId = @event.CustomerId,
-            PhotoUrl = product.MainPhotoUrl!,
+            PhotoUrl = "PHOTO",
             PriceWithDiscount = product.FinalPrice,
             Title = product.Title,
             ProductId = product.Id,
