@@ -10,6 +10,8 @@ using Support.Application.Services;
 
 namespace Support.Endpoints.Endpoints;
 
+//TODO: CUSTOMER RESPONSES FOR REQUESTS
+
 internal static class SupportRequestEndpoints
 {
     private const string Route = "api/support-requests";
@@ -23,7 +25,7 @@ internal static class SupportRequestEndpoints
         group.MapGet("", GetAllPending)
             .WithSummary("Get all support requests");
         
-        app.MapPost("", Create)
+        app.MapPost(Route, Create)
             .WithTags("Support Requests")
             .RequireAuthorization(Roles.Customer)
             .WithSummary("Create support request");
@@ -33,6 +35,10 @@ internal static class SupportRequestEndpoints
         
         group.MapPatch("{supportRequestId:guid}/supports/{supportId:guid}/cancel", Cancel)
             .WithSummary("Cancel support request");
+        
+        group.MapGet("by-category", GetAllByCategory)
+            .WithSummary("Get all support requests by category")
+            .RequireAuthorization("Support");
     }
 
     private static async Task<Ok<IReadOnlyCollection<SupportRequestShortDto>>> GetAllPending(
@@ -70,7 +76,7 @@ internal static class SupportRequestEndpoints
 
         if (respondOnRequestResult.IsFailure)
         {
-            TypedResults.NotFound(respondOnRequestResult.ErrorMessage);
+            return TypedResults.NotFound(respondOnRequestResult.ErrorMessage);
         }
         
         return TypedResults.NoContent();
@@ -90,5 +96,22 @@ internal static class SupportRequestEndpoints
         }
         
         return TypedResults.NoContent();
+    }
+
+    private static async Task<Results<Ok<IReadOnlyCollection<SupportRequestShortDto>>, BadRequest<string>>>
+        GetAllByCategory(
+            [FromBody] string category,
+            [FromServices] SupportRequestService supportRequestService,
+            CancellationToken ct)
+    {
+        Result<IReadOnlyCollection<SupportRequestShortDto>> result
+            = await supportRequestService.GetAllByCategoryAsync(category, ct);
+        
+        if (result.IsFailure)
+        {
+            return TypedResults.BadRequest(result.ErrorMessage);
+        }
+        
+        return TypedResults.Ok(result.Value);
     }
 }

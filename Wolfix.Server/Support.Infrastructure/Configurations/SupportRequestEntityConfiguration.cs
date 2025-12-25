@@ -18,13 +18,6 @@ public sealed class SupportRequestEntityConfiguration : IEntityTypeConfiguration
     
     private void ConfigureBasicProperties(EntityTypeBuilder<SupportRequest> builder)
     {
-        builder.OwnsOne(sr => sr.Email, email =>
-        {
-            email.Property(e => e.Value)
-                .HasColumnName("Email")
-                .IsRequired();
-        });
-        
         builder.OwnsOne(sr => sr.FullName, fullName =>
         {
             fullName.Property(fn => fn.FirstName)
@@ -57,12 +50,9 @@ public sealed class SupportRequestEntityConfiguration : IEntityTypeConfiguration
         builder.Property(sr => sr.CustomerId)
             .IsRequired();
 
-        builder.Property(sr => sr.Title)
+        builder.Property(sr => sr.Category)
+            .HasConversion<string>()
             .IsRequired();
-
-        builder.Property(sr => sr.ProductId)
-            .IsRequired(false)
-            .HasDefaultValue(null);
 
         builder.Property(sr => sr.RequestContent)
             .IsRequired();

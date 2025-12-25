@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Support.Infrastructure;
@@ -11,9 +12,11 @@ using Support.Infrastructure;
 namespace Support.Infrastructure.Migrations
 {
     [DbContext(typeof(SupportContext))]
-    partial class SupportContextModelSnapshot : ModelSnapshot
+    [Migration("20251223152639_updatedSupportRequestModel")]
+    partial class updatedSupportRequestModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

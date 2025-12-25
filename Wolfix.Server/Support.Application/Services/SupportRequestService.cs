@@ -5,9 +5,11 @@ using Shared.IntegrationEvents.Interfaces;
 using Support.Application.Dto;
 using Support.Application.Mapping;
 using Support.Domain.Entities;
+using Support.Domain.Enums;
 using Support.Domain.Interfaces;
 using Support.Domain.Projections;
 using Support.IntegrationEvents;
+using Support.IntegrationEvents.Dto;
 
 namespace Support.Application.Services;
 
@@ -93,19 +95,22 @@ public sealed class SupportRequestService(
             return checkCustomerExistsResult;
         }
 
-        if (request.ProductId is not null)
+        Result<CustomerInformationForSupportRequestDto> fetchCustomerInfoResult
+            = await eventBus.PublishWithSingleResultAsync<
+                FetchCustomerInformationForCreatingSupportRequest,
+                CustomerInformationForSupportRequestDto>(
+                new FetchCustomerInformationForCreatingSupportRequest(request.CustomerId),
+                ct);
+
+        if (fetchCustomerInfoResult.IsFailure)
         {
-            VoidResult checkProductExistsResult = await eventBus.PublishWithoutResultAsync(new CheckProductExistsForCreatingSupportRequest(request.ProductId.Value), ct);
-            
-            if (checkProductExistsResult.IsFailure)
-            {
-                return checkProductExistsResult;
-            }
+            return VoidResult.Failure(fetchCustomerInfoResult);
         }
 
-        Result<SupportRequest> createSupportRequestResult = SupportRequest.Create(request.Email, request.FirstName,
-            request.LastName, request.MiddleName, request.PhoneNumber, request.BirthDate, request.CustomerId,
-            request.Title, request.Content, request.ProductId);
+        Result<SupportRequest> createSupportRequestResult = SupportRequest.Create(fetchCustomerInfoResult.Value!.FirstName,
+            fetchCustomerInfoResult.Value!.LastName, fetchCustomerInfoResult.Value!.MiddleName,
+            fetchCustomerInfoResult.Value!.PhoneNumber, fetchCustomerInfoResult.Value.BirthDate,
+            request.CustomerId, request.Category, request.Content);
 
         if (createSupportRequestResult.IsFailure)
         {
@@ -117,7 +122,7 @@ public sealed class SupportRequestService(
         
         return VoidResult.Success();
     }
-
+    
     public async Task<IReadOnlyCollection<SupportRequestShortDto>> GetAllPendingAsync(CancellationToken ct)
     {
         IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequestRepository.GetAllPendingAsync(ct);
@@ -127,5 +132,23 @@ public sealed class SupportRequestService(
             .ToList();
         
         return dto;
+    }
+
+    public async Task<Result<IReadOnlyCollection<SupportRequestShortDto>>> GetAllByCategoryAsync(string category,
+        CancellationToken ct)
+    {
+        if(!Enum.TryParse<SupportRequestCategory>(category,true, out var categoryE))
+        {
+            return Result<IReadOnlyCollection<SupportRequestShortDto>>.Failure(
+                $"Category '{category}' is invalid.");
+        }
+        
+        IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequestRepository.GetAllByCategoryAsync(categoryE, ct);
+        
+        IReadOnlyCollection<SupportRequestShortDto> dto = projection
+            .Select(pr => pr.ToShortDto())
+            .ToList();
+        
+        return Result<IReadOnlyCollection<SupportRequestShortDto>>.Success(dto);
     }
 }
