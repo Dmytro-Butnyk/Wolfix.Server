@@ -9,6 +9,8 @@ using Support.Application.Services;
 
 namespace Support.Endpoints.Endpoints;
 
+//TODO: CUSTOMER RESPONSES FOR REQUESTS
+
 internal static class SupportRequestEndpoints
 {
     private const string Route = "api/support-requests";
@@ -22,7 +24,7 @@ internal static class SupportRequestEndpoints
         group.MapGet("", GetAllPending)
             .WithSummary("Get all support requests");
         
-        app.MapPost("", Create)
+        app.MapPost(Route, Create)
             .WithTags("Support Requests")
             .RequireAuthorization("Customer")
             .WithSummary("Create support request");
@@ -73,7 +75,7 @@ internal static class SupportRequestEndpoints
 
         if (respondOnRequestResult.IsFailure)
         {
-            TypedResults.NotFound(respondOnRequestResult.ErrorMessage);
+            return TypedResults.NotFound(respondOnRequestResult.ErrorMessage);
         }
         
         return TypedResults.NoContent();
