@@ -29,10 +29,7 @@ public static class DependencyInjection
     public static IServiceCollection AddSupportRepositories(this IServiceCollection services)
     {
         services.AddScoped<IBaseRepository<Domain.Entities.Support>, BaseRepository<SupportContext, Domain.Entities.Support>>();
-        services.AddScoped<IBaseRepository<SupportRequest>, BaseRepository<SupportContext, SupportRequest>>();
-
         services.AddScoped<ISupportRepository, SupportRepository>();
-        services.AddScoped<ISupportRequestRepository, SupportRequestRepository>();
         
         return services;
     }

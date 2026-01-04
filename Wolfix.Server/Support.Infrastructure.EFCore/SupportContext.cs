@@ -23,7 +23,6 @@ public sealed class SupportContext : DbContext, IContextWithConfigurations
     public void ApplyConfigurations(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new SupportEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new SupportRequestEntityConfiguration());
     }
     
     // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

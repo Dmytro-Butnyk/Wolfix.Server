@@ -1,4 +1,5 @@
 using System.Net;
+using MongoDB.Driver;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
@@ -14,8 +15,8 @@ using Support.IntegrationEvents.Dto;
 namespace Support.Application.Services;
 
 public sealed class SupportRequestService(
-    ISupportRequestRepository supportRequestRepository,
     ISupportRepository supportRepository,
+    IMongoDatabase mongoDb,
     EventBus eventBus)
 {
     public async Task<VoidResult> RespondAsync(Guid supportId, Guid supportRequestId, RespondOnRequestDto request, CancellationToken ct)
@@ -30,7 +31,8 @@ public sealed class SupportRequestService(
             );
         }
 
-        SupportRequest? supportRequest = await supportRequestRepository.GetByIdAsync(supportRequestId, ct);
+        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("supportRequests");
+        SupportRequest? supportRequest = await supportRequests.Find(sr => sr.Id == supportRequestId).FirstOrDefaultAsync(ct);
 
         if (supportRequest is null)
         {
