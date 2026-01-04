@@ -5,11 +5,11 @@ namespace Shared.Domain.ValueObjects;
 
 public sealed class FullName
 {
-    public string FirstName { get; }
+    public string FirstName { get; init; }
     
-    public string LastName { get; }
+    public string LastName { get; init; }
     
-    public string MiddleName { get; }
+    public string MiddleName { get; init; }
 
     [BsonConstructor]
     private FullName(string firstName, string lastName, string middleName)

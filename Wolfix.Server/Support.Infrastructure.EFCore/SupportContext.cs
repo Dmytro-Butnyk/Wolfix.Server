@@ -33,5 +33,4 @@ public sealed class SupportContext : DbContext, IContextWithConfigurations
     // }
     
     internal DbSet<Domain.Entities.Support> Supports { get; set; }
-    internal DbSet<SupportRequest> SupportRequests { get; set; }
 }

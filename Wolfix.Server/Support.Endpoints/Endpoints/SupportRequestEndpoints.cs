@@ -27,7 +27,7 @@ internal static class SupportRequestEndpoints
         
         app.MapPost(Route, Create)
             .WithTags("Support Requests")
-            .RequireAuthorization(Roles.Customer)
+            // .RequireAuthorization(Roles.Customer)
             .WithSummary("Create support request");
         
         group.MapPatch("{supportRequestId:guid}/supports/{supportId:guid}/respond", Respond)

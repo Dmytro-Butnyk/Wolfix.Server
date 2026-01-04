@@ -104,28 +104,34 @@ public sealed class SupportRequestService(
 
     public async Task<VoidResult> CreateAsync(CreateSupportRequestDto request, CancellationToken ct)
     {
-        VoidResult checkCustomerExistsResult = await eventBus.PublishWithoutResultAsync(new CheckCustomerExistsForCreatingSupportRequest(request.CustomerId), ct);
+        // VoidResult checkCustomerExistsResult = await eventBus.PublishWithoutResultAsync(new CheckCustomerExistsForCreatingSupportRequest(request.CustomerId), ct);
+        //
+        // if (checkCustomerExistsResult.IsFailure)
+        // {
+        //     return checkCustomerExistsResult;
+        // }
 
-        if (checkCustomerExistsResult.IsFailure)
-        {
-            return checkCustomerExistsResult;
-        }
+        // Result<CustomerInformationForSupportRequestDto> fetchCustomerInfoResult
+        //     = await eventBus.PublishWithSingleResultAsync<
+        //         FetchCustomerInformationForCreatingSupportRequest,
+        //         CustomerInformationForSupportRequestDto>(
+        //         new FetchCustomerInformationForCreatingSupportRequest(request.CustomerId),
+        //         ct);
+        //
+        // if (fetchCustomerInfoResult.IsFailure)
+        // {
+        //     return VoidResult.Failure(fetchCustomerInfoResult);
+        // }
 
-        Result<CustomerInformationForSupportRequestDto> fetchCustomerInfoResult
-            = await eventBus.PublishWithSingleResultAsync<
-                FetchCustomerInformationForCreatingSupportRequest,
-                CustomerInformationForSupportRequestDto>(
-                new FetchCustomerInformationForCreatingSupportRequest(request.CustomerId),
-                ct);
-
-        if (fetchCustomerInfoResult.IsFailure)
-        {
-            return VoidResult.Failure(fetchCustomerInfoResult);
-        }
-
-        Result<SupportRequest> createSupportRequestResult = SupportRequest.Create(fetchCustomerInfoResult.Value!.FirstName,
-            fetchCustomerInfoResult.Value!.LastName, fetchCustomerInfoResult.Value!.MiddleName,
-            fetchCustomerInfoResult.Value!.PhoneNumber, fetchCustomerInfoResult.Value.BirthDate,
+        // Result<SupportRequest> createSupportRequestResult = SupportRequest.Create(fetchCustomerInfoResult.Value!.FirstName,
+        //     fetchCustomerInfoResult.Value!.LastName, fetchCustomerInfoResult.Value!.MiddleName,
+        //     fetchCustomerInfoResult.Value!.PhoneNumber, fetchCustomerInfoResult.Value.BirthDate,
+        //     request.CustomerId, request.Category, request.Content, request.ExtraElements);
+        
+        //убрать резалт снизу
+        Result<SupportRequest> createSupportRequestResult = SupportRequest.Create("Illia",
+            "Hryshchenko", "Vladimirovich",
+            "+380970878346", DateOnly.FromDateTime(new DateTime(2005, 4, 12)),
             request.CustomerId, request.Category, request.Content, request.ExtraElements);
 
         if (createSupportRequestResult.IsFailure)
@@ -135,7 +141,6 @@ public sealed class SupportRequestService(
 
         IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("supportRequests");
         await supportRequests.InsertOneAsync(createSupportRequestResult.Value!, cancellationToken: ct);
-        
         return VoidResult.Success();
     }
     
