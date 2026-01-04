@@ -38,32 +38,32 @@ internal static class ProductEndpoints
     {
         group.MapPost("", CreateProduct)
             .DisableAntiforgery()
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Add product");
         
         group.MapDelete("{productId:guid}", DeleteProduct)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Delete product");
 
         group.MapPatch("product/{productId:guid}/new-main-photo/{newMainPhotoId:guid}", ChangeProductMainPhoto)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change product main photo");
         
         group.MapPatch("product/{productId:guid}/general-info", ChangeProductGeneralInfo)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change product general info");
         
         group.MapPatch("product/{productId:guid}/price", ChangePrice)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change product price");
 
         group.MapPatch("add-product-media", AddProductMedia)
             .DisableAntiforgery()
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Add product media");
 
         group.MapDelete("product/{productId:guid}/media/{mediaId:guid}", DeleteProductMedia)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Delete product media");
         
         group.MapGet("product/{productId:guid}", GetProductFullInfo)
@@ -82,7 +82,7 @@ internal static class ProductEndpoints
             .WithSummary("Get random products");
         
         group.MapGet("seller/{sellerId:guid}/category/{categoryId:guid}/page/{page:int}", GetAllBySellerCategoryForPage)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Get all products by specific seller category");
         
         group.MapGet("search/category/{categoryId:guid}", GetSearchByCategory)
@@ -95,11 +95,11 @@ internal static class ProductEndpoints
             .WithSummary("Get products by attributes filtration");
         
         group.MapPost("product/{productId:guid}/discount", AddDiscount)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Add discount to product");
 
         group.MapDelete("product/{productId:guid}/discount", DeleteDiscount)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Delete product discount");
     }
 
@@ -109,7 +109,7 @@ internal static class ProductEndpoints
             .WithSummary("Get all reviews by specific product");
         
         group.MapPost("", AddReview)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Add review");
     }
 

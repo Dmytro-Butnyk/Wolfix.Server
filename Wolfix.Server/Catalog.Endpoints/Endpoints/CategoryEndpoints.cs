@@ -39,7 +39,7 @@ internal static class CategoryEndpoints
             .WithSummary("Get all child categories");
 
         group.MapGet("child/{childId:guid}/attributes", GetAllAttributesByCategory)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Get all attributes by specific category");
         
         group.MapGet("child/{childId:guid}/attributes-with-values", GetAllAttributesWithUniqueValues)
@@ -50,40 +50,40 @@ internal static class CategoryEndpoints
     {
         group.MapPost("", AddParent)
             .DisableAntiforgery()
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Add parent category");
         
         group.MapPatch("{categoryId:guid}", ChangeParent)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Change parent category");
 
         group.MapDelete("{categoryId:guid}", DeleteCategory)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Delete category");
         
         group.MapPost("{parentId:guid}", AddChild)
             .DisableAntiforgery()
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Add child category");
         
         group.MapPatch("child/{childCategoryId:guid}", ChangeChild)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Change child category");
         
         group.MapPost("child/{childCategoryId:guid}/attributes", AddAttribute)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Add attribute to child category");
         
         group.MapDelete("child/{childCategoryId:guid}/attributes/{attributeId:guid}", DeleteAttribute)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Delete attribute of child category");
 
         group.MapPost("child/{childCategoryId:guid}/variants", AddVariant)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Add variant to child category");
 
         group.MapDelete("child/{childCategoryId:guid}/variants/{variantId:guid}", DeleteVariant)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Delete variant of child category");
     }
 

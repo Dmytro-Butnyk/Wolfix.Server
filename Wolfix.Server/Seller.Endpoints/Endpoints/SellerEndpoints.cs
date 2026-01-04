@@ -23,22 +23,22 @@ internal static class SellerEndpoints
             .WithTags("Seller");
 
         sellerGroup.MapGet("{sellerId:guid}", GetProfileInfo)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Get profile info");
         
         sellerGroup.MapGet("page/{page:int}", GetAllForPage)
-            .RequireAuthorization(Roles.SuperAdmin)
+            .RequireAuthorization(AuthorizationRoles.SuperAdmin)
             .WithSummary("Get all sellers for page");
         
         sellerGroup.MapDelete("{sellerId:guid}", Delete)
-            .RequireAuthorization(Roles.SuperAdmin)
+            .RequireAuthorization(AuthorizationRoles.SuperAdmin)
             .WithSummary("Delete seller");
         
         var changeGroup = sellerGroup.MapGroup("{sellerId:guid}");
         MapChangeEndpoints(changeGroup);
 
         changeGroup.MapGet("categories", GetAllSellerCategories)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Get all seller categories");
 
         //todo: ендпоинт для смены фото
@@ -47,19 +47,19 @@ internal static class SellerEndpoints
     private static void MapChangeEndpoints(RouteGroupBuilder group)
     {
         group.MapPatch("full-name", ChangeFullName)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change full name");
         
         group.MapPatch("phone-number", ChangePhoneNumber)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change phone number");
         
         group.MapPatch("address", ChangeAddress)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change address");
         
         group.MapPatch("birth-date", ChangeBirthDate)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change birth date");
     }
 

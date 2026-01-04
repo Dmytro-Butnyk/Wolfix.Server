@@ -1,6 +1,6 @@
 namespace Shared.Endpoints;
 
-public static class Roles
+public static class AuthorizationRoles
 {
     public static readonly string[] All = [Seller, Customer, SuperAdmin, Admin, Support]; 
     

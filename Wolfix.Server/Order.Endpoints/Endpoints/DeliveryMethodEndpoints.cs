@@ -20,7 +20,7 @@ internal static class DeliveryMethodEndpoints
             .WithTags("DeliveryMethods");
         
         deliveryMethodsGroup.MapGet("delivery-methods", GetDeliveryMethods)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Get delivery methods");
     }
     

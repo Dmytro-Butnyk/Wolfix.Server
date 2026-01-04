@@ -50,11 +50,11 @@ internal static class IdentityEndpoints
     private static void MapChangeEndpoints(RouteGroupBuilder group)
     {
         group.MapPatch("email", ChangeEmail)
-            .RequireAuthorization(Roles.Customer, Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Customer, AuthorizationRoles.Seller)
             .WithSummary("Change email");
         
         group.MapPatch("password", ChangePassword)
-            .RequireAuthorization(Roles.Customer, Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Customer, AuthorizationRoles.Seller)
             .WithSummary("Change password");
     }
 

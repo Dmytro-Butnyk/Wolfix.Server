@@ -24,15 +24,15 @@ internal static class AdminEndpoints
             .WithTags("Admin");
         
         adminGroup.MapGet("page/{page:int}", GetAllForPage)
-            .RequireAuthorization(Roles.SuperAdmin)
+            .RequireAuthorization(AuthorizationRoles.SuperAdmin)
             .WithSummary("Get all admins for page");
         
         adminGroup.MapPost("", Create)
-            .RequireAuthorization(Roles.SuperAdmin)
+            .RequireAuthorization(AuthorizationRoles.SuperAdmin)
             .WithSummary("Add admin");
         
         adminGroup.MapDelete("{adminId:guid}", Delete)
-            .RequireAuthorization(Roles.SuperAdmin)
+            .RequireAuthorization(AuthorizationRoles.SuperAdmin)
             .WithSummary("Delete admin");
         
         //todo: добавить админу(обычному) возможность добавлять города и отделения в них

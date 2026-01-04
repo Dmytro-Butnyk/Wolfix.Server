@@ -20,14 +20,14 @@ internal static class SupportRequestEndpoints
     {
         var group = app.MapGroup(Route)
             .WithTags("Support Requests")
-            .RequireAuthorization(Roles.Support);
+            .RequireAuthorization(AuthorizationRoles.Support);
         
         group.MapGet("", GetAllPending)
             .WithSummary("Get all support requests");
         
         app.MapPost(Route, Create)
             .WithTags("Support Requests")
-            // .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Create support request");
         
         group.MapPatch("{supportRequestId:guid}/supports/{supportId:guid}/respond", Respond)

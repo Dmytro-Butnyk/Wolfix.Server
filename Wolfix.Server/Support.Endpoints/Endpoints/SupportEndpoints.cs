@@ -23,15 +23,15 @@ internal static class SupportEndpoints
             .WithTags("Support");
         
         group.MapGet("page/{page:int}", GetAllForPage)
-            .RequireAuthorization(Roles.SuperAdmin)
+            .RequireAuthorization(AuthorizationRoles.SuperAdmin)
             .WithSummary("Get all supports for page");
         
         group.MapPost("", Create)
-            .RequireAuthorization(Roles.SuperAdmin)
+            .RequireAuthorization(AuthorizationRoles.SuperAdmin)
             .WithSummary("Create support");
         
         group.MapDelete("{supportId:guid}", Delete)
-            .RequireAuthorization(Roles.SuperAdmin)
+            .RequireAuthorization(AuthorizationRoles.SuperAdmin)
             .WithSummary("Delete support");
     }
 
