@@ -1,3 +1,4 @@
+using MongoDB.Bson.Serialization.Attributes;
 using Shared.Domain.Models;
 
 namespace Shared.Domain.ValueObjects;
@@ -6,6 +7,7 @@ public sealed class BirthDate
 {
     public DateOnly Value { get; private set; }
 
+    [BsonConstructor]
     private BirthDate(DateOnly value)
     {
         Value = value;

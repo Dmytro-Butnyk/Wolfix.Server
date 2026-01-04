@@ -1,12 +1,15 @@
-using Shared.Domain.Entities;
+using MongoDB.Bson.Serialization.Attributes;
 using Shared.Domain.Models;
 using Shared.Domain.ValueObjects;
 using Support.Domain.Enums;
 
 namespace Support.Domain.Entities;
 
-public sealed class SupportRequest : BaseEntity
+public sealed class SupportRequest
 {
+    [BsonId]
+    public Guid Id { get; private set; } = Guid.CreateVersion7();
+    
     public FullName FullName { get; private set; }
     
     public PhoneNumber PhoneNumber { get; private set; }
@@ -21,14 +24,11 @@ public sealed class SupportRequest : BaseEntity
 
     public SupportRequestStatus Status { get; private set; } = SupportRequestStatus.Pending;
 
-    public Support? ProcessedBy { get; private set; } = null;
     public Guid? SupportId { get; private set; } = null;
     
     public bool IsProcessed
         => Status != SupportRequestStatus.Pending
-           && ProcessedBy != null
            && SupportId != null
-           && SupportId == ProcessedBy.Id
            && ProcessedAt != null;
     
     public string ResponseContent { get; private set; } = string.Empty;
@@ -36,6 +36,9 @@ public sealed class SupportRequest : BaseEntity
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
     
     public DateTime? ProcessedAt { get; private set; } = null;
+    
+    [BsonExtraElements]
+    public required Dictionary<string, object> ExtraElements { get; init; } = [];
     
     private SupportRequest() { }
 
@@ -50,8 +53,8 @@ public sealed class SupportRequest : BaseEntity
         RequestContent = requestContent;
     }
 
-    public static Result<SupportRequest> Create(string firstName, string lastName, string middleName,
-        string phoneNumber, DateOnly? birthDate, Guid customerId, string category, string content)
+    public static Result<SupportRequest> Create(string firstName, string lastName, string middleName, string phoneNumber,
+        DateOnly? birthDate, Guid customerId, string category, string content, Dictionary<string, object> extraElements)
     {
         Result<FullName> createFullNameResult = FullName.Create(firstName, lastName, middleName);
 
@@ -67,7 +70,7 @@ public sealed class SupportRequest : BaseEntity
             return Result<SupportRequest>.Failure(createPhoneNumberResult);
         }
 
-        Shared.Domain.ValueObjects.BirthDate? birthDateVo = null;
+        BirthDate? birthDateVo = null;
         
         if (birthDate is not null)
         {
@@ -97,11 +100,14 @@ public sealed class SupportRequest : BaseEntity
         }
         
         SupportRequest supportRequest = new(createFullNameResult.Value!,
-            createPhoneNumberResult.Value!, birthDateVo, customerId, categoryValue, content);
+            createPhoneNumberResult.Value!, birthDateVo, customerId, categoryValue, content)
+        {
+            ExtraElements = extraElements
+        };
         return Result<SupportRequest>.Success(supportRequest);
     }
     
-    public VoidResult Respond(Support support, string responseContent)
+    public VoidResult Respond(Guid supportId, string responseContent)
     {
         if (IsProcessed)
         {
@@ -113,29 +119,37 @@ public sealed class SupportRequest : BaseEntity
             return VoidResult.Failure("Response content is already set");
         }
 
+        if (supportId == Guid.Empty)
+        {
+            return VoidResult.Failure("Support id is required");
+        }
+
         if (string.IsNullOrWhiteSpace(responseContent))
         {
             return VoidResult.Failure("Response content is required");
         }
 
         Status = SupportRequestStatus.Processed;
-        ProcessedBy = support;
-        SupportId = support.Id;
+        SupportId = supportId;
         ResponseContent = responseContent;
         ProcessedAt = DateTime.UtcNow;
         return VoidResult.Success();
     }
 
-    public VoidResult Cancel(Support support)
+    public VoidResult Cancel(Guid supportId)
     {
         if (IsProcessed)
         {
             return VoidResult.Failure("Request must be not processed yet to be canceled");
         }
+
+        if (supportId == Guid.Empty)
+        {
+            return VoidResult.Failure("Support id is required");
+        }
         
         Status = SupportRequestStatus.Canceled;
-        ProcessedBy = support;
-        SupportId = support.Id;
+        SupportId = supportId;
         ProcessedAt = DateTime.UtcNow;
         return VoidResult.Success();       
     }

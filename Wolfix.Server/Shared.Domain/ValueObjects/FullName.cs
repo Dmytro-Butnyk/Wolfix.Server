@@ -1,3 +1,4 @@
+using MongoDB.Bson.Serialization.Attributes;
 using Shared.Domain.Models;
 
 namespace Shared.Domain.ValueObjects;
@@ -10,6 +11,7 @@ public sealed class FullName
     
     public string MiddleName { get; }
 
+    [BsonConstructor]
     private FullName(string firstName, string lastName, string middleName)
     {
         FirstName = firstName;

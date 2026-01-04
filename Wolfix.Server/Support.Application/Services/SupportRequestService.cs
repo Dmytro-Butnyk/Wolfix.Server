@@ -40,7 +40,7 @@ public sealed class SupportRequestService(
             );
         }
 
-        VoidResult respondOnRequestResult = supportRequest.Respond(support, request.Content);
+        VoidResult respondOnRequestResult = supportRequest.Respond(support.Id, request.Content);
 
         if (respondOnRequestResult.IsFailure)
         {
@@ -74,7 +74,7 @@ public sealed class SupportRequestService(
             );
         }
 
-        VoidResult cancelRequestAsync = supportRequest.Cancel(support);
+        VoidResult cancelRequestAsync = supportRequest.Cancel(support.Id);
 
         if (cancelRequestAsync.IsFailure)
         {
@@ -110,7 +110,7 @@ public sealed class SupportRequestService(
         Result<SupportRequest> createSupportRequestResult = SupportRequest.Create(fetchCustomerInfoResult.Value!.FirstName,
             fetchCustomerInfoResult.Value!.LastName, fetchCustomerInfoResult.Value!.MiddleName,
             fetchCustomerInfoResult.Value!.PhoneNumber, fetchCustomerInfoResult.Value.BirthDate,
-            request.CustomerId, request.Category, request.Content);
+            request.CustomerId, request.Category, request.Content, request.ExtraElements);
 
         if (createSupportRequestResult.IsFailure)
         {

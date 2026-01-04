@@ -13,7 +13,8 @@
     <ItemGroup>
       <ProjectReference Include="..\Shared.Endpoints\Shared.Endpoints.csproj" />
       <ProjectReference Include="..\Support.Application\Support.Application.csproj" />
-      <ProjectReference Include="..\Support.Infrastructure\Support.Infrastructure.csproj" />
+      <ProjectReference Include="..\Support.Infrastructure.EFCore\Support.Infrastructure.EFCore.csproj" />
+      <ProjectReference Include="..\Support.Infrastructure.MongoDB\Support.Infrastructure.MongoDB.csproj" />
     </ItemGroup>
 
 </Project>

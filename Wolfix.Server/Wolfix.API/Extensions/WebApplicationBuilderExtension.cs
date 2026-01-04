@@ -28,7 +28,7 @@ public static class WebApplicationBuilderExtension
             .AddSellerModule(connectionString)
             .AddOrderModule(connectionString)
             .AddAdminModule(connectionString)
-            .AddSupportModule(connectionString);
+            .AddSupportModule();
         
         return builder;
     }
@@ -75,9 +75,12 @@ public static class WebApplicationBuilderExtension
         return builder;
     }
 
-    private static WebApplicationBuilder AddSupportModule(this WebApplicationBuilder builder, string connectionString)
+    private static WebApplicationBuilder AddSupportModule(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSupportModule(connectionString);
+        string connectionString = builder.Configuration.GetOrThrow("MONGODB_CONNECTION_STRING");
+        string databaseName = builder.Configuration.GetOrThrow("MONGODB_DATABASE_NAME");
+        
+        builder.Services.AddSupportModule(connectionString, databaseName);
         
         return builder;
     }
