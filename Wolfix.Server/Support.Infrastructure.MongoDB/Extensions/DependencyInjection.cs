@@ -28,11 +28,6 @@ public static class DependencyInjection
             var client = sp.GetRequiredService<IMongoClient>();
             return client.GetDatabase(databaseName);
         });
-    
-        builder.Services.ConfigureHttpJsonOptions(options =>
-        {
-            options.SerializerOptions.PropertyNameCaseInsensitive = true;
-        });
         
         return services;
     }

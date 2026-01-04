@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Support.Application.Dto;
 
 public sealed record CreateSupportRequestDto(
@@ -5,5 +7,6 @@ public sealed record CreateSupportRequestDto(
     string Category,
     string Content)
 {
+    [JsonExtensionData]
     public required Dictionary<string, object> ExtraElements { get; init; } = [];
 }

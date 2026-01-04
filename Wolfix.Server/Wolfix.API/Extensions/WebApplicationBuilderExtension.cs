@@ -82,6 +82,11 @@ public static class WebApplicationBuilderExtension
         
         builder.Services.AddSupportModule(connectionString, databaseName);
         
+        builder.Services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.PropertyNameCaseInsensitive = true;
+        });
+        
         return builder;
     }
 

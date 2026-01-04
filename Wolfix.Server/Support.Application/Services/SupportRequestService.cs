@@ -49,7 +49,14 @@ public sealed class SupportRequestService(
             return respondOnRequestResult;
         }
         
-        await supportRequestRepository.SaveChangesAsync(ct);
+        var filter = Builders<SupportRequest>.Filter.Eq(sr => sr.Id, supportRequestId);
+        var update = Builders<SupportRequest>.Update
+            .Set(sr => sr.Status, supportRequest.Status)
+            .Set(sr => sr.SupportId, supportRequest.SupportId)
+            .Set(sr => sr.ResponseContent, supportRequest.ResponseContent)
+            .Set(sr => sr.ProcessedAt, supportRequest.ProcessedAt);
+        
+        await supportRequests.UpdateOneAsync(filter, update, cancellationToken: ct);
         
         return VoidResult.Success();
     }
@@ -66,7 +73,8 @@ public sealed class SupportRequestService(
             );
         }
 
-        SupportRequest? supportRequest = await supportRequestRepository.GetByIdAsync(supportRequestId, ct);
+        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("supportRequests");
+        SupportRequest? supportRequest = await supportRequests.Find(sr => sr.Id == supportRequestId).FirstOrDefaultAsync(ct);
 
         if (supportRequest is null)
         {
@@ -83,7 +91,13 @@ public sealed class SupportRequestService(
             return cancelRequestAsync;
         }
         
-        await supportRequestRepository.SaveChangesAsync(ct);
+        var filter = Builders<SupportRequest>.Filter.Eq(sr => sr.Id, supportRequestId);
+        var update = Builders<SupportRequest>.Update
+            .Set(sr => sr.Status, supportRequest.Status)
+            .Set(sr => sr.SupportId, supportRequest.SupportId)
+            .Set(sr => sr.ProcessedAt, supportRequest.ProcessedAt);
+        
+        await supportRequests.UpdateOneAsync(filter, update, cancellationToken: ct);
         
         return VoidResult.Success();
     }
@@ -119,15 +133,21 @@ public sealed class SupportRequestService(
             return VoidResult.Failure(createSupportRequestResult);
         }
 
-        await supportRequestRepository.AddAsync(createSupportRequestResult.Value!, ct);
-        await supportRequestRepository.SaveChangesAsync(ct);
+        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("supportRequests");
+        await supportRequests.InsertOneAsync(createSupportRequestResult.Value!, cancellationToken: ct);
         
         return VoidResult.Success();
     }
     
     public async Task<IReadOnlyCollection<SupportRequestShortDto>> GetAllPendingAsync(CancellationToken ct)
     {
-        IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequestRepository.GetAllPendingAsync(ct);
+        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("supportRequests");
+        
+        IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequests
+            .Find(sr => sr.Status == SupportRequestStatus.Pending)
+            .SortByDescending(sr => sr.CreatedAt)
+            .Project(sr => new SupportRequestShortProjection(sr.Id, sr.Category.ToString(), sr.RequestContent, sr.CreatedAt))
+            .ToListAsync(ct);
 
         IReadOnlyCollection<SupportRequestShortDto> dto = projection
             .Select(pr => pr.ToShortDto())
@@ -139,13 +159,19 @@ public sealed class SupportRequestService(
     public async Task<Result<IReadOnlyCollection<SupportRequestShortDto>>> GetAllByCategoryAsync(string category,
         CancellationToken ct)
     {
-        if(!Enum.TryParse<SupportRequestCategory>(category,true, out var categoryE))
+        if (!Enum.TryParse<SupportRequestCategory>(category,true, out var categoryE))
         {
             return Result<IReadOnlyCollection<SupportRequestShortDto>>.Failure(
                 $"Category '{category}' is invalid.");
         }
         
-        IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequestRepository.GetAllByCategoryAsync(categoryE, ct);
+        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("supportRequests");
+        
+        IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequests
+            .Find(sr => sr.Category == categoryE)
+            .SortByDescending(sr => sr.CreatedAt)
+            .Project(sr => new SupportRequestShortProjection(sr.Id, sr.Category.ToString(), sr.RequestContent, sr.CreatedAt))
+            .ToListAsync(ct);
         
         IReadOnlyCollection<SupportRequestShortDto> dto = projection
             .Select(pr => pr.ToShortDto())

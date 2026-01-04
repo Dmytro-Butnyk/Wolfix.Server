@@ -2,6 +2,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using Shared.Domain.Models;
 using Shared.Domain.ValueObjects;
 using Support.Domain.Enums;
+using Support.Domain.Extensions;
 
 namespace Support.Domain.Entities;
 
@@ -102,7 +103,7 @@ public sealed class SupportRequest
         SupportRequest supportRequest = new(createFullNameResult.Value!,
             createPhoneNumberResult.Value!, birthDateVo, customerId, categoryValue, content)
         {
-            ExtraElements = extraElements
+            ExtraElements = extraElements.ToDictionaryFromJson()
         };
         return Result<SupportRequest>.Success(supportRequest);
     }
