@@ -8,5 +8,5 @@ public sealed record CreateSupportRequestDto(
     string Content)
 {
     [JsonExtensionData]
-    public required Dictionary<string, object> ExtraElements { get; init; } = [];
+    public Dictionary<string, object> ExtraElements { get; init; } = [];
 }
