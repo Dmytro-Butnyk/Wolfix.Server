@@ -31,7 +31,7 @@ public sealed class SupportRequestService(
             );
         }
 
-        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("supportRequests");
+        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("support_requests");
         SupportRequest? supportRequest = await supportRequests.Find(sr => sr.Id == supportRequestId).FirstOrDefaultAsync(ct);
 
         if (supportRequest is null)
@@ -73,7 +73,7 @@ public sealed class SupportRequestService(
             );
         }
 
-        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("supportRequests");
+        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("support_requests");
         SupportRequest? supportRequest = await supportRequests.Find(sr => sr.Id == supportRequestId).FirstOrDefaultAsync(ct);
 
         if (supportRequest is null)
@@ -131,14 +131,14 @@ public sealed class SupportRequestService(
             return VoidResult.Failure(createSupportRequestResult);
         }
 
-        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("supportRequests");
+        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("support_requests");
         await supportRequests.InsertOneAsync(createSupportRequestResult.Value!, cancellationToken: ct);
         return VoidResult.Success();
     }
     
     public async Task<IReadOnlyCollection<SupportRequestShortDto>> GetAllPendingAsync(CancellationToken ct)
     {
-        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("supportRequests");
+        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("support_requests");
         
         IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequests
             .Find(sr => sr.Status == SupportRequestStatus.Pending)
@@ -162,7 +162,7 @@ public sealed class SupportRequestService(
                 $"Category '{category}' is invalid.");
         }
         
-        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("supportRequests");
+        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("support_requests");
         
         IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequests
             .Find(sr => sr.Category == categoryE)
