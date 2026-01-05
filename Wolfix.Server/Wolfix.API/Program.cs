@@ -1,3 +1,4 @@
+using Serilog;
 using Wolfix.API.ExceptionHandlers;
 using Wolfix.API.Extensions;
 using Wolfix.ServiceDefaults;
@@ -14,6 +15,7 @@ builder.Services.AddAuthentication();
 //todo: написать отдельный проект для заполнения базы
 
 builder
+    .AddLoggingToMongoDb()
     .AddAppCache()
     .AddEventBus()
     .AddResponseCompression()
@@ -52,6 +54,8 @@ if (app.Environment.IsDevelopment())
         return Task.CompletedTask;
     });
 }
+
+app.UseSerilogRequestLogging();
 
 app.UseRouting();
 app.UseAuthorization();

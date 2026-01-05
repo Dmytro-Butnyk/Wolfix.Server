@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.OpenApi.Models;
 using Order.Endpoints.Extensions;
 using Seller.Endpoints.Extensions;
+using Serilog;
 using Shared.Application.Extensions;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
@@ -182,6 +183,22 @@ public static class WebApplicationBuilderExtension
             options.Providers.Add<GzipCompressionProvider>();
         });
 
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddLoggingToMongoDb(this WebApplicationBuilder builder)
+    {
+        string databaseUrl = builder.Configuration.GetOrThrow("MONGODB_LOGGING_DATABASE_URL");
+        string collectionName = builder.Configuration.GetOrThrow("MONGODB_LOGGING_COLLECTION_NAME");
+
+        builder.Host.UseSerilog((context, _, configuration) => configuration
+            .ReadFrom.Configuration(context.Configuration)
+            .WriteTo.MongoDBBson(
+                databaseUrl,
+                collectionName: collectionName,
+                cappedMaxSizeMb: 100)
+            .Enrich.FromLogContext());
+        
         return builder;
     }
     //

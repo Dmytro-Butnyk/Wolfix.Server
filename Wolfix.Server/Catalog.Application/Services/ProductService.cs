@@ -19,6 +19,7 @@ using Catalog.Domain.ValueObjects.AddProduct;
 using Catalog.Domain.ValueObjects.FullProductDto;
 using Catalog.IntegrationEvents;
 using Catalog.IntegrationEvents.Dto;
+using Microsoft.Extensions.Logging;
 using Shared.Application.Dto;
 using Shared.Domain.Enums;
 using Shared.Domain.Models;
@@ -31,7 +32,8 @@ public sealed class ProductService(
     IProductRepository productRepository,
     ProductDomainService productDomainService,
     EventBus eventBus,
-    IToxicityService toxicityService)
+    IToxicityService toxicityService,
+    ILogger<ProductService> logger)
 {
     public async Task<VoidResult> CreateProductAsync(
         AddProductDto addProductDto, CancellationToken ct)
