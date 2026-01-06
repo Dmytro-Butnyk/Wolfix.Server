@@ -31,6 +31,13 @@ public sealed class Result<TValue>
         StatusCode = statusCode;
     }
 
+    private Result(TValue? value, HttpStatusCode statusCode, string? errorMessage)
+    {
+        Value = value;
+        ErrorMessage = errorMessage;
+        StatusCode = statusCode;
+    }
+
     public static Result<TValue> Success(TValue value, HttpStatusCode statusCode = HttpStatusCode.OK)
         => new(value, statusCode);
 
@@ -49,9 +56,9 @@ public sealed class Result<TValue>
         return new Result<TValue>(failedResult.ErrorMessage!, failedResult.StatusCode);
     }
 
-    public static Result<TValue> Copy<TResult>(Result<TResult> result)
+    public static Result<TValue> Copy<TResult>(Result<TResult> result) where TResult : TValue
     {
-        return new Result<TValue>(result.ErrorMessage!, result.StatusCode);
+        return new Result<TValue>(result.Value, result.StatusCode, result.ErrorMessage);
     }
 
     public TResult Map<TResult>(Func<TValue, TResult> onSuccess, Func<string, TResult> onFailure)

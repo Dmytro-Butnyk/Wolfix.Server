@@ -1,11 +1,12 @@
 using System.Text.Json.Serialization;
+using Support.Domain.Enums;
 
 namespace Support.Application.Dto.SupportRequest.Create;
 
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "category")]
-[JsonDerivedType(typeof(CreateBugOrErrorSupportRequestDto), typeDiscriminator: "BugOrError")]
-[JsonDerivedType(typeof(CreateGeneralSupportRequestDto), typeDiscriminator: "General")]
-[JsonDerivedType(typeof(CreateOrderIssueSupportRequestDto), typeDiscriminator: "OrderIssue")]
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
+[JsonDerivedType(typeof(CreateBugOrErrorSupportRequestDto), typeDiscriminator: nameof(SupportRequestCategory.BugOrError))]
+[JsonDerivedType(typeof(CreateGeneralSupportRequestDto), typeDiscriminator: nameof(SupportRequestCategory.General))]
+[JsonDerivedType(typeof(CreateOrderIssueSupportRequestDto), typeDiscriminator: nameof(SupportRequestCategory.OrderIssue))]
 public abstract record CreateSupportRequestDto(
     string FirstName,
     string LastName,

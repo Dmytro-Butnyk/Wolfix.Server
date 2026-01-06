@@ -11,6 +11,7 @@ using Serilog;
 using Shared.Application.Extensions;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
+using Support.Application.Dto.SupportRequest.Create;
 using Support.Endpoints.Extensions;
 using Support.Infrastructure.MongoDB.Extensions;
 
@@ -148,6 +149,22 @@ public static class WebApplicationBuilderExtension
     {
         builder.Services.AddSwaggerGen(options =>
         {
+            options.UseOneOfForPolymorphism();
+            
+            options.SelectDiscriminatorNameUsing(baseType =>
+                baseType.Name == nameof(CreateSupportRequestDto) ? "kind" : null);
+            
+            options.SelectSubTypesUsing(baseType =>
+            {
+                if (baseType == typeof(CreateSupportRequestDto))
+                {
+                    return typeof(Program).Assembly.GetTypes()
+                       .Where(t => t.IsSubclassOf(baseType) && !t.IsAbstract);
+                }
+
+                return [];
+            });
+            
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",

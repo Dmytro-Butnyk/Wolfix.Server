@@ -1,3 +1,5 @@
+using Support.Domain.Enums;
+
 namespace Support.Application.Dto.SupportRequest.Create;
 
 public sealed record CreateBugOrErrorSupportRequestDto(
@@ -7,7 +9,6 @@ public sealed record CreateBugOrErrorSupportRequestDto(
     string PhoneNumber,
     DateOnly? BirthDate,
     Guid CustomerId,
-    string Category,
     string Content,
     string PhotoUrl
-) : CreateSupportRequestDto(FirstName, LastName, MiddleName, PhoneNumber, BirthDate, CustomerId, Category, Content);
+) : CreateSupportRequestDto(FirstName, LastName, MiddleName, PhoneNumber, BirthDate, CustomerId, nameof(SupportRequestCategory.BugOrError), Content);
