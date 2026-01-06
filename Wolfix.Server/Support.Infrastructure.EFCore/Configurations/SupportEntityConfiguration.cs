@@ -33,6 +33,13 @@ public sealed class SupportEntityConfiguration : IEntityTypeConfiguration<Domain
             fullName.Property(fn => fn.MiddleName)
                 .HasColumnName("MiddleName")
                 .IsRequired();
+
+            fullName.HasIndex(fn => new
+            {
+                fn.LastName,
+                fn.FirstName,
+                fn.MiddleName
+            }, "idx_EQUALS_fullName");
         });
 
         builder.Property(sup => sup.AccountId)

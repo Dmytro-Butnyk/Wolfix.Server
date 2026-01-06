@@ -51,8 +51,6 @@ public sealed class Product : BaseEntity
     
     public Guid CategoryId { get; private set; }
     
-    //todo: seller ID (именно ID, потому что другой контекст)
-    
     private readonly List<ProductMedia> _productMedias = [];
     public IReadOnlyCollection<ProductMediaInfo> ProductMedias => _productMedias
         .Select(pm => (ProductMediaInfo)pm)

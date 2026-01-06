@@ -8,7 +8,7 @@ namespace Order.Domain.OrderAggregate;
 
 public sealed class Order : BaseEntity
 {
-    public string Number { get; private set; } = Guid.NewGuid().ToString();
+    public string Number { get; private set; } = Guid.CreateVersion7().ToString();
     
     public CustomerInfo CustomerInfo { get; private set; }
     

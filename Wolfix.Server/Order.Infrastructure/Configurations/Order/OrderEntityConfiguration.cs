@@ -16,6 +16,8 @@ internal sealed class OrderEntityConfiguration : IEntityTypeConfiguration<OrderA
         ConfigureBasicProperties(builder);
         
         ConfigureOrderItemRelation(builder);
+
+        ConfigureIndexes(builder);
     }
 
     private void ConfigureBasicProperties(EntityTypeBuilder<OrderAggregate> builder)
@@ -25,7 +27,7 @@ internal sealed class OrderEntityConfiguration : IEntityTypeConfiguration<OrderA
             .ValueGeneratedOnAdd();
 
         builder.Property(order => order.Number)
-            .HasDefaultValue(Guid.NewGuid().ToString())
+            .HasDefaultValue(Guid.CreateVersion7().ToString())
             .IsRequired();
 
         builder.OwnsOne(order => order.CustomerInfo, customerInfo =>
@@ -156,5 +158,11 @@ internal sealed class OrderEntityConfiguration : IEntityTypeConfiguration<OrderA
             .IsRequired();
         builder.Navigation("_orderItems")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+    }
+
+    private void ConfigureIndexes(EntityTypeBuilder<OrderAggregate> builder)
+    {
+        builder.HasIndex(o => o.Number, "idx_UNIQUE_number").IsUnique();
+        builder.HasIndex(o => new { o.CustomerId, o.CreatedAt }, "idx_EQUALS_customerId_SORT_createdAt");
     }
 }

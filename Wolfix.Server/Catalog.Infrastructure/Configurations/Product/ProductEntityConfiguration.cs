@@ -24,6 +24,8 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
         ConfigureProductVariantValuesRelation(builder);
 
         ConfigureProductMediaRelation(builder);
+        
+        ConfigureIndexes(builder);
     }
 
     private void ConfigureBasicProperties(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
@@ -110,5 +112,12 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
             .IsRequired(false);
         builder.Navigation("_productVariantValues")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+    }
+
+    private void ConfigureIndexes(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
+    {
+        builder.HasIndex(p => new { p.CategoryId, p.FinalPrice }, "idx_EQUALS_categoryId_SORT_finalPrice");
+        builder.HasIndex(p => p.SellerId, "idx_EQUALS_sellerId");
+        builder.HasIndex(p => new { p.SellerId, p.CategoryId }, "idx_EQUALS_sellerId_EQUALS_categoryId");
     }
 }
