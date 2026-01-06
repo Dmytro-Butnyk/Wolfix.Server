@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Routing;
 using Shared.Domain.Models;
 using Shared.Endpoints;
 using Support.Application.Dto;
+using Support.Application.Dto.SupportRequest;
+using Support.Application.Dto.SupportRequest.Create;
 using Support.Application.Services;
 
 namespace Support.Endpoints.Endpoints;

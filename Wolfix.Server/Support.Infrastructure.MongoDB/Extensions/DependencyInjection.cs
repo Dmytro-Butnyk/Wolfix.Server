@@ -38,26 +38,26 @@ public static class DependencyInjection
     {
         var mongoDb = serviceProvider.GetRequiredService<IMongoDatabase>();
         
-        var supportRequestsCollection = mongoDb.GetCollection<SupportRequest>("support_requests");
+        var supportRequestsCollection = mongoDb.GetCollection<BaseSupportRequest>("support_requests");
         
-        var indexBuilder = Builders<SupportRequest>.IndexKeys;
+        var indexBuilder = Builders<BaseSupportRequest>.IndexKeys;
 
-        var supportDashboardIndex = new CreateIndexModel<SupportRequest>(
+        var supportDashboardIndex = new CreateIndexModel<BaseSupportRequest>(
             indexBuilder.Ascending(sr => sr.Status).Descending(sr => sr.CreatedAt),
             new CreateIndexOptions { Name = "idx_status_createdAt_desc" }
         );
 
-        var supportFilterIndex = new CreateIndexModel<SupportRequest>(
+        var supportFilterIndex = new CreateIndexModel<BaseSupportRequest>(
             indexBuilder.Ascending(sr => sr.Status).Ascending(sr => sr.Category).Descending(sr => sr.CreatedAt),
             new CreateIndexOptions { Name = "idx_status_category_createdAt_desc" }
         );
 
-        var customerIndex = new CreateIndexModel<SupportRequest>(
+        var customerIndex = new CreateIndexModel<BaseSupportRequest>(
             indexBuilder.Ascending(sr => sr.CustomerId).Descending(sr => sr.CreatedAt),
             new CreateIndexOptions { Name = "idx_customerId_createdAt_desc" }
         );
 
-        var customerFilterIndex = new CreateIndexModel<SupportRequest>(
+        var customerFilterIndex = new CreateIndexModel<BaseSupportRequest>(
             indexBuilder.Ascending(sr => sr.CustomerId).Ascending(sr => sr.Category).Descending(sr => sr.CreatedAt),
             new CreateIndexOptions { Name = "idx_customerId_category_createdAt_desc" }
         );

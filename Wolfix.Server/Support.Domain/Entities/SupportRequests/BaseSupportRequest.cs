@@ -62,57 +62,6 @@ public abstract class BaseSupportRequest
         RequestContent = requestContent;
         ExtraElements = extraElements.ToDictionaryFromJson();
     }
-    
-    // public static Result<BaseSupportRequest> Create(string firstName, string lastName, string middleName, string phoneNumber,
-    //     DateOnly? birthDate, Guid customerId, string category, string content, Dictionary<string, object> extraElements)
-    // {
-    //     Result<FullName> createFullNameResult = FullName.Create(firstName, lastName, middleName);
-    //
-    //     if (createFullNameResult.IsFailure)
-    //     {
-    //         return Result<BaseSupportRequest>.Failure(createFullNameResult);
-    //     }
-    //     
-    //     Result<PhoneNumber> createPhoneNumberResult = PhoneNumber.Create(phoneNumber);
-    //     
-    //     if (createPhoneNumberResult.IsFailure)
-    //     {
-    //         return Result<BaseSupportRequest>.Failure(createPhoneNumberResult);
-    //     }
-    //
-    //     BirthDate? birthDateVo = null;
-    //     
-    //     if (birthDate is not null)
-    //     {
-    //         Result<BirthDate> createBirthDateResult = BirthDate.Create(birthDate.Value);
-    //         
-    //         if (createBirthDateResult.IsFailure)
-    //         {
-    //             return Result<BaseSupportRequest>.Failure(createBirthDateResult);
-    //         }
-    //         
-    //         birthDateVo = createBirthDateResult.Value!;
-    //     }
-    //
-    //     if (customerId == Guid.Empty)
-    //     {
-    //         return Result<BaseSupportRequest>.Failure("Customer Id is required");
-    //     }
-    //
-    //     if (string.IsNullOrWhiteSpace(content))
-    //     {
-    //         return Result<BaseSupportRequest>.Failure("RequestContent is required");
-    //     }
-    //
-    //     if (string.IsNullOrWhiteSpace(category) || !Enum.TryParse<SupportRequestCategory>(category, out var categoryValue))
-    //     {
-    //         return Result<BaseSupportRequest>.Failure("Category is required");
-    //     }
-    //
-    //     BaseSupportRequest supportRequest = new(createFullNameResult.Value!,
-    //         createPhoneNumberResult.Value!, birthDateVo, customerId, categoryValue, content, extraElements);
-    //     return Result<BaseSupportRequest>.Success(supportRequest);
-    // }
 
     public static Result<SupportRequestCreateData> ValidateCreateData(string firstName, string lastName, string middleName, string phoneNumber,
         DateOnly? birthDate, Guid customerId, string category, string content)

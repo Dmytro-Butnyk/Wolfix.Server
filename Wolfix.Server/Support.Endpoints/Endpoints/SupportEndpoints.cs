@@ -9,6 +9,7 @@ using Shared.Domain.Models;
 using Shared.Endpoints;
 using Shared.Endpoints.Exceptions;
 using Support.Application.Dto;
+using Support.Application.Dto.Support;
 using Support.Application.Services;
 
 namespace Support.Endpoints.Endpoints;

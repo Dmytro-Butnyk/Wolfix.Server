@@ -1,5 +1,3 @@
-using Shared.Domain.ValueObjects;
-
-namespace Support.Application.Dto;
+namespace Support.Application.Dto.SupportRequest;
 
 public sealed record SupportRequestShortDto(Guid Id, string Category, string RequestContent, DateTime CreatedAt);

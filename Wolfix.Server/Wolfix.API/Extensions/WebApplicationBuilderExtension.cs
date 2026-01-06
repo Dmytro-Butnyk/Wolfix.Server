@@ -148,7 +148,7 @@ public static class WebApplicationBuilderExtension
     {
         builder.Services.AddSwaggerGen(options =>
         {
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
                 In = ParameterLocation.Header,

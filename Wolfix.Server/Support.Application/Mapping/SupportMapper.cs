@@ -1,4 +1,5 @@
 using Support.Application.Dto;
+using Support.Application.Dto.Support;
 using Support.Domain.Projections;
 
 namespace Support.Application.Mapping;

@@ -4,6 +4,8 @@ using Shared.Domain.Models;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 using Support.Application.Dto;
+using Support.Application.Dto.SupportRequest;
+using Support.Application.Dto.SupportRequest.Create;
 using Support.Application.Mapping;
 using Support.Domain.Entities;
 using Support.Domain.Entities.SupportRequests;
@@ -32,8 +34,8 @@ public sealed class SupportRequestService(
             );
         }
 
-        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("support_requests");
-        SupportRequest? supportRequest = await supportRequests.Find(sr => sr.Id == supportRequestId).FirstOrDefaultAsync(ct);
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>("support_requests");
+        BaseSupportRequest? supportRequest = await supportRequests.Find(sr => sr.Id == supportRequestId).FirstOrDefaultAsync(ct);
 
         if (supportRequest is null)
         {
@@ -50,8 +52,8 @@ public sealed class SupportRequestService(
             return respondOnRequestResult;
         }
         
-        var filter = Builders<SupportRequest>.Filter.Eq(sr => sr.Id, supportRequestId);
-        var update = Builders<SupportRequest>.Update
+        var filter = Builders<BaseSupportRequest>.Filter.Eq(sr => sr.Id, supportRequestId);
+        var update = Builders<BaseSupportRequest>.Update
             .Set(sr => sr.Status, supportRequest.Status)
             .Set(sr => sr.SupportId, supportRequest.SupportId)
             .Set(sr => sr.ResponseContent, supportRequest.ResponseContent)
@@ -74,8 +76,8 @@ public sealed class SupportRequestService(
             );
         }
 
-        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("support_requests");
-        SupportRequest? supportRequest = await supportRequests.Find(sr => sr.Id == supportRequestId).FirstOrDefaultAsync(ct);
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>("support_requests");
+        BaseSupportRequest? supportRequest = await supportRequests.Find(sr => sr.Id == supportRequestId).FirstOrDefaultAsync(ct);
 
         if (supportRequest is null)
         {
@@ -92,8 +94,8 @@ public sealed class SupportRequestService(
             return cancelRequestAsync;
         }
         
-        var filter = Builders<SupportRequest>.Filter.Eq(sr => sr.Id, supportRequestId);
-        var update = Builders<SupportRequest>.Update
+        var filter = Builders<BaseSupportRequest>.Filter.Eq(sr => sr.Id, supportRequestId);
+        var update = Builders<BaseSupportRequest>.Update
             .Set(sr => sr.Status, supportRequest.Status)
             .Set(sr => sr.SupportId, supportRequest.SupportId)
             .Set(sr => sr.ProcessedAt, supportRequest.ProcessedAt);
@@ -122,7 +124,8 @@ public sealed class SupportRequestService(
             return VoidResult.Failure(fetchCustomerInfoResult);
         }
 
-        Result<SupportRequest> createSupportRequestResult = SupportRequest.Create(fetchCustomerInfoResult.Value!.FirstName,
+        //TODO!!!!
+        Result<BaseSupportRequest> createSupportRequestResult = SupportRequest.Create(fetchCustomerInfoResult.Value!.FirstName,
             fetchCustomerInfoResult.Value!.LastName, fetchCustomerInfoResult.Value!.MiddleName,
             fetchCustomerInfoResult.Value!.PhoneNumber, fetchCustomerInfoResult.Value.BirthDate,
             request.CustomerId, request.Category, request.Content, request.ExtraElements);
@@ -132,14 +135,14 @@ public sealed class SupportRequestService(
             return VoidResult.Failure(createSupportRequestResult);
         }
 
-        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("support_requests");
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>("support_requests");
         await supportRequests.InsertOneAsync(createSupportRequestResult.Value!, cancellationToken: ct);
         return VoidResult.Success();
     }
     
     public async Task<IReadOnlyCollection<SupportRequestShortDto>> GetAllPendingAsync(CancellationToken ct)
     {
-        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("support_requests");
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>("support_requests");
         
         IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequests
             .Find(sr => sr.Status == SupportRequestStatus.Pending)
@@ -163,10 +166,10 @@ public sealed class SupportRequestService(
                 $"Category '{category}' is invalid.");
         }
         
-        IMongoCollection<SupportRequest> supportRequests = mongoDb.GetCollection<SupportRequest>("support_requests");
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>("support_requests");
         
         IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequests
-            .Find(sr => sr.Category == categoryE)
+            .Find(sr => sr.Status == SupportRequestStatus.Pending && sr.Category == categoryE)
             .SortByDescending(sr => sr.CreatedAt)
             .Project(sr => new SupportRequestShortProjection(sr.Id, sr.Category.ToString(), sr.RequestContent, sr.CreatedAt))
             .ToListAsync(ct);

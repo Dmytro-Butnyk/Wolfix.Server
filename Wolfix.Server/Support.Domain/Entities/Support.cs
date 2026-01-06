@@ -11,8 +11,6 @@ public sealed class Support : BaseEntity
     
     public Guid AccountId { get; private set; }
 
-    public List<SupportRequest> SupportRequests = [];
-    
     private Support() { }
 
     private Support(Guid accountId, FullName fullName)
