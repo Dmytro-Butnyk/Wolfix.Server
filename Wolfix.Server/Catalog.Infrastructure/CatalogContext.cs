@@ -2,6 +2,7 @@
 using Catalog.Domain.CategoryAggregate.Entities;
 using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.ProductAggregate.Entities;
+using Catalog.Domain.ProductAggregate.ValueObjects;
 using Catalog.Infrastructure.Configurations.Category;
 using Catalog.Infrastructure.Configurations.Product;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,6 @@ internal sealed class CatalogContext : DbContext, IContextWithConfigurations
         
         //Product
         modelBuilder.ApplyConfiguration(new DiscountEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new ProductAttributeValueEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ProductEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ProductVariantValueEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ReviewEntityConfiguration());

@@ -2,6 +2,7 @@
 using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.ProductAggregate.Entities;
 using Catalog.Domain.ProductAggregate.Enums;
+using Catalog.Domain.ProductAggregate.ValueObjects;
 using Catalog.Domain.Projections.Product;
 using Catalog.Domain.Projections.Product.Review;
 using Catalog.Domain.ValueObjects;
@@ -284,30 +285,31 @@ internal sealed class ProductRepository(CatalogContext context)
         IReadOnlyCollection<(Guid AttributeId, string Value)> filters, int pageSize, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        
-        var predicate = PredicateBuilder.New<ProductAttributeValue>(false);
+
+        if (filters.Count == 0) return [];
+
+        // 1. Изменился тип предиката: Product вместо ProductAttributeValue
+        var predicate = PredicateBuilder.New<Product>(false);
 
         foreach (var f in filters)
         {
-            var temp = f; // обязательно, чтобы захват переменной корректно
-            predicate = predicate.Or(pa =>
-                EF.Property<Guid>(pa, "CategoryAttributeId") == temp.AttributeId &&
-                EF.Property<string>(pa, "Value") == temp.Value
-            );
+            var temp = f; 
+        
+            // 2. Логика условия: "У продукта есть (Any) атрибут в JSON-списке, который совпадает с фильтром"
+            predicate = predicate.Or(p => p.ProductAttributeValues.Any(av => 
+                av.CategoryAttributeId == temp.AttributeId && 
+                av.Value == temp.Value));
         }
 
-        var query = _products
+        // 3. Упростился запрос: убрали SelectMany, так как фильтруем сами Продукты
+        return await _products
             .AsNoTracking()
-            .SelectMany(p => EF.Property<List<ProductAttributeValue>>(p, "_productAttributeValues"))
-            .Where(predicate)
+            .Where(predicate) // EF Core транслирует это в SQL оператор @> (contains) для JSONB
             .Take(pageSize)
-            .Select(pa => (
-                pa.Product.Id
-            ));
-
-        return await query.Distinct().ToListAsync(ct);
+            .Select(p => p.Id)
+            .ToListAsync(ct);
     }
-
+    
     public async Task<IReadOnlyCollection<ProductShortProjection>> GetShortProductsByIdsAsNoTrackingAsync(
         IReadOnlyCollection<Guid> ids, CancellationToken ct)
     {
@@ -335,12 +337,11 @@ internal sealed class ProductRepository(CatalogContext context)
         Guid childCategory, IReadOnlyCollection<Guid> attributeIds, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        
-        var result = await _products
+    
+        return await _products
             .AsNoTracking()
-            .Include("_productAttributeValues")
             .Where(p => p.CategoryId == childCategory)
-            .SelectMany(p => EF.Property<List<ProductAttributeValue>>(p, "_productAttributeValues"))
+            .SelectMany(p => p.ProductAttributeValues)
             .Where(pav => attributeIds.Contains(pav.CategoryAttributeId))
             .GroupBy(pav => new { pav.CategoryAttributeId, pav.Key })
             .Select(g => new AttributeAndUniqueValuesValueObject
@@ -350,8 +351,6 @@ internal sealed class ProductRepository(CatalogContext context)
                 Values = g.Select(x => x.Value).Distinct().ToList()
             })
             .ToListAsync(ct);
-
-        return result;
     }
 
     public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllBySellerCategoryForPageAsync(Guid sellerId, Guid categoryId, int page, int pageSize, CancellationToken ct)
