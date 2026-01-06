@@ -341,6 +341,10 @@ public sealed class ProductService(
     public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRecommendedForPageAsync(int pageSize,
         List<Guid> visitedCategoriesIds, CancellationToken ct)
     {
+        if (visitedCategoriesIds.Count == 0)
+        {
+            return Result<IReadOnlyCollection<ProductShortDto>>.Success([]);
+        }
         //todo: добавить проверку на существование категорий через доменный сервис(или событие) и кинуть нот фаунт если нету
 
         List<ProductShortProjection> recommendedProducts = new(pageSize);

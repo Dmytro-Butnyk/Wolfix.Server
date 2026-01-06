@@ -358,18 +358,12 @@ internal static class ProductEndpoints
         return TypedResults.Ok(getProductsWithDiscountResult.Value);
     }
 
-    private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>, NotFound<string>>>
-        GetRecommendedForPage(
-            [FromQuery] Guid[] visitedCategoriesIds,
-            [FromServices] ProductService productService,
-            CancellationToken ct,
-            [FromQuery] int pageSize = 12)
+    private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, NotFound<string>>> GetRecommendedForPage(
+        [FromQuery] Guid[] visitedCategoriesIds,
+        [FromServices] ProductService productService,
+        CancellationToken ct,
+        [FromQuery] int pageSize = 12)
     {
-        if (visitedCategoriesIds.Length == 0)
-        {
-            return TypedResults.BadRequest("Visited categories must be not empty");
-        }
-
         Result<IReadOnlyCollection<ProductShortDto>> getRecommendedProductsResult =
             await productService.GetRecommendedForPageAsync(pageSize, visitedCategoriesIds.ToList(), ct);
 
