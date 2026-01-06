@@ -19,9 +19,10 @@ builder
     .AddAppCache()
     .AddEventBus()
     .AddResponseCompression()
-    .AddAllModules()
     .AddCors()
     .AddSwaggerJwtBearer();
+
+await builder.AddAllModules();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ExceptionHandler>();

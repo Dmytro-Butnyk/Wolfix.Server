@@ -1,3 +1,4 @@
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Shared.Domain.Models;
 using Shared.Domain.ValueObjects;
@@ -19,10 +20,12 @@ public sealed class SupportRequest
     
     public Guid CustomerId { get; private set; }
     
+    [BsonRepresentation(BsonType.String)]
     public SupportRequestCategory Category { get; private set; }
     
     public string RequestContent { get; private set; }
 
+    [BsonRepresentation(BsonType.String)]
     public SupportRequestStatus Status { get; private set; } = SupportRequestStatus.Pending;
 
     public Guid? SupportId { get; private set; } = null;

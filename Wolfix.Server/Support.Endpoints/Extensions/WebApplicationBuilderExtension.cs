@@ -13,8 +13,11 @@ public static class WebApplicationBuilderExtension
         services.AddSupportRepositories();
         services.AddSupportApplicationServices();
         services.AddSupportEventHandlers();
-        services.AddSupportMongoDB(connectionString, databaseName);
+        services.AddSupportMongoDb(connectionString, databaseName);
 
         return services;
     }
+
+    public static async Task AddSupportMongoDbIndexes(IServiceProvider serviceProvider)
+        => await serviceProvider.AddSupportMongoDbIndexes();
 }

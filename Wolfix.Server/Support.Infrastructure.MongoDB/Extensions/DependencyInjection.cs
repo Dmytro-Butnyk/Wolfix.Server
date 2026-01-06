@@ -4,12 +4,13 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using Support.Domain.Entities;
 
 namespace Support.Infrastructure.MongoDB.Extensions;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddSupportMongoDB(this IServiceCollection services, string connectionString, string databaseName)
+    public static IServiceCollection AddSupportMongoDb(this IServiceCollection services, string connectionString, string databaseName)
     {
         var pack = new ConventionPack
         {
@@ -30,5 +31,38 @@ public static class DependencyInjection
         });
         
         return services;
+    }
+
+    public static async Task AddSupportMongoDbIndexes(this IServiceProvider serviceProvider)
+    {
+        var mongoDb = serviceProvider.GetRequiredService<IMongoDatabase>();
+        
+        var supportRequestsCollection = mongoDb.GetCollection<SupportRequest>("support_requests");
+        
+        var indexBuilder = Builders<SupportRequest>.IndexKeys;
+
+        var supportDashboardIndex = new CreateIndexModel<SupportRequest>(
+            indexBuilder.Ascending(sr => sr.Status).Descending(sr => sr.CreatedAt),
+            new CreateIndexOptions { Name = "idx_status_createdAt_desc" }
+        );
+
+        var supportFilterIndex = new CreateIndexModel<SupportRequest>(
+            indexBuilder.Ascending(sr => sr.Status).Ascending(sr => sr.Category).Descending(sr => sr.CreatedAt),
+            new CreateIndexOptions { Name = "idx_status_category_createdAt_desc" }
+        );
+
+        var customerIndex = new CreateIndexModel<SupportRequest>(
+            indexBuilder.Ascending(sr => sr.CustomerId).Descending(sr => sr.CreatedAt),
+            new CreateIndexOptions { Name = "idx_customerId_createdAt_desc" }
+        );
+
+        var customerFilterIndex = new CreateIndexModel<SupportRequest>(
+            indexBuilder.Ascending(sr => sr.CustomerId).Ascending(sr => sr.Category).Descending(sr => sr.CreatedAt),
+            new CreateIndexOptions { Name = "idx_customerId_category_createdAt_desc" }
+        );
+
+        await supportRequestsCollection.Indexes.CreateManyAsync(
+            [supportDashboardIndex, supportFilterIndex, customerIndex, customerFilterIndex]
+        );
     }
 }

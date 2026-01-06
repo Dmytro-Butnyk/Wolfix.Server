@@ -12,12 +12,13 @@ using Shared.Application.Extensions;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
 using Support.Endpoints.Extensions;
+using Support.Infrastructure.MongoDB.Extensions;
 
 namespace Wolfix.API.Extensions;
 
 public static class WebApplicationBuilderExtension
 {
-    public static WebApplicationBuilder AddAllModules(this WebApplicationBuilder builder)
+    public static async Task<WebApplicationBuilder> AddAllModules(this WebApplicationBuilder builder)
     {
         string connectionString = builder.Configuration.GetOrThrow("DB");
 
@@ -28,8 +29,9 @@ public static class WebApplicationBuilderExtension
             .AddMediaModule(connectionString)
             .AddSellerModule(connectionString)
             .AddOrderModule(connectionString)
-            .AddAdminModule(connectionString)
-            .AddSupportModule();
+            .AddAdminModule(connectionString);
+
+        await builder.AddSupportModule();
         
         return builder;
     }
@@ -76,12 +78,13 @@ public static class WebApplicationBuilderExtension
         return builder;
     }
 
-    private static WebApplicationBuilder AddSupportModule(this WebApplicationBuilder builder)
+    private static async Task<WebApplicationBuilder> AddSupportModule(this WebApplicationBuilder builder)
     {
         string connectionString = builder.Configuration.GetOrThrow("MONGODB_CONNECTION_STRING");
         string databaseName = builder.Configuration.GetOrThrow("MONGODB_DATABASE_NAME");
         
         builder.Services.AddSupportModule(connectionString, databaseName);
+        await builder.Services.BuildServiceProvider().AddSupportMongoDbIndexes();
         
         builder.Services.ConfigureHttpJsonOptions(options =>
         {
