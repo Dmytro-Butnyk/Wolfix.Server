@@ -2,7 +2,7 @@ namespace Support.Domain.Enums;
 
 public enum SupportRequestCategory
 {
+    General,
     OrderIssue,      // Order issue
-    BugOrError,     // Site error
-    Other            // Other
+    BugOrError     // Site error
 }

@@ -5,6 +5,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Support.Domain.Entities;
+using Support.Domain.Entities.SupportRequests;
 
 namespace Support.Infrastructure.MongoDB.Extensions;
 

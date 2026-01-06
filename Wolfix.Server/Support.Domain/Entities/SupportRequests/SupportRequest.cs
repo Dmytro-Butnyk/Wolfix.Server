@@ -5,7 +5,7 @@ using Shared.Domain.ValueObjects;
 using Support.Domain.Enums;
 using Support.Domain.Extensions;
 
-namespace Support.Domain.Entities;
+namespace Support.Domain.Entities.SupportRequests;
 
 public sealed class SupportRequest
 {

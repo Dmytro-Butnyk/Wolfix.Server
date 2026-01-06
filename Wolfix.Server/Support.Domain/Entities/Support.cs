@@ -1,6 +1,7 @@
 using Shared.Domain.Entities;
 using Shared.Domain.Models;
 using Shared.Domain.ValueObjects;
+using Support.Domain.Entities.SupportRequests;
 
 namespace Support.Domain.Entities;
 

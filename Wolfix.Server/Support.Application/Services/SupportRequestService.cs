@@ -6,6 +6,7 @@ using Shared.IntegrationEvents.Interfaces;
 using Support.Application.Dto;
 using Support.Application.Mapping;
 using Support.Domain.Entities;
+using Support.Domain.Entities.SupportRequests;
 using Support.Domain.Enums;
 using Support.Domain.Interfaces;
 using Support.Domain.Projections;
