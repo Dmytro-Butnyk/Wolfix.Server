@@ -124,21 +124,58 @@ public sealed class SupportRequestService(
             return VoidResult.Failure(fetchCustomerInfoResult);
         }
 
-        //TODO!!!!
-        Result<BaseSupportRequest> createSupportRequestResult = SupportRequest.Create(fetchCustomerInfoResult.Value!.FirstName,
-            fetchCustomerInfoResult.Value!.LastName, fetchCustomerInfoResult.Value!.MiddleName,
-            fetchCustomerInfoResult.Value!.PhoneNumber, fetchCustomerInfoResult.Value.BirthDate,
-            request.CustomerId, request.Category, request.Content, request.ExtraElements);
+        Result<BaseSupportRequest> createResult = GetSupportRequestByCategory(request);
         
-        if (createSupportRequestResult.IsFailure)
+        if (createResult.IsFailure)
         {
-            return VoidResult.Failure(createSupportRequestResult);
+            return VoidResult.Failure(createResult);
         }
 
         IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>("support_requests");
-        await supportRequests.InsertOneAsync(createSupportRequestResult.Value!, cancellationToken: ct);
+        await supportRequests.InsertOneAsync(createResult.Value!, cancellationToken: ct);
         return VoidResult.Success();
     }
+    
+    private Result<BaseSupportRequest> GetSupportRequestByCategory(CreateSupportRequestDto request)
+        => request switch
+        {
+            CreateBugOrErrorSupportRequestDto orderDto => Result<BaseSupportRequest>.Copy(BugOrErrorSupportRequest.Create(
+                orderDto.FirstName,
+                orderDto.LastName,
+                orderDto.MiddleName,
+                orderDto.PhoneNumber,
+                orderDto.BirthDate,
+                orderDto.CustomerId,
+                orderDto.Category,
+                orderDto.Content,
+                orderDto.ExtraElements,
+                orderDto.PhotoUrl
+            )),
+            CreateGeneralSupportRequestDto generalDto => Result<BaseSupportRequest>.Copy(GeneralSupportRequest.Create(
+                generalDto.FirstName,
+                generalDto.LastName,
+                generalDto.MiddleName,
+                generalDto.PhoneNumber,
+                generalDto.BirthDate,
+                generalDto.CustomerId,
+                generalDto.Category,
+                generalDto.Content,
+                generalDto.ExtraElements
+            )),
+            CreateOrderIssueSupportRequestDto orderIssueDto => Result<BaseSupportRequest>.Copy(OrderIssueSupportRequest.Create(
+                orderIssueDto.FirstName,
+                orderIssueDto.LastName,
+                orderIssueDto.MiddleName,
+                orderIssueDto.PhoneNumber,
+                orderIssueDto.BirthDate,
+                orderIssueDto.CustomerId,
+                orderIssueDto.Category,
+                orderIssueDto.Content,
+                orderIssueDto.ExtraElements,
+                orderIssueDto.OrderId
+            )),
+            _ => Result<BaseSupportRequest>.Failure("Invalid or unknown support category")
+        };
     
     public async Task<IReadOnlyCollection<SupportRequestShortDto>> GetAllPendingAsync(CancellationToken ct)
     {

@@ -2,15 +2,6 @@ using System.Text.Json.Serialization;
 
 namespace Support.Application.Dto.SupportRequest.Create;
 
-// public sealed record CreateSupportRequestDto(
-//     Guid CustomerId,
-//     string Category,
-//     string Content)
-// {
-//     [JsonExtensionData]
-//     public Dictionary<string, object> ExtraElements { get; init; } = [];
-// }
-
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "category")]
 [JsonDerivedType(typeof(CreateBugOrErrorSupportRequestDto), typeDiscriminator: "BugOrError")]
 [JsonDerivedType(typeof(CreateGeneralSupportRequestDto), typeDiscriminator: "General")]
@@ -24,4 +15,8 @@ public abstract record CreateSupportRequestDto(
     Guid CustomerId,
     string Category,
     string Content
-);
+)
+{
+    [JsonExtensionData]
+    public Dictionary<string, object> ExtraElements { get; init; } = [];
+}

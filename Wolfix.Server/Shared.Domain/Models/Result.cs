@@ -49,6 +49,11 @@ public sealed class Result<TValue>
         return new Result<TValue>(failedResult.ErrorMessage!, failedResult.StatusCode);
     }
 
+    public static Result<TValue> Copy<TResult>(Result<TResult> result)
+    {
+        return new Result<TValue>(result.ErrorMessage!, result.StatusCode);
+    }
+
     public TResult Map<TResult>(Func<TValue, TResult> onSuccess, Func<string, TResult> onFailure)
     {
         return IsSuccess ? onSuccess(Value!) : onFailure(ErrorMessage!);
