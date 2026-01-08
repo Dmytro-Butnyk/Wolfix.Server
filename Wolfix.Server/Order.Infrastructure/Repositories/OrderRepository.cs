@@ -76,4 +76,12 @@ public sealed class OrderRepository(OrderContext context)
                 oi.PhotoUrl))
             .ToListAsync(ct);
     }
+
+    public async Task<Domain.OrderAggregate.Order?> GetCustomerOrderAsync(Guid orderId, Guid customerId, CancellationToken ct)
+    {
+        return await _orders
+            .AsNoTracking()
+            .Where(order => order.Id == orderId && order.CustomerId == customerId)
+            .FirstOrDefaultAsync(ct);
+    }
 }

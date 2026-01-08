@@ -10,5 +10,6 @@ public sealed record CreateOrderIssueSupportRequestDto(
     DateOnly? BirthDate,
     Guid CustomerId,
     string Content,
-    Guid OrderId
+    Guid OrderId,
+    string OrderNumber
 ) : CreateSupportRequestDto(FirstName, LastName, MiddleName, PhoneNumber, BirthDate, CustomerId, nameof(SupportRequestCategory.OrderIssue), Content);

@@ -111,7 +111,11 @@ internal static class OrderEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(placeOrderWithPaymentResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(placeOrderWithPaymentResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(placeOrderWithPaymentResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(PlaceOrderWithPayment), placeOrderWithPaymentResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(OrderEndpoints),
+                    nameof(PlaceOrderWithPayment),
+                    placeOrderWithPaymentResult.StatusCode
+                )
             };
         }
         
@@ -132,7 +136,11 @@ internal static class OrderEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(placeOrderResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(placeOrderResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(PlaceOrder), placeOrderResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(OrderEndpoints),
+                    nameof(PlaceOrder),
+                    placeOrderResult.StatusCode
+                )
             };
         }
 

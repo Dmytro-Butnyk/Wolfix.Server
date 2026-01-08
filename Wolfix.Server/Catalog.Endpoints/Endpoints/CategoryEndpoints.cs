@@ -128,7 +128,11 @@ internal static class CategoryEndpoints
             {
                 HttpStatusCode.Conflict => TypedResults.NotFound(result.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(result.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddParent), result.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(AddParent),
+                    result.StatusCode
+                )
             };
         }
         
@@ -174,7 +178,11 @@ internal static class CategoryEndpoints
             {
                 HttpStatusCode.Conflict => TypedResults.Conflict(addParentCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addParentCategoryResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddParent), addParentCategoryResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(AddParent),
+                    addParentCategoryResult.StatusCode
+                )
             };
         }
         
@@ -196,7 +204,11 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeParentCategoryResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(changeParentCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeParentCategoryResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeParent), changeParentCategoryResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(ChangeParent),
+                    changeParentCategoryResult.StatusCode
+                )
             };
         }
 
@@ -233,7 +245,11 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(addChildCategoryResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(addChildCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addChildCategoryResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddChild), addChildCategoryResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(AddChild),
+                    addChildCategoryResult.StatusCode
+                )
             };
         }
         
@@ -255,7 +271,11 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeChildCategoryResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(changeChildCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeChildCategoryResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeChild), changeChildCategoryResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(ChangeChild),
+                    changeChildCategoryResult.StatusCode
+                )
             };
         }
         
@@ -277,7 +297,11 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(addCategoryAttributeResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(addCategoryAttributeResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addCategoryAttributeResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddAttribute), addCategoryAttributeResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(AddAttribute),
+                    addCategoryAttributeResult.StatusCode
+                )
             };
         }
         
@@ -315,7 +339,11 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(addCategoryVariantResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(addCategoryVariantResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addCategoryVariantResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddVariant), addCategoryVariantResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(AddVariant),
+                    addCategoryVariantResult.StatusCode
+                )
             };
         }
         

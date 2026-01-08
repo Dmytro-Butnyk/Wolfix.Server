@@ -61,7 +61,11 @@ internal static class SupportEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(createSupportResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(createSupportResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(createSupportResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(Create), createSupportResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(SupportEndpoints),
+                    nameof(Create),
+                    createSupportResult.StatusCode
+                )
             };
         }
         
@@ -82,7 +86,11 @@ internal static class SupportEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(deleteResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(deleteResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(deleteResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(Delete), deleteResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(SupportEndpoints),
+                    nameof(Delete),
+                    deleteResult.StatusCode
+                )
             };
         }
         

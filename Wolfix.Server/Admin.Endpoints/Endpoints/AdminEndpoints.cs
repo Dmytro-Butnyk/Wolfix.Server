@@ -78,7 +78,11 @@ internal static class AdminEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(deleteResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(deleteResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(deleteResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(Delete), deleteResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(AdminEndpoints),
+                    nameof(Delete),
+                    deleteResult.StatusCode
+                )
             };
         }
         

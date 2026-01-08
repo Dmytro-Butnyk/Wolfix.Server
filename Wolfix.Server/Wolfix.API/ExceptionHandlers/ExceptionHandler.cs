@@ -5,7 +5,10 @@ using Shared.Endpoints.Exceptions;
 
 namespace Wolfix.API.ExceptionHandlers;
 
-public sealed class ExceptionHandler(IProblemDetailsService problemDetailsService) : IExceptionHandler
+public sealed class ExceptionHandler(
+    IProblemDetailsService problemDetailsService,
+    ILogger<ExceptionHandler> logger
+    ) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
@@ -23,6 +26,15 @@ public sealed class ExceptionHandler(IProblemDetailsService problemDetailsServic
             Detail = exception.Message,
             Instance = httpContext.Request.Path
         };
+        
+        logger.LogError(
+            "Title: {Title}, Status: {Status}, Detail: {Detail}, Instance: {Instance}, Exception: {Exception}",
+            problemDetails.Title,
+            problemDetails.Status,
+            problemDetails.Detail,
+            problemDetails.Instance,
+            exception
+        );
         
         httpContext.Response.StatusCode = statusCode;
 

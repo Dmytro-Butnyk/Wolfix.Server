@@ -43,22 +43,32 @@ public static class DependencyInjection
         var indexBuilder = Builders<BaseSupportRequest>.IndexKeys;
 
         var supportDashboardIndex = new CreateIndexModel<BaseSupportRequest>(
-            indexBuilder.Ascending(sr => sr.Status).Descending(sr => sr.CreatedAt),
+            indexBuilder
+                .Ascending(sr => sr.Status)
+                .Descending(sr => sr.CreatedAt),
             new CreateIndexOptions { Name = "idx_status_createdAt_desc" }
         );
 
         var supportFilterIndex = new CreateIndexModel<BaseSupportRequest>(
-            indexBuilder.Ascending(sr => sr.Status).Ascending(sr => sr.Category).Descending(sr => sr.CreatedAt),
+            indexBuilder
+                .Ascending(sr => sr.Status)
+                .Ascending(sr => sr.Category)
+                .Descending(sr => sr.CreatedAt),
             new CreateIndexOptions { Name = "idx_status_category_createdAt_desc" }
         );
 
         var customerIndex = new CreateIndexModel<BaseSupportRequest>(
-            indexBuilder.Ascending(sr => sr.CustomerId).Descending(sr => sr.CreatedAt),
+            indexBuilder
+                .Ascending(sr => sr.CustomerId)
+                .Descending(sr => sr.CreatedAt),
             new CreateIndexOptions { Name = "idx_customerId_createdAt_desc" }
         );
 
         var customerFilterIndex = new CreateIndexModel<BaseSupportRequest>(
-            indexBuilder.Ascending(sr => sr.CustomerId).Ascending(sr => sr.Category).Descending(sr => sr.CreatedAt),
+            indexBuilder
+                .Ascending(sr => sr.CustomerId)
+                .Ascending(sr => sr.Category)
+                .Descending(sr => sr.CreatedAt),
             new CreateIndexOptions { Name = "idx_customerId_category_createdAt_desc" }
         );
 

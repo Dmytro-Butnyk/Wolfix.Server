@@ -84,7 +84,11 @@ internal static class IdentityEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getTokenResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(getTokenResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(getTokenResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ContinueWithGoogle), getTokenResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(IdentityEndpoints),
+                    nameof(ContinueWithGoogle),
+                    getTokenResult.StatusCode
+                )
             };
         }
         
@@ -107,7 +111,11 @@ internal static class IdentityEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(logInResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(logInResult.ErrorMessage),
                 HttpStatusCode.Forbidden => TypedResults.Forbid(),
-                _ => throw new UnknownStatusCodeException(nameof(LogInAndGetUserRoles), logInResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(IdentityEndpoints),
+                    nameof(LogInAndGetUserRoles),
+                    logInResult.StatusCode
+                )
             };
         }
         
@@ -128,7 +136,11 @@ internal static class IdentityEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(getTokenResult.ErrorMessage),
                 HttpStatusCode.Forbidden => TypedResults.Forbid(),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getTokenResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(GetTokenByRole), getTokenResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(IdentityEndpoints),
+                    nameof(GetTokenByRole),
+                    getTokenResult.StatusCode
+                )
             };
         }
         
@@ -149,7 +161,11 @@ internal static class IdentityEndpoints
                 HttpStatusCode.Conflict => TypedResults.Conflict(registerResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(registerResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(registerResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(Register), registerResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(IdentityEndpoints),
+                    nameof(Register),
+                    registerResult.StatusCode
+                )
             };
         }
         
@@ -178,7 +194,11 @@ internal static class IdentityEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeEmailResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeEmailResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeEmail), changeEmailResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(IdentityEndpoints),
+                    nameof(ChangeEmail),
+                    changeEmailResult.StatusCode
+                )
             };
         }
         
@@ -216,7 +236,11 @@ internal static class IdentityEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changePasswordResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changePasswordResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangePassword), changePasswordResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(IdentityEndpoints),
+                    nameof(ChangePassword),
+                    changePasswordResult.StatusCode
+                )
             };
         }
         

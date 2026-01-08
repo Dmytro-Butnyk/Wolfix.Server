@@ -10,4 +10,6 @@ public interface IOrderRepository : IBaseRepository<OrderAggregate.Order>
     Task<OrderDetailsProjection?> GetOrderDetailsAsync(Guid orderId, CancellationToken ct);
     
     Task<IReadOnlyCollection<SellerOrderItemProjection>> GetSellerOrdersAsync(Guid sellerId, CancellationToken ct);
+    
+    Task<OrderAggregate.Order?> GetCustomerOrderAsync(Guid orderId, Guid customerId, CancellationToken ct);
 }

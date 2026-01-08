@@ -22,6 +22,8 @@ public sealed class SupportRequestService(
     IMongoDatabase mongoDb,
     EventBus eventBus)
 {
+    private static string _supportRequestsCollectionName = "support_requests";
+    
     public async Task<VoidResult> RespondAsync(Guid supportId, Guid supportRequestId, RespondOnRequestDto request, CancellationToken ct)
     {
         Domain.Entities.Support? support = await supportRepository.GetByIdAsNoTrackingAsync(supportId, ct);
@@ -34,7 +36,7 @@ public sealed class SupportRequestService(
             );
         }
 
-        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>("support_requests");
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
         BaseSupportRequest? supportRequest = await supportRequests.Find(sr => sr.Id == supportRequestId).FirstOrDefaultAsync(ct);
 
         if (supportRequest is null)
@@ -76,7 +78,7 @@ public sealed class SupportRequestService(
             );
         }
 
-        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>("support_requests");
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
         BaseSupportRequest? supportRequest = await supportRequests.Find(sr => sr.Id == supportRequestId).FirstOrDefaultAsync(ct);
 
         if (supportRequest is null)
@@ -124,19 +126,19 @@ public sealed class SupportRequestService(
             return VoidResult.Failure(fetchCustomerInfoResult);
         }
 
-        Result<BaseSupportRequest> createResult = GetSupportRequestByCategory(request);
+        Result<BaseSupportRequest> createResult = await CreateSupportRequestByCategory(request, ct);
         
         if (createResult.IsFailure)
         {
             return VoidResult.Failure(createResult);
         }
 
-        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>("support_requests");
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
         await supportRequests.InsertOneAsync(createResult.Value!, cancellationToken: ct);
         return VoidResult.Success();
     }
     
-    private Result<BaseSupportRequest> GetSupportRequestByCategory(CreateSupportRequestDto request)
+    private async Task<Result<BaseSupportRequest>> CreateSupportRequestByCategory(CreateSupportRequestDto request, CancellationToken ct)
         => request switch
         {
             CreateBugOrErrorSupportRequestDto orderDto => Result<BaseSupportRequest>.Copy(BugOrErrorSupportRequest.Create(
@@ -162,29 +164,50 @@ public sealed class SupportRequestService(
                 generalDto.Content,
                 generalDto.ExtraElements
             )),
-            CreateOrderIssueSupportRequestDto orderIssueDto => Result<BaseSupportRequest>.Copy(OrderIssueSupportRequest.Create(
-                orderIssueDto.FirstName,
-                orderIssueDto.LastName,
-                orderIssueDto.MiddleName,
-                orderIssueDto.PhoneNumber,
-                orderIssueDto.BirthDate,
-                orderIssueDto.CustomerId,
-                orderIssueDto.Category,
-                orderIssueDto.Content,
-                orderIssueDto.ExtraElements,
-                orderIssueDto.OrderId
-            )),
+            CreateOrderIssueSupportRequestDto orderIssueDto => Result<BaseSupportRequest>.Copy(
+                await CreateOrderIssueSupportRequest(orderIssueDto, ct)
+            ),
             _ => Result<BaseSupportRequest>.Failure("Invalid or unknown support category")
         };
+
+    private async Task<Result<OrderIssueSupportRequest>> CreateOrderIssueSupportRequest(CreateOrderIssueSupportRequestDto request, CancellationToken ct)
+    {
+        var @event = new CheckCustomerOrder(request.OrderId, request.OrderNumber, request.CustomerId);
+        VoidResult checkOrderData = await eventBus.PublishWithoutResultAsync(@event, ct);
+
+        if (checkOrderData.IsFailure)
+        {
+            return Result<OrderIssueSupportRequest>.Failure(checkOrderData);
+        }
+
+        return OrderIssueSupportRequest.Create(
+            request.FirstName,
+            request.LastName,
+            request.MiddleName,
+            request.PhoneNumber,
+            request.BirthDate,
+            request.CustomerId,
+            request.Category,
+            request.Content,
+            request.ExtraElements,
+            request.OrderId,
+            request.OrderNumber
+        );
+    }
     
     public async Task<IReadOnlyCollection<SupportRequestShortDto>> GetAllPendingAsync(CancellationToken ct)
     {
-        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>("support_requests");
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
         
         IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequests
             .Find(sr => sr.Status == SupportRequestStatus.Pending)
             .SortByDescending(sr => sr.CreatedAt)
-            .Project(sr => new SupportRequestShortProjection(sr.Id, sr.Category.ToString(), sr.RequestContent, sr.CreatedAt))
+            .Project(sr => new SupportRequestShortProjection(
+                sr.Id,
+                sr.Category.ToString(),
+                sr.RequestContent,
+                sr.CreatedAt
+            ))
             .ToListAsync(ct);
 
         IReadOnlyCollection<SupportRequestShortDto> dto = projection
@@ -203,12 +226,17 @@ public sealed class SupportRequestService(
                 $"Category '{category}' is invalid.");
         }
         
-        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>("support_requests");
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
         
         IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequests
             .Find(sr => sr.Status == SupportRequestStatus.Pending && sr.Category == categoryE)
             .SortByDescending(sr => sr.CreatedAt)
-            .Project(sr => new SupportRequestShortProjection(sr.Id, sr.Category.ToString(), sr.RequestContent, sr.CreatedAt))
+            .Project(sr => new SupportRequestShortProjection(
+                sr.Id,
+                sr.Category.ToString(),
+                sr.RequestContent,
+                sr.CreatedAt
+            ))
             .ToListAsync(ct);
         
         IReadOnlyCollection<SupportRequestShortDto> dto = projection
@@ -217,4 +245,128 @@ public sealed class SupportRequestService(
         
         return Result<IReadOnlyCollection<SupportRequestShortDto>>.Success(dto);
     }
+
+    public async Task<Result<IReadOnlyCollection<SupportRequestForCustomerShortDto>>> GetAllForCustomerAsync(
+        Guid customerId, CancellationToken ct, string? category)
+    {
+        var @event = new CheckCustomerExistsForCreatingSupportRequest(customerId);
+        VoidResult checkCustomerExistsResult = await eventBus.PublishWithoutResultAsync(@event, ct);
+
+        if (checkCustomerExistsResult.IsFailure)
+        {
+            return Result<IReadOnlyCollection<SupportRequestForCustomerShortDto>>.Failure(checkCustomerExistsResult);
+        }
+        
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
+
+        IReadOnlyCollection<SupportRequestForCustomerShortProjection> projection;
+        if (category is not null)
+        {
+            if (!Enum.TryParse<SupportRequestCategory>(category, out var categoryE))
+            {
+                return Result<IReadOnlyCollection<SupportRequestForCustomerShortDto>>.Failure(
+                    $"Category '{category}' is invalid.");
+            }
+            
+            projection = await supportRequests
+                .Find(sr => sr.CustomerId == customerId && sr.Category == categoryE)
+                .SortByDescending(sr => sr.CreatedAt)
+                .Project(sr => new SupportRequestForCustomerShortProjection(
+                    sr.Id,
+                    sr.Category,
+                    sr.RequestContent,
+                    sr.Status,
+                    sr.CreatedAt
+                ))
+                .ToListAsync(ct);
+        }
+        else
+        {
+            projection = await supportRequests
+                .Find(sr => sr.CustomerId == customerId)
+                .SortByDescending(sr => sr.CreatedAt)
+                .Project(sr => new SupportRequestForCustomerShortProjection(
+                    sr.Id,
+                    sr.Category,
+                    sr.RequestContent,
+                    sr.Status,
+                    sr.CreatedAt
+                ))
+                .ToListAsync(ct);
+        }
+
+        IReadOnlyCollection<SupportRequestForCustomerShortDto> dto = projection
+            .Select(pr => pr.ToCustomerShortDto())
+            .ToList();
+        
+        return Result<IReadOnlyCollection<SupportRequestForCustomerShortDto>>.Success(dto);
+    }
+
+    public async Task<Result<SupportRequestForCustomerDto>> GetForCustomerAsync(Guid customerId, Guid supportRequestId, CancellationToken ct)
+    {
+        var @event = new CheckCustomerExistsForCreatingSupportRequest(customerId);
+        VoidResult checkCustomerExistsResult = await eventBus.PublishWithoutResultAsync(@event, ct);
+
+        if (checkCustomerExistsResult.IsFailure)
+        {
+            return Result<SupportRequestForCustomerDto>.Failure(checkCustomerExistsResult);
+        }
+        
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
+
+        BaseSupportRequest? supportRequest = await supportRequests
+            .Find(sr => sr.Id == supportRequestId && sr.CustomerId == customerId)
+            .FirstOrDefaultAsync(ct);
+
+        if (supportRequest is null)
+        {
+            return Result<SupportRequestForCustomerDto>.Failure(
+                $"Support request with id: {supportRequestId} not found",
+                HttpStatusCode.NotFound
+            );
+        }
+
+        SupportRequestForCustomerProjection projection = new(
+            supportRequest.Id,
+            supportRequest.Category,
+            supportRequest.RequestContent,
+            supportRequest.Status,
+            supportRequest.ResponseContent,
+            supportRequest.CreatedAt,
+            supportRequest.ProcessedAt,
+            GetAdditionalProperties(supportRequest)
+        );
+
+        SupportRequestForCustomerDto dto = projection.ToCustomerDto();
+        
+        return Result<SupportRequestForCustomerDto>.Success(dto);
+    }
+
+    private List<SupportRequestAdditionalProperty> GetAdditionalProperties(BaseSupportRequest supportRequest)
+        => supportRequest switch
+        {
+            BugOrErrorSupportRequest bugOrError =>
+            [
+                new SupportRequestAdditionalProperty(
+                    nameof(bugOrError.PhotoUrl),
+                    bugOrError.PhotoUrl,
+                    bugOrError.PhotoUrl.GetType().Name
+                )
+            ],
+            GeneralSupportRequest => [],
+            OrderIssueSupportRequest orderIssue => 
+            [
+                new SupportRequestAdditionalProperty(
+                    nameof(orderIssue.OrderId),
+                    orderIssue.OrderId.ToString(),
+                    orderIssue.OrderId.ToString().GetType().Name
+                ),
+                new SupportRequestAdditionalProperty(
+                    nameof(orderIssue.OrderNumber),
+                    orderIssue.OrderNumber,
+                    orderIssue.OrderNumber.GetType().Name
+                )
+            ],
+            _ => throw new ArgumentException("Invalid or unknown support category")
+        };
 }
