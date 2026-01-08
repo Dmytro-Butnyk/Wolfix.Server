@@ -116,6 +116,7 @@ internal static class SupportRequestEndpoints
         return TypedResults.NoContent();
     }
 
+    //TODO: убрать этот метод и просто добавить [FromQuery] параметр в базовый ендпоинт
     private static async Task<Results<Ok<IReadOnlyCollection<SupportRequestShortDto>>, BadRequest<string>>>
         GetAllByCategory(
             [FromBody] string category,
