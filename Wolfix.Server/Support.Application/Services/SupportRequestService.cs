@@ -22,7 +22,7 @@ public sealed class SupportRequestService(
     IMongoDatabase mongoDb,
     EventBus eventBus)
 {
-    private static string _supportRequestsCollectionName = "support_requests";
+    private const string SupportRequestsCollectionName = "support_requests";
     
     public async Task<VoidResult> RespondAsync(Guid supportId, Guid supportRequestId, RespondOnRequestDto request, CancellationToken ct)
     {
@@ -36,7 +36,7 @@ public sealed class SupportRequestService(
             );
         }
 
-        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(SupportRequestsCollectionName);
         BaseSupportRequest? supportRequest = await supportRequests.Find(sr => sr.Id == supportRequestId).FirstOrDefaultAsync(ct);
 
         if (supportRequest is null)
@@ -78,7 +78,7 @@ public sealed class SupportRequestService(
             );
         }
 
-        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(SupportRequestsCollectionName);
         BaseSupportRequest? supportRequest = await supportRequests.Find(sr => sr.Id == supportRequestId).FirstOrDefaultAsync(ct);
 
         if (supportRequest is null)
@@ -133,7 +133,7 @@ public sealed class SupportRequestService(
             return VoidResult.Failure(createResult);
         }
 
-        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(SupportRequestsCollectionName);
         await supportRequests.InsertOneAsync(createResult.Value!, cancellationToken: ct);
         return VoidResult.Success();
     }
@@ -197,27 +197,26 @@ public sealed class SupportRequestService(
     
     public async Task<Result<IReadOnlyCollection<SupportRequestShortDto>>> GetAllPendingAsync(string? category, CancellationToken ct)
     {
-        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(SupportRequestsCollectionName);
 
         if (category is not null)
         {
             return await GetAllByCategoryAsync(category, ct);
         }
         
-        IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequests
+        IReadOnlyCollection<BaseSupportRequest> foundSupportRequests = await supportRequests
             .Find(sr => sr.Status == SupportRequestStatus.Pending)
             .SortByDescending(sr => sr.CreatedAt)
-            .Project(sr => new SupportRequestShortProjection(
-                sr.Id,
-                sr.Category.ToString(),
-                sr.RequestContent,
-                sr.CreatedAt,
-                sr.GetAdditionalProperties()
-            ))
             .ToListAsync(ct);
-
-        IReadOnlyCollection<SupportRequestShortDto> dto = projection
-            .Select(pr => pr.ToShortDto())
+        
+        IReadOnlyCollection<SupportRequestShortDto> dto = foundSupportRequests
+            .Select(fsr => new SupportRequestShortDto(
+                fsr.Id,
+                fsr.Category.ToString(),
+                fsr.RequestContent,
+                fsr.CreatedAt,
+                fsr.GetAdditionalProperties()
+            ))
             .ToList();
         
         return Result<IReadOnlyCollection<SupportRequestShortDto>>.Success(dto);
@@ -229,25 +228,24 @@ public sealed class SupportRequestService(
         if (!Enum.TryParse<SupportRequestCategory>(category,true, out var categoryE))
         {
             return Result<IReadOnlyCollection<SupportRequestShortDto>>.Failure(
-                $"Category '{category}' is invalid.");
+                $"Category: '{category}' is invalid.");
         }
         
-        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(SupportRequestsCollectionName);
         
-        IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequests
+        IReadOnlyCollection<BaseSupportRequest> foundSupportRequests = await supportRequests
             .Find(sr => sr.Status == SupportRequestStatus.Pending && sr.Category == categoryE)
             .SortByDescending(sr => sr.CreatedAt)
-            .Project(sr => new SupportRequestShortProjection(
-                sr.Id,
-                sr.Category.ToString(),
-                sr.RequestContent,
-                sr.CreatedAt,
-                sr.GetAdditionalProperties()
-            ))
             .ToListAsync(ct);
-        
-        IReadOnlyCollection<SupportRequestShortDto> dto = projection
-            .Select(pr => pr.ToShortDto())
+
+        IReadOnlyCollection<SupportRequestShortDto> dto = foundSupportRequests
+            .Select(fsr => new SupportRequestShortDto(
+                fsr.Id,
+                fsr.Category.ToString(),
+                fsr.RequestContent,
+                fsr.CreatedAt,
+                fsr.GetAdditionalProperties()
+            ))
             .ToList();
         
         return Result<IReadOnlyCollection<SupportRequestShortDto>>.Success(dto);
@@ -264,7 +262,7 @@ public sealed class SupportRequestService(
             return Result<IReadOnlyCollection<SupportRequestForCustomerShortDto>>.Failure(checkCustomerExistsResult);
         }
         
-        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(SupportRequestsCollectionName);
 
         IReadOnlyCollection<SupportRequestForCustomerShortProjection> projection;
         if (category is not null)
@@ -319,7 +317,7 @@ public sealed class SupportRequestService(
             return Result<SupportRequestForCustomerDto>.Failure(checkCustomerExistsResult);
         }
         
-        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
+        IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(SupportRequestsCollectionName);
 
         BaseSupportRequest? supportRequest = await supportRequests
             .Find(sr => sr.Id == supportRequestId && sr.CustomerId == customerId)
