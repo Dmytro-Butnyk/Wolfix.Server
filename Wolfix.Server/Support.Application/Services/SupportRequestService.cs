@@ -206,7 +206,8 @@ public sealed class SupportRequestService(
                 sr.Id,
                 sr.Category.ToString(),
                 sr.RequestContent,
-                sr.CreatedAt
+                sr.CreatedAt,
+                sr.GetAdditionalProperties()
             ))
             .ToListAsync(ct);
 
@@ -235,7 +236,8 @@ public sealed class SupportRequestService(
                 sr.Id,
                 sr.Category.ToString(),
                 sr.RequestContent,
-                sr.CreatedAt
+                sr.CreatedAt,
+                sr.GetAdditionalProperties()
             ))
             .ToListAsync(ct);
         
@@ -334,39 +336,11 @@ public sealed class SupportRequestService(
             supportRequest.ResponseContent,
             supportRequest.CreatedAt,
             supportRequest.ProcessedAt,
-            GetAdditionalProperties(supportRequest)
+            supportRequest.GetAdditionalProperties()
         );
 
         SupportRequestForCustomerDto dto = projection.ToCustomerDto();
         
         return Result<SupportRequestForCustomerDto>.Success(dto);
     }
-
-    private List<SupportRequestAdditionalProperty> GetAdditionalProperties(BaseSupportRequest supportRequest)
-        => supportRequest switch
-        {
-            BugOrErrorSupportRequest bugOrError =>
-            [
-                new SupportRequestAdditionalProperty(
-                    nameof(bugOrError.PhotoUrl),
-                    bugOrError.PhotoUrl,
-                    bugOrError.PhotoUrl.GetType().Name
-                )
-            ],
-            GeneralSupportRequest => [],
-            OrderIssueSupportRequest orderIssue => 
-            [
-                new SupportRequestAdditionalProperty(
-                    nameof(orderIssue.OrderId),
-                    orderIssue.OrderId.ToString(),
-                    orderIssue.OrderId.ToString().GetType().Name
-                ),
-                new SupportRequestAdditionalProperty(
-                    nameof(orderIssue.OrderNumber),
-                    orderIssue.OrderNumber,
-                    orderIssue.OrderNumber.GetType().Name
-                )
-            ],
-            _ => throw new ArgumentException("Invalid or unknown support category")
-        };
 }

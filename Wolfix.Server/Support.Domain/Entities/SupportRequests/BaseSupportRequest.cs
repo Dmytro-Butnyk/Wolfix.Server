@@ -4,6 +4,7 @@ using Shared.Domain.Models;
 using Shared.Domain.ValueObjects;
 using Support.Domain.Enums;
 using Support.Domain.Extensions;
+using Support.Domain.Projections;
 
 namespace Support.Domain.Entities.SupportRequests;
 
@@ -159,6 +160,34 @@ public abstract class BaseSupportRequest
         ProcessedAt = DateTime.UtcNow;
         return VoidResult.Success();       
     }
+    
+    public List<SupportRequestAdditionalProperty> GetAdditionalProperties()
+        => this switch
+        {
+            BugOrErrorSupportRequest bugOrError =>
+            [
+                new SupportRequestAdditionalProperty(
+                    nameof(bugOrError.PhotoUrl),
+                    bugOrError.PhotoUrl,
+                    bugOrError.PhotoUrl.GetType().Name
+                )
+            ],
+            GeneralSupportRequest => [],
+            OrderIssueSupportRequest orderIssue => 
+            [
+                new SupportRequestAdditionalProperty(
+                    nameof(orderIssue.OrderId),
+                    orderIssue.OrderId.ToString(),
+                    orderIssue.OrderId.ToString().GetType().Name
+                ),
+                new SupportRequestAdditionalProperty(
+                    nameof(orderIssue.OrderNumber),
+                    orderIssue.OrderNumber,
+                    orderIssue.OrderNumber.GetType().Name
+                )
+            ],
+            _ => throw new ArgumentException("Invalid or unknown support category")
+        };
 }
 
 public sealed record SupportRequestCreateData(FullName FullName, PhoneNumber PhoneNumber, BirthDate? BirthDate, SupportRequestCategory Category);
