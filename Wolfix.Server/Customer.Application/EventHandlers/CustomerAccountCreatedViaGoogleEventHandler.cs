@@ -22,7 +22,6 @@ public sealed class CustomerAccountCreatedViaGoogleEventHandler(ICustomerReposit
         CustomerAggregate customer = createCustomerResult.Value!;
 
         await customerRepository.AddAsync(customer, ct);
-        
         await customerRepository.SaveChangesAsync(ct);
         
         return Result<Guid>.Success(customer.Id);
