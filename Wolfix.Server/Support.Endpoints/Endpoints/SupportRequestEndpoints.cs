@@ -20,8 +20,8 @@ internal static class SupportRequestEndpoints
     public static void MapSupportRequestEndpoints(this IEndpointRouteBuilder app)
     {
         var supportGroup = app.MapGroup(Route)
-            .WithTags("Support Requests");
-            // .RequireAuthorization(AuthorizationRoles.Support);
+            .WithTags("Support Requests")
+            .RequireAuthorization(AuthorizationRoles.Support);
         
         supportGroup.MapGet("", GetAllPending)
             .WithSummary("Get all support requests");
