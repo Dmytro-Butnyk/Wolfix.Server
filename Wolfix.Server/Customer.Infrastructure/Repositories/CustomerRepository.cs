@@ -70,7 +70,8 @@ public sealed class CustomerRepository(CustomerContext context)
                 customer.PhoneNumber == null ? null : customer.PhoneNumber.Value,
                 customer.Address,
                 customer.BirthDate == null ? null : customer.BirthDate.Value,
-                customer.BonusesAmount))
+                customer.BonusesAmount
+            ))
             .FirstOrDefaultAsync(ct);
     }
 }

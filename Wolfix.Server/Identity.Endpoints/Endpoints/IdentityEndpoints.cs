@@ -58,6 +58,8 @@ internal static class IdentityEndpoints
             .WithSummary("Change password");
     }
 
+    //TODO: при регистрации фио заноситься с гугл аккаунта (то есть в базу ложиться) а вот в
+    // профиле не отображается. ендпоинт на получение данных с профиля в принципе возвращает фио как нул
     private static async Task<Results<Ok<string>, Conflict<string>, BadRequest<string>, InternalServerError<string>, NotFound<string>>>
         ContinueWithGoogle([FromBody] GoogleLoginDto request,
         [FromServices] IConfiguration configuration,
