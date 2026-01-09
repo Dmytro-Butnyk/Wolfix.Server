@@ -43,7 +43,7 @@ internal static class IdentityEndpoints
         customerGroup.MapPost("register", Register)
             .WithSummary("Register as customer");
         
-        customerGroup.MapPatch("google", ContinueWithGoogle)
+        customerGroup.MapPost("google", ContinueWithGoogle)
             .WithSummary("Continue with google");
     }
 
