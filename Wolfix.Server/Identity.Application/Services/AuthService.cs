@@ -190,13 +190,16 @@ public sealed class AuthService(
             
             accountId = registerAccountResult.Value;
             
-            var @event = new CustomerAccountCreated
+            var @event = new CustomerAccountCreatedViaGoogle
             {
-                AccountId = accountId
+                AccountId = accountId,
+                LastName = payload.FamilyName,
+                FirstName = payload.GivenName,
+                PhotoUrl = payload.Picture
             };
         
             Result<Guid> createCustomerAndGetIdResult = await eventBus
-                .PublishWithSingleResultAsync<CustomerAccountCreated, Guid>(@event, ct);
+                .PublishWithSingleResultAsync<CustomerAccountCreatedViaGoogle, Guid>(@event, ct);
 
             if (createCustomerAndGetIdResult.IsFailure)
             {

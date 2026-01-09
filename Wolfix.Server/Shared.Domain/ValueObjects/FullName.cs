@@ -9,17 +9,17 @@ public sealed class FullName
     
     public string LastName { get; init; }
     
-    public string MiddleName { get; init; }
+    public string? MiddleName { get; init; }
 
     [BsonConstructor]
-    private FullName(string firstName, string lastName, string middleName)
+    private FullName(string firstName, string lastName, string? middleName = null)
     {
         FirstName = firstName;
         LastName = lastName;
         MiddleName = middleName;
     }
 
-    public static Result<FullName> Create(string firstName, string lastName, string middleName)
+    public static Result<FullName> Create(string firstName, string lastName, string? middleName = null)
     {
         if (string.IsNullOrWhiteSpace(firstName))
         {
@@ -31,11 +31,14 @@ public sealed class FullName
             return Result<FullName>.Failure($"{nameof(lastName)} cannot be null or empty");
         }
 
-        if (string.IsNullOrWhiteSpace(middleName))
+        if (middleName is not null)
         {
-            return Result<FullName>.Failure($"{nameof(middleName)} cannot be null or empty");
+            if (string.IsNullOrWhiteSpace(middleName))
+            {
+                return Result<FullName>.Failure($"{nameof(middleName)} cannot be null or empty");
+            }
         }
-        
+
         FullName fullName = new(firstName, lastName, middleName);
         return Result<FullName>.Success(fullName);
     }

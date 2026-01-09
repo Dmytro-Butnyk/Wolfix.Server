@@ -47,6 +47,14 @@ public sealed class Customer : BaseEntity
         ViolationStatus = violationStatus;
     }
 
+    private Customer(Guid accountId, ViolationStatus violationStatus,
+        FullName fullName, string photoUrl)
+        : this(accountId, violationStatus)
+    {
+        PhotoUrl = photoUrl;
+        FullName = fullName;
+    }
+
     public static Result<Customer> Create(Guid accountId)
     {
         if (accountId == Guid.Empty)
@@ -55,6 +63,31 @@ public sealed class Customer : BaseEntity
         }
 
         Customer customer = new(accountId, ViolationStatus.Create().Value!);
+        return Result<Customer>.Success(customer);
+    }
+
+    public static Result<Customer> CreateViaGoogle(Guid accountId, string lastName, string firstName, string photoUrl)
+    {
+        if (accountId == Guid.Empty)
+        {
+            return Result<Customer>.Failure($"{nameof(accountId)} cannot be empty");
+        }
+
+        Result<FullName> createFullNameResult = FullName.Create(firstName, lastName);
+
+        if (createFullNameResult.IsFailure)
+        {
+            return Result<Customer>.Failure(createFullNameResult);
+        }
+
+        FullName fullName = createFullNameResult.Value!;
+
+        if (string.IsNullOrWhiteSpace(photoUrl))
+        {
+            return Result<Customer>.Failure($"{nameof(photoUrl)} cannot be empty");
+        }
+
+        Customer customer = new(accountId, ViolationStatus.Create().Value!, fullName, photoUrl);
         return Result<Customer>.Success(customer);
     }
     
