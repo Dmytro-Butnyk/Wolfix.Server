@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Routing;
 using Shared.Domain.Models;
 using Shared.Endpoints;
 using Shared.Endpoints.Exceptions;
-using Support.Application.Dto;
 using Support.Application.Dto.SupportRequest;
 using Support.Application.Dto.SupportRequest.Create;
 using Support.Application.Services;
@@ -33,9 +32,6 @@ internal static class SupportRequestEndpoints
         supportGroup.MapPatch("{supportRequestId:guid}/supports/{supportId:guid}/cancel", Cancel)
             .WithSummary("Cancel support request");
 
-        supportGroup.MapGet("by-category", GetAllByCategory)
-            .WithSummary("Get all support requests by category");
-
         var customerGroup = app.MapGroup(Route)
             .WithTags("Support Requests")
             .RequireAuthorization(AuthorizationRoles.Customer);
@@ -50,13 +46,19 @@ internal static class SupportRequestEndpoints
             .WithSummary("Get support request full info for customer");
     }
 
-    private static async Task<Ok<IReadOnlyCollection<SupportRequestShortDto>>> GetAllPending(
+    private static async Task<Results<Ok<IReadOnlyCollection<SupportRequestShortDto>>, BadRequest<string>>> GetAllPending(
         [FromServices] SupportRequestService supportRequestService,
-        CancellationToken ct)
+        CancellationToken ct,
+        [FromQuery] string? category = null)
     {
-        IReadOnlyCollection<SupportRequestShortDto> getAllRequestsResult = await supportRequestService.GetAllPendingAsync(ct);
+        Result<IReadOnlyCollection<SupportRequestShortDto>> result = await supportRequestService.GetAllPendingAsync(category, ct);
 
-        return TypedResults.Ok(getAllRequestsResult);
+        if (result.IsFailure)
+        {
+            return TypedResults.BadRequest(result.ErrorMessage);
+        }
+
+        return TypedResults.Ok(result.Value!);
     }
 
     private static async Task<Results<NoContent, NotFound<string>, BadRequest<string>>> Create(
@@ -114,24 +116,6 @@ internal static class SupportRequestEndpoints
         }
         
         return TypedResults.NoContent();
-    }
-
-    //TODO: убрать этот метод и просто добавить [FromQuery] параметр в базовый ендпоинт
-    private static async Task<Results<Ok<IReadOnlyCollection<SupportRequestShortDto>>, BadRequest<string>>>
-        GetAllByCategory(
-            [FromBody] string category,
-            [FromServices] SupportRequestService supportRequestService,
-            CancellationToken ct)
-    {
-        Result<IReadOnlyCollection<SupportRequestShortDto>> result
-            = await supportRequestService.GetAllByCategoryAsync(category, ct);
-        
-        if (result.IsFailure)
-        {
-            return TypedResults.BadRequest(result.ErrorMessage);
-        }
-        
-        return TypedResults.Ok(result.Value);
     }
 
     private static async Task<Results<Ok<IReadOnlyCollection<SupportRequestForCustomerShortDto>>, NotFound<string>, BadRequest<string>>>

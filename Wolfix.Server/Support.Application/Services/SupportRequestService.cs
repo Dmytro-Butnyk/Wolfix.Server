@@ -195,9 +195,14 @@ public sealed class SupportRequestService(
         );
     }
     
-    public async Task<IReadOnlyCollection<SupportRequestShortDto>> GetAllPendingAsync(CancellationToken ct)
+    public async Task<Result<IReadOnlyCollection<SupportRequestShortDto>>> GetAllPendingAsync(string? category, CancellationToken ct)
     {
         IMongoCollection<BaseSupportRequest> supportRequests = mongoDb.GetCollection<BaseSupportRequest>(_supportRequestsCollectionName);
+
+        if (category is not null)
+        {
+            return await GetAllByCategoryAsync(category, ct);
+        }
         
         IReadOnlyCollection<SupportRequestShortProjection> projection = await supportRequests
             .Find(sr => sr.Status == SupportRequestStatus.Pending)
@@ -215,10 +220,10 @@ public sealed class SupportRequestService(
             .Select(pr => pr.ToShortDto())
             .ToList();
         
-        return dto;
+        return Result<IReadOnlyCollection<SupportRequestShortDto>>.Success(dto);
     }
 
-    public async Task<Result<IReadOnlyCollection<SupportRequestShortDto>>> GetAllByCategoryAsync(string category,
+    private async Task<Result<IReadOnlyCollection<SupportRequestShortDto>>> GetAllByCategoryAsync(string category,
         CancellationToken ct)
     {
         if (!Enum.TryParse<SupportRequestCategory>(category,true, out var categoryE))
