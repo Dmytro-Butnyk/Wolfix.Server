@@ -11,7 +11,7 @@ public interface IAuthStore
     
     Task<Result<Guid>> CheckUserExistsAndHasRoleAsync(string email, string password, string role, CancellationToken ct);
     
-    Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role, CancellationToken ct, string? authProvider = "Custom");
+    Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role, CancellationToken ct, string authProvider = "Custom");
     
     Task<VoidResult> AddSellerRoleAsync(Guid accountId, CancellationToken ct);
     

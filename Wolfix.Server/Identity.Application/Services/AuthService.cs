@@ -181,7 +181,8 @@ public sealed class AuthService(
         {
             const string password = "NULL BECAUSE REGISTERED VIA GOOGLE fsjJKI!23";
 
-            Result<Guid> registerAccountResult = await authStore.RegisterAccountAsync(payload.Email, password, Roles.Customer, ct);
+            Result<Guid> registerAccountResult = await authStore.RegisterAccountAsync(
+                payload.Email, password, Roles.Customer, ct, "Google");
 
             if (registerAccountResult.IsFailure)
             {

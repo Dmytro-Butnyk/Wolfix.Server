@@ -111,7 +111,7 @@ internal sealed class AuthStore(
         return Result<Account>.Success(user);
     }
 
-    public async Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role, CancellationToken ct, string? authProvider = "Custom")
+    public async Task<Result<Guid>> RegisterAccountAsync(string email, string password, string role, CancellationToken ct, string authProvider = "Custom")
     {
         ct.ThrowIfCancellationRequested();
 
@@ -122,13 +122,9 @@ internal sealed class AuthStore(
             return Result<Guid>.Failure("This email already taken", HttpStatusCode.Conflict);
         }
 
-        var authProviderEnum = AccountAuthProvider.Custom;
-        if (authProvider != null)
+        if (!Enum.TryParse<AccountAuthProvider>(authProvider, out var authProviderEnum)) 
         {
-            if (!Enum.TryParse(authProvider, out authProviderEnum))
-            {
-                return Result<Guid>.Failure($"Invalid auth provider: {authProvider}");
-            }
+            return Result<Guid>.Failure($"Invalid or unknown auth provider: {authProvider}");
         }
 
         var user = new Account
