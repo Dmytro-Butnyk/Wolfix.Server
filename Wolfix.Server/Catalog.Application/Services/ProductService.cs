@@ -49,8 +49,7 @@ public sealed class ProductService(
             return VoidResult.Failure("Invalid status");
         }
 
-        //todo: вместо хардкода указать тут addProductDto.ContentType
-        if (!Enum.TryParse("Photo", out BlobResourceType blobResourceType))
+        if (!Enum.TryParse(addProductDto.ContentType, out BlobResourceType blobResourceType))
         {
             return VoidResult.Failure("Invalid blob resource type");
         }
@@ -64,9 +63,7 @@ public sealed class ProductService(
             .Select(attr => new AddAttributeValueObject(attr.Id, attr.Value))
             .ToList();
 
-        //todo: исправить логику доменного сервиса (сейчас продукт создается внутри него, что не очень хорошо)
-
-        Result<Guid> result = await productDomainService.AddProductAsync(
+        Result<Product> result = await productDomainService.CreateProductWithAttributesAsync(
             addProductDto.Title,
             addProductDto.Description,
             addProductDto.Price,
@@ -81,6 +78,9 @@ public sealed class ProductService(
         {
             return VoidResult.Failure(result);
         }
+        
+        await productRepository.AddAsync(result.Value!, ct);
+        await productRepository.SaveChangesAsync(ct);
 
         //todo: пофиксить (ажур аккаунт срок истёк)
         

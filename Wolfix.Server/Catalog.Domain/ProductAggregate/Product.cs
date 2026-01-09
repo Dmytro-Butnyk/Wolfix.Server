@@ -502,7 +502,7 @@ public sealed class Product : BaseEntity
     #endregion
     
     #region productAttributeValues
-    public VoidResult AddProductAttributeValue(string key, string value, Guid attributeId)
+    public VoidResult AddProductAttributeValue(Guid attributeId, string key, string value)
     {
         if (_productAttributeValues.Any(av => av.CategoryAttributeId == attributeId && av.Key == value))
         {
