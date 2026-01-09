@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
+using GooglePayload = Google.Apis.Auth.GoogleJsonWebSignature.Payload;
 
 namespace Identity.Application.Services;
 
@@ -170,7 +171,7 @@ public sealed class AuthService(
         return VoidResult.Success();
     }
 
-    public async Task<Result<string>> ContinueWithGoogleAsync(GoogleJsonWebSignature.Payload payload, CancellationToken ct)
+    public async Task<Result<string>> ContinueWithGoogleAsync(GooglePayload payload, CancellationToken ct)
     {
         Result<Guid> checkUserExistsResult = await authStore.CheckUserExistsAsync(payload.Email, ct);
 
