@@ -179,58 +179,84 @@ public sealed class AuthService(
         
         if (checkUserExistsResult.IsFailure)
         {
-            const string password = "NULL BECAUSE REGISTERED VIA GOOGLE fsjJKI!23";
+            Result<(Guid, Guid)> registerViaGoogleResult = await RegisterViaGoogle(payload, ct);
 
-            Result<Guid> registerAccountResult = await authStore.RegisterAccountAsync(
-                payload.Email, password, Roles.Customer, ct, "Google");
-
-            if (registerAccountResult.IsFailure)
+            if (registerViaGoogleResult.IsFailure)
             {
-                return Result<string>.Failure(registerAccountResult);
+                return Result<string>.Failure(registerViaGoogleResult);
             }
-            
-            accountId = registerAccountResult.Value;
-            
-            var @event = new CustomerAccountCreatedViaGoogle
-            {
-                AccountId = accountId,
-                LastName = payload.FamilyName,
-                FirstName = payload.GivenName,
-                PhotoUrl = payload.Picture
-            };
-        
-            Result<Guid> createCustomerAndGetIdResult = await eventBus
-                .PublishWithSingleResultAsync<CustomerAccountCreatedViaGoogle, Guid>(@event, ct);
 
-            if (createCustomerAndGetIdResult.IsFailure)
-            {
-                return Result<string>.Failure(createCustomerAndGetIdResult);
-            }
-        
-            customerId = createCustomerAndGetIdResult.Value;
+            (accountId, customerId) = registerViaGoogleResult.Value;
         }
         else
         {
             accountId = checkUserExistsResult.Value;
 
-            var @event = new GetCustomerProfileId
+            Result<Guid> logInViaGoogleResult = await LogInViaGoogle(accountId, ct);
+
+            if (logInViaGoogleResult.IsFailure)
             {
-                AccountId = accountId
-            };
-            
-            Result<Guid> getCustomerProfileIdResult = await eventBus
-                .PublishWithSingleResultAsync<GetCustomerProfileId, Guid>(@event, ct);
-            
-            if (getCustomerProfileIdResult.IsFailure)
-            {
-                return Result<string>.Failure(getCustomerProfileIdResult);
+                return Result<string>.Failure(logInViaGoogleResult);
             }
-            
-            customerId = getCustomerProfileIdResult.Value;
+
+            customerId = logInViaGoogleResult.Value;
         }
         
         string token = jwtService.GenerateToken(accountId, customerId, payload.Email, Roles.Customer);
         
         return Result<string>.Success(token);
+    }
+
+    private async Task<Result<(Guid, Guid)>> RegisterViaGoogle(GooglePayload payload, CancellationToken ct)
+    {
+        const string password = "NULL BECAUSE REGISTERED VIA GOOGLE fsjJKI!23";
+
+        Result<Guid> registerAccountResult = await authStore.RegisterAccountAsync(
+            payload.Email, password, Roles.Customer, ct, "Google");
+
+        if (registerAccountResult.IsFailure)
+        {
+            return Result<(Guid, Guid)>.Failure(registerAccountResult);
+        }
+            
+        Guid accountId = registerAccountResult.Value;
+            
+        var @event = new CustomerAccountCreatedViaGoogle
+        {
+            AccountId = accountId,
+            LastName = payload.FamilyName,
+            FirstName = payload.GivenName,
+            PhotoUrl = payload.Picture
+        };
+        
+        Result<Guid> createCustomerAndGetIdResult = await eventBus
+            .PublishWithSingleResultAsync<CustomerAccountCreatedViaGoogle, Guid>(@event, ct);
+
+        if (createCustomerAndGetIdResult.IsFailure)
+        {
+            return Result<(Guid, Guid)>.Failure(createCustomerAndGetIdResult);
+        }
+        
+        Guid customerId = createCustomerAndGetIdResult.Value;
+        
+        return Result<(Guid, Guid)>.Success((accountId, customerId));
+    }
+
+    private async Task<Result<Guid>> LogInViaGoogle(Guid accountId, CancellationToken ct)
+    {
+        var @event = new GetCustomerProfileId
+        {
+            AccountId = accountId
+        };
+            
+        Result<Guid> getCustomerProfileIdResult = await eventBus
+            .PublishWithSingleResultAsync<GetCustomerProfileId, Guid>(@event, ct);
+            
+        if (getCustomerProfileIdResult.IsFailure)
+        {
+            return Result<Guid>.Failure(getCustomerProfileIdResult);
+        }
+            
+        return Result<Guid>.Success(getCustomerProfileIdResult.Value);
     }
 }
