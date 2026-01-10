@@ -18,22 +18,29 @@ public sealed class AuthService(
     JwtService jwtService,
     EventBus eventBus)
 {
+    private const string GooglePassword = "NULL BECAUSE REGISTERED VIA GOOGLE fsjJKI!23";
+    
     public async Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(LogInDto logInDto, CancellationToken ct)
     {
         Result<UserRolesProjection> getUserRolesResult = await authStore.LogInAndGetUserRolesAsync(logInDto.Email, logInDto.Password, ct);
 
-        if (!getUserRolesResult.IsSuccess)
+        if (getUserRolesResult.IsFailure)
         {
-            return Result<UserRolesDto>.Failure(getUserRolesResult.ErrorMessage!, getUserRolesResult.StatusCode);
+            return Result<UserRolesDto>.Failure(getUserRolesResult);
         }
 
         UserRolesDto dto = getUserRolesResult.Value!.ToDto();
         return Result<UserRolesDto>.Success(dto);
     }
 
-    public async Task<Result<string>> GetTokenByRoleAsync(TokenDto dto, CancellationToken ct)
+    public async Task<Result<string>> GetTokenByRoleAsync(TokenDto dto, CancellationToken ct, string authProvider = "Custom")
     {
-        Result<Guid> checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRoleAsync(dto.Email, dto.Password, dto.Role, ct);
+        Result<Guid> checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRoleAsync(
+            dto.Email,
+            password: authProvider == "Custom" ? dto.Password : GooglePassword,
+            dto.Role,
+            ct
+        );
 
         if (checkUserExistsAndHasRoleResult.IsFailure)
         {
@@ -171,52 +178,48 @@ public sealed class AuthService(
         return VoidResult.Success();
     }
 
-    public async Task<Result<string>> ContinueWithGoogleAsync(GooglePayload payload, CancellationToken ct)
+    public async Task<Result<UserRolesDto>> ContinueWithGoogleAndGetRolesAsync(GooglePayload payload, CancellationToken ct)
     {
         Result<Guid> checkUserExistsResult = await authStore.CheckUserExistsAsync(payload.Email, ct);
 
-        Guid accountId, customerId;
+        UserRolesDto dto;
         
         if (checkUserExistsResult.IsFailure)
         {
-            Result<(Guid, Guid)> registerViaGoogleResult = await RegisterViaGoogle(payload, ct);
+            Result<Guid> registerViaGoogleResult = await RegisterViaGoogle(payload, GooglePassword, ct);
 
             if (registerViaGoogleResult.IsFailure)
             {
-                return Result<string>.Failure(registerViaGoogleResult);
+                return Result<UserRolesDto>.Failure(registerViaGoogleResult);
             }
-
-            (accountId, customerId) = registerViaGoogleResult.Value;
+            
+            Guid accountId = registerViaGoogleResult.Value;
+            
+            dto = new UserRolesDto(accountId, payload.Email, [Roles.Customer]);
         }
         else
         {
-            accountId = checkUserExistsResult.Value;
+            Result<UserRolesProjection> getUserRolesResult = await authStore.LogInViaGoogleAndGetUserRolesAsync(payload.Email, GooglePassword, ct);
 
-            Result<Guid> logInViaGoogleResult = await LogInViaGoogle(accountId, ct);
-
-            if (logInViaGoogleResult.IsFailure)
+            if (getUserRolesResult.IsFailure)
             {
-                return Result<string>.Failure(logInViaGoogleResult);
+                return Result<UserRolesDto>.Failure(getUserRolesResult);
             }
 
-            customerId = logInViaGoogleResult.Value;
+            dto = getUserRolesResult.Value!.ToDto();
         }
         
-        string token = jwtService.GenerateToken(accountId, customerId, payload.Email, Roles.Customer);
-        
-        return Result<string>.Success(token);
+        return Result<UserRolesDto>.Success(dto);
     }
 
-    private async Task<Result<(Guid, Guid)>> RegisterViaGoogle(GooglePayload payload, CancellationToken ct)
+    private async Task<Result<Guid>> RegisterViaGoogle(GooglePayload payload, string password, CancellationToken ct)
     {
-        const string password = "NULL BECAUSE REGISTERED VIA GOOGLE fsjJKI!23";
-
         Result<Guid> registerAccountResult = await authStore.RegisterAccountAsync(
             payload.Email, password, Roles.Customer, ct, "Google");
 
         if (registerAccountResult.IsFailure)
         {
-            return Result<(Guid, Guid)>.Failure(registerAccountResult);
+            return Result<Guid>.Failure(registerAccountResult);
         }
             
         Guid accountId = registerAccountResult.Value;
@@ -234,29 +237,9 @@ public sealed class AuthService(
 
         if (createCustomerAndGetIdResult.IsFailure)
         {
-            return Result<(Guid, Guid)>.Failure(createCustomerAndGetIdResult);
+            return Result<Guid>.Failure(createCustomerAndGetIdResult);
         }
         
-        Guid customerId = createCustomerAndGetIdResult.Value;
-        
-        return Result<(Guid, Guid)>.Success((accountId, customerId));
-    }
-
-    private async Task<Result<Guid>> LogInViaGoogle(Guid accountId, CancellationToken ct)
-    {
-        var @event = new GetCustomerProfileId
-        {
-            AccountId = accountId
-        };
-            
-        Result<Guid> getCustomerProfileIdResult = await eventBus
-            .PublishWithSingleResultAsync<GetCustomerProfileId, Guid>(@event, ct);
-            
-        if (getCustomerProfileIdResult.IsFailure)
-        {
-            return Result<Guid>.Failure(getCustomerProfileIdResult);
-        }
-            
-        return Result<Guid>.Success(getCustomerProfileIdResult.Value);
+        return Result<Guid>.Success(createCustomerAndGetIdResult.Value);
     }
 }

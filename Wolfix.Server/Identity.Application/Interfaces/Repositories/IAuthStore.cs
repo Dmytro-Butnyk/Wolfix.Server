@@ -7,6 +7,8 @@ public interface IAuthStore
 {
     Task<Result<UserRolesProjection>> LogInAndGetUserRolesAsync(string email, string password, CancellationToken ct);
     
+    Task<Result<UserRolesProjection>> LogInViaGoogleAndGetUserRolesAsync(string email, string password, CancellationToken ct);
+    
     Task<Result<Guid>> CheckUserExistsAsync(string email, CancellationToken ct);
     
     Task<Result<Guid>> CheckUserExistsAndHasRoleAsync(string email, string password, string role, CancellationToken ct);

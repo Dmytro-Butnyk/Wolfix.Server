@@ -22,29 +22,70 @@ internal sealed class AuthStore(
 
         Result<Account> getUserResult = await GetUserAsync(email, password, ct);
 
-        if (!getUserResult.IsSuccess)
+        if (getUserResult.IsFailure)
         {
-            return Result<UserRolesProjection>.Failure(getUserResult.ErrorMessage!, getUserResult.StatusCode);
+            return Result<UserRolesProjection>.Failure(getUserResult);
         }
         
         Account user = getUserResult.Value!;
-
+        
         if (user.AuthProvider != AccountAuthProvider.Custom)
         {
-            return Result<UserRolesProjection>.Failure("User is not registered with custom auth provider", HttpStatusCode.Forbidden);
+            return Result<UserRolesProjection>.Failure(
+                "User is not registered with custom auth provider",
+                HttpStatusCode.Forbidden
+            );
         }
         
         IList<string> userRoles = await userManager.GetRolesAsync(user);
 
         if (userRoles.Count == 0)
         {
-            return Result<UserRolesProjection>.Failure("User does not have any roles", HttpStatusCode.InternalServerError);
+            return Result<UserRolesProjection>.Failure(
+                "User does not have any roles",
+                HttpStatusCode.InternalServerError
+            );
         }
         
         UserRolesProjection userRolesProjection = new(user.Id, user.Email!, userRoles);
         return Result<UserRolesProjection>.Success(userRolesProjection);
     }
 
+    public async Task<Result<UserRolesProjection>> LogInViaGoogleAndGetUserRolesAsync(string email, string password, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        Result<Account> getUserResult = await GetUserAsync(email, password, ct);
+
+        if (getUserResult.IsFailure)
+        {
+            return Result<UserRolesProjection>.Failure(getUserResult);
+        }
+        
+        Account user = getUserResult.Value!;
+        
+        if (user.AuthProvider != AccountAuthProvider.Google)
+        {
+            return Result<UserRolesProjection>.Failure(
+                "User is not registered with Google auth provider",
+                HttpStatusCode.Forbidden
+            );
+        }
+        
+        IList<string> userRoles = await userManager.GetRolesAsync(user);
+
+        if (userRoles.Count == 0)
+        {
+            return Result<UserRolesProjection>.Failure(
+                "User does not have any roles",
+                HttpStatusCode.InternalServerError
+            );
+        }
+        
+        UserRolesProjection userRolesProjection = new(user.Id, user.Email!, userRoles);
+        return Result<UserRolesProjection>.Success(userRolesProjection);
+    }
+    
     public async Task<Result<Guid>> CheckUserExistsAsync(string email, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();

@@ -48,33 +48,33 @@ public sealed class Seller : BaseEntity
         
         Result<FullName> createFullNameResult = FullName.Create(firstName, lastName, middleName);
 
-        if (!createFullNameResult.IsSuccess)
+        if (createFullNameResult.IsFailure)
         {
-            return Result<Seller>.Failure(createFullNameResult.ErrorMessage!, createFullNameResult.StatusCode);
+            return Result<Seller>.Failure(createFullNameResult);
         }
         FullName newFullName = createFullNameResult.Value!;
         
         Result<PhoneNumber> createPhoneNumberResult = PhoneNumber.Create(phoneNumber);
 
-        if (!createPhoneNumberResult.IsSuccess)
+        if (createPhoneNumberResult.IsFailure)
         {
-            return Result<Seller>.Failure(createPhoneNumberResult.ErrorMessage!, createPhoneNumberResult.StatusCode);
+            return Result<Seller>.Failure(createPhoneNumberResult);
         }
         PhoneNumber newPhoneNumber = createPhoneNumberResult.Value!;
         
         Result<Address> createAddressResult = Address.Create(city, street, houseNumber, apartmentNumber);
         
-        if (!createAddressResult.IsSuccess)
+        if (createAddressResult.IsFailure)
         {
-            return Result<Seller>.Failure(createAddressResult.ErrorMessage!, createAddressResult.StatusCode);
+            return Result<Seller>.Failure(createAddressResult);
         }
         Address newAddress = createAddressResult.Value!;
         
         Result<BirthDate> createBirthDateResult = BirthDate.Create(birthDate);
 
-        if (!createBirthDateResult.IsSuccess)
+        if (createBirthDateResult.IsFailure)
         {
-            return Result<Seller>.Failure(createBirthDateResult.ErrorMessage!, createBirthDateResult.StatusCode);
+            return Result<Seller>.Failure(createBirthDateResult);
         }
         BirthDate newBirthDate = createBirthDateResult.Value!;
 
@@ -133,9 +133,9 @@ public sealed class Seller : BaseEntity
     {
         Result<FullName> createFullNameResult = FullName.Create(firstName, lastName, middleName);
         
-        if (!createFullNameResult.IsSuccess)
+        if (createFullNameResult.IsFailure)
         {
-            return VoidResult.Failure(createFullNameResult.ErrorMessage!, createFullNameResult.StatusCode);
+            return VoidResult.Failure(createFullNameResult);
         }
         
         FullName = createFullNameResult.Value!;
@@ -146,9 +146,9 @@ public sealed class Seller : BaseEntity
     {
         Result<PhoneNumber> createPhoneNumberResult = PhoneNumber.Create(phoneNumber);
 
-        if (!createPhoneNumberResult.IsSuccess)
+        if (createPhoneNumberResult.IsFailure)
         {
-            return VoidResult.Failure(createPhoneNumberResult.ErrorMessage!, createPhoneNumberResult.StatusCode);
+            return VoidResult.Failure(createPhoneNumberResult);
         }
         
         PhoneNumber = createPhoneNumberResult.Value!;
@@ -159,9 +159,9 @@ public sealed class Seller : BaseEntity
     {
         Result<Address> createAddressResult = Address.Create(city, street, houseNumber, apartmentNumber);
         
-        if (!createAddressResult.IsSuccess)
+        if (createAddressResult.IsFailure)
         {
-            return VoidResult.Failure(createAddressResult.ErrorMessage!, createAddressResult.StatusCode);
+            return VoidResult.Failure(createAddressResult);
         }
         
         Address = createAddressResult.Value!;
@@ -172,9 +172,9 @@ public sealed class Seller : BaseEntity
     {
         Result<BirthDate> createBirthDateResult = BirthDate.Create(birthDate);
         
-        if (!createBirthDateResult.IsSuccess)
+        if (createBirthDateResult.IsFailure)
         {
-            return VoidResult.Failure(createBirthDateResult.ErrorMessage!, createBirthDateResult.StatusCode);
+            return VoidResult.Failure(createBirthDateResult);
         }
         
         BirthDate = createBirthDateResult.Value!;
@@ -209,9 +209,9 @@ public sealed class Seller : BaseEntity
         
         Result<SellerCategory> createSellerCategory = SellerCategory.Create(this, categoryId, name);
         
-        if (!createSellerCategory.IsSuccess)
+        if (createSellerCategory.IsFailure)
         {
-            return VoidResult.Failure(createSellerCategory.ErrorMessage!, createSellerCategory.StatusCode);
+            return VoidResult.Failure(createSellerCategory);
         }
         
         SellerCategory sellerCategory = createSellerCategory.Value!;

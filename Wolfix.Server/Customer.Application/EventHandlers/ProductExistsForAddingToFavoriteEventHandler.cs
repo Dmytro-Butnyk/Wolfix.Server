@@ -30,7 +30,7 @@ internal sealed class ProductExistsForAddingToFavoriteEventHandler(ICustomerRepo
             @event.FinalPrice
         );
         
-        if (!addToFavoriteResult.IsSuccess)
+        if (addToFavoriteResult.IsFailure)
         {
             return addToFavoriteResult;
         }

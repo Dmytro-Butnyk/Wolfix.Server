@@ -138,7 +138,7 @@ public sealed class CategoryService(
         Result<Category> createCategoryResult = Category.Create(Guid.CreateVersion7(), "URL",
             request.Name, request.Description);
         
-        if (!createCategoryResult.IsSuccess)
+        if (createCategoryResult.IsFailure)
         {
             return VoidResult.Failure(createCategoryResult);
         }
@@ -203,7 +203,7 @@ public sealed class CategoryService(
         Result<Category> createCategoryResult = Category.Create(Guid.CreateVersion7(), "URL",
             request.Name, request.Description, parentCategory);
 
-        if (!createCategoryResult.IsSuccess)
+        if (createCategoryResult.IsFailure)
         {
             return VoidResult.Failure(createCategoryResult);
         }
@@ -212,14 +212,14 @@ public sealed class CategoryService(
 
         VoidResult addAttributesResult = category.AddProductAttributes(request.AttributeKeys);
 
-        if (!addAttributesResult.IsSuccess)
+        if (addAttributesResult.IsFailure)
         {
             return VoidResult.Failure(addAttributesResult);
         }
         
         VoidResult addVariantsResult = category.AddProductVariants(request.VariantKeys);
 
-        if (!addVariantsResult.IsSuccess)
+        if (addVariantsResult.IsFailure)
         {
             return VoidResult.Failure(addVariantsResult);
         }
@@ -262,7 +262,7 @@ public sealed class CategoryService(
 
         VoidResult changeCategoryName = parentCategory.ChangeName(request.Name);
 
-        if (!changeCategoryName.IsSuccess) 
+        if (changeCategoryName.IsFailure) 
         {
             return Result<ParentCategoryDto>.Failure(changeCategoryName);
         }
@@ -271,7 +271,7 @@ public sealed class CategoryService(
         
         VoidResult changeCategoryDescription = parentCategory.ChangeDescription(request.Description);
 
-        if (!changeCategoryDescription.IsSuccess)
+        if (changeCategoryDescription.IsFailure)
         {
             return Result<ParentCategoryDto>.Failure(changeCategoryDescription);
         }
@@ -321,7 +321,7 @@ public sealed class CategoryService(
 
         VoidResult changeCategoryName = childCategory.ChangeName(request.Name);
             
-        if (!changeCategoryName.IsSuccess)
+        if (changeCategoryName.IsFailure)
         {
             return Result<ChildCategoryDto>.Failure(changeCategoryName);
         }
@@ -330,7 +330,7 @@ public sealed class CategoryService(
         
         VoidResult changeCategoryDescription = childCategory.ChangeDescription(request.Description);
 
-        if (!changeCategoryDescription.IsSuccess)
+        if (changeCategoryDescription.IsFailure)
         {
             return Result<ChildCategoryDto>.Failure(changeCategoryDescription);
         }

@@ -143,9 +143,9 @@ public sealed class Customer : BaseEntity
     {
         Result<FullName> createFullNameResult = FullName.Create(firstName, lastName, middleName);
         
-        if (!createFullNameResult.IsSuccess)
+        if (createFullNameResult.IsFailure)
         {
-            return VoidResult.Failure(createFullNameResult.ErrorMessage!, createFullNameResult.StatusCode);
+            return VoidResult.Failure(createFullNameResult);
         }
         
         FullName = createFullNameResult.Value!;
@@ -156,9 +156,9 @@ public sealed class Customer : BaseEntity
     {
         Result<PhoneNumber> createPhoneNumberResult = PhoneNumber.Create(phoneNumber);
 
-        if (!createPhoneNumberResult.IsSuccess)
+        if (createPhoneNumberResult.IsFailure)
         {
-            return VoidResult.Failure(createPhoneNumberResult.ErrorMessage!, createPhoneNumberResult.StatusCode);
+            return VoidResult.Failure(createPhoneNumberResult);
         }
         
         PhoneNumber = createPhoneNumberResult.Value!;

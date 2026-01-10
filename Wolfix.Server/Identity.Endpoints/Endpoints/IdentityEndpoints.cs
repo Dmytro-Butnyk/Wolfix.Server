@@ -58,9 +58,7 @@ internal static class IdentityEndpoints
             .WithSummary("Change password");
     }
 
-    //TODO: при регистрации фио заноситься с гугл аккаунта (то есть в базу ложиться) а вот в
-    // профиле не отображается. ендпоинт на получение данных с профиля в принципе возвращает фио как нул
-    private static async Task<Results<Ok<string>, Conflict<string>, BadRequest<string>, InternalServerError<string>, NotFound<string>>>
+    private static async Task<Results<Ok<UserRolesDto>, Conflict<string>, BadRequest<string>, InternalServerError<string>, NotFound<string>>>
         ContinueWithGoogle([FromBody] GoogleLoginDto request,
         [FromServices] IConfiguration configuration,
         [FromServices] AuthService authService,
@@ -76,25 +74,25 @@ internal static class IdentityEndpoints
             return TypedResults.BadRequest("Invalid token");
         }
 
-        Result<string> getTokenResult = await authService.ContinueWithGoogleAsync(payload, ct);
+        Result<UserRolesDto> getRolesResult = await authService.ContinueWithGoogleAndGetRolesAsync(payload, ct);
 
-        if (getTokenResult.IsFailure)
+        if (getRolesResult.IsFailure)
         {
-            return getTokenResult.StatusCode switch
+            return getRolesResult.StatusCode switch
             {
-                HttpStatusCode.Conflict => TypedResults.Conflict(getTokenResult.ErrorMessage),
-                HttpStatusCode.BadRequest => TypedResults.BadRequest(getTokenResult.ErrorMessage),
-                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(getTokenResult.ErrorMessage),
-                HttpStatusCode.NotFound => TypedResults.NotFound(getTokenResult.ErrorMessage),
+                HttpStatusCode.Conflict => TypedResults.Conflict(getRolesResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(getRolesResult.ErrorMessage),
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(getRolesResult.ErrorMessage),
+                HttpStatusCode.NotFound => TypedResults.NotFound(getRolesResult.ErrorMessage),
                 _ => throw new UnknownStatusCodeException(
                     nameof(IdentityEndpoints),
                     nameof(ContinueWithGoogle),
-                    getTokenResult.StatusCode
+                    getRolesResult.StatusCode
                 )
             };
         }
         
-        return TypedResults.Ok(getTokenResult.Value);
+        return TypedResults.Ok(getRolesResult.Value);
     }
     
     private static async Task<Results<Ok<UserRolesDto>, NotFound<string>, BadRequest<string>, InternalServerError<string>, ForbidHttpResult>>
