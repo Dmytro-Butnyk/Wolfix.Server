@@ -1,4 +1,5 @@
 using Catalog.Domain.ProductAggregate.Entities;
+using Catalog.Domain.ProductAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shared.Infrastructure.ValueGenerators;
@@ -94,12 +95,13 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
 
     private void ConfigureProductAttributeValuesRelation(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
     {
-        builder.HasMany<ProductAttributeValue>("_productAttributeValues")
-            .WithOne(pav => pav.Product)
-            .HasForeignKey("ProductId")
-            .OnDelete(DeleteBehavior.Cascade)
-            .IsRequired(false);
-        builder.Navigation("_productAttributeValues")
+        builder.OwnsMany(p => p.ProductAttributeValues, b =>
+        {
+            b.ToJson();
+            b.Property(x => x.CategoryAttributeId).IsRequired();
+            b.Property(x => x.Key).IsRequired();
+        })
+            .Navigation(p => p.ProductAttributeValues)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 

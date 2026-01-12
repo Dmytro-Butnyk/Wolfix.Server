@@ -2,6 +2,7 @@
 using Catalog.Domain.CategoryAggregate.Entities;
 using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.ProductAggregate.Entities;
+using Catalog.Domain.ProductAggregate.ValueObjects;
 using Catalog.Infrastructure.Configurations.Category;
 using Catalog.Infrastructure.Configurations.Product;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,6 @@ internal sealed class CatalogContext : DbContext, IContextWithConfigurations
         
         //Product
         modelBuilder.ApplyConfiguration(new DiscountEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new ProductAttributeValueEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ProductEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ProductVariantValueEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ReviewEntityConfiguration());
@@ -44,7 +44,7 @@ internal sealed class CatalogContext : DbContext, IContextWithConfigurations
     // {
     //     if (optionsBuilder.IsConfigured) return;
     //     
-    //     optionsBuilder.UseNpgsql();
+    //     optionsBuilder.UseNpgsql("");
     // }
     
     internal DbSet<Product> Products { get; set; } // Aggregate 
@@ -54,6 +54,5 @@ internal sealed class CatalogContext : DbContext, IContextWithConfigurations
     
     internal DbSet<Category> Categories { get; set; } // Aggregate
     internal DbSet<Discount>  Discounts { get; set; }
-    internal DbSet<ProductAttributeValue> ProductAttributeValues { get; set; }
     internal DbSet<ProductVariantValue> ProductVariantValues { get; set; }
 }

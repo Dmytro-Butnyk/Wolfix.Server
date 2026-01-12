@@ -3,6 +3,7 @@ using System;
 using Catalog.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Catalog.Infrastructure.Migrations
 {
     [DbContext(typeof(CatalogContext))]
-    partial class CatalogContextModelSnapshot : ModelSnapshot
+    [Migration("20260112145418_fixAttributesValues")]
+    partial class fixAttributesValues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,12 +54,7 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId")
-                        .HasDatabaseName("idx_EQUALS_isChild")
-                        .HasFilter("\"ParentId\" IS NULL");
-
-                    b.HasIndex(new[] { "Name" }, "idx_UNIQUE_name")
-                        .IsUnique();
+                    b.HasIndex("ParentId");
 
                     b.ToTable("Categories", "catalog");
                 });
@@ -214,7 +212,7 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "ProductId", "CreatedAt" }, "idx_EQUALS_productId_SORT_createdAt");
+                    b.HasIndex("ProductId");
 
                     b.ToTable("Reviews", "catalog");
                 });
@@ -257,11 +255,7 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "CategoryId", "FinalPrice" }, "idx_EQUALS_categoryId_SORT_finalPrice");
-
-                    b.HasIndex(new[] { "SellerId" }, "idx_EQUALS_sellerId");
-
-                    b.HasIndex(new[] { "SellerId", "CategoryId" }, "idx_EQUALS_sellerId_EQUALS_categoryId");
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Products", "catalog");
                 });
