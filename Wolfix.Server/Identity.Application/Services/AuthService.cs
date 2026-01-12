@@ -6,6 +6,7 @@ using Identity.Application.Mapping;
 using Identity.Application.Projections;
 using Identity.IntegrationEvents;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
@@ -16,9 +17,10 @@ namespace Identity.Application.Services;
 public sealed class AuthService(
     IAuthStore authStore,
     JwtService jwtService,
+    IConfiguration configuration,
     EventBus eventBus)
 {
-    private const string GooglePassword = "NULL BECAUSE REGISTERED VIA GOOGLE fsjJKI!23";
+    private string GooglePassword => configuration["GOOGLE_PASSWORD"] ?? throw new Exception("GOOGLE_PASSWORD is not set");
     
     public async Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(LogInDto logInDto, CancellationToken ct)
     {

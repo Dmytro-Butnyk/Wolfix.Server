@@ -12,7 +12,9 @@ using Microsoft.Extensions.Configuration;
 using Shared.Domain.Models;
 using Shared.Endpoints;
 using Shared.Endpoints.Exceptions;
+
 using GooglePayload = Google.Apis.Auth.GoogleJsonWebSignature.Payload;
+using GoogleValidationSettings = Google.Apis.Auth.GoogleJsonWebSignature.ValidationSettings;
 
 namespace Identity.Endpoints.Endpoints;
 
@@ -58,13 +60,15 @@ internal static class IdentityEndpoints
             .WithSummary("Change password");
     }
 
-    private static async Task<Results<Ok<UserRolesDto>, Conflict<string>, BadRequest<string>, InternalServerError<string>, NotFound<string>>>
-        ContinueWithGoogle([FromBody] GoogleLoginDto request,
+    //todo: на фронте адаптировать изменения(теперь возвращает список ролей)
+    private static async Task<Results<Ok<UserRolesDto>, Conflict<string>, BadRequest<string>, InternalServerError<string>, NotFound<string>, ForbidHttpResult>>
+        ContinueWithGoogle(
+        [FromBody] GoogleLoginDto request,
         [FromServices] IConfiguration configuration,
         [FromServices] AuthService authService,
         CancellationToken ct)
     {
-        GooglePayload? payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, new GoogleJsonWebSignature.ValidationSettings
+        GooglePayload? payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, new GoogleValidationSettings
         {
             Audience = [configuration["GOOGLE_CLIENT_ID"]]
         });
@@ -84,6 +88,7 @@ internal static class IdentityEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getRolesResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(getRolesResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(getRolesResult.ErrorMessage),
+                HttpStatusCode.Forbidden => TypedResults.Forbid(),
                 _ => throw new UnknownStatusCodeException(
                     nameof(IdentityEndpoints),
                     nameof(ContinueWithGoogle),
