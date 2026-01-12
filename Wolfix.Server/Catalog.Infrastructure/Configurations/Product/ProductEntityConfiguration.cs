@@ -93,8 +93,14 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
 
     private void ConfigureProductAttributeValuesRelation(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
     {
-        builder.OwnsMany<ProductAttributeValue>("_productAttributeValues")
-            .ToJson();
+        builder.OwnsMany(p => p.ProductAttributeValues, b =>
+        {
+            b.ToJson();
+            b.Property(x => x.CategoryAttributeId).IsRequired();
+            b.Property(x => x.Key).IsRequired();
+        })
+            .Navigation(p => p.ProductAttributeValues)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 
     private void ConfigureProductVariantValuesRelation(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)

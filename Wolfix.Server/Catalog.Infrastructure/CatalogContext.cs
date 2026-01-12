@@ -44,7 +44,7 @@ internal sealed class CatalogContext : DbContext, IContextWithConfigurations
     // {
     //     if (optionsBuilder.IsConfigured) return;
     //     
-    //     optionsBuilder.UseNpgsql();
+    //     optionsBuilder.UseNpgsql("");
     // }
     
     internal DbSet<Product> Products { get; set; } // Aggregate 
@@ -54,6 +54,5 @@ internal sealed class CatalogContext : DbContext, IContextWithConfigurations
     
     internal DbSet<Category> Categories { get; set; } // Aggregate
     internal DbSet<Discount>  Discounts { get; set; }
-    internal DbSet<ProductAttributeValue> ProductAttributeValues { get; set; }
     internal DbSet<ProductVariantValue> ProductVariantValues { get; set; }
 }

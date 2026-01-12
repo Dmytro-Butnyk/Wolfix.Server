@@ -3,6 +3,7 @@ using System;
 using Catalog.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Catalog.Infrastructure.Migrations
 {
     [DbContext(typeof(CatalogContext))]
-    partial class CatalogContextModelSnapshot : ModelSnapshot
+    [Migration("20260109160030_product_attributesValues_to_jsonb")]
+    partial class product_attributesValues_to_jsonb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -346,7 +349,7 @@ namespace Catalog.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsMany("Catalog.Domain.ProductAggregate.ValueObjects.ProductAttributeValue", "ProductAttributeValues", b1 =>
+                    b.OwnsMany("Catalog.Domain.ProductAggregate.ValueObjects.ProductAttributeValue", "_productAttributeValues", b1 =>
                         {
                             b1.Property<Guid>("ProductId")
                                 .HasColumnType("uuid");
@@ -367,15 +370,15 @@ namespace Catalog.Infrastructure.Migrations
 
                             b1.HasKey("ProductId", "__synthesizedOrdinal");
 
-                            b1.ToTable("Products", "catalog");
+                            b1.ToTable((string)null);
 
-                            b1.ToJson("ProductAttributeValues");
+                            b1.ToJson("_productAttributeValues");
 
                             b1.WithOwner()
                                 .HasForeignKey("ProductId");
                         });
 
-                    b.Navigation("ProductAttributeValues");
+                    b.Navigation("_productAttributeValues");
                 });
 
             modelBuilder.Entity("Catalog.Domain.CategoryAggregate.Category", b =>

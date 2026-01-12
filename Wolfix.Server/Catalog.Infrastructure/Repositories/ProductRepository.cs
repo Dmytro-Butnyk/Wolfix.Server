@@ -337,20 +337,29 @@ internal sealed class ProductRepository(CatalogContext context)
         Guid childCategory, IReadOnlyCollection<Guid> attributeIds, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-    
-        return await _products
+        var distinctValues = await _products
             .AsNoTracking()
             .Where(p => p.CategoryId == childCategory)
             .SelectMany(p => p.ProductAttributeValues)
             .Where(pav => attributeIds.Contains(pav.CategoryAttributeId))
-            .GroupBy(pav => new { pav.CategoryAttributeId, pav.Key })
+            .Select(pav => new 
+            { 
+                pav.CategoryAttributeId, 
+                pav.Key, 
+                pav.Value 
+            })
+            .Distinct()
+            .ToListAsync(ct);
+
+        return distinctValues
+            .GroupBy(x => new { x.CategoryAttributeId, x.Key })
             .Select(g => new AttributeAndUniqueValuesValueObject
             {
                 AttributeId = g.Key.CategoryAttributeId,
                 Key = g.Key.Key,
-                Values = g.Select(x => x.Value).Distinct().ToList()
+                Values = g.Select(x => x.Value).ToList()
             })
-            .ToListAsync(ct);
+            .ToList();
     }
 
     public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllBySellerCategoryForPageAsync(Guid sellerId, Guid categoryId, int page, int pageSize, CancellationToken ct)

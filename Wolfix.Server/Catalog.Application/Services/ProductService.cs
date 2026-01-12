@@ -200,7 +200,7 @@ public sealed class ProductService(
     public async Task<Result<ProductFullDto>> GetProductFullInfoAsync(Guid productId, CancellationToken ct)
     {
         Product? product = await productRepository.GetByIdAsNoTrackingAsync(productId, ct,
-            "_productMedias", "_productAttributeValues", "_productVariantValues");
+            "_productMedias", "_productVariantValues");
 
         if (product is null)
         {
