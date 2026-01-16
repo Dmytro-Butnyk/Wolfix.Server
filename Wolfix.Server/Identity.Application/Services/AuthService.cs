@@ -1,15 +1,12 @@
-using Google.Apis.Auth;
 using Identity.Application.Dto.Requests;
 using Identity.Application.Dto.Responses;
 using Identity.Application.Interfaces.Repositories;
 using Identity.Application.Mapping;
 using Identity.Application.Projections;
 using Identity.IntegrationEvents;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents;
-using Shared.IntegrationEvents.Interfaces;
 using GooglePayload = Google.Apis.Auth.GoogleJsonWebSignature.Payload;
 
 namespace Identity.Application.Services;
@@ -20,7 +17,7 @@ public sealed class AuthService(
     IConfiguration configuration,
     EventBus eventBus)
 {
-    private string GooglePassword => configuration["GOOGLE_PASSWORD"] ?? throw new Exception("GOOGLE_PASSWORD is not set");
+    private readonly string _googlePassword = configuration["GOOGLE_PASSWORD"] ?? throw new Exception("GOOGLE_PASSWORD is not set");
     
     public async Task<Result<UserRolesDto>> LogInAndGetUserRolesAsync(LogInDto logInDto, CancellationToken ct)
     {
@@ -39,7 +36,7 @@ public sealed class AuthService(
     {
         Result<Guid> checkUserExistsAndHasRoleResult = await authStore.CheckUserExistsAndHasRoleAsync(
             dto.Email,
-            password: authProvider == "Custom" ? dto.Password : GooglePassword,
+            password: authProvider == "Custom" ? dto.Password : _googlePassword,
             dto.Role,
             ct
         );
@@ -60,7 +57,13 @@ public sealed class AuthService(
         
         Guid profileId = getProfileIdResult.Value;
 
-        string token = jwtService.GenerateToken(accountId, profileId, dto.Email, dto.Role);
+        string token = jwtService.GenerateToken(
+            accountId,
+            profileId,
+            dto.Email,
+            dto.Role
+        );
+        
         return Result<string>.Success(token);
     }
 
@@ -126,7 +129,12 @@ public sealed class AuthService(
 
     public async Task<Result<string>> RegisterAsync(RegisterAsCustomerDto dto, CancellationToken ct)
     {
-        Result<Guid> registerResult = await authStore.RegisterAccountAsync(dto.Email, dto.Password, Roles.Customer, ct);
+        Result<Guid> registerResult = await authStore.RegisterAccountAsync(
+            dto.Email,
+            dto.Password,
+            Roles.Customer,
+            ct
+        );
 
         if (registerResult.IsFailure)
         {
@@ -149,17 +157,27 @@ public sealed class AuthService(
         }
         
         Guid customerId = createCustomerAndGetIdResult.Value;
-        
-        string token = jwtService.GenerateToken(registeredCustomerId, customerId, dto.Email, Roles.Customer);
+
+        string token = jwtService.GenerateToken(
+            registeredCustomerId,
+            customerId,
+            dto.Email,
+            Roles.Customer
+        );
         
         return Result<string>.Success(token);
     }
 
     public async Task<Result<string>> ChangeEmailAsync(Guid accountId, ChangeEmailDto request, string token, CancellationToken ct)
     {
-        VoidResult changeEmailResult = await authStore.ChangeEmailAsync(accountId, request.Email, token, ct);
+        VoidResult changeEmailResult = await authStore.ChangeEmailAsync(
+            accountId,
+            request.Email,
+            token,
+            ct
+        );
         
-        if (!changeEmailResult.IsSuccess)
+        if (changeEmailResult.IsFailure)
         {
             return Result<string>.Failure(changeEmailResult);
         }
@@ -169,10 +187,14 @@ public sealed class AuthService(
 
     public async Task<VoidResult> ChangePasswordAsync(Guid accountId, ChangePasswordDto request, CancellationToken ct)
     {
-        VoidResult changePasswordResult = await authStore.ChangePasswordAsync(accountId, request.CurrentPassword,
-            request.NewPassword, ct);
+        VoidResult changePasswordResult = await authStore.ChangePasswordAsync(
+            accountId,
+            request.CurrentPassword,
+            request.NewPassword,
+            ct
+        );
         
-        if (!changePasswordResult.IsSuccess)
+        if (changePasswordResult.IsFailure)
         {
             return VoidResult.Failure(changePasswordResult);
         }
@@ -188,7 +210,7 @@ public sealed class AuthService(
         
         if (checkUserExistsResult.IsFailure)
         {
-            Result<Guid> registerViaGoogleResult = await RegisterViaGoogle(payload, GooglePassword, ct);
+            Result<Guid> registerViaGoogleResult = await RegisterViaGoogle(payload, _googlePassword, ct);
 
             if (registerViaGoogleResult.IsFailure)
             {
@@ -201,7 +223,11 @@ public sealed class AuthService(
         }
         else
         {
-            Result<UserRolesProjection> getUserRolesResult = await authStore.LogInViaGoogleAndGetUserRolesAsync(payload.Email, GooglePassword, ct);
+            Result<UserRolesProjection> getUserRolesResult = await authStore.LogInViaGoogleAndGetUserRolesAsync(
+                payload.Email,
+                _googlePassword,
+                ct
+            );
 
             if (getUserRolesResult.IsFailure)
             {
@@ -217,7 +243,12 @@ public sealed class AuthService(
     private async Task<Result<Guid>> RegisterViaGoogle(GooglePayload payload, string password, CancellationToken ct)
     {
         Result<Guid> registerAccountResult = await authStore.RegisterAccountAsync(
-            payload.Email, password, Roles.Customer, ct, "Google");
+            payload.Email,
+            password,
+            Roles.Customer,
+            ct,
+            "Google"
+        );
 
         if (registerAccountResult.IsFailure)
         {
