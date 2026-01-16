@@ -288,23 +288,29 @@ internal sealed class ProductRepository(CatalogContext context)
 
         if (filters.Count == 0) return [];
 
-        // 1. Изменился тип предиката: Product вместо ProductAttributeValue
-        var predicate = PredicateBuilder.New<Product>(false);
+        var groupedFilters = filters.GroupBy(x => x.AttributeId);
 
-        foreach (var f in filters)
+        var masterPredicate = PredicateBuilder.New<Product>(true);
+
+        foreach (var group in groupedFilters)
         {
-            var temp = f; 
-        
-            // 2. Логика условия: "У продукта есть (Any) атрибут в JSON-списке, который совпадает с фильтром"
-            predicate = predicate.Or(p => p.ProductAttributeValues.Any(av => 
-                av.CategoryAttributeId == temp.AttributeId && 
-                av.Value == temp.Value));
+            var groupPredicate = PredicateBuilder.New<Product>(false);
+
+            foreach (var filter in group)
+            {
+                var temp = filter;
+                groupPredicate = groupPredicate.Or(p => p.ProductAttributeValues.Any(av => 
+                    av.CategoryAttributeId == temp.AttributeId && 
+                    av.Value == temp.Value));
+            }
+
+            masterPredicate = masterPredicate.And(groupPredicate);
         }
 
-        // 3. Упростился запрос: убрали SelectMany, так как фильтруем сами Продукты
         return await _products
             .AsNoTracking()
-            .Where(predicate) // EF Core транслирует это в SQL оператор @> (contains) для JSONB
+            .Where(masterPredicate)
+            .OrderBy(p => p.Id)
             .Take(pageSize)
             .Select(p => p.Id)
             .ToListAsync(ct);
