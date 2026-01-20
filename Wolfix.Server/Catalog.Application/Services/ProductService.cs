@@ -525,25 +525,40 @@ public sealed class ProductService(
         return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
     }
 
-    public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetByAttributesFiltrationAsync(AttributesFiltrationDto attributesFiltrationDto, int pageSize,
+    public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetByAttributesFiltrationAsync(
+        ProductFilterCriteriaDto productFilterCriteriaDto, 
         CancellationToken ct)
     {
-        VoidResult isCategoryAndtributesExist = await productDomainService
-            .IsCategoryAndAttributesExistAsync(attributesFiltrationDto.CategoryId,
-                attributesFiltrationDto.FiltrationAttribute.Select(fa => fa.AttributeId).ToList(), ct);
-        
-        if (isCategoryAndtributesExist.IsFailure)
+        var ensureValidResult = productFilterCriteriaDto.EnsureValid();
+
+        if (ensureValidResult.IsFailure)
         {
-            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(isCategoryAndtributesExist);
+            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(ensureValidResult);
+        }
+        
+        VoidResult isCategoryAndAttributesExist = await productDomainService
+            .IsCategoryAndAttributesExistAsync(productFilterCriteriaDto.CategoryId,
+                productFilterCriteriaDto.FiltrationAttribute.Select(fa => fa.AttributeId).ToList(), ct);
+        
+        if (isCategoryAndAttributesExist.IsFailure)
+        {
+            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(isCategoryAndAttributesExist);
         }
 
+        IReadOnlyCollection<(Guid AttributeId, string Value)> filtrationAttribute = productFilterCriteriaDto.FiltrationAttribute
+            .Select(fa => (fa.AttributeId, fa.Value))
+            .ToList();
+        
         IReadOnlyCollection<Guid> productIds =
             await productRepository.GetByAttributesFiltrationAsNoTrackingAsync(
-                attributesFiltrationDto.FiltrationAttribute
-                    .Select(fa => (fa.AttributeId, fa.Value))
-                    .ToList(),
-                pageSize,
-                ct);
+                filtrationAttribute,
+                productFilterCriteriaDto.MinPrice,
+                productFilterCriteriaDto.MaxPrice,
+                productFilterCriteriaDto.PageSize,
+                productFilterCriteriaDto.PageNumber,
+                productFilterCriteriaDto.SkipCount,
+                ct
+                );
 
         IReadOnlyCollection<ProductShortProjection> productShortProjections =
             await productRepository.GetShortProductsByIdsAsNoTrackingAsync(productIds, ct);

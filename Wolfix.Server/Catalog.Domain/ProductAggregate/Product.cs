@@ -480,7 +480,7 @@ public sealed class Product : BaseEntity
     public VoidResult ChangeReviewRating(Guid reviewId, uint rating)
     {
         Review? review = _reviews.FirstOrDefault(r => r.Id == reviewId);
-
+        
         if (review == null)
         {
             return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.", HttpStatusCode.NotFound);

@@ -549,13 +549,12 @@ internal static class ProductEndpoints
 
     private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>, NotFound<string>>>
         GetProductsByAttributes(
-            [FromBody] AttributesFiltrationDto attributesFiltrationDto,
+            [FromBody] ProductFilterCriteriaDto productFilterCriteriaDto,
             [FromServices] ProductService productService,
-            CancellationToken ct,
-            [FromQuery] int pageSize = 20)
+            CancellationToken ct)
     {
         Result<IReadOnlyCollection<ProductShortDto>> getProductsByAttributes =
-            await productService.GetByAttributesFiltrationAsync(attributesFiltrationDto, pageSize, ct);
+            await productService.GetByAttributesFiltrationAsync(productFilterCriteriaDto, ct);
 
         if (getProductsByAttributes.IsFailure)
         {

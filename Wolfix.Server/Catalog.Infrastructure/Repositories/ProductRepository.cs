@@ -1,4 +1,5 @@
-﻿using Catalog.Domain.Interfaces;
+﻿using Catalog.Application.Dto.Product;
+using Catalog.Domain.Interfaces;
 using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.ProductAggregate.Entities;
 using Catalog.Domain.ProductAggregate.Enums;
@@ -282,35 +283,47 @@ internal sealed class ProductRepository(CatalogContext context)
     }
 
     public async Task<IReadOnlyCollection<Guid>> GetByAttributesFiltrationAsNoTrackingAsync(
-        IReadOnlyCollection<(Guid AttributeId, string Value)> filters, int pageSize, CancellationToken ct)
+        IReadOnlyCollection<(Guid AttributeId, string Value)> attributeFilters,
+        decimal? minPrice,
+        decimal? maxPrice,
+        int pageSize,
+        int pageNumber,
+        int skipCount,
+        CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-        if (filters.Count == 0) return [];
-
-        var groupedFilters = filters.GroupBy(x => x.AttributeId);
-
         var masterPredicate = PredicateBuilder.New<Product>(true);
 
-        foreach (var group in groupedFilters)
+        if (minPrice.HasValue)
+            masterPredicate = masterPredicate.And(p => p.FinalPrice >= minPrice.Value);
+
+        if (maxPrice.HasValue)
+            masterPredicate = masterPredicate.And(p => p.FinalPrice <= maxPrice.Value);
+
+        if (attributeFilters.Count > 0)
         {
-            var groupPredicate = PredicateBuilder.New<Product>(false);
-
-            foreach (var filter in group)
+            var groupedFilters = attributeFilters.GroupBy(x => x.AttributeId);
+            foreach (var group in groupedFilters)
             {
-                var temp = filter;
-                groupPredicate = groupPredicate.Or(p => p.ProductAttributeValues.Any(av => 
-                    av.CategoryAttributeId == temp.AttributeId && 
-                    av.Value == temp.Value));
+                var groupPredicate = PredicateBuilder.New<Product>(false);
+                foreach (var filter in group)
+                {
+                    var currentFilter = filter;
+                    groupPredicate = groupPredicate.Or(p => p.ProductAttributeValues.Any(av => 
+                        av.CategoryAttributeId == currentFilter.AttributeId && 
+                        av.Value == currentFilter.Value));
+                }
+                masterPredicate = masterPredicate.And(groupPredicate);
             }
-
-            masterPredicate = masterPredicate.And(groupPredicate);
         }
-
+        
         return await _products
             .AsNoTracking()
             .Where(masterPredicate)
-            .OrderBy(p => p.Id)
+            .OrderBy(p => p.FinalPrice) 
+            .ThenBy(p => p.Id)
+            .Skip(skipCount)
             .Take(pageSize)
             .Select(p => p.Id)
             .ToListAsync(ct);
