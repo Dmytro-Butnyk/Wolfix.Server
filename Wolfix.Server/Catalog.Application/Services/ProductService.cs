@@ -551,11 +551,11 @@ public sealed class ProductService(
         
         IReadOnlyCollection<Guid> productIds =
             await productRepository.GetByAttributesFiltrationAsNoTrackingAsync(
+                productFilterCriteriaDto.CategoryId,
                 filtrationAttribute,
                 productFilterCriteriaDto.MinPrice,
                 productFilterCriteriaDto.MaxPrice,
                 productFilterCriteriaDto.PageSize,
-                productFilterCriteriaDto.PageNumber,
                 productFilterCriteriaDto.SkipCount,
                 ct
                 );

@@ -283,17 +283,17 @@ internal sealed class ProductRepository(CatalogContext context)
     }
 
     public async Task<IReadOnlyCollection<Guid>> GetByAttributesFiltrationAsNoTrackingAsync(
+        Guid categoryId,
         IReadOnlyCollection<(Guid AttributeId, string Value)> attributeFilters,
         decimal? minPrice,
         decimal? maxPrice,
         int pageSize,
-        int pageNumber,
         int skipCount,
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-        var masterPredicate = PredicateBuilder.New<Product>(true);
+        var masterPredicate = PredicateBuilder.New<Product>(p => p.CategoryId == categoryId);
 
         if (minPrice.HasValue)
             masterPredicate = masterPredicate.And(p => p.FinalPrice >= minPrice.Value);
@@ -309,7 +309,7 @@ internal sealed class ProductRepository(CatalogContext context)
                 var groupPredicate = PredicateBuilder.New<Product>(false);
                 foreach (var filter in group)
                 {
-                    var currentFilter = filter;
+                    var currentFilter = filter; 
                     groupPredicate = groupPredicate.Or(p => p.ProductAttributeValues.Any(av => 
                         av.CategoryAttributeId == currentFilter.AttributeId && 
                         av.Value == currentFilter.Value));
@@ -317,7 +317,7 @@ internal sealed class ProductRepository(CatalogContext context)
                 masterPredicate = masterPredicate.And(groupPredicate);
             }
         }
-        
+
         return await _products
             .AsNoTracking()
             .Where(masterPredicate)

@@ -40,11 +40,11 @@ public interface IProductRepository
         CancellationToken ct);
     
     Task<IReadOnlyCollection<Guid>> GetByAttributesFiltrationAsNoTrackingAsync (
+        Guid categoryId,
         IReadOnlyCollection<(Guid AttributeId, string Value)> attributeFilters,
         decimal? minPrice,
         decimal? maxPrice,
         int pageSize,
-        int pageNumber,
         int skipCount,
         CancellationToken ct);
     
