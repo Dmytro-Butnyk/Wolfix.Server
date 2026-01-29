@@ -18,6 +18,19 @@ public sealed class BlobResource : BaseEntity
         Type = type;
     }
 
+    public static Result<BlobResource> Create(string type)
+    {
+        if (!Enum.TryParse(type, out BlobResourceType blobResourceType))
+        {
+            return Result<BlobResource>.Failure("Invalid blob resource type");
+        }
+
+        var name = $"{Guid.NewGuid():N}-{type.ToLowerInvariant()}";
+
+        BlobResource blobResource = new(name, blobResourceType);
+        return Result<BlobResource>.Success(blobResource);
+    }
+    
     public static Result<BlobResource> Create(BlobResourceType type)
     {
         if (!Enum.IsDefined(type))
@@ -27,7 +40,8 @@ public sealed class BlobResource : BaseEntity
 
         var name = $"{Guid.NewGuid():N}-{type.ToString().ToLowerInvariant()}";
 
-        return Result<BlobResource>.Success(new(name, type));
+        BlobResource blobResource = new(name, type);
+        return Result<BlobResource>.Success(blobResource);
     }
 
     public VoidResult ChangeName(string name)
@@ -52,19 +66,18 @@ public sealed class BlobResource : BaseEntity
         return VoidResult.Success();
     }
 
-    public VoidResult ChangeType(BlobResourceType type)
+    public VoidResult ChangeType(string type)
     {
-        if (!Enum.IsDefined(type))
+        if (!Enum.TryParse(type, out BlobResourceType blobResourceType))
         {
             return VoidResult.Failure("Invalid blob resource type");
         }
         
-        Type = type;
+        Type = blobResourceType;
         return VoidResult.Success();
     }
 
     #region Validation
-
     private static bool IsTextInvalid(string text, out string errorMessage)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -76,6 +89,5 @@ public sealed class BlobResource : BaseEntity
         errorMessage = string.Empty;
         return false;
     }
-
     #endregion
 }
