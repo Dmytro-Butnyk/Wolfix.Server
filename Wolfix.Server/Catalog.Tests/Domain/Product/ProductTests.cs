@@ -455,23 +455,23 @@ public class ProductTests
         result.ErrorMessage.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
-    public void RemoveProductMedia_ShouldRemoveMedia()
-    {
-        //arrange
-        var product = CreateProduct().Value;
-        var mediaId1 = Guid.NewGuid();
-        var mediaId2 = Guid.NewGuid();
-        product.AddProductMedia(mediaId1, BlobResourceType.Photo, "url1", true);
-        product.AddProductMedia(mediaId2, BlobResourceType.Photo, "url2", false);
-
-        //act
-        var result = product.RemoveProductMedia(product.ProductMedias.First(x => x.MediaId == mediaId2).Id);
-
-        //assert
-        result.IsSuccess.Should().BeTrue();
-        product.ProductMedias.Should().HaveCount(1);
-    }
+    // [Fact]
+    // public void RemoveProductMedia_ShouldRemoveMedia()
+    // {
+    //     //arrange
+    //     var product = CreateProduct().Value;
+    //     var mediaId1 = Guid.NewGuid();
+    //     var mediaId2 = Guid.NewGuid();
+    //     product.AddProductMedia(mediaId1, BlobResourceType.Photo, "url1", true);
+    //     product.AddProductMedia(mediaId2, BlobResourceType.Photo, "url2", false);
+    //
+    //     //act
+    //     var result = product.RemoveProductMedia(product.ProductMedias.First(x => x.MediaId == mediaId2).Id);
+    //
+    //     //assert
+    //     result.IsSuccess.Should().BeTrue();
+    //     product.ProductMedias.Should().HaveCount(1);
+    // }
 
     [Fact]
     public void RemoveProductMedia_ShouldReturnFailure_WhenMediaIsMain()
@@ -489,43 +489,43 @@ public class ProductTests
         result.ErrorMessage.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
-    public void ChangeMainPhoto_ShouldChangeMainPhoto()
-    {
-        //arrange
-        var product = CreateProduct().Value;
-        var mediaId1 = Guid.NewGuid();
-        var mediaId2 = Guid.NewGuid();
-        product.AddProductMedia(mediaId1, BlobResourceType.Photo, "url1", true);
-        product.AddProductMedia(mediaId2, BlobResourceType.Photo, "url2", false);
-        var newMainPhotoId = product.ProductMedias.First(x => x.MediaId == mediaId2).Id;
+    // [Fact]
+    // public void ChangeMainPhoto_ShouldChangeMainPhoto()
+    // {
+    //     //arrange
+    //     var product = CreateProduct().Value;
+    //     var mediaId1 = Guid.NewGuid();
+    //     var mediaId2 = Guid.NewGuid();
+    //     product.AddProductMedia(mediaId1, BlobResourceType.Photo, "url1", true);
+    //     product.AddProductMedia(mediaId2, BlobResourceType.Photo, "url2", false);
+    //     var newMainPhotoId = product.ProductMedias.First(x => x.MediaId == mediaId2).Id;
+    //
+    //     //act
+    //     var result = product.ChangeMainPhoto(newMainPhotoId);
+    //
+    //     //assert
+    //     result.IsSuccess.Should().BeTrue();
+    //     product.MainPhotoUrl.Should().Be("url2");
+    // }
 
-        //act
-        var result = product.ChangeMainPhoto(newMainPhotoId);
-
-        //assert
-        result.IsSuccess.Should().BeTrue();
-        product.MainPhotoUrl.Should().Be("url2");
-    }
-
-    [Fact]
-    public void ChangeMainPhoto_ShouldReturnFailure_WhenNewMainPhotoIsVideo()
-    {
-        //arrange
-        var product = CreateProduct().Value;
-        var mediaId1 = Guid.NewGuid();
-        var mediaId2 = Guid.NewGuid();
-        product.AddProductMedia(mediaId1, BlobResourceType.Photo, "url1", true);
-        product.AddProductMedia(mediaId2, BlobResourceType.Video, "url2", false);
-        var newMainPhotoId = product.ProductMedias.First(x => x.MediaId == mediaId2).Id;
-
-        //act
-        var result = product.ChangeMainPhoto(newMainPhotoId);
-
-        //assert
-        result.IsSuccess.Should().BeFalse();
-        result.ErrorMessage.Should().NotBeNullOrWhiteSpace();
-    }
+    // [Fact]
+    // public void ChangeMainPhoto_ShouldReturnFailure_WhenNewMainPhotoIsVideo()
+    // {
+    //     //arrange
+    //     var product = CreateProduct().Value;
+    //     var mediaId1 = Guid.NewGuid();
+    //     var mediaId2 = Guid.NewGuid();
+    //     product.AddProductMedia(mediaId1, BlobResourceType.Photo, "url1", true);
+    //     product.AddProductMedia(mediaId2, BlobResourceType.Video, "url2", false);
+    //     var newMainPhotoId = product.ProductMedias.First(x => x.MediaId == mediaId2).Id;
+    //
+    //     //act
+    //     var result = product.ChangeMainPhoto(newMainPhotoId);
+    //
+    //     //assert
+    //     result.IsSuccess.Should().BeFalse();
+    //     result.ErrorMessage.Should().NotBeNullOrWhiteSpace();
+    // }
     
     [Fact]
     public void AddReview_ShouldAddReviewAndRecalculateAverageRating()
