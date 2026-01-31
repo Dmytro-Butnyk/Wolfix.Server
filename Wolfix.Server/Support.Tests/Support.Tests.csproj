@@ -20,12 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Domain\SellerApplication\" />
-      <Folder Include="Domain\Seller\Entities\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Seller.Domain\Seller.Domain.csproj" />
+      <ProjectReference Include="..\Support.Domain\Support.Domain.csproj" />
     </ItemGroup>
 
 </Project>
