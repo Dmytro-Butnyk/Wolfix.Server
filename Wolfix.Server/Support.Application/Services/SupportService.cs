@@ -3,6 +3,7 @@ using Shared.Application.Dto;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents;
 using Support.Application.Dto;
+using Support.Application.Dto.Support;
 using Support.Application.Mapping;
 using Support.Domain.Interfaces;
 using Support.Domain.Projections;

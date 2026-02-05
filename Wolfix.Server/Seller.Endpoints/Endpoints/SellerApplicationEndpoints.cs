@@ -23,19 +23,19 @@ internal static class SellerApplicationEndpoints
         
         sellerApplicationGroup.MapPost("{accountId:guid}", CreateApplication)
             .DisableAntiforgery()
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Create application to be a seller");
         
         sellerApplicationGroup.MapGet("", GetAllPendingApplications)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Get all pending applications");
         
         sellerApplicationGroup.MapPatch("{sellerApplicationId:guid}/approve", ApproveApplication)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Approve application");
         
         sellerApplicationGroup.MapPatch("{sellerApplicationId:guid}/reject", RejectApplication)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Reject application");
     }
 
@@ -53,7 +53,11 @@ internal static class SellerApplicationEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(createApplicationResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(createApplicationResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(CreateApplication), createApplicationResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(SellerApplicationEndpoints),
+                    nameof(CreateApplication),
+                    createApplicationResult.StatusCode
+                )
             };
         }
         
@@ -85,7 +89,11 @@ internal static class SellerApplicationEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(approveApplicationResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(approveApplicationResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(approveApplicationResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ApproveApplication), approveApplicationResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(SellerApplicationEndpoints),
+                    nameof(ApproveApplication),
+                    approveApplicationResult.StatusCode
+                )
             };
         }
         
@@ -105,7 +113,11 @@ internal static class SellerApplicationEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(rejectApplicationResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(rejectApplicationResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(RejectApplication), rejectApplicationResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(SellerApplicationEndpoints),
+                    nameof(RejectApplication),
+                    rejectApplicationResult.StatusCode
+                )
             };
         }
         

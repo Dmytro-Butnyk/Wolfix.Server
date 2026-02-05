@@ -149,6 +149,8 @@ namespace Order.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
+                    b.HasIndex(new[] { "SellerId" }, "idx_EQUALS_sellerId");
+
                     b.ToTable("OrderItems", "order");
                 });
 
@@ -178,7 +180,7 @@ namespace Order.Infrastructure.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text")
-                        .HasDefaultValue("e2afca3d-7886-4210-8da2-6d018921beb3");
+                        .HasDefaultValue("019b9396-5f89-7ea1-9287-592246cafdbf");
 
                     b.Property<string>("PaymentIntentId")
                         .HasColumnType("text");
@@ -203,6 +205,11 @@ namespace Order.Infrastructure.Migrations
                         .HasColumnType("boolean");
 
                     b.HasKey("Id");
+
+                    b.HasIndex(new[] { "CustomerId", "CreatedAt" }, "idx_EQUALS_customerId_SORT_createdAt");
+
+                    b.HasIndex(new[] { "Number" }, "idx_UNIQUE_number")
+                        .IsUnique();
 
                     b.ToTable("Orders", "order");
                 });
@@ -311,7 +318,7 @@ namespace Order.Infrastructure.Migrations
                                         .HasForeignKey("CustomerInfoOrderId");
                                 });
 
-                            b1.OwnsOne("Order.Domain.OrderAggregate.ValueObjects.Email", "Email", b2 =>
+                            b1.OwnsOne("Shared.Domain.ValueObjects.Email", "Email", b2 =>
                                 {
                                     b2.Property<Guid>("CustomerInfoOrderId")
                                         .HasColumnType("uuid");

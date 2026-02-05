@@ -1,3 +1,3 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Support.Infrastructure")]
+[assembly: InternalsVisibleTo("Support.Infrastructure.EFCore")]

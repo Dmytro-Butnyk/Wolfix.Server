@@ -14,6 +14,8 @@ internal sealed class OrderItemEntityConfiguration : IEntityTypeConfiguration<Or
         ConfigureBasicProperties(builder);
         
         ConfigureOrderRelation(builder);
+        
+        ConfigureIndexes(builder);
     }
 
     private void ConfigureBasicProperties(EntityTypeBuilder<OrderItem> builder)
@@ -53,5 +55,10 @@ internal sealed class OrderItemEntityConfiguration : IEntityTypeConfiguration<Or
             .IsRequired();
         builder.Navigation(oi => oi.Order)
             .UsePropertyAccessMode(PropertyAccessMode.Property);
+    }
+
+    private void ConfigureIndexes(EntityTypeBuilder<OrderItem> builder)
+    {
+        builder.HasIndex(oi => oi.SellerId, "idx_EQUALS_sellerId");
     }
 }

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 using Shared.Application.Dto;
 using Shared.Domain.Models;
 using Shared.Endpoints;
@@ -38,32 +39,32 @@ internal static class ProductEndpoints
     {
         group.MapPost("", CreateProduct)
             .DisableAntiforgery()
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Add product");
         
         group.MapDelete("{productId:guid}", DeleteProduct)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Delete product");
 
         group.MapPatch("product/{productId:guid}/new-main-photo/{newMainPhotoId:guid}", ChangeProductMainPhoto)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change product main photo");
         
         group.MapPatch("product/{productId:guid}/general-info", ChangeProductGeneralInfo)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change product general info");
         
         group.MapPatch("product/{productId:guid}/price", ChangePrice)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change product price");
 
         group.MapPatch("add-product-media", AddProductMedia)
             .DisableAntiforgery()
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Add product media");
 
         group.MapDelete("product/{productId:guid}/media/{mediaId:guid}", DeleteProductMedia)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Delete product media");
         
         group.MapGet("product/{productId:guid}", GetProductFullInfo)
@@ -82,7 +83,7 @@ internal static class ProductEndpoints
             .WithSummary("Get random products");
         
         group.MapGet("seller/{sellerId:guid}/category/{categoryId:guid}/page/{page:int}", GetAllBySellerCategoryForPage)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Get all products by specific seller category");
         
         group.MapGet("search/category/{categoryId:guid}", GetSearchByCategory)
@@ -95,11 +96,11 @@ internal static class ProductEndpoints
             .WithSummary("Get products by attributes filtration");
         
         group.MapPost("product/{productId:guid}/discount", AddDiscount)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Add discount to product");
 
         group.MapDelete("product/{productId:guid}/discount", DeleteDiscount)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Delete product discount");
     }
 
@@ -109,7 +110,7 @@ internal static class ProductEndpoints
             .WithSummary("Get all reviews by specific product");
         
         group.MapPost("", AddReview)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Add review");
     }
 
@@ -126,7 +127,11 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addProductResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(addProductResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(CreateProduct), addProductResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(CreateProduct),
+                    addProductResult.StatusCode
+                )
             };
         }
 
@@ -162,7 +167,11 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(addDiscountResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addDiscountResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddDiscount), addDiscountResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(AddDiscount),
+                    addDiscountResult.StatusCode
+                )
             };
         }
         
@@ -182,7 +191,11 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(deleteDiscountResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(deleteDiscountResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(DeleteDiscount), deleteDiscountResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(DeleteDiscount),
+                    deleteDiscountResult.StatusCode
+                )
             };
         }
         
@@ -204,7 +217,11 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeMainPhotoResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeMainPhotoResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeProductMainPhoto), changeMainPhotoResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(ChangeProductMainPhoto),
+                    changeMainPhotoResult.StatusCode
+                )
             };
         }
 
@@ -225,7 +242,11 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeProductGeneralInfoResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeProductGeneralInfoResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeProductGeneralInfo), changeProductGeneralInfoResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(ChangeProductGeneralInfo),
+                    changeProductGeneralInfoResult.StatusCode
+                )
             };
         }
         
@@ -246,7 +267,11 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeProductResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeProductResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangePrice), changeProductResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(ChangePrice),
+                    changeProductResult.StatusCode
+                )
             };
         }
         
@@ -267,7 +292,11 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addProductMediaResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(addProductMediaResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddProductMedia), addProductMediaResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(AddProductMedia),
+                    addProductMediaResult.StatusCode
+                )
             };
         }
         
@@ -288,7 +317,11 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(deleteProductMediaResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(deleteProductMediaResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(DeleteProductMedia), deleteProductMediaResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(DeleteProductMedia),
+                    deleteProductMediaResult.StatusCode
+                )
             };
         }
 
@@ -309,7 +342,11 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getProductFullInfoResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(getProductFullInfoResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(GetProductFullInfo), getProductFullInfoResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(GetProductFullInfo),
+                    getProductFullInfoResult.StatusCode
+                )
             };
         }
 
@@ -334,7 +371,16 @@ internal static class ProductEndpoints
 
         if (getProductsByCategoryResult.IsFailure)
         {
-            return TypedResults.NotFound(getProductsByCategoryResult.ErrorMessage);
+            return getProductsByCategoryResult.StatusCode switch
+            {
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(getProductsByCategoryResult.ErrorMessage),
+                HttpStatusCode.NotFound => TypedResults.NotFound(getProductsByCategoryResult.ErrorMessage),
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(GetAllByCategoryForPage),
+                    getProductsByCategoryResult.StatusCode
+                )
+            };
         }
 
         return TypedResults.Ok(getProductsByCategoryResult.Value);
@@ -357,18 +403,12 @@ internal static class ProductEndpoints
         return TypedResults.Ok(getProductsWithDiscountResult.Value);
     }
 
-    private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>, NotFound<string>>>
-        GetRecommendedForPage(
-            [FromQuery] Guid[] visitedCategoriesIds,
-            [FromServices] ProductService productService,
-            CancellationToken ct,
-            [FromQuery] int pageSize = 12)
+    private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, NotFound<string>>> GetRecommendedForPage(
+        [FromQuery] Guid[] visitedCategoriesIds,
+        [FromServices] ProductService productService,
+        CancellationToken ct,
+        [FromQuery] int pageSize = 12)
     {
-        if (visitedCategoriesIds.Length == 0)
-        {
-            return TypedResults.BadRequest("Visited categories must be not empty");
-        }
-
         Result<IReadOnlyCollection<ProductShortDto>> getRecommendedProductsResult =
             await productService.GetRecommendedForPageAsync(pageSize, visitedCategoriesIds.ToList(), ct);
 
@@ -442,7 +482,11 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(addReviewResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addReviewResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddReview), addReviewResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(AddReview),
+                    addReviewResult.StatusCode
+                )
             };
         }
 
@@ -466,7 +510,11 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getProductsBySearchQueryAndCategoryResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(getProductsBySearchQueryAndCategoryResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeProductMainPhoto), getProductsBySearchQueryAndCategoryResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(GetSearchByCategory),
+                    getProductsBySearchQueryAndCategoryResult.StatusCode
+                )
             };
         }
 
@@ -488,7 +536,11 @@ internal static class ProductEndpoints
             return getProductsBySearchQueryAndCategoryResult.StatusCode switch
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getProductsBySearchQueryAndCategoryResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeProductMainPhoto), getProductsBySearchQueryAndCategoryResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(GetSearch),
+                    getProductsBySearchQueryAndCategoryResult.StatusCode
+                )
             };
         }
 
@@ -497,13 +549,12 @@ internal static class ProductEndpoints
 
     private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>, NotFound<string>>>
         GetProductsByAttributes(
-            [FromBody] AttributesFiltrationDto attributesFiltrationDto,
+            [FromBody] ProductFilterCriteriaDto productFilterCriteriaDto,
             [FromServices] ProductService productService,
-            CancellationToken ct,
-            [FromQuery] int pageSize = 20)
+            CancellationToken ct)
     {
         Result<IReadOnlyCollection<ProductShortDto>> getProductsByAttributes =
-            await productService.GetByAttributesFiltrationAsync(attributesFiltrationDto, pageSize, ct);
+            await productService.GetByAttributesFiltrationAsync(productFilterCriteriaDto, ct);
 
         if (getProductsByAttributes.IsFailure)
         {
@@ -511,7 +562,11 @@ internal static class ProductEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(getProductsByAttributes.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(getProductsByAttributes.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeProductMainPhoto), getProductsByAttributes.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(ProductEndpoints),
+                    nameof(GetProductsByAttributes),
+                    getProductsByAttributes.StatusCode
+                )
             };
         }
 

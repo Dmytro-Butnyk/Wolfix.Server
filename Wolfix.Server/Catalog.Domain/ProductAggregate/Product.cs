@@ -1,6 +1,7 @@
 using System.Net;
 using Catalog.Domain.ProductAggregate.Entities;
 using Catalog.Domain.ProductAggregate.Enums;
+using Catalog.Domain.ProductAggregate.ValueObjects;
 using Shared.Domain.Entities;
 using Shared.Domain.Enums;
 using Shared.Domain.Models;
@@ -51,8 +52,6 @@ public sealed class Product : BaseEntity
     
     public Guid CategoryId { get; private set; }
     
-    //todo: seller ID (именно ID, потому что другой контекст)
-    
     private readonly List<ProductMedia> _productMedias = [];
     public IReadOnlyCollection<ProductMediaInfo> ProductMedias => _productMedias
         .Select(pm => (ProductMediaInfo)pm)
@@ -64,12 +63,12 @@ public sealed class Product : BaseEntity
         .Select(r => (ReviewInfo)r)
         .ToList()
         .AsReadOnly();
-
+    
+    #region ProductAttributeValues
     private readonly List<ProductAttributeValue> _productAttributeValues = [];
-    public IReadOnlyCollection<ProductAttributeValueInfo> ProductAttributeValues => _productAttributeValues
-        .Select(pav => (ProductAttributeValueInfo)pav)
-        .ToList()
+    public IReadOnlyCollection<ProductAttributeValue> ProductAttributeValues => _productAttributeValues
         .AsReadOnly();
+    #endregion
     
     private readonly List<ProductVariantValue> _productVariantValues = [];
     public IReadOnlyCollection<ProductVariantValueInfo> ProductVariantValues => _productVariantValues
@@ -481,7 +480,7 @@ public sealed class Product : BaseEntity
     public VoidResult ChangeReviewRating(Guid reviewId, uint rating)
     {
         Review? review = _reviews.FirstOrDefault(r => r.Id == reviewId);
-
+        
         if (review == null)
         {
             return VoidResult.Failure($"{nameof(review)} is null. Nothing to change.", HttpStatusCode.NotFound);
@@ -500,93 +499,56 @@ public sealed class Product : BaseEntity
     }
     #endregion
     
-    #region productAttributeValue
-    public Result<ProductAttributeValueInfo> GetProductAttributeValue(Guid productAttributeValueId)
-    {
-        ProductAttributeValue? productAttributeValue = _productAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
-
-        if (productAttributeValue == null)
-        {
-            return Result<ProductAttributeValueInfo>.Failure($"{nameof(productAttributeValue)} is null. Nothing to get.");
-        }
-        
-        return Result<ProductAttributeValueInfo>.Success((ProductAttributeValueInfo)productAttributeValue);
-    }
-    #endregion
-
     #region productAttributeValues
-    public VoidResult AddProductAttributeValue(string key, string value, Guid productAttributeId)
+    public VoidResult AddProductAttributeValue(Guid attributeId, string key, string value)
     {
-        ProductAttributeValue? existingProductAttributeValue = _productAttributeValues.FirstOrDefault(pav => pav.Value == value);
-
-        if (existingProductAttributeValue != null)
+        if (_productAttributeValues.Any(av => av.CategoryAttributeId == attributeId && av.Key == value))
         {
-            return VoidResult.Failure($"{nameof(existingProductAttributeValue)} already exists", HttpStatusCode.Conflict);
+            return VoidResult.Failure("Attribute already exists");
         }
         
-        Result<ProductAttributeValue> createProductAttributeValueResult =
-            ProductAttributeValue.Create(this, key, value, productAttributeId);
+        Result<ProductAttributeValue> attributeResult = ProductAttributeValue.Create(attributeId, key, value);
+        if (attributeResult.IsFailure)
+        {
+            return VoidResult.Failure(attributeResult.ErrorMessage!, attributeResult.StatusCode);
+        }
 
-        return createProductAttributeValueResult.Map(
-            onSuccess: productAttributeValue =>
-            {
-                _productAttributeValues.Add(productAttributeValue);
-                return VoidResult.Success();
-            },
-            onFailure: errorMessage => VoidResult.Failure(errorMessage, createProductAttributeValueResult.StatusCode)
-        );
+        _productAttributeValues.Add(attributeResult.Value!);
+        
+        return VoidResult.Success();
     }
 
-    public void RemoveProductAttributeValue(Guid productAttributeId)
+    public void RemoveProductAttributeValue(Guid attributeId)
     {
-        ProductAttributeValue? productAttributeValue = _productAttributeValues.FirstOrDefault(pav => pav.CategoryAttributeId == productAttributeId);
-        
-        if (productAttributeValue == null)
-        {
-            return;
-        }
-        
-        _productAttributeValues.Remove(productAttributeValue);
+        _productAttributeValues.RemoveAll(av => av.CategoryAttributeId == attributeId);
     }
     
     public VoidResult RemoveAllProductAttributeValues()
     {
         _productAttributeValues.Clear();
+
+        if (_productAttributeValues.Count != 0)
+        {
+            return VoidResult.Failure("Failed to remove all product attribute values.");
+        }
+        
         return VoidResult.Success();
     }
 
-    public VoidResult ChangeProductAttributeKey(Guid productAttributeValueId, string key)
+    public VoidResult ChangeProductAttributeValue(Guid attributeId, string newValue)
     {
-        ProductAttributeValue? productAttributeValue = _productAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
-        
-        if (productAttributeValue == null)
+        var existing = _productAttributeValues.FirstOrDefault(a => a.CategoryAttributeId == attributeId);
+        if (existing is null)
         {
-            return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to change.", HttpStatusCode.NotFound);
+            return VoidResult.Failure("Attribute not found", HttpStatusCode.NotFound);
         }
-        
-        VoidResult setProductAttributeKeyResult = productAttributeValue.SetKey(key);
 
-        return setProductAttributeKeyResult.Map(
-            onSuccess: () => VoidResult.Success(),
-            onFailure: errorMessage => VoidResult.Failure(errorMessage, setProductAttributeKeyResult.StatusCode)
-        );
-    }
-
-    public VoidResult ChangeProductAttributeValue(Guid productAttributeValueId, string value)
-    {
-        ProductAttributeValue? productAttributeValue = _productAttributeValues.FirstOrDefault(pav => pav.Id == productAttributeValueId);
+        _productAttributeValues.Remove(existing);
         
-        if (productAttributeValue == null)
-        {
-            return VoidResult.Failure($"{nameof(productAttributeValue)} is null. Nothing to change.", HttpStatusCode.NotFound);
-        }
+        var newAttr = new ProductAttributeValue(existing.CategoryAttributeId, existing.Key, newValue);
+        _productAttributeValues.Add(newAttr);
         
-        VoidResult setProductAttributeValueResult = productAttributeValue.SetValue(value);
-
-        return setProductAttributeValueResult.Map(
-            onSuccess: () => VoidResult.Success(),
-            onFailure: errorMessage => VoidResult.Failure(errorMessage, setProductAttributeValueResult.StatusCode)
-        );
+        return VoidResult.Success();
     }
     #endregion
     

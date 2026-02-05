@@ -42,7 +42,7 @@ internal sealed class CustomerEntityConfiguration : IEntityTypeConfiguration<Dom
 
             fullName.Property(fn => fn.MiddleName)
                 .HasColumnName("MiddleName")
-                .IsRequired();
+                .IsRequired(false);
         });
         
         builder.Property(c => c.PhoneNumber)

@@ -4,6 +4,7 @@ using Catalog.Domain.CategoryAggregate.Entities;
 using Catalog.Domain.Interfaces;
 using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.ProductAggregate.Enums;
+using Catalog.Domain.ProductAggregate.ValueObjects;
 using Catalog.Domain.ValueObjects.AddProduct;
 using Catalog.Domain.ValueObjects.FullProductDto;
 using Shared.Domain.Models;
@@ -14,21 +15,21 @@ public sealed class ProductDomainService(
     IProductRepository productRepository,
     ICategoryRepository categoryRepository)
 {
-    public async Task<Result<Guid>> AddProductAsync(
+    public async Task<Result<Product>> CreateProductWithAttributesAsync(
         string title,
         string description,
         decimal price,
         ProductStatus status,
         Guid categoryId,
         Guid sellerId,
-        IReadOnlyCollection<AddAttributeValueObject> attributes,
+        IReadOnlyCollection<AddAttributeValueObject> attributeDtos,
         CancellationToken ct)
     {
-        Category? category = await categoryRepository.GetByIdAsNoTrackingAsync(categoryId, ct);
+        Category? category = await categoryRepository.GetByIdWithProductAttributesAsNoTrackingAsync(categoryId, ct);
 
         if (category is null)
         {
-            return Result<Guid>.Failure("Category not found", HttpStatusCode.NotFound);
+            return Result<Product>.Failure("Category not found", HttpStatusCode.NotFound);
         }
 
         Result<Product> newProduct = Product.Create(
@@ -42,65 +43,46 @@ public sealed class ProductDomainService(
 
         if (!newProduct.IsSuccess)
         {
-            return Result<Guid>.Failure(newProduct.ErrorMessage!, newProduct.StatusCode);
+            return Result<Product>.Failure(newProduct);
         }
 
-        await productRepository.AddAsync(newProduct.Value!, ct);
-        
-        await productRepository.SaveChangesAsync(ct);
-        
-        //todo: придумать как обрабатывать ошибку, если случиться проблема с одним из атрибутов
         VoidResult addProductAttributesResult =
-            await AddProductAttributesAsync(newProduct.Value!, attributes, ct);
+            AddProductAttributes(newProduct.Value!, attributeDtos, category.ProductAttributes);
 
-        return Result<Guid>.Success(newProduct.Value!.Id);
-    }
-    
-    private async Task<VoidResult> AddProductAttributesAsync(Product newProduct,
-        IReadOnlyCollection<AddAttributeValueObject> addAttributesDtos,
-        CancellationToken ct)
-    {
-        //todo: убрать метод GetByIdWithProductAttributesAsNoTrackingAsync так как есть возможность добавлять инклуды как аргументы
-        
-        Category? category = await categoryRepository.GetByIdWithProductAttributesAsNoTrackingAsync(newProduct.CategoryId, ct);
-
-        if (category is null)
+        if (addProductAttributesResult.IsFailure)
         {
-            return VoidResult.Failure(
-                $"Category with id: {newProduct.CategoryId} not found",
-                HttpStatusCode.NotFound
-            );
+            return Result<Product>.Failure(addProductAttributesResult);
         }
 
-        IReadOnlyCollection<ProductAttributeInfo> attributes = category.ProductAttributes;
+        return Result<Product>.Success(newProduct.Value!);
+    }
 
-        bool isAllSuccess = true;
+    private VoidResult AddProductAttributes(Product newProduct,
+        IReadOnlyCollection<AddAttributeValueObject> incomingAttributes,
+        IReadOnlyCollection<ProductAttributeInfo> allowedAttributes)
+    {
+        var allowedAttributesDict = allowedAttributes
+            .ToDictionary(a => a.Id);
 
-        foreach (AddAttributeValueObject addAttributesDto in addAttributesDtos)
+        foreach (AddAttributeValueObject incomingAttribute in incomingAttributes)
         {
-            ProductAttributeInfo? attributeInfo = attributes.FirstOrDefault(a => a.Id == addAttributesDto.ProductAttributeId);
-
-            if (attributeInfo is null)
+            if (!allowedAttributesDict.TryGetValue(incomingAttribute.CategoryAttributeId,
+                    out ProductAttributeInfo? attributeInfo))
             {
-                isAllSuccess = false;
-                continue;
+                return VoidResult.Failure($"Attribute with id:{incomingAttribute.CategoryAttributeId} not found",
+                    HttpStatusCode.NotFound);
             }
 
-            string key = attributeInfo.Key;
-
-            VoidResult addAttributeResult = newProduct.AddProductAttributeValue(key, addAttributesDto.Value, addAttributesDto.ProductAttributeId);
+            VoidResult addAttributeResult =
+                newProduct.AddProductAttributeValue(
+                    incomingAttribute.CategoryAttributeId,
+                    attributeInfo.Key,
+                    incomingAttribute.Value);
 
             if (addAttributeResult.IsFailure)
             {
-                isAllSuccess = false;
+                return VoidResult.Failure(addAttributeResult);
             }
-        }
-
-        await productRepository.SaveChangesAsync(ct);
-
-        if (!isAllSuccess)
-        {
-            return VoidResult.Failure("Error during one or many attributes creation");
         }
 
         return VoidResult.Success();
@@ -110,8 +92,9 @@ public sealed class ProductDomainService(
     {
         return await productRepository.GetAllMediaIdsByCategoryProductsAsync(categoryId, ct);
     }
-    
-    public async Task<Result<IReadOnlyCollection<ProductCategoriesValueObject>>> GetCategoriesLineForProduct(Guid categoryId, CancellationToken ct)
+
+    public async Task<Result<IReadOnlyCollection<ProductCategoriesValueObject>>> GetCategoriesLineForProduct(
+        Guid categoryId, CancellationToken ct)
     {
         Category? category = await categoryRepository.GetByIdAsNoTrackingAsync(categoryId, ct, "Parent");
 
@@ -139,7 +122,7 @@ public sealed class ProductDomainService(
             {
                 CategoryId = category.Parent.Id,
                 CategoryName = category.Parent.Name,
-                Order = 1         
+                Order = 1
             }
         ];
 
@@ -150,16 +133,17 @@ public sealed class ProductDomainService(
     public async Task<VoidResult> IsCategoryExistAsync(Guid categoryId, CancellationToken ct)
     {
         Category? category = await categoryRepository.GetByIdAsNoTrackingAsync(categoryId, ct);
-        
+
         if (category is null)
         {
             return VoidResult.Failure($"Category with id:{categoryId} not found", HttpStatusCode.NotFound);
         }
-        
+
         return VoidResult.Success();
     }
 
-    public async Task<VoidResult> IsCategoryAndAttributesExistAsync(Guid categoryId, List<Guid> attributeIds, CancellationToken ct)
+    public async Task<VoidResult> IsCategoryAndAttributesExistAsync(Guid categoryId, List<Guid> attributeIds,
+        CancellationToken ct)
     {
         Category? category = await categoryRepository.GetByIdWithProductAttributesAsNoTrackingAsync(categoryId, ct);
 
@@ -167,7 +151,7 @@ public sealed class ProductDomainService(
         {
             return VoidResult.Failure($"Category with id:{categoryId} not found", HttpStatusCode.NotFound);
         }
-        
+
         HashSet<Guid> categoryAttributeIds = category.ProductAttributes
             .Select(a => a.Id)
             .ToHashSet();
@@ -178,7 +162,7 @@ public sealed class ProductDomainService(
         {
             return VoidResult.Failure("One or more attributes do not belong to this category");
         }
-        
-        return VoidResult.Success();       
+
+        return VoidResult.Success();
     }
 }

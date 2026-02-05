@@ -24,29 +24,29 @@ internal static class OrderEndpoints
             .WithTags("Order");
         
         orderGroup.MapGet("{orderId:guid}/details", GetOrderDetails)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Get order details");
 
         //todo: переделать роут на: /api/orders/customers/{customerId:guid}
         //todo: та и вообще перенести заказы пользователя в модуль пользователей а заказы продавца в модуль продавца
         orderGroup.MapGet("{customerId:guid}", GetCustomerOrders)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Get all orders by specific customer");
         
         orderGroup.MapGet("sellers/{sellerId:guid}", GetSellerOrders)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Get all orders by specific seller");
         
         orderGroup.MapPost("with-payment", PlaceOrderWithPayment)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Creates an order and returns client secret for payment");
 
         orderGroup.MapPatch("{orderId:guid}/paid", MarkOrderPaid)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Marks order as paid");
 
         orderGroup.MapPost("", PlaceOrder)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Creates an order without payment");
     }
 
@@ -111,7 +111,11 @@ internal static class OrderEndpoints
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(placeOrderWithPaymentResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(placeOrderWithPaymentResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(placeOrderWithPaymentResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(PlaceOrderWithPayment), placeOrderWithPaymentResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(OrderEndpoints),
+                    nameof(PlaceOrderWithPayment),
+                    placeOrderWithPaymentResult.StatusCode
+                )
             };
         }
         
@@ -132,7 +136,11 @@ internal static class OrderEndpoints
             {
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(placeOrderResult.ErrorMessage),
                 HttpStatusCode.NotFound => TypedResults.NotFound(placeOrderResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(PlaceOrder), placeOrderResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(OrderEndpoints),
+                    nameof(PlaceOrder),
+                    placeOrderResult.StatusCode
+                )
             };
         }
 

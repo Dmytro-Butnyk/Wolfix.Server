@@ -22,6 +22,7 @@ public static class DependencyInjection
     public static IServiceCollection AddCustomerEventHandlers(this IServiceCollection services)
     {
         services.AddScoped<IIntegrationEventHandler<CustomerAccountCreated, Guid>, CustomerAccountCreatedEventHandler>();
+        services.AddScoped<IIntegrationEventHandler<CustomerAccountCreatedViaGoogle, Guid>, CustomerAccountCreatedViaGoogleEventHandler>();
         services.AddScoped<IIntegrationEventHandler<ProductExistsForAddingToFavorite>, ProductExistsForAddingToFavoriteEventHandler>();
         services.AddScoped<IIntegrationEventHandler<ProductExistsForAddingToCart>, ProductExistsForAddingToCartEventHandler>();
         services.AddScoped<IIntegrationEventHandler<CheckCustomerExistsForAddingReview>, CheckCustomerExistsForAddingReviewEventHandler>();

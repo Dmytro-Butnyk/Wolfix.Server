@@ -1,5 +1,5 @@
 ﻿namespace Catalog.Domain.ValueObjects.AddProduct;
 
 public sealed record AddAttributeValueObject(
-    Guid ProductAttributeId,
+    Guid CategoryAttributeId,
     string Value);

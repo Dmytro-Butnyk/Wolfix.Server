@@ -16,6 +16,8 @@ internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Cat
         ConfigureParentRelation(builder);
         ConfigureProductVariantsRelation(builder);
         ConfigureProductAttributesRelation(builder);
+
+        ConfigureIndexes(builder);
     }
 
     private void ConfigureParentRelation(EntityTypeBuilder<Catalog.Domain.CategoryAggregate.Category> builder)
@@ -67,5 +69,16 @@ internal sealed class CategoryEntityConfiguration : IEntityTypeConfiguration<Cat
             .IsRequired(false);
         builder.Navigation("_productAttributes")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+    }
+
+    private void ConfigureIndexes(EntityTypeBuilder<Catalog.Domain.CategoryAggregate.Category> builder)
+    {
+        builder.HasIndex(c => c.Name, "idx_UNIQUE_name").IsUnique();
+        
+        builder.HasIndex("ParentId")
+            .HasFilter("\"ParentId\" IS NULL")
+            .HasDatabaseName("idx_EQUALS_isParent");
+        builder.HasIndex("ParentId")
+            .HasDatabaseName("idx_EQUALS_isChild");
     }
 }

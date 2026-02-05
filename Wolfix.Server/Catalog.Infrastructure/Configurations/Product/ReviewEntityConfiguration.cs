@@ -14,6 +14,8 @@ internal sealed class ReviewEntityConfiguration : IEntityTypeConfiguration<Revie
         ConfigureBasicProperties(builder);
 
         ConfigureProductRelation(builder);
+        
+        ConfigureIndexes(builder);
     }
 
     private void ConfigureBasicProperties(EntityTypeBuilder<Review> builder)
@@ -38,5 +40,10 @@ internal sealed class ReviewEntityConfiguration : IEntityTypeConfiguration<Revie
             .OnDelete(DeleteBehavior.Cascade);
         builder.Navigation(r => r.Product)
             .UsePropertyAccessMode(PropertyAccessMode.Property);
+    }
+
+    private void ConfigureIndexes(EntityTypeBuilder<Review> builder)
+    {
+        builder.HasIndex(r => new { r.ProductId, r.CreatedAt }, "idx_EQUALS_productId_SORT_createdAt");
     }
 }

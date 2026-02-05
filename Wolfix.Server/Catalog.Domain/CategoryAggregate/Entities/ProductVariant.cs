@@ -55,7 +55,7 @@ internal sealed class ProductVariant : BaseEntity
     #endregion
     
     public static explicit operator ProductVariantInfo(ProductVariant productVariant)
-        => new(productVariant.Key);
+        => new(productVariant.Id, productVariant.Key);
 }
 
-public record ProductVariantInfo(string Key);
+public record ProductVariantInfo(Guid Id, string Key);

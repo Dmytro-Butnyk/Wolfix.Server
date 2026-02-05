@@ -19,11 +19,11 @@ using Catalog.Domain.ValueObjects.AddProduct;
 using Catalog.Domain.ValueObjects.FullProductDto;
 using Catalog.IntegrationEvents;
 using Catalog.IntegrationEvents.Dto;
+using Microsoft.Extensions.Logging;
 using Shared.Application.Dto;
 using Shared.Domain.Enums;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents;
-using Shared.IntegrationEvents.Interfaces;
 
 namespace Catalog.Application.Services;
 
@@ -49,8 +49,7 @@ public sealed class ProductService(
             return VoidResult.Failure("Invalid status");
         }
 
-        //todo: вместо хардкода указать тут addProductDto.ContentType
-        if (!Enum.TryParse("Photo", out BlobResourceType blobResourceType))
+        if (!Enum.TryParse(addProductDto.ContentType, out BlobResourceType blobResourceType))
         {
             return VoidResult.Failure("Invalid blob resource type");
         }
@@ -64,9 +63,7 @@ public sealed class ProductService(
             .Select(attr => new AddAttributeValueObject(attr.Id, attr.Value))
             .ToList();
 
-        //todo: исправить логику доменного сервиса (сейчас продукт создается внутри него, что не очень хорошо)
-
-        Result<Guid> result = await productDomainService.AddProductAsync(
+        Result<Product> result = await productDomainService.CreateProductWithAttributesAsync(
             addProductDto.Title,
             addProductDto.Description,
             addProductDto.Price,
@@ -81,6 +78,9 @@ public sealed class ProductService(
         {
             return VoidResult.Failure(result);
         }
+        
+        await productRepository.AddAsync(result.Value!, ct);
+        await productRepository.SaveChangesAsync(ct);
 
         //todo: пофиксить (ажур аккаунт срок истёк)
         
@@ -200,7 +200,7 @@ public sealed class ProductService(
     public async Task<Result<ProductFullDto>> GetProductFullInfoAsync(Guid productId, CancellationToken ct)
     {
         Product? product = await productRepository.GetByIdAsNoTrackingAsync(productId, ct,
-            "_productMedias", "_productAttributeValues", "_productVariantValues");
+            "_productMedias", "_productVariantValues");
 
         if (product is null)
         {
@@ -341,6 +341,10 @@ public sealed class ProductService(
     public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetRecommendedForPageAsync(int pageSize,
         List<Guid> visitedCategoriesIds, CancellationToken ct)
     {
+        if (visitedCategoriesIds.Count == 0)
+        {
+            return Result<IReadOnlyCollection<ProductShortDto>>.Success([]);
+        }
         //todo: добавить проверку на существование категорий через доменный сервис(или событие) и кинуть нот фаунт если нету
 
         List<ProductShortProjection> recommendedProducts = new(pageSize);
@@ -521,25 +525,40 @@ public sealed class ProductService(
         return Result<IReadOnlyCollection<ProductShortDto>>.Success(productShortDtos);
     }
 
-    public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetByAttributesFiltrationAsync(AttributesFiltrationDto attributesFiltrationDto, int pageSize,
+    public async Task<Result<IReadOnlyCollection<ProductShortDto>>> GetByAttributesFiltrationAsync(
+        ProductFilterCriteriaDto productFilterCriteriaDto, 
         CancellationToken ct)
     {
-        VoidResult isCategoryAndtributesExist = await productDomainService
-            .IsCategoryAndAttributesExistAsync(attributesFiltrationDto.CategoryId,
-                attributesFiltrationDto.FiltrationAttribute.Select(fa => fa.AttributeId).ToList(), ct);
-        
-        if (isCategoryAndtributesExist.IsFailure)
+        var ensureValidResult = productFilterCriteriaDto.EnsureValid();
+
+        if (ensureValidResult.IsFailure)
         {
-            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(isCategoryAndtributesExist);
+            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(ensureValidResult);
+        }
+        
+        VoidResult isCategoryAndAttributesExist = await productDomainService
+            .IsCategoryAndAttributesExistAsync(productFilterCriteriaDto.CategoryId,
+                productFilterCriteriaDto.FiltrationAttribute.Select(fa => fa.AttributeId).ToList(), ct);
+        
+        if (isCategoryAndAttributesExist.IsFailure)
+        {
+            return Result<IReadOnlyCollection<ProductShortDto>>.Failure(isCategoryAndAttributesExist);
         }
 
+        IReadOnlyCollection<(Guid AttributeId, string Value)> filtrationAttribute = productFilterCriteriaDto.FiltrationAttribute
+            .Select(fa => (fa.AttributeId, fa.Value))
+            .ToList();
+        
         IReadOnlyCollection<Guid> productIds =
             await productRepository.GetByAttributesFiltrationAsNoTrackingAsync(
-                attributesFiltrationDto.FiltrationAttribute
-                    .Select(fa => (fa.AttributeId, fa.Value))
-                    .ToList(),
-                pageSize,
-                ct);
+                productFilterCriteriaDto.CategoryId,
+                filtrationAttribute,
+                productFilterCriteriaDto.MinPrice,
+                productFilterCriteriaDto.MaxPrice,
+                productFilterCriteriaDto.PageSize,
+                productFilterCriteriaDto.SkipCount,
+                ct
+                );
 
         IReadOnlyCollection<ProductShortProjection> productShortProjections =
             await productRepository.GetShortProductsByIdsAsNoTrackingAsync(productIds, ct);

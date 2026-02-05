@@ -11,6 +11,8 @@ internal sealed class SellerApplicationEntityConfiguration : IEntityTypeConfigur
         builder.ToTable("SellerApplications");
         
         ConfigureBasicProperties(builder);
+        
+        ConfigureIndexes(builder);
     }
     
     private void ConfigureBasicProperties(EntityTypeBuilder<Domain.SellerApplicationAggregate.SellerApplication> builder)
@@ -88,5 +90,10 @@ internal sealed class SellerApplicationEntityConfiguration : IEntityTypeConfigur
                     .IsRequired();
             });
         });
+    }
+
+    private void ConfigureIndexes(EntityTypeBuilder<Domain.SellerApplicationAggregate.SellerApplication> builder)
+    {
+        builder.HasIndex(sa => sa.Status, "idx_EQUALS_status");
     }
 }

@@ -39,7 +39,7 @@ internal static class CategoryEndpoints
             .WithSummary("Get all child categories");
 
         group.MapGet("child/{childId:guid}/attributes", GetAllAttributesByCategory)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Get all attributes by specific category");
         
         group.MapGet("child/{childId:guid}/attributes-with-values", GetAllAttributesWithUniqueValues)
@@ -50,40 +50,40 @@ internal static class CategoryEndpoints
     {
         group.MapPost("", AddParent)
             .DisableAntiforgery()
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Add parent category");
         
         group.MapPatch("{categoryId:guid}", ChangeParent)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Change parent category");
 
         group.MapDelete("{categoryId:guid}", DeleteCategory)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Delete category");
         
         group.MapPost("{parentId:guid}", AddChild)
             .DisableAntiforgery()
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Add child category");
         
         group.MapPatch("child/{childCategoryId:guid}", ChangeChild)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Change child category");
         
         group.MapPost("child/{childCategoryId:guid}/attributes", AddAttribute)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Add attribute to child category");
         
         group.MapDelete("child/{childCategoryId:guid}/attributes/{attributeId:guid}", DeleteAttribute)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Delete attribute of child category");
 
         group.MapPost("child/{childCategoryId:guid}/variants", AddVariant)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Add variant to child category");
 
         group.MapDelete("child/{childCategoryId:guid}/variants/{variantId:guid}", DeleteVariant)
-            .RequireAuthorization(Roles.Admin)
+            .RequireAuthorization(AuthorizationRoles.Admin)
             .WithSummary("Delete variant of child category");
     }
 
@@ -128,7 +128,11 @@ internal static class CategoryEndpoints
             {
                 HttpStatusCode.Conflict => TypedResults.NotFound(result.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(result.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddParent), result.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(AddParent),
+                    result.StatusCode
+                )
             };
         }
         
@@ -174,7 +178,11 @@ internal static class CategoryEndpoints
             {
                 HttpStatusCode.Conflict => TypedResults.Conflict(addParentCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addParentCategoryResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddParent), addParentCategoryResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(AddParent),
+                    addParentCategoryResult.StatusCode
+                )
             };
         }
         
@@ -196,7 +204,11 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeParentCategoryResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(changeParentCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeParentCategoryResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeParent), changeParentCategoryResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(ChangeParent),
+                    changeParentCategoryResult.StatusCode
+                )
             };
         }
 
@@ -233,7 +245,11 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(addChildCategoryResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(addChildCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addChildCategoryResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddChild), addChildCategoryResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(AddChild),
+                    addChildCategoryResult.StatusCode
+                )
             };
         }
         
@@ -255,7 +271,11 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeChildCategoryResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(changeChildCategoryResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeChildCategoryResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeChild), changeChildCategoryResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(ChangeChild),
+                    changeChildCategoryResult.StatusCode
+                )
             };
         }
         
@@ -277,7 +297,11 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(addCategoryAttributeResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(addCategoryAttributeResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addCategoryAttributeResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddAttribute), addCategoryAttributeResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(AddAttribute),
+                    addCategoryAttributeResult.StatusCode
+                )
             };
         }
         
@@ -315,7 +339,11 @@ internal static class CategoryEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(addCategoryVariantResult.ErrorMessage),
                 HttpStatusCode.Conflict => TypedResults.Conflict(addCategoryVariantResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(addCategoryVariantResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(AddVariant), addCategoryVariantResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CategoryEndpoints),
+                    nameof(AddVariant),
+                    addCategoryVariantResult.StatusCode
+                )
             };
         }
         

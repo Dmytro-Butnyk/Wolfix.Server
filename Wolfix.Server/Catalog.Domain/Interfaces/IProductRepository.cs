@@ -39,7 +39,14 @@ public interface IProductRepository
     Task<IReadOnlyCollection<ProductShortProjection>> GetBySearchQueryAndCategoryAsync(Guid categoryId, string searchQuery, int pageSize,
         CancellationToken ct);
     
-    Task<IReadOnlyCollection<Guid>> GetByAttributesFiltrationAsNoTrackingAsync (IReadOnlyCollection<(Guid AttributeId, string Value)> filters, int pageSize, CancellationToken ct);
+    Task<IReadOnlyCollection<Guid>> GetByAttributesFiltrationAsNoTrackingAsync (
+        Guid categoryId,
+        IReadOnlyCollection<(Guid AttributeId, string Value)> attributeFilters,
+        decimal? minPrice,
+        decimal? maxPrice,
+        int pageSize,
+        int skipCount,
+        CancellationToken ct);
     
     Task<IReadOnlyCollection<ProductShortProjection>> GetShortProductsByIdsAsNoTrackingAsync (IReadOnlyCollection<Guid> ids, CancellationToken ct);
     

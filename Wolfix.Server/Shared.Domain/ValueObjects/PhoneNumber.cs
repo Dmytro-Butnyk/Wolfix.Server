@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using MongoDB.Bson.Serialization.Attributes;
 using Shared.Domain.Models;
 
 namespace Shared.Domain.ValueObjects;
@@ -9,6 +10,7 @@ public sealed class PhoneNumber
     
     public string Value { get; private set; }
 
+    [BsonConstructor]
     private PhoneNumber(string value)
     {
         Value = value;

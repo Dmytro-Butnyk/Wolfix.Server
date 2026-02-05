@@ -108,6 +108,8 @@ namespace Seller.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex(new[] { "Status" }, "idx_EQUALS_status");
+
                     b.ToTable("SellerApplications", "seller");
                 });
 

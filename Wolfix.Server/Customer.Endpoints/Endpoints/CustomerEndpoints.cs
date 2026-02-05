@@ -26,7 +26,7 @@ internal static class CustomerEndpoints
             .WithTags("Customer");
         
         customerGroup.MapGet("{customerId:guid}", GetProfileInfo)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Get profile info");
         
         var favoriteItemsGroup = customerGroup.MapGroup("favorites");
@@ -44,49 +44,49 @@ internal static class CustomerEndpoints
     private static void MapFavoriteItemsEndpoints(RouteGroupBuilder group)
     {
         group.MapGet("{customerId:guid}", GetFavoriteProducts)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Get all favorite products by specific customer");
         
         group.MapPost("", AddProductToFavorite)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Add product to favorite");
         
         group.MapDelete("{customerId:guid}/{favoriteItemId:guid}", DeleteFavoriteItem)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Delete favorite item");
     }
 
     private static void MapCartItemsEndpoints(RouteGroupBuilder group)
     {
         group.MapGet("{customerId:guid}", GetCartProducts)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Get all products in cart by specific customer");
         
         group.MapPost("", AddProductToCart)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Add product to cart");
         
         group.MapDelete("{customerId:guid}/{cartItemId:guid}", DeleteCartItem)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Delete cart item");
     }
 
     private static void MapChangeMethods(RouteGroupBuilder group)
     {
         group.MapPatch("full-name", ChangeFullName)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Change full name");
 
         group.MapPatch("phone-number", ChangePhoneNumber)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Change phone number");
         
         group.MapPatch("address", ChangeAddress)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Change address");
         
         group.MapPatch("birth-date", ChangeBirthDate)
-            .RequireAuthorization(Roles.Customer)
+            .RequireAuthorization(AuthorizationRoles.Customer)
             .WithSummary("Change birth date");
     }
     
@@ -213,7 +213,11 @@ internal static class CustomerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeFullNameResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeFullNameResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeFullName), changeFullNameResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CustomerEndpoints),
+                    nameof(ChangeFullName),
+                    changeFullNameResult.StatusCode
+                )
             };
         }
         
@@ -234,7 +238,11 @@ internal static class CustomerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changePhoneNumberResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changePhoneNumberResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangePhoneNumber), changePhoneNumberResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CustomerEndpoints),
+                    nameof(ChangePhoneNumber),
+                    changePhoneNumberResult.StatusCode
+                )
             };
         }
         
@@ -255,7 +263,11 @@ internal static class CustomerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeAddressResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeAddressResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeAddress), changeAddressResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CustomerEndpoints),
+                    nameof(ChangeAddress),
+                    changeAddressResult.StatusCode
+                )
             };
         }
         
@@ -276,7 +288,11 @@ internal static class CustomerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeBirthDateResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeBirthDateResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeBirthDate), changeBirthDateResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(CustomerEndpoints),
+                    nameof(ChangeBirthDate),
+                    changeBirthDateResult.StatusCode
+                )
             };
         }
         

@@ -1,4 +1,5 @@
 using Catalog.Domain.ProductAggregate.Entities;
+using Catalog.Domain.ProductAggregate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shared.Infrastructure.ValueGenerators;
@@ -24,6 +25,8 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
         ConfigureProductVariantValuesRelation(builder);
 
         ConfigureProductMediaRelation(builder);
+        
+        ConfigureIndexes(builder);
     }
 
     private void ConfigureBasicProperties(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
@@ -92,12 +95,13 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
 
     private void ConfigureProductAttributeValuesRelation(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
     {
-        builder.HasMany<ProductAttributeValue>("_productAttributeValues")
-            .WithOne(pav => pav.Product)
-            .HasForeignKey("ProductId")
-            .OnDelete(DeleteBehavior.Cascade)
-            .IsRequired(false);
-        builder.Navigation("_productAttributeValues")
+        builder.OwnsMany(p => p.ProductAttributeValues, b =>
+        {
+            b.ToJson();
+            b.Property(x => x.CategoryAttributeId).IsRequired();
+            b.Property(x => x.Key).IsRequired();
+        })
+            .Navigation(p => p.ProductAttributeValues)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 
@@ -110,5 +114,12 @@ internal sealed class ProductEntityConfiguration : IEntityTypeConfiguration<Cata
             .IsRequired(false);
         builder.Navigation("_productVariantValues")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+    }
+
+    private void ConfigureIndexes(EntityTypeBuilder<Catalog.Domain.ProductAggregate.Product> builder)
+    {
+        builder.HasIndex(p => new { p.CategoryId, p.FinalPrice }, "idx_EQUALS_categoryId_SORT_finalPrice");
+        builder.HasIndex(p => p.SellerId, "idx_EQUALS_sellerId");
+        builder.HasIndex(p => new { p.SellerId, p.CategoryId }, "idx_EQUALS_sellerId_EQUALS_categoryId");
     }
 }

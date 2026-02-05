@@ -7,16 +7,19 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.OpenApi.Models;
 using Order.Endpoints.Extensions;
 using Seller.Endpoints.Extensions;
+using Serilog;
 using Shared.Application.Extensions;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
+using Support.Application.Dto.SupportRequest.Create;
 using Support.Endpoints.Extensions;
+using Support.Infrastructure.MongoDB.Extensions;
 
 namespace Wolfix.API.Extensions;
 
 public static class WebApplicationBuilderExtension
 {
-    public static WebApplicationBuilder AddAllModules(this WebApplicationBuilder builder)
+    public static async Task<WebApplicationBuilder> AddAllModules(this WebApplicationBuilder builder)
     {
         string connectionString = builder.Configuration.GetOrThrow("DB");
 
@@ -27,8 +30,9 @@ public static class WebApplicationBuilderExtension
             .AddMediaModule(connectionString)
             .AddSellerModule(connectionString)
             .AddOrderModule(connectionString)
-            .AddAdminModule(connectionString)
-            .AddSupportModule(connectionString);
+            .AddAdminModule(connectionString);
+
+        await builder.AddSupportModule();
         
         return builder;
     }
@@ -75,9 +79,18 @@ public static class WebApplicationBuilderExtension
         return builder;
     }
 
-    private static WebApplicationBuilder AddSupportModule(this WebApplicationBuilder builder, string connectionString)
+    private static async Task<WebApplicationBuilder> AddSupportModule(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSupportModule(connectionString);
+        string connectionString = builder.Configuration.GetOrThrow("MONGODB_CONNECTION_STRING");
+        string databaseName = builder.Configuration.GetOrThrow("MONGODB_DATABASE_NAME");
+        
+        builder.Services.AddSupportModule(connectionString, databaseName);
+        await builder.Services.BuildServiceProvider().AddSupportMongoDbIndexes();
+        
+        builder.Services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.PropertyNameCaseInsensitive = true;
+        });
         
         return builder;
     }
@@ -136,7 +149,23 @@ public static class WebApplicationBuilderExtension
     {
         builder.Services.AddSwaggerGen(options =>
         {
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+            options.UseOneOfForPolymorphism();
+            
+            options.SelectDiscriminatorNameUsing(baseType =>
+                baseType.Name == nameof(CreateSupportRequestDto) ? "kind" : null);
+            
+            options.SelectSubTypesUsing(baseType =>
+            {
+                if (baseType == typeof(CreateSupportRequestDto))
+                {
+                    return typeof(Program).Assembly.GetTypes()
+                       .Where(t => t.IsSubclassOf(baseType) && !t.IsAbstract);
+                }
+
+                return [];
+            });
+            
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
                 In = ParameterLocation.Header,
@@ -174,6 +203,22 @@ public static class WebApplicationBuilderExtension
             options.Providers.Add<GzipCompressionProvider>();
         });
 
+        return builder;
+    }
+
+    public static WebApplicationBuilder AddLoggingToMongoDb(this WebApplicationBuilder builder)
+    {
+        string databaseUrl = builder.Configuration.GetOrThrow("MONGODB_LOGGING_DATABASE_URL");
+        string collectionName = builder.Configuration.GetOrThrow("MONGODB_LOGGING_COLLECTION_NAME");
+
+        builder.Host.UseSerilog((context, _, configuration) => configuration
+            .ReadFrom.Configuration(context.Configuration)
+            .WriteTo.MongoDBBson(
+                databaseUrl,
+                collectionName: collectionName,
+                cappedMaxSizeMb: 100)
+            .Enrich.FromLogContext());
+        
         return builder;
     }
     //

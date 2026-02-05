@@ -23,22 +23,22 @@ internal static class SellerEndpoints
             .WithTags("Seller");
 
         sellerGroup.MapGet("{sellerId:guid}", GetProfileInfo)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Get profile info");
         
         sellerGroup.MapGet("page/{page:int}", GetAllForPage)
-            .RequireAuthorization(Roles.SuperAdmin)
+            .RequireAuthorization(AuthorizationRoles.SuperAdmin)
             .WithSummary("Get all sellers for page");
         
         sellerGroup.MapDelete("{sellerId:guid}", Delete)
-            .RequireAuthorization(Roles.SuperAdmin)
+            .RequireAuthorization(AuthorizationRoles.SuperAdmin)
             .WithSummary("Delete seller");
         
         var changeGroup = sellerGroup.MapGroup("{sellerId:guid}");
         MapChangeEndpoints(changeGroup);
 
         changeGroup.MapGet("categories", GetAllSellerCategories)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Get all seller categories");
 
         //todo: ендпоинт для смены фото
@@ -47,19 +47,19 @@ internal static class SellerEndpoints
     private static void MapChangeEndpoints(RouteGroupBuilder group)
     {
         group.MapPatch("full-name", ChangeFullName)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change full name");
         
         group.MapPatch("phone-number", ChangePhoneNumber)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change phone number");
         
         group.MapPatch("address", ChangeAddress)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change address");
         
         group.MapPatch("birth-date", ChangeBirthDate)
-            .RequireAuthorization(Roles.Seller)
+            .RequireAuthorization(AuthorizationRoles.Seller)
             .WithSummary("Change birth date");
     }
 
@@ -88,7 +88,11 @@ internal static class SellerEndpoints
                 HttpStatusCode.NotFound => TypedResults.NotFound(deleteResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(deleteResult.ErrorMessage),
                 HttpStatusCode.InternalServerError => TypedResults.InternalServerError(deleteResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(Delete), deleteResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(SellerEndpoints),
+                    nameof(Delete),
+                    deleteResult.StatusCode
+                )
             };
         }
         
@@ -139,7 +143,11 @@ internal static class SellerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeFullNameResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeFullNameResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeFullName), changeFullNameResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(SellerEndpoints),
+                    nameof(ChangeFullName),
+                    changeFullNameResult.StatusCode
+                )
             };
         }
         
@@ -160,7 +168,11 @@ internal static class SellerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changePhoneNumberResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changePhoneNumberResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangePhoneNumber), changePhoneNumberResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(SellerEndpoints),
+                    nameof(ChangePhoneNumber),
+                    changePhoneNumberResult.StatusCode
+                )
             };
         }
         
@@ -181,7 +193,11 @@ internal static class SellerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeAddressResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeAddressResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeAddress), changeAddressResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(SellerEndpoints),
+                    nameof(ChangeAddress),
+                    changeAddressResult.StatusCode
+                )
             };
         }
         
@@ -202,7 +218,11 @@ internal static class SellerEndpoints
             {
                 HttpStatusCode.NotFound => TypedResults.NotFound(changeBirthDateResult.ErrorMessage),
                 HttpStatusCode.BadRequest => TypedResults.BadRequest(changeBirthDateResult.ErrorMessage),
-                _ => throw new UnknownStatusCodeException(nameof(ChangeBirthDate), changeBirthDateResult.StatusCode)
+                _ => throw new UnknownStatusCodeException(
+                    nameof(SellerEndpoints),
+                    nameof(ChangeBirthDate),
+                    changeBirthDateResult.StatusCode
+                )
             };
         }
         

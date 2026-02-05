@@ -14,6 +14,7 @@ public static class WebApplicationBuilderExtension
         services.AddOrderInfrastructureServices();
 
         services.AddOrderApplicationServices();
+        services.AddOrderEventHandlers();
 
         return services;
     }

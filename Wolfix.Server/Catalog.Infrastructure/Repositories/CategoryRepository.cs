@@ -50,7 +50,7 @@ internal sealed class CategoryRepository(CatalogContext context) :
         List<CategoryFullProjection> childCategories = await _categories
             .Include(c => c.Parent)
             .AsNoTracking()
-            .Where(category => category.Parent != null && category.Parent.Id == parentId)
+            .Where(category => category.Parent != null && category.Parent!.Id == parentId)
             .Select(category => new CategoryFullProjection(category.Id, category.Name, category.PhotoUrl))
             .ToListAsync(ct);
         
@@ -72,7 +72,7 @@ internal sealed class CategoryRepository(CatalogContext context) :
         List<CategoryShortProjection> childCategories = await _categories
             .Include(c => c.Parent)
             .AsNoTracking()
-            .Where(category => category.Parent != null)
+            .Where(category => category.IsChild)
             .Select(category => new CategoryShortProjection(category.Id, category.Name))
             .ToListAsync(ct);
         

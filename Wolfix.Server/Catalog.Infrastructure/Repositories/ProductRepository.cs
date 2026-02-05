@@ -1,7 +1,9 @@
-﻿using Catalog.Domain.Interfaces;
+﻿using Catalog.Application.Dto.Product;
+using Catalog.Domain.Interfaces;
 using Catalog.Domain.ProductAggregate;
 using Catalog.Domain.ProductAggregate.Entities;
 using Catalog.Domain.ProductAggregate.Enums;
+using Catalog.Domain.ProductAggregate.ValueObjects;
 using Catalog.Domain.Projections.Product;
 using Catalog.Domain.Projections.Product.Review;
 using Catalog.Domain.ValueObjects;
@@ -281,33 +283,52 @@ internal sealed class ProductRepository(CatalogContext context)
     }
 
     public async Task<IReadOnlyCollection<Guid>> GetByAttributesFiltrationAsNoTrackingAsync(
-        IReadOnlyCollection<(Guid AttributeId, string Value)> filters, int pageSize, CancellationToken ct)
+        Guid categoryId,
+        IReadOnlyCollection<(Guid AttributeId, string Value)> attributeFilters,
+        decimal? minPrice,
+        decimal? maxPrice,
+        int pageSize,
+        int skipCount,
+        CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        
-        var predicate = PredicateBuilder.New<ProductAttributeValue>(false);
 
-        foreach (var f in filters)
+        var masterPredicate = PredicateBuilder.New<Product>(p => p.CategoryId == categoryId);
+
+        if (minPrice.HasValue)
+            masterPredicate = masterPredicate.And(p => p.FinalPrice >= minPrice.Value);
+
+        if (maxPrice.HasValue)
+            masterPredicate = masterPredicate.And(p => p.FinalPrice <= maxPrice.Value);
+
+        if (attributeFilters.Count > 0)
         {
-            var temp = f; // обязательно, чтобы захват переменной корректно
-            predicate = predicate.Or(pa =>
-                EF.Property<Guid>(pa, "CategoryAttributeId") == temp.AttributeId &&
-                EF.Property<string>(pa, "Value") == temp.Value
-            );
+            var groupedFilters = attributeFilters.GroupBy(x => x.AttributeId);
+            foreach (var group in groupedFilters)
+            {
+                var groupPredicate = PredicateBuilder.New<Product>(false);
+                foreach (var filter in group)
+                {
+                    var currentFilter = filter; 
+                    groupPredicate = groupPredicate.Or(p => p.ProductAttributeValues.Any(av => 
+                        av.CategoryAttributeId == currentFilter.AttributeId && 
+                        av.Value == currentFilter.Value));
+                }
+                masterPredicate = masterPredicate.And(groupPredicate);
+            }
         }
 
-        var query = _products
+        return await _products
             .AsNoTracking()
-            .SelectMany(p => EF.Property<List<ProductAttributeValue>>(p, "_productAttributeValues"))
-            .Where(predicate)
+            .Where(masterPredicate)
+            .OrderBy(p => p.FinalPrice) 
+            .ThenBy(p => p.Id)
+            .Skip(skipCount)
             .Take(pageSize)
-            .Select(pa => (
-                pa.Product.Id
-            ));
-
-        return await query.Distinct().ToListAsync(ct);
+            .Select(p => p.Id)
+            .ToListAsync(ct);
     }
-
+    
     public async Task<IReadOnlyCollection<ProductShortProjection>> GetShortProductsByIdsAsNoTrackingAsync(
         IReadOnlyCollection<Guid> ids, CancellationToken ct)
     {
@@ -335,23 +356,29 @@ internal sealed class ProductRepository(CatalogContext context)
         Guid childCategory, IReadOnlyCollection<Guid> attributeIds, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
-        
-        var result = await _products
+        var distinctValues = await _products
             .AsNoTracking()
-            .Include("_productAttributeValues")
             .Where(p => p.CategoryId == childCategory)
-            .SelectMany(p => EF.Property<List<ProductAttributeValue>>(p, "_productAttributeValues"))
+            .SelectMany(p => p.ProductAttributeValues)
             .Where(pav => attributeIds.Contains(pav.CategoryAttributeId))
-            .GroupBy(pav => new { pav.CategoryAttributeId, pav.Key })
+            .Select(pav => new 
+            { 
+                pav.CategoryAttributeId, 
+                pav.Key, 
+                pav.Value 
+            })
+            .Distinct()
+            .ToListAsync(ct);
+
+        return distinctValues
+            .GroupBy(x => new { x.CategoryAttributeId, x.Key })
             .Select(g => new AttributeAndUniqueValuesValueObject
             {
                 AttributeId = g.Key.CategoryAttributeId,
                 Key = g.Key.Key,
-                Values = g.Select(x => x.Value).Distinct().ToList()
+                Values = g.Select(x => x.Value).ToList()
             })
-            .ToListAsync(ct);
-
-        return result;
+            .ToList();
     }
 
     public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllBySellerCategoryForPageAsync(Guid sellerId, Guid categoryId, int page, int pageSize, CancellationToken ct)

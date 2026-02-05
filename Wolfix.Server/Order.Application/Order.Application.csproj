@@ -11,6 +11,7 @@
       <ProjectReference Include="..\Order.IntegrationEvents\Order.IntegrationEvents.csproj" />
       <ProjectReference Include="..\Shared.Application\Shared.Application.csproj" />
       <ProjectReference Include="..\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Support.IntegrationEvents\Support.IntegrationEvents.csproj" />
     </ItemGroup>
 
 </Project>

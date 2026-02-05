@@ -51,7 +51,12 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId");
+                    b.HasIndex("ParentId")
+                        .HasDatabaseName("idx_EQUALS_isChild")
+                        .HasFilter("\"ParentId\" IS NULL");
+
+                    b.HasIndex(new[] { "Name" }, "idx_UNIQUE_name")
+                        .IsUnique();
 
                     b.ToTable("Categories", "catalog");
                 });
@@ -121,34 +126,6 @@ namespace Catalog.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Discounts", "catalog");
-                });
-
-            modelBuilder.Entity("Catalog.Domain.ProductAggregate.Entities.ProductAttributeValue", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CategoryAttributeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryAttributeId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductAttributeValues", "catalog");
                 });
 
             modelBuilder.Entity("Catalog.Domain.ProductAggregate.Entities.ProductMedia", b =>
@@ -237,7 +214,7 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex(new[] { "ProductId", "CreatedAt" }, "idx_EQUALS_productId_SORT_createdAt");
 
                     b.ToTable("Reviews", "catalog");
                 });
@@ -280,7 +257,11 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex(new[] { "CategoryId", "FinalPrice" }, "idx_EQUALS_categoryId_SORT_finalPrice");
+
+                    b.HasIndex(new[] { "SellerId" }, "idx_EQUALS_sellerId");
+
+                    b.HasIndex(new[] { "SellerId", "CategoryId" }, "idx_EQUALS_sellerId_EQUALS_categoryId");
 
                     b.ToTable("Products", "catalog");
                 });
@@ -322,22 +303,6 @@ namespace Catalog.Infrastructure.Migrations
                     b.HasOne("Catalog.Domain.ProductAggregate.Product", "Product")
                         .WithOne("Discount")
                         .HasForeignKey("Catalog.Domain.ProductAggregate.Entities.Discount", "ProductId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Catalog.Domain.ProductAggregate.Entities.ProductAttributeValue", b =>
-                {
-                    b.HasOne("Catalog.Domain.CategoryAggregate.Entities.ProductAttribute", null)
-                        .WithMany()
-                        .HasForeignKey("CategoryAttributeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Catalog.Domain.ProductAggregate.Product", "Product")
-                        .WithMany("_productAttributeValues")
-                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Product");
@@ -389,6 +354,37 @@ namespace Catalog.Infrastructure.Migrations
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.OwnsMany("Catalog.Domain.ProductAggregate.ValueObjects.ProductAttributeValue", "ProductAttributeValues", b1 =>
+                        {
+                            b1.Property<Guid>("ProductId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<Guid>("CategoryAttributeId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Key")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Value")
+                                .HasColumnType("text");
+
+                            b1.HasKey("ProductId", "__synthesizedOrdinal");
+
+                            b1.ToTable("Products", "catalog");
+
+                            b1.ToJson("ProductAttributeValues");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ProductId");
+                        });
+
+                    b.Navigation("ProductAttributeValues");
                 });
 
             modelBuilder.Entity("Catalog.Domain.CategoryAggregate.Category", b =>
@@ -401,8 +397,6 @@ namespace Catalog.Infrastructure.Migrations
             modelBuilder.Entity("Catalog.Domain.ProductAggregate.Product", b =>
                 {
                     b.Navigation("Discount");
-
-                    b.Navigation("_productAttributeValues");
 
                     b.Navigation("_productMedias");
 

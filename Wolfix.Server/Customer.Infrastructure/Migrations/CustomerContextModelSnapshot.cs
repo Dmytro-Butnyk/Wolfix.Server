@@ -193,7 +193,6 @@ namespace Customer.Infrastructure.Migrations
                                 .HasColumnName("LastName");
 
                             b1.Property<string>("MiddleName")
-                                .IsRequired()
                                 .HasColumnType("text")
                                 .HasColumnName("MiddleName");
 
