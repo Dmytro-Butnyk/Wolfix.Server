@@ -38,8 +38,8 @@ public sealed class Address
 
     public override string ToString()
     {
-        string apartmentNumber = ApartmentNumber.HasValue ? $", кв.{ApartmentNumber}" : string.Empty;
-        return $"м.{City}, вул.{Street}, буд.{HouseNumber}{apartmentNumber}";
+        string apartmentNumber = ApartmentNumber.HasValue ? $", кв. {ApartmentNumber}" : string.Empty;
+        return $"м. {City}, вул. {Street}, буд. {HouseNumber}{apartmentNumber}";
     }
 
     public static explicit operator Address(string addressString)

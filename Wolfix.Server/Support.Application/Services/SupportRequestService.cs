@@ -138,20 +138,20 @@ public sealed class SupportRequestService(
         return VoidResult.Success();
     }
     
-    private async Task<Result<BaseSupportRequest>> CreateSupportRequestByCategory(CreateSupportRequestDto request, CancellationToken ct)
+    private async ValueTask<Result<BaseSupportRequest>> CreateSupportRequestByCategory(CreateSupportRequestDto request, CancellationToken ct)
         => request switch
         {
-            CreateBugOrErrorSupportRequestDto orderDto => Result<BaseSupportRequest>.Copy(BugOrErrorSupportRequest.Create(
-                orderDto.FirstName,
-                orderDto.LastName,
-                orderDto.MiddleName,
-                orderDto.PhoneNumber,
-                orderDto.BirthDate,
-                orderDto.CustomerId,
-                orderDto.Category,
-                orderDto.Content,
-                orderDto.ExtraElements,
-                orderDto.PhotoUrl
+            CreateBugOrErrorSupportRequestDto bugOrErrorDto => Result<BaseSupportRequest>.Copy(BugOrErrorSupportRequest.Create(
+                bugOrErrorDto.FirstName,
+                bugOrErrorDto.LastName,
+                bugOrErrorDto.MiddleName,
+                bugOrErrorDto.PhoneNumber,
+                bugOrErrorDto.BirthDate,
+                bugOrErrorDto.CustomerId,
+                bugOrErrorDto.Category,
+                bugOrErrorDto.Content,
+                bugOrErrorDto.ExtraElements,
+                bugOrErrorDto.PhotoUrl
             )),
             CreateGeneralSupportRequestDto generalDto => Result<BaseSupportRequest>.Copy(GeneralSupportRequest.Create(
                 generalDto.FirstName,

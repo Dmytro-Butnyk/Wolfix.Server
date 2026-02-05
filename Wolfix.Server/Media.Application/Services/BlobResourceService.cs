@@ -40,9 +40,9 @@ public sealed class BlobResourceService(
         
         VoidResult changeUrlResult = createBlobResourceResult.Value.ChangeUrl(url);
 
-        if (!changeUrlResult.IsSuccess)
+        if (changeUrlResult.IsFailure)
         {
-            return Result<BlobResourceShortDto>.Failure(changeUrlResult.ErrorMessage!, changeUrlResult.StatusCode);       
+            return Result<BlobResourceShortDto>.Failure(changeUrlResult);       
         }
         
         await blobResourceRepository.AddAsync(createBlobResourceResult.Value, ct);

@@ -21,6 +21,8 @@
 
     <ItemGroup>
       <Folder Include="Application\" />
+      <Folder Include="Domain\Category\Entities\ProductAttribute\" />
+      <Folder Include="Domain\Category\Entities\ProductVariant\" />
       <Folder Include="Domain\Product\Entities\" />
     </ItemGroup>
 

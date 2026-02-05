@@ -233,6 +233,19 @@ public sealed class Category : BaseEntity
         return VoidResult.Success();
     }
 
+    public VoidResult RemoveProductVariant(string key)
+    {
+        ProductVariant? existingProductVariant = _productVariants.FirstOrDefault(pv => pv.Key == key);
+        
+        if (existingProductVariant == null)
+        {
+            return VoidResult.Failure($"{nameof(existingProductVariant)} does not exist", HttpStatusCode.NotFound);
+        }
+        
+        _productVariants.Remove(existingProductVariant);
+        return VoidResult.Success();
+    }
+
     public VoidResult RemoveAllProductVariants()
     {
         _productVariants.Clear();
@@ -311,6 +324,19 @@ public sealed class Category : BaseEntity
     public VoidResult RemoveProductAttribute(Guid productAttributeId)
     {
         ProductAttribute? existingProductAttribute = _productAttributes.FirstOrDefault(pa => pa.Id == productAttributeId);
+        
+        if (existingProductAttribute == null)
+        {
+            return VoidResult.Failure($"{nameof(existingProductAttribute)} does not exist", HttpStatusCode.NotFound);
+        }
+        
+        _productAttributes.Remove(existingProductAttribute);
+        return VoidResult.Success();
+    }
+
+    public VoidResult RemoveProductAttribute(string key)
+    {
+        ProductAttribute? existingProductAttribute = _productAttributes.FirstOrDefault(pa => pa.Key == key);
         
         if (existingProductAttribute == null)
         {

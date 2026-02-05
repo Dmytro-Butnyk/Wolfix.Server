@@ -123,9 +123,9 @@ public sealed class CustomerService(ICustomerRepository customerRepository, Even
         
         VoidResult changeFullNameResult = customer.ChangeFullName(request.FirstName, request.LastName, request.MiddleName);
 
-        if (!changeFullNameResult.IsSuccess)
+        if (changeFullNameResult.IsFailure)
         {
-            return Result<FullNameDto>.Failure(changeFullNameResult.ErrorMessage!, changeFullNameResult.StatusCode);
+            return Result<FullNameDto>.Failure(changeFullNameResult);
         }
 
         await customerRepository.SaveChangesAsync(ct);

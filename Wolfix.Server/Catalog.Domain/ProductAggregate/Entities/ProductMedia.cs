@@ -69,4 +69,5 @@ public record ProductMediaInfo(
     Guid MediaId,
     BlobResourceType MediaType,
     string MediaUrl,
-    bool IsMain);
+    bool IsMain
+);

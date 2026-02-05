@@ -12,7 +12,9 @@ using Microsoft.Extensions.Configuration;
 using Shared.Domain.Models;
 using Shared.Endpoints;
 using Shared.Endpoints.Exceptions;
+
 using GooglePayload = Google.Apis.Auth.GoogleJsonWebSignature.Payload;
+using GoogleValidationSettings = Google.Apis.Auth.GoogleJsonWebSignature.ValidationSettings;
 
 namespace Identity.Endpoints.Endpoints;
 
@@ -43,7 +45,7 @@ internal static class IdentityEndpoints
         customerGroup.MapPost("register", Register)
             .WithSummary("Register as customer");
         
-        customerGroup.MapPatch("google", ContinueWithGoogle)
+        customerGroup.MapPost("google", ContinueWithGoogle)
             .WithSummary("Continue with google");
     }
 
@@ -58,13 +60,15 @@ internal static class IdentityEndpoints
             .WithSummary("Change password");
     }
 
-    private static async Task<Results<Ok<string>, Conflict<string>, BadRequest<string>, InternalServerError<string>, NotFound<string>>>
-        ContinueWithGoogle([FromBody] GoogleLoginDto request,
+    //todo: на фронте адаптировать изменения(теперь возвращает список ролей)
+    private static async Task<Results<Ok<UserRolesDto>, Conflict<string>, BadRequest<string>, InternalServerError<string>, NotFound<string>, ForbidHttpResult>>
+        ContinueWithGoogle(
+        [FromBody] GoogleLoginDto request,
         [FromServices] IConfiguration configuration,
         [FromServices] AuthService authService,
         CancellationToken ct)
     {
-        GooglePayload? payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, new GoogleJsonWebSignature.ValidationSettings
+        GooglePayload? payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, new GoogleValidationSettings
         {
             Audience = [configuration["GOOGLE_CLIENT_ID"]]
         });
@@ -74,25 +78,26 @@ internal static class IdentityEndpoints
             return TypedResults.BadRequest("Invalid token");
         }
 
-        Result<string> getTokenResult = await authService.ContinueWithGoogleAsync(payload, ct);
+        Result<UserRolesDto> getRolesResult = await authService.ContinueWithGoogleAndGetRolesAsync(payload, ct);
 
-        if (getTokenResult.IsFailure)
+        if (getRolesResult.IsFailure)
         {
-            return getTokenResult.StatusCode switch
+            return getRolesResult.StatusCode switch
             {
-                HttpStatusCode.Conflict => TypedResults.Conflict(getTokenResult.ErrorMessage),
-                HttpStatusCode.BadRequest => TypedResults.BadRequest(getTokenResult.ErrorMessage),
-                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(getTokenResult.ErrorMessage),
-                HttpStatusCode.NotFound => TypedResults.NotFound(getTokenResult.ErrorMessage),
+                HttpStatusCode.Conflict => TypedResults.Conflict(getRolesResult.ErrorMessage),
+                HttpStatusCode.BadRequest => TypedResults.BadRequest(getRolesResult.ErrorMessage),
+                HttpStatusCode.InternalServerError => TypedResults.InternalServerError(getRolesResult.ErrorMessage),
+                HttpStatusCode.NotFound => TypedResults.NotFound(getRolesResult.ErrorMessage),
+                HttpStatusCode.Forbidden => TypedResults.Forbid(),
                 _ => throw new UnknownStatusCodeException(
                     nameof(IdentityEndpoints),
                     nameof(ContinueWithGoogle),
-                    getTokenResult.StatusCode
+                    getRolesResult.StatusCode
                 )
             };
         }
         
-        return TypedResults.Ok(getTokenResult.Value);
+        return TypedResults.Ok(getRolesResult.Value);
     }
     
     private static async Task<Results<Ok<UserRolesDto>, NotFound<string>, BadRequest<string>, InternalServerError<string>, ForbidHttpResult>>
