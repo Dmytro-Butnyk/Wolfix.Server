@@ -1,4 +1,5 @@
-﻿using Catalog.IntegrationEvents;
+﻿using System.Net;
+using Catalog.IntegrationEvents;
 using Catalog.IntegrationEvents.Dto;
 using Seller.Domain.Interfaces;
 using Shared.Domain.Models;
@@ -17,10 +18,10 @@ public sealed class FetchSellerInformationEventHandler(
 
         if (seller is null)
         {
-            return Result<ProductSellerEventResult>.Failure($"Seller with id: {@event.SellerId} not found");
+            return Result<ProductSellerEventResult>.Failure($"Seller with id: {@event.SellerId} not found", HttpStatusCode.NotFound);
         }
 
-        ProductSellerEventResult result = new ProductSellerEventResult
+        var result = new ProductSellerEventResult
         {
             SellerId = seller.Id,
             SellerFullName = seller.GetFullName(),

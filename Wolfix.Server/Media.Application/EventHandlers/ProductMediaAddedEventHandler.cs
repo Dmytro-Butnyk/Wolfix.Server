@@ -19,9 +19,9 @@ public sealed class ProductMediaAddedEventHandler(
         Result<BlobResourceShortDto> result = await blobResourceService
             .AddBlobResourceAsync(@event.Media.ContentType, @event.Media.FileData, ct);
 
-        if (!result.IsSuccess)
+        if (result.IsFailure)
         {
-            return VoidResult.Failure(result.ErrorMessage!, result.StatusCode);
+            return VoidResult.Failure(result);
         }
 
         BlobResourceAddedDto blobResourceAddedDto =
@@ -30,9 +30,9 @@ public sealed class ProductMediaAddedEventHandler(
         VoidResult publishResult = await eventBus
             .PublishWithoutResultAsync(new BlobResourceForProductAdded(@event.ProductId, blobResourceAddedDto), ct);
 
-        if (!publishResult.IsSuccess)
+        if (publishResult.IsFailure)
         {
-            return VoidResult.Failure(publishResult.ErrorMessage!, publishResult.StatusCode);
+            return VoidResult.Failure(publishResult);
         }
 
         return VoidResult.Success();

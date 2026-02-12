@@ -65,7 +65,7 @@ public sealed class BlobResourceService(
         
         if (blobResource is null)
         {
-            return VoidResult.Failure("Blob resource not found");
+            return VoidResult.Failure("Blob resource not found", HttpStatusCode.NotFound);
         }
         
         string fileName = blobResource.Name;

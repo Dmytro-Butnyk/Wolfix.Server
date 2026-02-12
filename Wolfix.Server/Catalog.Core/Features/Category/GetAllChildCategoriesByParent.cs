@@ -1,14 +1,9 @@
-using System.Net;
-using Catalog.Application.Dto.Category.Responses;
-using Catalog.Application.Services;
-using Catalog.Domain.Projections.Category;
 using Catalog.Infrastructure;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shared.Core.Caching;
 using Shared.Core.Endpoints;
-using Shared.Domain.Models;
 
 namespace Catalog.Core.Features.Category;
 
@@ -24,39 +19,16 @@ public static class GetAllChildCategoriesByParent
                 .WithSummary("Get all child categories by parent");
         }
 
-        private async Task<Results<Ok<IReadOnlyCollection<Response>>, NotFound<string>>> Handle(
+        private static async Task<Results<Ok<List<Response>>, NotFound<string>>> Handle(
             [FromRoute] Guid parentId,
+            [FromServices] CatalogContext db,
+            [FromServices] IAppCache appCache,
             CancellationToken cancellationToken,
-            [FromServices] Handler handler,
             [FromQuery] bool withCaching = true)
-        {
-            Result<IReadOnlyCollection<Response>> getChildCategoriesResult =
-                await handler.HandleAsync(parentId, cancellationToken, withCaching);
-
-            if (getChildCategoriesResult.IsFailure)
-            {
-                return TypedResults.NotFound(getChildCategoriesResult.ErrorMessage);
-            }
-        
-            return TypedResults.Ok(getChildCategoriesResult.Value);
-        }
-    }
-
-    public sealed class Handler(
-        CatalogContext db,
-        IAppCache appCache)
-    {
-        public async Task<Result<IReadOnlyCollection<Response>>> HandleAsync(
-            Guid parentId,
-            CancellationToken cancellationToken,
-            bool withCaching = true)
         {
             if (!await db.Categories.AsNoTracking().AnyAsync(e => e.Id == parentId, cancellationToken))
             {
-                return Result<IReadOnlyCollection<Response>>.Failure(
-                    $"Parent category with id: {parentId} not found",
-                    HttpStatusCode.NotFound
-                );
+                return TypedResults.NotFound($"Parent category with id: {parentId} not found");
             }
 
             List<Response> childCategoriesDto;
@@ -67,25 +39,24 @@ public static class GetAllChildCategoriesByParent
 
                 childCategoriesDto = await appCache.GetOrCreateAsync(
                     cacheKey,
-                    async ctx => await GetFromDb(parentId, ctx),
+                    async ctx => await GetFromDb(ctx),
                     cancellationToken,
                     TimeSpan.FromMinutes(20)
                 );
             }
             else
             {
-                childCategoriesDto = await GetFromDb(parentId, cancellationToken);
+                childCategoriesDto = await GetFromDb(cancellationToken);
             }
 
-            return Result<IReadOnlyCollection<Response>>.Success(childCategoriesDto);
-        }
+            return TypedResults.Ok(childCategoriesDto);
 
-        private async Task<List<Response>> GetFromDb(Guid parentId, CancellationToken ct)
-            => await db.Categories
-                .Include(c => c.Parent)
-                .AsNoTracking()
-                .Where(category => category.Parent != null && category.Parent!.Id == parentId)
-                .Select(category => new Response(category.Id, category.Name, category.PhotoUrl))
-                .ToListAsync(ct);
+            async Task<List<Response>> GetFromDb(CancellationToken ct) =>
+                await db.Categories.Include(c => c.Parent)
+                    .AsNoTracking()
+                    .Where(category => category.Parent != null && category.Parent!.Id == parentId)
+                    .Select(category => new Response(category.Id, category.Name, category.PhotoUrl))
+                    .ToListAsync(ct);
+        }
     }
 }

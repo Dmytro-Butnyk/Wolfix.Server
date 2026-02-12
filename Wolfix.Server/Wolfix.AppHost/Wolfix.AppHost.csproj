@@ -40,7 +40,6 @@
       <ProjectReference Include="..\Seller.Domain\Seller.Domain.csproj" />
       <ProjectReference Include="..\Seller.Endpoints\Seller.Endpoints.csproj" />
       <ProjectReference Include="..\Seller.Infrastructure\Seller.Infrastructure.csproj" />
-      <ProjectReference Include="..\Shared.Application\Shared.Application.csproj" />
       <ProjectReference Include="..\Shared.Domain\Shared.Domain.csproj" />
       <ProjectReference Include="..\Shared.Infrastructure\Shared.Infrastructure.csproj" />
       <ProjectReference Include="..\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj" />

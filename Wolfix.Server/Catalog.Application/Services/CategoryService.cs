@@ -10,7 +10,7 @@ using Catalog.Domain.Services;
 using Catalog.Domain.ValueObjects;
 using Catalog.IntegrationEvents;
 using Catalog.IntegrationEvents.Dto;
-using Shared.Application.Interfaces;
+using Shared.Application.Caching;
 using Shared.Domain.Models;
 using Shared.IntegrationEvents;
 using Shared.IntegrationEvents.Interfaces;
@@ -363,10 +363,7 @@ public sealed class CategoryService(
         
         if (!childCategory.IsChild)
         {
-            return VoidResult.Failure(
-                $"Category with id: {childCategoryId} is not a child category",
-                HttpStatusCode.Conflict
-            );
+            return VoidResult.Failure($"Category with id: {childCategoryId} is not a child category");
         }
         
         VoidResult addAttributeResult = childCategory.AddProductAttribute(request.Key);
@@ -398,10 +395,7 @@ public sealed class CategoryService(
         
         if (!childCategory.IsChild)
         {
-            return VoidResult.Failure(
-                $"Category with id: {childCategoryId} is not a child category",
-                HttpStatusCode.Conflict
-            );
+            return VoidResult.Failure($"Category with id: {childCategoryId} is not a child category");
         }
         
         VoidResult addVariantResult = childCategory.AddProductVariant(request.Key);
@@ -462,10 +456,7 @@ public sealed class CategoryService(
         
         if (!childCategory.IsChild)
         {
-            return VoidResult.Failure(
-                $"Category with id: {childCategoryId} is not a child category",
-                HttpStatusCode.Conflict
-            );
+            return VoidResult.Failure($"Category with id: {childCategoryId} is not a child category");
         }
 
         VoidResult deleteAttributeResult = childCategory.RemoveProductAttribute(attributeId);
@@ -495,10 +486,7 @@ public sealed class CategoryService(
         
         if (!childCategory.IsChild)
         {
-            return VoidResult.Failure(
-                $"Category with id: {childCategoryId} is not a child category",
-                HttpStatusCode.Conflict
-            );
+            return VoidResult.Failure($"Category with id: {childCategoryId} is not a child category");
         }
 
         VoidResult deleteVariantResult = childCategory.RemoveProductVariant(variantId);

@@ -9,7 +9,7 @@ using Shared.Infrastructure;
 
 namespace Catalog.Infrastructure;
 
-internal sealed class CatalogContext : DbContext, IContextWithConfigurations
+public sealed class CatalogContext : DbContext, IContextWithConfigurations
 {
     public CatalogContext() {}
     
@@ -47,12 +47,12 @@ internal sealed class CatalogContext : DbContext, IContextWithConfigurations
     //     optionsBuilder.UseNpgsql();
     // }
     
-    internal DbSet<Product> Products { get; set; } // Aggregate 
+    public DbSet<Product> Products { get; set; } // Aggregate 
     internal DbSet<ProductAttribute> ProductAttributes  { get; set; }
     internal DbSet<ProductVariant> ProductVariants  { get; set; }
     internal DbSet<ProductMedia> ProductMedias { get; set; }
     
-    internal DbSet<Category> Categories { get; set; } // Aggregate
+    public DbSet<Category> Categories { get; set; } // Aggregate
     internal DbSet<Discount>  Discounts { get; set; }
     internal DbSet<ProductAttributeValue> ProductAttributeValues { get; set; }
     internal DbSet<ProductVariantValue> ProductVariantValues { get; set; }

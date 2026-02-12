@@ -4,7 +4,7 @@ using Shared.Infrastructure;
 
 namespace Admin.Infrastructure;
 
-internal sealed class AdminContext : DbContext, IContextWithConfigurations
+public sealed class AdminContext : DbContext, IContextWithConfigurations
 {
     public AdminContext() { }
     
@@ -31,5 +31,5 @@ internal sealed class AdminContext : DbContext, IContextWithConfigurations
     //     optionsBuilder.UseNpgsql(connectionString);
     // }
     
-    internal DbSet<Domain.AdminAggregate.Admin> Admins { get; set; }
+    public DbSet<Domain.AdminAggregate.Admin> Admins { get; set; }
 }

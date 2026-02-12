@@ -1,4 +1,5 @@
-﻿using Catalog.Domain.Interfaces;
+﻿using System.Net;
+using Catalog.Domain.Interfaces;
 using Catalog.Domain.ProductAggregate;
 using Media.IntegrationEvents;
 using Shared.Domain.Models;
@@ -16,15 +17,15 @@ public sealed class BlobResourceForProductAddedEventHandler(IProductRepository p
 
         if (product is null)
         {
-            return VoidResult.Failure("Product not found");
+            return VoidResult.Failure("Product not found", HttpStatusCode.NotFound);
         }
 
         VoidResult result = product.AddProductMedia(@event.BlobResource.Id, @event.BlobResource.ContentType, @event.BlobResource.Url,
             @event.BlobResource.IsMain);
 
-        if (!result.IsSuccess)
+        if (result.IsFailure)
         {
-            return VoidResult.Failure("Media file could not be added to the product");
+            return VoidResult.Failure(result);
         }
 
         await productRepository.SaveChangesAsync(ct);

@@ -521,6 +521,7 @@ internal static class ProductEndpoints
         return TypedResults.Ok(getProductsBySearchQueryAndCategoryResult.Value);
     }
     
+    //todo: DHGFJSDHGO!!!!
     private static async Task<Results<Ok<IReadOnlyCollection<ProductShortDto>>, BadRequest<string>>>
         GetSearch(
             [FromQuery] string searchQuery,

@@ -179,7 +179,7 @@ public sealed class ProductService(
 
         Result<Guid> deleteProductMediaResult = product.RemoveProductMedia(mediaId);
 
-        if (!deleteProductMediaResult.IsSuccess)
+        if (deleteProductMediaResult.IsFailure)
         {
             return VoidResult.Failure(deleteProductMediaResult);
         }
@@ -211,7 +211,7 @@ public sealed class ProductService(
         }
 
         IReadOnlyCollection<ProductMediaDto> productMediasDto = product.ProductMedias.Select(pmi =>
-            new ProductMediaDto()
+            new ProductMediaDto
             {
                 Url = pmi.MediaUrl,
                 ContentType = pmi.MediaType.ToString(),
@@ -220,7 +220,7 @@ public sealed class ProductService(
         ).ToList();
 
         IReadOnlyCollection<ProductAttributeDto> productAttributesDto = product.ProductAttributeValues.Select(pav =>
-            new ProductAttributeDto()
+            new ProductAttributeDto
             {
                 Key = pav.Key,
                 Value = pav.Value,
@@ -228,7 +228,7 @@ public sealed class ProductService(
         ).ToList();
         
         IReadOnlyCollection<ProductVariantDto> productVariantsDto = product.ProductVariantValues.Select(pvv =>
-            new ProductVariantDto()
+            new ProductVariantDto
             {
                 Key = pvv.Key,
                 Value = pvv.Value,
@@ -261,7 +261,7 @@ public sealed class ProductService(
             return Result<ProductFullDto>.Failure(fetchSellerInformationResult);
         }
 
-        ProductSellerDto sellerDto = new ProductSellerDto
+        var sellerDto = new ProductSellerDto
         {
             SellerId = fetchSellerInformationResult.Value!.SellerId,
             SellerFullName = fetchSellerInformationResult.Value!.SellerFullName,

@@ -354,7 +354,8 @@ internal sealed class ProductRepository(CatalogContext context)
         return result;
     }
 
-    public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllBySellerCategoryForPageAsync(Guid sellerId, Guid categoryId, int page, int pageSize, CancellationToken ct)
+    public async Task<IReadOnlyCollection<ProductShortProjection>> GetAllBySellerCategoryForPageAsync(Guid sellerId, Guid categoryId, int page,
+        int pageSize, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
         

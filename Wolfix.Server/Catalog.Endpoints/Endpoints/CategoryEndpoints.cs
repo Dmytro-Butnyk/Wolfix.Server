@@ -238,7 +238,7 @@ internal static class CategoryEndpoints
     {
         VoidResult addChildCategoryResult = await categoryService.AddChildAsync(request, parentId, ct);
 
-        if (!addChildCategoryResult.IsSuccess)
+        if (addChildCategoryResult.IsFailure)
         {
             return addChildCategoryResult.StatusCode switch
             {

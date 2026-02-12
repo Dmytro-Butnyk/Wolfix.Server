@@ -72,7 +72,7 @@ internal sealed class CategoryRepository(CatalogContext context) :
         List<CategoryShortProjection> childCategories = await _categories
             .Include(c => c.Parent)
             .AsNoTracking()
-            .Where(category => category.IsChild)
+            .Where(category => category.Parent != null)
             .Select(category => new CategoryShortProjection(category.Id, category.Name))
             .ToListAsync(ct);
         
