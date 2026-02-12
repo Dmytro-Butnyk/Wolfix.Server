@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4"/>
+        <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+        <PackageReference Include="Serilog.Sinks.MongoDB" Version="7.2.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\modules\admin\Admin.Endpoints\Admin.Endpoints.csproj" />
+      <ProjectReference Include="..\modules\catalog\Catalog.Endpoints\Catalog.Endpoints.csproj" />
+      <ProjectReference Include="..\modules\media\Media.Api\Media.Api.csproj" />
+      <ProjectReference Include="..\modules\customer\Customer.Endpoints\Customer.Endpoints.csproj" />
+      <ProjectReference Include="..\modules\identity\Identity.Endpoints\Identity.Endpoints.csproj" />
+      <ProjectReference Include="..\modules\order\Order.Endpoints\Order.Endpoints.csproj" />
+      <ProjectReference Include="..\modules\seller\Seller.Endpoints\Seller.Endpoints.csproj" />
+      <ProjectReference Include="..\modules\support\Support.Endpoints\Support.Endpoints.csproj" />
+      <ProjectReference Include="..\aspire\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
+
+</Project>

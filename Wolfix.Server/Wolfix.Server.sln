@@ -1,138 +1,138 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Catalog", "Catalog", "{5C43244C-A4A2-4DA3-B9B8-C752E892551A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "catalog", "catalog", "{5C43244C-A4A2-4DA3-B9B8-C752E892551A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Endpoints", "Catalog.Endpoints\Catalog.Endpoints.csproj", "{7C03B289-0C7B-4DE0-A63F-E67501C1987F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Endpoints", "src\modules\catalog\Catalog.Endpoints\Catalog.Endpoints.csproj", "{7C03B289-0C7B-4DE0-A63F-E67501C1987F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Application", "Catalog.Application\Catalog.Application.csproj", "{5E47EF7A-072C-4C87-8857-F8166FA7C785}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Application", "src\modules\catalog\Catalog.Application\Catalog.Application.csproj", "{5E47EF7A-072C-4C87-8857-F8166FA7C785}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Domain", "Catalog.Domain\Catalog.Domain.csproj", "{EA94B18D-8829-4B40-816B-9369CEE10668}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Domain", "src\modules\catalog\Catalog.Domain\Catalog.Domain.csproj", "{EA94B18D-8829-4B40-816B-9369CEE10668}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Infrastructure", "Catalog.Infrastructure\Catalog.Infrastructure.csproj", "{D8067DDE-6FCA-493B-A29D-E55403425260}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Infrastructure", "src\modules\catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj", "{D8067DDE-6FCA-493B-A29D-E55403425260}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{59DBDF1D-F704-483B-ADF1-F6B7BF87965E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{59DBDF1D-F704-483B-ADF1-F6B7BF87965E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Domain", "Shared.Domain\Shared.Domain.csproj", "{B65042A3-32E9-458D-B440-A0544AF8E473}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Domain", "src\shared\Shared.Domain\Shared.Domain.csproj", "{B65042A3-32E9-458D-B440-A0544AF8E473}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure", "Shared.Infrastructure\Shared.Infrastructure.csproj", "{54F154BD-E12D-4E56-8288-3AC4DF3CD2A6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure", "src\shared\Shared.Infrastructure\Shared.Infrastructure.csproj", "{54F154BD-E12D-4E56-8288-3AC4DF3CD2A6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{05BFFD7C-0F31-4EA0-A4FB-C326F25D1D31}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "modules", "modules", "{05BFFD7C-0F31-4EA0-A4FB-C326F25D1D31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wolfix.API", "Wolfix.API\Wolfix.API.csproj", "{198662DE-2796-436C-B941-27E3F91B9966}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wolfix.API", "src\Wolfix.API\Wolfix.API.csproj", "{198662DE-2796-436C-B941-27E3F91B9966}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Media", "Media", "{C5C9F05F-011D-418D-8C50-F4EA02592335}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "media", "media", "{C5C9F05F-011D-418D-8C50-F4EA02592335}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Media.Application", "Media.Application\Media.Application.csproj", "{502F29ED-9556-4858-9A75-27EDEA665DC3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Media.Application", "src\modules\media\Media.Application\Media.Application.csproj", "{502F29ED-9556-4858-9A75-27EDEA665DC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Media.Domain", "Media.Domain\Media.Domain.csproj", "{4474325D-982F-4753-A515-74C86916BE85}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Media.Domain", "src\modules\media\Media.Domain\Media.Domain.csproj", "{4474325D-982F-4753-A515-74C86916BE85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Media.Infrastructure", "Media.Infrastructure\Media.Infrastructure.csproj", "{D83F0551-50C5-4598-962B-1AF41CAE6344}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Media.Infrastructure", "src\modules\media\Media.Infrastructure\Media.Infrastructure.csproj", "{D83F0551-50C5-4598-962B-1AF41CAE6344}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Media.Api", "Media.Api\Media.Api.csproj", "{F24D1C94-9C1B-40C0-A4C4-DE208E528EB7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Media.Api", "src\modules\media\Media.Api\Media.Api.csproj", "{F24D1C94-9C1B-40C0-A4C4-DE208E528EB7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{E94731D4-9F62-4399-9F25-72065FFBE8A6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "identity", "identity", "{E94731D4-9F62-4399-9F25-72065FFBE8A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Infrastructure", "Identity.Infrastructure\Identity.Infrastructure.csproj", "{401DBB67-672B-4FC9-8854-AD12F3DACA3A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Infrastructure", "src\modules\identity\Identity.Infrastructure\Identity.Infrastructure.csproj", "{401DBB67-672B-4FC9-8854-AD12F3DACA3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Application", "Identity.Application\Identity.Application.csproj", "{DC7A047E-FB7F-46B9-885A-013104B9AB31}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Application", "src\modules\identity\Identity.Application\Identity.Application.csproj", "{DC7A047E-FB7F-46B9-885A-013104B9AB31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Endpoints", "Identity.Endpoints\Identity.Endpoints.csproj", "{85594006-01AD-446D-BDEF-0E9A7C6F4E61}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.Endpoints", "src\modules\identity\Identity.Endpoints\Identity.Endpoints.csproj", "{85594006-01AD-446D-BDEF-0E9A7C6F4E61}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Customer", "Customer", "{3E1E9B5F-596F-47BF-8F86-0E1B264C6849}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "customer", "customer", "{3E1E9B5F-596F-47BF-8F86-0E1B264C6849}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.Domain", "Customer.Domain\Customer.Domain.csproj", "{8A580AE0-B0D4-42B9-BEFF-37FDFE518F0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.Domain", "src\modules\customer\Customer.Domain\Customer.Domain.csproj", "{8A580AE0-B0D4-42B9-BEFF-37FDFE518F0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.Infrastructure", "Customer.Infrastructure\Customer.Infrastructure.csproj", "{F47A5A49-A331-492C-B076-85BC95F26675}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.Infrastructure", "src\modules\customer\Customer.Infrastructure\Customer.Infrastructure.csproj", "{F47A5A49-A331-492C-B076-85BC95F26675}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.Application", "Customer.Application\Customer.Application.csproj", "{E8431038-6A66-4D4E-8A3F-92B056036140}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.Application", "src\modules\customer\Customer.Application\Customer.Application.csproj", "{E8431038-6A66-4D4E-8A3F-92B056036140}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.Endpoints", "Customer.Endpoints\Customer.Endpoints.csproj", "{A938CEFD-5283-40C6-94D6-CE3208F90026}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.Endpoints", "src\modules\customer\Customer.Endpoints\Customer.Endpoints.csproj", "{A938CEFD-5283-40C6-94D6-CE3208F90026}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.IntegrationEvents", "Identity.IntegrationEvents\Identity.IntegrationEvents.csproj", "{293DB9A8-0310-40F3-A01D-3E97B7A849CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.IntegrationEvents", "src\modules\identity\Identity.IntegrationEvents\Identity.IntegrationEvents.csproj", "{293DB9A8-0310-40F3-A01D-3E97B7A849CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.IntegrationEvents", "Shared.IntegrationEvents\Shared.IntegrationEvents.csproj", "{004EAC1B-14BF-47E2-9E65-8DF535ACB03F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.IntegrationEvents", "src\shared\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj", "{004EAC1B-14BF-47E2-9E65-8DF535ACB03F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Media.IntegrationEvents", "Media.IntegrationEvents\Media.IntegrationEvents.csproj", "{91A43440-E2C7-4CF0-AC4D-AEF728796A57}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Media.IntegrationEvents", "src\modules\media\Media.IntegrationEvents\Media.IntegrationEvents.csproj", "{91A43440-E2C7-4CF0-AC4D-AEF728796A57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.IntegrationEvents", "Customer.IntegrationEvents\Customer.IntegrationEvents.csproj", "{D16C9C65-8A62-498A-8DF7-06237401FCD4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.IntegrationEvents", "src\modules\customer\Customer.IntegrationEvents\Customer.IntegrationEvents.csproj", "{D16C9C65-8A62-498A-8DF7-06237401FCD4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Tests", "Catalog.Tests\Catalog.Tests.csproj", "{03873945-88AE-45EE-A52C-8FE524D6FB01}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Tests", "src\modules\catalog\Catalog.Tests\Catalog.Tests.csproj", "{03873945-88AE-45EE-A52C-8FE524D6FB01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.IntegrationEvents", "Catalog.IntegrationEvents\Catalog.IntegrationEvents.csproj", "{990546AF-1228-4B9D-A775-245651FCEAFE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.IntegrationEvents", "src\modules\catalog\Catalog.IntegrationEvents\Catalog.IntegrationEvents.csproj", "{990546AF-1228-4B9D-A775-245651FCEAFE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Seller", "Seller", "{4644CFDC-FF85-4CEE-98BE-7D438CD9C3D5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "seller", "seller", "{4644CFDC-FF85-4CEE-98BE-7D438CD9C3D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seller.Domain", "Seller.Domain\Seller.Domain.csproj", "{42BFDBBA-09AE-4DBE-977B-6B8883BB8C7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seller.Domain", "src\modules\seller\Seller.Domain\Seller.Domain.csproj", "{42BFDBBA-09AE-4DBE-977B-6B8883BB8C7E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seller.Infrastructure", "Seller.Infrastructure\Seller.Infrastructure.csproj", "{1B1B3FE9-9FC9-4BF3-A563-8DC6CB1671D1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seller.Infrastructure", "src\modules\seller\Seller.Infrastructure\Seller.Infrastructure.csproj", "{1B1B3FE9-9FC9-4BF3-A563-8DC6CB1671D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seller.Application", "Seller.Application\Seller.Application.csproj", "{5C098E39-9E86-4D20-B82B-4790A98D7592}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seller.Application", "src\modules\seller\Seller.Application\Seller.Application.csproj", "{5C098E39-9E86-4D20-B82B-4790A98D7592}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seller.Endpoints", "Seller.Endpoints\Seller.Endpoints.csproj", "{18AC7D26-9FB6-4139-AAFC-5580A447A066}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seller.Endpoints", "src\modules\seller\Seller.Endpoints\Seller.Endpoints.csproj", "{18AC7D26-9FB6-4139-AAFC-5580A447A066}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wolfix.AppHost", "Wolfix.AppHost\Wolfix.AppHost.csproj", "{5007DB17-79A8-4183-8A7A-7974D5F57289}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wolfix.AppHost", "src\aspire\Wolfix.AppHost\Wolfix.AppHost.csproj", "{5007DB17-79A8-4183-8A7A-7974D5F57289}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wolfix.ServiceDefaults", "Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj", "{B2F86A16-5020-4934-99B5-201B614CD61D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wolfix.ServiceDefaults", "src\aspire\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj", "{B2F86A16-5020-4934-99B5-201B614CD61D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aspire", "Aspire", "{FFC560F8-858F-4497-8644-15E9AE793708}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aspire", "aspire", "{FFC560F8-858F-4497-8644-15E9AE793708}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Order", "Order", "{51024836-E905-4B1B-B84D-E6C4CEEA240D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "order", "order", "{51024836-E905-4B1B-B84D-E6C4CEEA240D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Domain", "Order.Domain\Order.Domain.csproj", "{E0D08E0C-D222-456A-9973-64D533CAFCF1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Domain", "src\modules\order\Order.Domain\Order.Domain.csproj", "{E0D08E0C-D222-456A-9973-64D533CAFCF1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Infrastructure", "Order.Infrastructure\Order.Infrastructure.csproj", "{134CC8BE-F75B-450D-98D2-92F8E35FF99D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Infrastructure", "src\modules\order\Order.Infrastructure\Order.Infrastructure.csproj", "{134CC8BE-F75B-450D-98D2-92F8E35FF99D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Application", "Order.Application\Order.Application.csproj", "{55CA59C5-8456-4932-8F42-37B76E8FF388}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Application", "src\modules\order\Order.Application\Order.Application.csproj", "{55CA59C5-8456-4932-8F42-37B76E8FF388}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Endpoints", "Order.Endpoints\Order.Endpoints.csproj", "{D0C6CE8B-A815-47FC-B4E1-02CDBD2BD9D6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Endpoints", "src\modules\order\Order.Endpoints\Order.Endpoints.csproj", "{D0C6CE8B-A815-47FC-B4E1-02CDBD2BD9D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.IntegrationEvents", "Order.IntegrationEvents\Order.IntegrationEvents.csproj", "{CF26116F-5295-408B-9344-CDE8658D9B21}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.IntegrationEvents", "src\modules\order\Order.IntegrationEvents\Order.IntegrationEvents.csproj", "{CF26116F-5295-408B-9344-CDE8658D9B21}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Admin", "Admin", "{FCF741C3-7FDD-4F5B-9C79-D566BCB48C80}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "admin", "admin", "{FCF741C3-7FDD-4F5B-9C79-D566BCB48C80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Domain", "Admin.Domain\Admin.Domain.csproj", "{95D7E8A5-9272-4A4B-8FA2-7929B104CDE1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Domain", "src\modules\admin\Admin.Domain\Admin.Domain.csproj", "{95D7E8A5-9272-4A4B-8FA2-7929B104CDE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seller.IntegrationEvents", "Seller.IntegrationEvents\Seller.IntegrationEvents.csproj", "{1D3662D4-0998-41CC-84A2-1F8652EDD29B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seller.IntegrationEvents", "src\modules\seller\Seller.IntegrationEvents\Seller.IntegrationEvents.csproj", "{1D3662D4-0998-41CC-84A2-1F8652EDD29B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Infrastructure", "Admin.Infrastructure\Admin.Infrastructure.csproj", "{2B89E555-C50C-4A88-956A-A6638A8D02C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Infrastructure", "src\modules\admin\Admin.Infrastructure\Admin.Infrastructure.csproj", "{2B89E555-C50C-4A88-956A-A6638A8D02C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Application", "Admin.Application\Admin.Application.csproj", "{472FA35E-D297-444B-A9DF-60770FBF90D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Application", "src\modules\admin\Admin.Application\Admin.Application.csproj", "{472FA35E-D297-444B-A9DF-60770FBF90D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Endpoints", "Admin.Endpoints\Admin.Endpoints.csproj", "{F6071750-5B70-470D-A5A3-2EFCF438A8FF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Endpoints", "src\modules\admin\Admin.Endpoints\Admin.Endpoints.csproj", "{F6071750-5B70-470D-A5A3-2EFCF438A8FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.IntegrationEvents", "Admin.IntegrationEvents\Admin.IntegrationEvents.csproj", "{68309173-23AE-4E03-861E-0C37573998DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.IntegrationEvents", "src\modules\admin\Admin.IntegrationEvents\Admin.IntegrationEvents.csproj", "{68309173-23AE-4E03-861E-0C37573998DC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Support", "Support", "{0CA0C967-1970-4915-8E79-B84FDE59E5DA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "support", "support", "{0CA0C967-1970-4915-8E79-B84FDE59E5DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.Domain", "Support.Domain\Support.Domain.csproj", "{F339F145-70B4-4364-9019-DD18EC818C30}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.Domain", "src\modules\support\Support.Domain\Support.Domain.csproj", "{F339F145-70B4-4364-9019-DD18EC818C30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.Application", "Support.Application\Support.Application.csproj", "{154FA215-005C-46DF-B967-59A52A5FDDBF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.Application", "src\modules\support\Support.Application\Support.Application.csproj", "{154FA215-005C-46DF-B967-59A52A5FDDBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.Endpoints", "Support.Endpoints\Support.Endpoints.csproj", "{D6FD7C5C-0C68-4959-9153-F078BF57BD18}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.Endpoints", "src\modules\support\Support.Endpoints\Support.Endpoints.csproj", "{D6FD7C5C-0C68-4959-9153-F078BF57BD18}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.Infrastructure.EFCore", "Support.Infrastructure.EFCore\Support.Infrastructure.EFCore.csproj", "{FDF66CA2-6E1F-497E-A224-9655B6E7DF3E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.Infrastructure.EFCore", "src\modules\support\Support.Infrastructure.EFCore\Support.Infrastructure.EFCore.csproj", "{FDF66CA2-6E1F-497E-A224-9655B6E7DF3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.IntegrationEvents", "Support.IntegrationEvents\Support.IntegrationEvents.csproj", "{E52B0A44-40EF-4F47-B73F-F4EB03DEB59E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.IntegrationEvents", "src\modules\support\Support.IntegrationEvents\Support.IntegrationEvents.csproj", "{E52B0A44-40EF-4F47-B73F-F4EB03DEB59E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.Infrastructure.MongoDB", "Support.Infrastructure.MongoDB\Support.Infrastructure.MongoDB.csproj", "{680FBAA8-7714-4654-B62C-D6266470F00D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.Infrastructure.MongoDB", "src\modules\support\Support.Infrastructure.MongoDB\Support.Infrastructure.MongoDB.csproj", "{680FBAA8-7714-4654-B62C-D6266470F00D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Tests", "Admin.Tests\Admin.Tests.csproj", "{2A003CAD-827F-4082-B8B2-C37A4A2C45D9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Tests", "src\modules\admin\Admin.Tests\Admin.Tests.csproj", "{2A003CAD-827F-4082-B8B2-C37A4A2C45D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.Tests", "Customer.Tests\Customer.Tests.csproj", "{2947814F-0F89-4D09-9F7C-22D1ACEEFA7D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customer.Tests", "src\modules\customer\Customer.Tests\Customer.Tests.csproj", "{2947814F-0F89-4D09-9F7C-22D1ACEEFA7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Media.Tests", "Media.Tests\Media.Tests.csproj", "{79436AFF-5BB7-4014-BB9A-8F070CD13689}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Media.Tests", "src\modules\media\Media.Tests\Media.Tests.csproj", "{79436AFF-5BB7-4014-BB9A-8F070CD13689}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Tests", "Order.Tests\Order.Tests.csproj", "{153785E4-71D0-4F8A-A6E2-8DC7B5AFB748}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Order.Tests", "src\modules\order\Order.Tests\Order.Tests.csproj", "{153785E4-71D0-4F8A-A6E2-8DC7B5AFB748}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seller.Tests", "Seller.Tests\Seller.Tests.csproj", "{31DD1A7A-85C2-4622-AB39-56568DFCBF12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Seller.Tests", "src\modules\seller\Seller.Tests\Seller.Tests.csproj", "{31DD1A7A-85C2-4622-AB39-56568DFCBF12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.Tests", "Support.Tests\Support.Tests.csproj", "{020E3212-3F58-4865-92CC-AE3DECEBFB96}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Support.Tests", "src\modules\support\Support.Tests\Support.Tests.csproj", "{020E3212-3F58-4865-92CC-AE3DECEBFB96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Core", "Admin.Core\Admin.Core.csproj", "{44665FEA-8E5F-49E2-9A94-712691937136}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Admin.Core", "src\modules\admin\Admin.Core\Admin.Core.csproj", "{44665FEA-8E5F-49E2-9A94-712691937136}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Core", "Shared.Core\Shared.Core.csproj", "{40159562-81F6-4528-AE60-E57A3043D04C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Core", "src\shared\Shared.Core\Shared.Core.csproj", "{40159562-81F6-4528-AE60-E57A3043D04C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Core", "Catalog.Core\Catalog.Core.csproj", "{8A606C2D-1A55-4107-B3F9-39D56491C235}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Catalog.Core", "src\modules\catalog\Catalog.Core\Catalog.Core.csproj", "{8A606C2D-1A55-4107-B3F9-39D56491C235}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

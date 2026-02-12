@@ -482,4 +482,4 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
-Wolfix.AppHost/infra/api.tmpl.yaml
+Wolfix.Server/src/aspire/Wolfix.AppHost/infra/api.tmpl.yaml

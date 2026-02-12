@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\admin\Admin.IntegrationEvents\Admin.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\..\customer\Customer.IntegrationEvents\Customer.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\..\identity\Identity.IntegrationEvents\Identity.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\..\seller\Seller.IntegrationEvents\Seller.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\..\..\shared\Shared.Domain\Shared.Domain.csproj" />
+      <ProjectReference Include="..\..\..\shared\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\..\support\Support.IntegrationEvents\Support.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\..\..\aspire\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Google.Apis.Auth" Version="1.72.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
+      <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.13.1" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\identity\Identity.IntegrationEvents\Identity.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\..\..\shared\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Support.Domain\Support.Domain.csproj" />
+      <ProjectReference Include="..\Support.Infrastructure.MongoDB\Support.Infrastructure.MongoDB.csproj" />
+      <ProjectReference Include="..\Support.IntegrationEvents\Support.IntegrationEvents.csproj" />
+    </ItemGroup>
+
+</Project>

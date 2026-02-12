@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\catalog\Catalog.IntegrationEvents\Catalog.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\..\identity\Identity.IntegrationEvents\Identity.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\..\media\Media.IntegrationEvents\Media.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\..\order\Order.IntegrationEvents\Order.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\Seller.Domain\Seller.Domain.csproj" />
+      <ProjectReference Include="..\Seller.IntegrationEvents\Seller.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\..\..\shared\Shared.IntegrationEvents\Shared.IntegrationEvents.csproj" />
+      <ProjectReference Include="..\..\..\aspire\Wolfix.ServiceDefaults\Wolfix.ServiceDefaults.csproj" />
+    </ItemGroup>
+
+</Project>
